@@ -20,8 +20,9 @@ kotlin {
     sourceSets {
         
         androidMain.dependencies {
-            implementation(compose.preview)
             implementation(libs.androidx.activity.compose)
+            implementation(compose.preview)
+//            implementation("androidx.activity:activity-ktx:1.9.3")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
