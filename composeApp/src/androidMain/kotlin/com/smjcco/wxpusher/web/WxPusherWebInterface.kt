@@ -26,7 +26,7 @@ object WxPusherWebInterface {
     fun getDeviceType() = "Android"
 
     @JavascriptInterface
-    fun getDeviceName() = Build.MODEL + "(Android)"
+    fun getDeviceName() = Build.BRAND + " " + Build.MODEL
 
     @JavascriptInterface
     fun getPushToken() = ""
