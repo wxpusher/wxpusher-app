@@ -7,7 +7,7 @@ object SaveUtils {
     private lateinit var sp: SharedPreferences
 
     fun init() {
-        sp = ApplicationUtils.application.getSharedPreferences("wxp", Context.MODE_PRIVATE)
+        sp = ApplicationUtils.application.getSharedPreferences("wxpusher-kv", Context.MODE_PRIVATE)
     }
 
     fun getByKey(key: String): String? {

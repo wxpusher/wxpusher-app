@@ -5,6 +5,7 @@ import android.webkit.JavascriptInterface
 import android.widget.Toast
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.SaveUtils
+import com.smjcco.wxpusher.utils.WxPusherUtils
 
 /**
  * web服务的接口
@@ -12,9 +13,7 @@ import com.smjcco.wxpusher.utils.SaveUtils
 object WxPusherWebInterface {
     @JavascriptInterface
     fun showToast(toast: String?) {
-        toast?.let {
-            Toast.makeText(ApplicationUtils.application, it, Toast.LENGTH_LONG).show()
-        }
+        WxPusherUtils.toast(toast)
     }
 
     @JavascriptInterface

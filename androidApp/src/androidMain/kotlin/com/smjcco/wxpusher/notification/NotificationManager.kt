@@ -1,0 +1,137 @@
+package com.smjcco.wxpusher.notification
+
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationChannelGroup
+import android.app.NotificationManager
+import android.content.Context
+import android.os.Build
+import androidx.core.app.NotificationCompat
+import com.smjcco.wxpusher.R
+import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.ws.IWsMessageListener
+import com.smjcco.wxpusher.ws.PushMsgDeviceMsg
+import com.smjcco.wxpusher.ws.WsManager
+import com.smjcco.wxpusher.ws.WsMessageTypeEnum
+import java.util.concurrent.atomic.AtomicInteger
+
+object NotificationManager {
+    private var messageId = AtomicInteger(0)
+    private const val UnknownChannelId = "unknown"
+    private const val WxPusherSystem = "WxPusherSystem"
+    private lateinit var sysNotificationManager: NotificationManager
+    fun init() {
+        sysNotificationManager =
+            ApplicationUtils.application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        initNotificationChannelGrouop()
+        createBizPushChannel(UnknownChannelId, "未归类的消息", "用于接收没有指定分类的消息")
+        createWxPusherSystemChannel(
+            WxPusherSystem,
+            "WxPusher系统公告和通知",
+            "WxPusher的公告、升级通知、异常提醒、订阅通知等"
+        )
+        val pushListener = object : IWsMessageListener<PushMsgDeviceMsg> {
+            override fun onMessage(message: PushMsgDeviceMsg) {
+                sendBizMessageNotification(message)
+            }
+        }
+        WsManager.addMsgListener(WsMessageTypeEnum.PUSH_NOTE.code, pushListener)
+    }
+
+    private fun sendBizMessageNotification(message: PushMsgDeviceMsg) {
+        val notification =
+            NotificationCompat.Builder(ApplicationUtils.application, UnknownChannelId)
+                .setContentTitle("收到来自WxPusher的消息")
+                .setTicker(message.summary)
+                .setContentText(message.summary)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setAutoCancel(true)
+                .build()
+        sendNotification(notification)
+    }
+
+    private fun sendNotification(notification: Notification) {
+        val id = messageId.incrementAndGet()
+        sysNotificationManager.notify(id, notification)
+    }
+
+    /**
+     * 创建业务消息的通知渠道
+     */
+    private fun createBizPushChannel(id: String, name: String, des: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return
+        }
+        val channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH)
+        channel.description = des
+        channel.enableLights(true)
+        channel.enableVibration(true)
+        channel.setShowBadge(true)
+        channel.group = ChannelGroup.SubscribeMessage.id
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            channel.setAllowBubbles(true)
+        }
+        channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        createNotificationChannel(channel)
+    }
+
+    private fun createWxPusherSystemChannel(id: String, name: String, des: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return
+        }
+        val channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH)
+        channel.description = des
+        channel.enableLights(true)
+        channel.enableVibration(true)
+        channel.setShowBadge(true)
+        channel.group = ChannelGroup.WxPusherSystem.id
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            channel.setAllowBubbles(true)
+        }
+        channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
+        createNotificationChannel(channel)
+    }
+
+
+    /**
+     * 创建推送渠道
+     */
+    private fun createNotificationChannel(channel: NotificationChannel) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            return
+        }
+        if (sysNotificationManager.getNotificationChannel(channel.id) != null) {
+            return
+        }
+        sysNotificationManager.createNotificationChannel(channel)
+    }
+
+    /**
+     * 初始化消息通知分组
+     */
+    private fun initNotificationChannelGrouop() {
+        ChannelGroup.entries.forEach {
+            createNotificationChannelGroup(it.id, it.title)
+        }
+    }
+
+    /**
+     * 创建通知分组
+     */
+    private fun createNotificationChannelGroup(id: String, name: String) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            return
+        }
+        if (sysNotificationManager.getNotificationChannelGroup(id) != null) {
+            return
+        }
+        val group = NotificationChannelGroup(id, name)
+        sysNotificationManager.createNotificationChannelGroup(group)
+    }
+}
+
+enum class ChannelGroup(val id: String, val title: String) {
+    WxPusherSystem("WxPusherSystem", "WxPusher平台消息"),
+    SubscribeMessage("SubscribeMessage", "你主动订阅的消息"),
+    Other("other", "其他"),
+}
