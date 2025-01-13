@@ -30,15 +30,10 @@ object NotificationManager {
             "WxPusher系统公告和通知",
             "WxPusher的公告、升级通知、异常提醒、订阅通知等"
         )
-        val pushListener = object : IWsMessageListener<PushMsgDeviceMsg> {
-            override fun onMessage(message: PushMsgDeviceMsg) {
-                sendBizMessageNotification(message)
-            }
-        }
-        WsManager.addMsgListener(WsMessageTypeEnum.PUSH_NOTE.code, pushListener)
+
     }
 
-    private fun sendBizMessageNotification(message: PushMsgDeviceMsg) {
+    fun sendBizMessageNotification(message: PushMsgDeviceMsg) {
         val notification =
             NotificationCompat.Builder(ApplicationUtils.application, UnknownChannelId)
                 .setContentTitle("收到来自WxPusher的消息")

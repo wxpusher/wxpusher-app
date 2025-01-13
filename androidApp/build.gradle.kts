@@ -21,9 +21,10 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
             implementation(compose.preview)
-            implementation("androidx.work:work-runtime-ktx:2.9.1")
+            implementation(libs.androidx.core.ktx)
+            implementation("androidx.work:work-runtime-ktx:2.10.0")
             implementation("com.squareup.okhttp3:okhttp:4.12.0")
-            implementation("com.google.code.gson:gson:2.8.6")
+            implementation("com.google.code.gson:gson:2.10.1")
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -73,7 +74,7 @@ android {
         create("offline") {
             dimension = "env"
             applicationIdSuffix = ".test"
-            versionNameSuffix = "-test"
+            versionNameSuffix = ".test"
         }
         create("prod") {
             dimension = "env"
@@ -83,6 +84,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.core)
     debugImplementation(compose.uiTooling)
 }
 

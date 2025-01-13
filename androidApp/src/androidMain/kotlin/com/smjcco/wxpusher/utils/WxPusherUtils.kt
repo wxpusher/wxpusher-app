@@ -10,8 +10,11 @@ import kotlinx.coroutines.launch
 
 object WxPusherUtils {
     private val mainScope = CoroutineScope(Dispatchers.Main)
+    private val ioScope = CoroutineScope(Dispatchers.IO)
 
     fun getMainScope(): CoroutineScope = mainScope
+    fun getIoScopeScope(): CoroutineScope = ioScope
+
 
     fun toast(toast: String?) {
         toast?.let {
@@ -35,7 +38,7 @@ object WxPusherUtils {
             val packageInfo =
                 packageManager.getPackageInfo(ApplicationUtils.application.packageName, 0)
             // 获取版本号
-            return packageInfo.versionName
+            return packageInfo.versionName ?: ""
         } catch (e: PackageManager.NameNotFoundException) {
             e.printStackTrace()
             return ""
