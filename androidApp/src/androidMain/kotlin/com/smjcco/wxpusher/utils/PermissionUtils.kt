@@ -39,7 +39,7 @@ object PermissionUtils {
         requester =
             activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                 if (it) {
-                    Log.i("TestActivity", "requestPermission: Ok")
+                    Log.d("TestActivity", "requestPermission: Ok")
                     return@registerForActivityResult
                 }
                 if (!ActivityCompat.shouldShowRequestPermissionRationale(

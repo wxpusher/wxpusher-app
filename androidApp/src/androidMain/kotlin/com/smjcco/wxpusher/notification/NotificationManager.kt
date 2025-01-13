@@ -9,14 +9,11 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.utils.ApplicationUtils
-import com.smjcco.wxpusher.ws.IWsMessageListener
 import com.smjcco.wxpusher.ws.PushMsgDeviceMsg
-import com.smjcco.wxpusher.ws.WsManager
-import com.smjcco.wxpusher.ws.WsMessageTypeEnum
 import java.util.concurrent.atomic.AtomicInteger
 
 object NotificationManager {
-    private var messageId = AtomicInteger(0)
+    private var messageId = AtomicInteger(1000)
     private const val UnknownChannelId = "unknown"
     private const val WxPusherSystem = "WxPusherSystem"
     private lateinit var sysNotificationManager: NotificationManager

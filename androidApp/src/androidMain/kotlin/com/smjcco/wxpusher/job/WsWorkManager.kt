@@ -20,7 +20,7 @@ class KeepWsConnectWork(appContext: Context, workerParams: WorkerParameters) :
     CoroutineWorker(appContext, workerParams) {
     override suspend fun doWork(): Result {
         Log.d(TAG, Thread.currentThread().name + ":doWork() called")
-        WsManager.connect();
+        WsManager.init();
 //        setForeground(getForegroundInfo())
         return Result.success()
     }

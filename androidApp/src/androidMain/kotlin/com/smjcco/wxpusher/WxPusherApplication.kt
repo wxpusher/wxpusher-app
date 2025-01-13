@@ -2,6 +2,7 @@ package com.smjcco.wxpusher
 
 import android.app.Application
 import android.util.Log
+import com.smjcco.wxpusher.connect.KeepWsConnectService
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotification
 import com.smjcco.wxpusher.utils.AppDataUtils
@@ -19,9 +20,10 @@ class WxPusherApplication : Application() {
         super.onCreate()
         ApplicationUtils.application = this
         SaveUtils.init()
-        WsManager.connect()
+        WsManager.init()
         NotificationManager.init()
         initBiz()
+        KeepWsConnectService.start(this)
     }
 
     private fun initBiz() {
@@ -36,7 +38,7 @@ class WxPusherApplication : Application() {
         val pushTokenListener = object : IWsMessageListener<InitDeviceMsg> {
             override fun onMessage(message: InitDeviceMsg) {
                 AppDataUtils.savePushToken(message.pushToken)
-                Log.i(TAG, "收到长链接Ws的pushToken=${message.pushToken}")
+                Log.d(TAG, "收到长链接Ws的pushToken=${message.pushToken}")
             }
         }
         WsManager.addMsgListener(WsMessageTypeEnum.DEVICE_INIT.code, pushTokenListener)

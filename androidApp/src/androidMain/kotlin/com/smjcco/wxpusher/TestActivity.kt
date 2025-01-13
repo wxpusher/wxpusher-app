@@ -14,7 +14,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.smjcco.wxpusher.connect.WebSocketService
+import com.smjcco.wxpusher.connect.KeepWsConnectService
 import com.smjcco.wxpusher.job.WsWorkManager
 
 
@@ -22,7 +22,7 @@ class TestActivity : ComponentActivity() {
 
     private val requester = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         if (it) {
-            Log.i("TestActivity", "requestPermission: Ok")
+            Log.d("TestActivity", "requestPermission: Ok")
         } else if (!ActivityCompat.shouldShowRequestPermissionRationale(
                 this,
                 Manifest.permission.POST_NOTIFICATIONS
@@ -76,7 +76,7 @@ class TestActivity : ComponentActivity() {
 
         val btn: Button = findViewById(R.id.ws)
         btn.setOnClickListener {
-            startService(Intent(this, WebSocketService::class.java))
+            startService(Intent(this, KeepWsConnectService::class.java))
             WsWorkManager.startPeriodicJob()
         }
         val permission: Button = findViewById(R.id.permission)

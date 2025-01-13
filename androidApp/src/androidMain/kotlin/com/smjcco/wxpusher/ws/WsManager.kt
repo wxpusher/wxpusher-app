@@ -6,6 +6,7 @@ import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -15,6 +16,7 @@ import okhttp3.WebSocketListener
 import okio.ByteString
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 
 object WsManager {
@@ -25,27 +27,63 @@ object WsManager {
     private val client = OkHttpClient
         .Builder()
         .pingInterval(10, TimeUnit.SECONDS)
+        .connectTimeout(10, TimeUnit.SECONDS) // 设置连接超时时间
+        .readTimeout(10, TimeUnit.SECONDS)    // 设置读取超时时间
         .build()
 
     //是否已经链接
-    private var connected = AtomicBoolean(false)
+    private var connectStatus = AtomicReference(WsConnectStatus.NotConnect)
+    private var init = AtomicBoolean(false)
 
-    fun connect() {
-        WxPusherUtils.getIoScopeScope().launch {
-            connectInner()
+    fun init() {
+        if (init.get()) {
+            return
         }
+        init.set(true)
+        WxPusherUtils.getIoScopeScope().launch {
+            while (true) {
+                if (connectStatus.get() == WsConnectStatus.NotConnect) {
+                    connectInner()
+                } else {
+                    Log.d(TAG, "延迟10秒检查链接")
+                    delay(10 * 1000)
+                }
+            }
+        }
+    }
+
+    private fun getHostUrl(): String {
+        val sb = StringBuilder()
+        sb.append(WxPusherConfig.WsUrl)
+        sb.append("/ws?")
+        sb.append("version=${WxPusherUtils.getVersionName()}")
+        sb.append("&")
+        sb.append("platform=${WxPusherWebInterface.getDeviceType()}")
+        if (!AppDataUtils.getPushToken().isNullOrEmpty()) {
+            sb.append("&")
+            sb.append("pushToken=${AppDataUtils.getPushToken()}")
+        }
+        return sb.toString()
     }
 
     private fun connectInner() {
         synchronized(this) {
-            if (connected.get()) {
-                Log.i(TAG, "connect: 已经链接")
+            if (connectStatus.get() == WsConnectStatus.Connected) {
+                Log.d(TAG, "connect: 已经链接，不进行链接")
                 return
             }
-            Log.i(TAG, "connect: 开始WS长链接")
-            setConnected(true)
+            if (connectStatus.get() == WsConnectStatus.Connecting) {
+                Log.d(TAG, "connect: 链接中，不进行链接")
+                return
+            }
+            if (connectStatus.get() == WsConnectStatus.Closing) {
+                Log.d(TAG, "connect: 关闭中，不进行链接")
+                return
+            }
+            Log.d(TAG, "connect: 开始WS长链接")
+            setConnectStatus(WsConnectStatus.Connecting)
             val request: Request = Request.Builder()
-                .url("${WxPusherConfig.WsUrl}/ws?version=${WxPusherUtils.getVersionName()}&platform=${WxPusherWebInterface.getDeviceType()}&pushToken=${AppDataUtils.getPushToken()}")
+                .url(getHostUrl())
                 .build()
             client.newWebSocket(request, WsListener())
         }
@@ -68,22 +106,35 @@ object WsManager {
         connectListenerList.remove(listener)
     }
 
-    private fun setConnected(connectStatus: Boolean) {
-        notifyConnectedChanged(connectStatus)
-        connected.set(connectStatus)
+    private fun setConnectStatus(status: WsConnectStatus) {
+        notifyConnectedChanged(status)
+        connectStatus.set(status)
     }
 
     /**
      * 通知链接变化
      */
-    private fun notifyConnectedChanged(connectStatus: Boolean) {
-        WxPusherUtils.getMainScope().launch {
-            if (connectStatus != connected.get()) {
+    private fun notifyConnectedChanged(status: WsConnectStatus) {
+        //链接状态变成已经链接或者未链接，才进行通知
+        if (connectStatus.get() != status &&
+            (status == WsConnectStatus.Connected || status == WsConnectStatus.NotConnect)
+        ) {
+            WxPusherUtils.getMainScope().launch {
                 connectListenerList.forEach {
-                    it.onChanged(connectStatus)
+                    it.onChanged(status == WsConnectStatus.Connected)
                 }
             }
         }
+    }
+
+    /**
+     * 网络链接状态
+     */
+    enum class WsConnectStatus(val code: Int, val des: String) {
+        NotConnect(1, "无链接"),
+        Connecting(2, "链接中"),
+        Connected(3, "已链接"),
+        Closing(4, "链接关闭中"),
     }
 
     interface IWsConnectChangedListener {
@@ -94,26 +145,23 @@ object WsManager {
         private val TAG = "WsManager"
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-            Log.i(TAG, "onClosed: 链接关闭，code=${code},reason=${reason}")
-            setConnected(false)
-            WxPusherUtils.toast("WebSocket-onClosed")
+            Log.d(TAG, "onClosed: 链接关闭，code=${code},reason=${reason}")
+            setConnectStatus(WsConnectStatus.NotConnect)
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
             Log.d(TAG, "onClosing: code=${code},reason=${reason}")
-            setConnected(false)
+            setConnectStatus(WsConnectStatus.Closing)
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             Log.d(TAG, "onFailure: error=${t.message}")
             t.printStackTrace()
-            WxPusherUtils.toast("WebSocket-onFailure：" + t.message)
-            setConnected(false)
+            setConnectStatus(WsConnectStatus.NotConnect)
         }
 
-
         override fun onMessage(webSocket: WebSocket, text: String) {
-            setConnected(true)
+            setConnectStatus(WsConnectStatus.Connected)
             Log.d(TAG, "onMessage() called with: webSocket = $webSocket, text = $text")
             val baseWsMsg = GsonUtils.toObj(text, BaseWsMsg::class.java)
             if (baseWsMsg == null) {
@@ -142,12 +190,13 @@ object WsManager {
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-            Log.i(TAG, "onMessage: 收到二进制数据")
+            Log.d(TAG, "onMessage: 收到二进制数据")
+            setConnectStatus(WsConnectStatus.Connected)
         }
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            Log.i(TAG, "onOpen: WS链接打开")
-            setConnected(true)
+            Log.d(TAG, "onOpen: WS链接打开")
+            setConnectStatus(WsConnectStatus.Connected)
         }
     }
 }

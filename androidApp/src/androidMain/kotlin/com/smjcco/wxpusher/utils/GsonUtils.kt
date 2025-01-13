@@ -20,7 +20,7 @@ object GsonUtils {
             try {
                 return GSON.fromJson<T>(str, cls)
             } catch (e: Throwable) {
-                Log.i("GSON", "序列化错误", e)
+                Log.d("GSON", "序列化错误", e)
             }
         }
         return null

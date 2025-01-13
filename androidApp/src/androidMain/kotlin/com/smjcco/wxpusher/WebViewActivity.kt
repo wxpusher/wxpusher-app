@@ -3,10 +3,9 @@ package com.smjcco.wxpusher
 import android.Manifest
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.webkit.WebView
-import android.window.OnBackInvokedDispatcher
 import androidx.activity.ComponentActivity
-import androidx.core.app.ActivityCompat
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 import com.smjcco.wxpusher.ws.WsManager
@@ -64,6 +63,7 @@ class WebViewActivity : ComponentActivity(), WsManager.IWsConnectChangedListener
 
     //把ws链接状态通知到容器里面，让容器再上报一次，避免pushToken变更，没有及时上报到服务器
     override fun onChanged(connectStatus: Boolean) {
+        Log.d(TAG, "通知容器上报WS链接状态变化")
         webview.evaluateJavascript("window.onWsConnect && window.onWsConnect(${connectStatus})") {
 
         }

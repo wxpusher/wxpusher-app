@@ -14,7 +14,7 @@ class NetworkChangeReceiver : BroadcastReceiver() {
         val networkInfo = connectivityManager.activeNetworkInfo
         if (networkInfo != null && networkInfo.isConnected) {
             // 网络连接成功时触发任务
-            WsManager.connect()
+            WsManager.init()
         }
     }
 }
