@@ -10,6 +10,9 @@ import kotlinx.coroutines.launch
 
 object WxPusherUtils {
     private val mainScope = CoroutineScope(Dispatchers.Main)
+
+    fun getMainScope(): CoroutineScope = mainScope
+
     fun toast(toast: String?) {
         toast?.let {
             if (Looper.myLooper() == Looper.getMainLooper()) {

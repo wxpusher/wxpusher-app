@@ -14,7 +14,11 @@ object SaveUtils {
         return sp.getString(key, null)
     }
 
-    fun setKeyValue(key: String, value: String) {
-        sp.edit().putString(key, value).apply()
+    fun setKeyValue(key: String, value: String?) {
+        if (value.isNullOrEmpty()) {
+            sp.edit().remove(key).apply()
+        } else {
+            sp.edit().putString(key, value).apply()
+        }
     }
 }
