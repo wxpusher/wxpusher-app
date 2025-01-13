@@ -34,7 +34,7 @@ object WsManager {
         Log.i(TAG, "connect: 开始WS长链接")
         connected = true
         val request: Request = Request.Builder()
-            .url("wss://${WxPusherConfig.Host}/ws?version=${WxPusherUtils.getVersionName()}&platform=Android&pushToken=PT_001_yFnkfTAZJ8VPsauxTuYdxtvdpmus")
+            .url("${WxPusherConfig.WsUrl}/ws?version=${WxPusherUtils.getVersionName()}&platform=Android&pushToken=PT_001_yFnkfTAZJ8VPsauxTuYdxtvdpmus")
             .build()
         client.newWebSocket(request, WsListener(msgListenerMap))
     }

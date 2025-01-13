@@ -64,6 +64,22 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    // 定义flavor维度
+    flavorDimensions.add("env")
+
+    // 配置产品风格
+    productFlavors {
+        create("offline") {
+            dimension = "env"
+            applicationIdSuffix = ".test"
+            versionNameSuffix = "-test"
+        }
+        create("prod") {
+            dimension = "env"
+        }
+    }
+
 }
 
 dependencies {
