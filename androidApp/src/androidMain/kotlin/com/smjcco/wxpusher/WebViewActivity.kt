@@ -2,6 +2,7 @@ package com.smjcco.wxpusher
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.webkit.WebView
@@ -11,6 +12,10 @@ import com.smjcco.wxpusher.web.WxPusherWebInterface
 import com.smjcco.wxpusher.ws.WsManager
 
 class WebViewActivity : ComponentActivity(), WsManager.IWsConnectChangedListener {
+    companion object {
+        const val INTENT_KEY_URL = "url"
+    }
+
     private val TAG: String = "WebViewActivity"
     lateinit var webview: WebView;
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,8 +43,24 @@ class WebViewActivity : ComponentActivity(), WsManager.IWsConnectChangedListener
         webview.addJavascriptInterface(WxPusherWebInterface, "wxPusherApi")
         //链接成功，需要调用到容器，上报一下
         WsManager.addConnectChangedListener(this)
+        addOnNewIntentListener {
+            openPageFromIntent(it)
+        }
+        if (!openPageFromIntent(intent)) {
+            webview.clearHistory()
+            webview.loadUrl("http://10.0.0.10:3000/home")
+        }
     }
 
+    private fun openPageFromIntent(intent: Intent?): Boolean {
+        val url = intent?.getStringExtra(INTENT_KEY_URL)
+        if (!url.isNullOrEmpty()) {
+            webview.clearHistory()
+            webview.loadUrl("http://10.0.0.10:3000/home?url=${url}")
+            return true
+        }
+        return false
+    }
 
     override fun onDestroy() {
         super.onDestroy()
@@ -47,7 +68,7 @@ class WebViewActivity : ComponentActivity(), WsManager.IWsConnectChangedListener
     }
 
     private fun mock() {
-        webview.loadUrl("http://10.0.0.10:3000/home")
+//        webview.loadUrl("http://10.0.0.10:3000/home")
 //        web.loadUrl("http://10.0.0.10:3000/login/bind")
 //        web.loadUrl("https://m.baidu.com")
     }

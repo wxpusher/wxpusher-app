@@ -1,6 +1,8 @@
 package com.smjcco.wxpusher
 
 object WxPusherConfig {
-    const val Host = "10.0.0.10:6104"
-    const val WsUrl = "ws://${Host}"
+    private const val Host = "10.0.0.10"
+    const val WsUrl = "ws://${Host}:6104"
+    const val apiUrl = "http://${Host}:6100"
+    const val webUrl = "http://${Host}:3000/home"
 }

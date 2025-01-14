@@ -19,9 +19,10 @@ open class ErrorMsg(var msg: String, msgType: Int, createTime: Long) :
 //推送消息
 open class PushMsgDeviceMsg(
     var mid: Long,
+    var sourceID: String,
+    var title: String,//标题
     var summary: String,//摘要
     var qid: String,//查询id
-    var content: String,//内容
     var contentType: Int,//内容类型
     var url: String,//链接
     msgType: Int, createTime: Long

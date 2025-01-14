@@ -4,13 +4,18 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationChannelGroup
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
+import com.smjcco.wxpusher.WebViewActivity
+import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.ws.PushMsgDeviceMsg
 import java.util.concurrent.atomic.AtomicInteger
+
 
 object NotificationManager {
     private var messageId = AtomicInteger(1000)
@@ -31,12 +36,32 @@ object NotificationManager {
     }
 
     fun sendBizMessageNotification(message: PushMsgDeviceMsg) {
+        var channel: String = UnknownChannelId
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+            && message.sourceID.isNotEmpty()
+            && sysNotificationManager.getNotificationChannel(message.sourceID) != null
+        ) {
+            channel = message.sourceID
+        }
+
+        // 创建Intent，用于在点击通知时启动Activity
+        val intent = Intent(ApplicationUtils.application, WebViewActivity::class.java)
+        intent.putExtra(WebViewActivity.INTENT_KEY_URL, "${WxPusherConfig.apiUrl}/api/message/${message.qid}")
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        val pendingIntent = PendingIntent.getActivity(
+            ApplicationUtils.application,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification =
-            NotificationCompat.Builder(ApplicationUtils.application, UnknownChannelId)
-                .setContentTitle("收到来自WxPusher的消息")
+            NotificationCompat.Builder(ApplicationUtils.application, channel)
+                .setContentTitle(message.title)
                 .setTicker(message.summary)
                 .setContentText(message.summary)
                 .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build()
         sendNotification(notification)

@@ -184,8 +184,10 @@ object WsManager {
                 Log.d(TAG, "onMessage() 没有消息监听器")
                 return
             }
-            listenerList.forEach {
-                (it as IWsMessageListener<BaseWsMsg>).onMessage(bizMsg)
+            WxPusherUtils.getMainScope().launch {
+                listenerList.forEach {
+                    (it as IWsMessageListener<BaseWsMsg>).onMessage(bizMsg)
+                }
             }
         }
 
