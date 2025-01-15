@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.connect
+package com.smjcco.wxpusher.ws
 
 import android.app.Service
 import android.content.Context
@@ -9,7 +9,6 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.notification.ChannelGroup
-import com.smjcco.wxpusher.ws.WsManager
 
 class KeepWsConnectService : Service() {
     val TAG = "KeepWsConnectService"

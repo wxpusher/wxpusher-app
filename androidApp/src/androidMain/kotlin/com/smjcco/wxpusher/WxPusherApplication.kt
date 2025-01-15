@@ -2,7 +2,7 @@ package com.smjcco.wxpusher
 
 import android.app.Application
 import android.util.Log
-import com.smjcco.wxpusher.connect.KeepWsConnectService
+import com.smjcco.wxpusher.ws.KeepWsConnectService
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotification
 import com.smjcco.wxpusher.utils.AppDataUtils

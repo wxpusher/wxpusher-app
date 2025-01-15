@@ -18,7 +18,7 @@
         android:theme="@android:style/Theme.Material.Light.NoActionBar">
 
         <service
-            android:name=".connect.KeepWsConnectService"
+            android:name=".ws.KeepWsConnectService"
             android:foregroundServiceType="remoteMessaging"
             tools:node="merge" />
         <service

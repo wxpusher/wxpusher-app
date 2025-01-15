@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.job
+package com.smjcco.wxpusher.ws
 
 import android.content.Context
 import android.util.Log
@@ -10,7 +10,6 @@ import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import androidx.work.WorkerParameters
 import com.smjcco.wxpusher.utils.ApplicationUtils
-import com.smjcco.wxpusher.ws.WsManager
 import java.util.concurrent.TimeUnit
 
 

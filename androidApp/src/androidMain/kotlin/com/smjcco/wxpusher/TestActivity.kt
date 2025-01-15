@@ -14,8 +14,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.smjcco.wxpusher.connect.KeepWsConnectService
-import com.smjcco.wxpusher.job.WsWorkManager
+import com.smjcco.wxpusher.ws.KeepWsConnectService
+import com.smjcco.wxpusher.ws.WsWorkManager
 
 
 class TestActivity : ComponentActivity() {
