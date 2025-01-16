@@ -8,6 +8,7 @@ import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotifi
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.SaveUtils
+import com.smjcco.wxpusher.web.update.WebBundleManager
 import com.smjcco.wxpusher.ws.IWsMessageListener
 import com.smjcco.wxpusher.ws.InitDeviceMsg
 import com.smjcco.wxpusher.ws.PushMsgDeviceMsg
@@ -24,6 +25,7 @@ class WxPusherApplication : Application() {
         NotificationManager.init()
         initBiz()
         KeepWsConnectService.start(this)
+        WebBundleManager.init()
     }
 
     private fun initBiz() {

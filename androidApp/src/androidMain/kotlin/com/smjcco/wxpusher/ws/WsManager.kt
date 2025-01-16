@@ -82,8 +82,10 @@ object WsManager {
             }
             Log.d(TAG, "connect: 开始WS长链接")
             setConnectStatus(WsConnectStatus.Connecting)
+            val wsUrl = getHostUrl()
+            Log.i(TAG, "wsUrl: ${wsUrl}")
             val request: Request = Request.Builder()
-                .url(getHostUrl())
+                .url(wsUrl)
                 .build()
             client.newWebSocket(request, WsListener())
         }

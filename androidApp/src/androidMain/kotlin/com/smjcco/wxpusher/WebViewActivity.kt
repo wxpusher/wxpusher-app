@@ -6,10 +6,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.webkit.WebView
+import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
+import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 import com.smjcco.wxpusher.ws.WsManager
+import com.smjcco.wxpusher.web.update.WebBundleManager
+import java.io.File
 
 class WebViewActivity : ComponentActivity(), WsManager.IWsConnectChangedListener {
     companion object {
@@ -39,16 +45,46 @@ class WebViewActivity : ComponentActivity(), WsManager.IWsConnectChangedListener
     @SuppressLint("SetJavaScriptEnabled")
     private fun initWebView() {
         webview = findViewById(R.id.web)
-        webview.settings.javaScriptEnabled = true
+        webview.settings.apply {
+            javaScriptEnabled = true
+            allowFileAccess = true
+            allowFileAccessFromFileURLs = true
+            allowUniversalAccessFromFileURLs = true
+            // 启用DOM存储API
+            domStorageEnabled = true
+            // 启用数据库存储API
+            databaseEnabled = true
+        }
+        
+        webview.webChromeClient = WebChromeClient()
+
+        webview.webViewClient = object : WebViewClient() {
+            override fun onReceivedError(
+                view: WebView?,
+                request: WebResourceRequest?,
+                error: WebResourceError?
+            ) {
+                Log.e(TAG, "加载页面错误: ${error?.description}")
+                super.onReceivedError(view, request, error)
+            }
+        }
+        
         webview.addJavascriptInterface(WxPusherWebInterface, "wxPusherApi")
+
         //链接成功，需要调用到容器，上报一下
         WsManager.addConnectChangedListener(this)
+
+        // 应用可能的更新
+        WebBundleManager.applyUpdateIfAvailable()
         addOnNewIntentListener {
             openPageFromIntent(it)
         }
+        
         if (!openPageFromIntent(intent)) {
             webview.clearHistory()
-            webview.loadUrl("http://10.0.0.10:3000/home")
+            // 加载本地文件
+            val webDir = WebBundleManager.getWebFileDir()
+            webview.loadUrl("file://${webDir.absolutePath}/index.html#/home")
         }
     }
 
@@ -56,7 +92,8 @@ class WebViewActivity : ComponentActivity(), WsManager.IWsConnectChangedListener
         val url = intent?.getStringExtra(INTENT_KEY_URL)
         if (!url.isNullOrEmpty()) {
             webview.clearHistory()
-            webview.loadUrl("http://10.0.0.10:3000/home?url=${url}")
+            val webDir = WebBundleManager.getWebFileDir()
+            webview.loadUrl("file://${webDir.absolutePath}/index.html?url=${url}#/home")
             return true
         }
         return false
