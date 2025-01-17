@@ -6,8 +6,10 @@ import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.getResourceUri
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
 import java.net.URL
 import java.util.zip.ZipInputStream
 
@@ -19,7 +21,10 @@ object WebBundleManager {
     private const val WEB_VERSION_KEY = "web_version"
     private const val NEED_APPLY_UPDATE_KEY = "need_apply_update"
 
+    //正式的工作目录
     private lateinit var webDir: File
+
+    //升级的时候的临时目录
     private lateinit var tempDir: File
 
     fun init() {
@@ -30,14 +35,59 @@ object WebBundleManager {
         // 确保目录存在
         webDir.mkdirs()
         tempDir.mkdirs()
-
-        // 首次运行时从assets解压初始网页文件
-        if (!isWebFilesExists()) {
-            extractAssetsBundle()
-        }
+        //检查内置包是否更新（用于host APP升级以后，可能需要释放内置包）
+        checkIfNeedUnzipInsetZip()
 
         // 检查更新
         checkUpdate()
+    }
+
+    /**
+     * 检查是否需要释放内置包
+     */
+    private fun checkIfNeedUnzipInsetZip() {
+        val nowVersion = SaveUtils.getByKey(WEB_VERSION_KEY) ?: "0.0.0"
+        val insetZipVersion =
+            getVersionFromZip(ApplicationUtils.application.assets.open(BUNDLE_NAME))
+
+        if (isVersionGreater(insetZipVersion, nowVersion)) {
+            Log.d(TAG, "内置包更新，需要重新解压")
+            ApplicationUtils.application.assets.open(BUNDLE_NAME).use {
+                extractZipTempDir(it)
+                applyUpdateIfAvailable()
+            }
+        }
+    }
+
+    private fun isVersionGreater(newVersion: String, oldVersion: String): Boolean {
+        val newParts = newVersion.split(".").map { it.toInt() }
+        val oldParts = oldVersion.split(".").map { it.toInt() }
+
+        for (i in 0 until Math.max(newParts.size, oldParts.size)) {
+            val newPart = newParts.getOrNull(i) ?: 0
+            val oldPart = oldParts.getOrNull(i) ?: 0
+            if (newPart > oldPart) return true
+            if (newPart < oldPart) return false
+        }
+        return false
+    }
+
+    /**
+     * 读取zip的版本号
+     */
+    private fun getVersionFromZip(input: InputStream): String {
+        var version = "0"
+        ZipInputStream(input).use { zipInputStream ->
+            var entry = zipInputStream.nextEntry
+            while (entry != null) {
+                if (entry.name == "version.txt") {
+                    version = zipInputStream.bufferedReader().readText().trim()
+                    break
+                }
+                entry = zipInputStream.nextEntry
+            }
+        }
+        return version
     }
 
     fun getWebFileDir(): File {
@@ -47,27 +97,12 @@ object WebBundleManager {
         return webDir
     }
 
-    private fun isWebFilesExists(): Boolean {
-        return webDir.exists() && webDir.list()?.isNotEmpty() == true
-    }
-
-    private fun extractAssetsBundle() {
-        try {
-            val input = ApplicationUtils.application.assets.open(BUNDLE_NAME)
-            ZipInputStream(input).use { zip ->
-                extractZipTo(zip, webDir)
-            }
-        } catch (e: Exception) {
-            Log.e(TAG, "解压assets中的bundle失败", e)
-        }
-    }
-
     private fun checkUpdate() {
         WxPusherUtils.getIoScopeScope().launch {
             try {
                 val serverVersion = URL("${WxPusherConfig.WebUrl}/version.txt").readText()
                 val localVersion = SaveUtils.getByKey(WEB_VERSION_KEY) ?: "0"
-                if (serverVersion > localVersion) {
+                if (isVersionGreater(serverVersion, localVersion)) {
                     Log.d(TAG, "检查到新版本，开始下载,version=${serverVersion}")
                     downloadNewBundle(serverVersion)
                 } else {
@@ -89,16 +124,20 @@ object WebBundleManager {
                 tempDir.mkdirs()
 
                 // 下载并解压到临时目录
-                val tempFile = File(tempDir, BUNDLE_NAME)
-                FileOutputStream(tempFile).use { output ->
+                val bundleZip = File(ApplicationUtils.application.filesDir, BUNDLE_NAME)
+                if (bundleZip.exists()) {
+                    bundleZip.delete()
+                }
+                FileOutputStream(bundleZip).use { output ->
                     connection.getInputStream().use { input ->
                         input.copyTo(output)
                     }
                 }
                 Log.d(TAG, "新版本下载完成,version=${serverVersion}")
-                ZipInputStream(tempFile.inputStream()).use { zip ->
-                    extractZipTo(zip, tempDir)
+                bundleZip.inputStream().use {
+                    extractZipTempDir(it)
                 }
+                bundleZip.delete()
                 Log.d(TAG, "新版本解压完成,version=${serverVersion}")
                 // 标记有新版本可用，并且标记本地版本
                 SaveUtils.setKeyValue(WEB_VERSION_KEY, serverVersion)
@@ -109,6 +148,9 @@ object WebBundleManager {
         }
     }
 
+    /**
+     * 在加载的时候，再去复制文件，避免解压失败 ，无法进入
+     */
     fun applyUpdateIfAvailable() {
         if (SaveUtils.getByKey(NEED_APPLY_UPDATE_KEY) == "true") {
             try {
@@ -134,21 +176,28 @@ object WebBundleManager {
         }
     }
 
-    private fun extractZipTo(zip: ZipInputStream, destDir: File) {
-        var entry = zip.nextEntry
-        while (entry != null) {
-            val file = File(destDir, entry.name)
-            if (entry.isDirectory) {
-                file.mkdirs()
-            } else {
-                file.parentFile?.mkdirs()
-                FileOutputStream(file).use { output ->
-                    zip.copyTo(output)
+    /**
+     * 解压释放到临时目录，后面调用 applyUpdateIfAvailable 即可生效
+     */
+    private fun extractZipTempDir(input: InputStream) {
+        tempDir.deleteRecursively()
+        tempDir.mkdirs()
+        ZipInputStream(input).use { zip ->
+            var entry = zip.nextEntry
+            while (entry != null) {
+                val file = File(tempDir, entry.name)
+                if (entry.isDirectory) {
+                    file.mkdirs()
+                } else {
+                    file.parentFile?.mkdirs()
+                    FileOutputStream(file).use { output ->
+                        zip.copyTo(output)
+                    }
+                    // 确保文件可读
+                    file.setReadable(true, false)
                 }
-                // 确保文件可读
-                file.setReadable(true, false)
+                entry = zip.nextEntry
             }
-            entry = zip.nextEntry
         }
     }
 }

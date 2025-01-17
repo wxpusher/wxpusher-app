@@ -93,7 +93,7 @@ class WebViewActivity : ComponentActivity(), WsManager.IWsConnectChangedListener
         if (!url.isNullOrEmpty()) {
             webview.clearHistory()
             val webDir = WebBundleManager.getWebFileDir()
-            webview.loadUrl("file://${webDir.absolutePath}/index.html?url=${url}#/home")
+            webview.loadUrl("file://${webDir.absolutePath}/index.html#/home?url=${url}")
             return true
         }
         return false
