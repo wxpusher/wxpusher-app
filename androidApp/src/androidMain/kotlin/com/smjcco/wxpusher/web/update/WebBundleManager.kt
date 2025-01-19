@@ -6,7 +6,6 @@ import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.getResourceUri
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -15,10 +14,20 @@ import java.util.zip.ZipInputStream
 
 object WebBundleManager {
     private const val TAG = "WebBundleManager"
+
+    //web数据的bundle文件
     private const val BUNDLE_NAME = "web_bundle.zip"
+
+    //webview浏览器访问的目录
     private const val WEB_FOLDER = "web"
-    private const val TEMP_FOLDER = "web_temp"
-    private const val WEB_VERSION_KEY = "web_version"
+
+    //更新数据的临时目录
+    private const val TEMP_FOLDER = "web_update_temp"
+
+    //存放版本号的文件名
+    private const val VERSION_FILE = "version.txt"
+
+    //是否需要apply更新的标记，主要用于网络更新bundle以后，在下一次启动应用更新（从web_temp复制到web）
     private const val NEED_APPLY_UPDATE_KEY = "need_apply_update"
 
     //正式的工作目录
@@ -46,7 +55,7 @@ object WebBundleManager {
      * 检查是否需要释放内置包
      */
     private fun checkIfNeedUnzipInsetZip() {
-        val nowVersion = SaveUtils.getByKey(WEB_VERSION_KEY) ?: "0.0.0"
+        val nowVersion = getNowVersion()
         val insetZipVersion =
             getVersionFromZip(ApplicationUtils.application.assets.open(BUNDLE_NAME))
 
@@ -80,7 +89,7 @@ object WebBundleManager {
         ZipInputStream(input).use { zipInputStream ->
             var entry = zipInputStream.nextEntry
             while (entry != null) {
-                if (entry.name == "version.txt") {
+                if (entry.name == VERSION_FILE) {
                     version = zipInputStream.bufferedReader().readText().trim()
                     break
                 }
@@ -88,6 +97,18 @@ object WebBundleManager {
             }
         }
         return version
+    }
+
+    /**
+     * 获取当前正在使用的版本
+     */
+    private fun getNowVersion(): String {
+        try {
+            return File(webDir, VERSION_FILE).readText()
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
+        return "0.0.0"
     }
 
     fun getWebFileDir(): File {
@@ -101,7 +122,7 @@ object WebBundleManager {
         WxPusherUtils.getIoScopeScope().launch {
             try {
                 val serverVersion = URL("${WxPusherConfig.WebUrl}/version.txt").readText()
-                val localVersion = SaveUtils.getByKey(WEB_VERSION_KEY) ?: "0"
+                val localVersion = getNowVersion()
                 if (isVersionGreater(serverVersion, localVersion)) {
                     Log.d(TAG, "检查到新版本，开始下载,version=${serverVersion}")
                     downloadNewBundle(serverVersion)
@@ -139,9 +160,6 @@ object WebBundleManager {
                 }
                 bundleZip.delete()
                 Log.d(TAG, "新版本解压完成,version=${serverVersion}")
-                // 标记有新版本可用，并且标记本地版本
-                SaveUtils.setKeyValue(WEB_VERSION_KEY, serverVersion)
-                SaveUtils.setKeyValue(NEED_APPLY_UPDATE_KEY, "true")
             } catch (e: Exception) {
                 Log.e(TAG, "下载新bundle失败", e)
             }
@@ -170,7 +188,6 @@ object WebBundleManager {
                 Log.d(TAG, "应用新版本完成")
             } catch (e: Exception) {
                 //更新失败，重置一下版本号，下次启动会再次更新
-                SaveUtils.setKeyValue(WEB_VERSION_KEY, "0")
                 Log.e(TAG, "应用更新失败", e)
             }
         }
@@ -180,6 +197,7 @@ object WebBundleManager {
      * 解压释放到临时目录，后面调用 applyUpdateIfAvailable 即可生效
      */
     private fun extractZipTempDir(input: InputStream) {
+        Log.d(TAG, "extractZipTempDir: 开始解压BundleZip")
         tempDir.deleteRecursively()
         tempDir.mkdirs()
         ZipInputStream(input).use { zip ->
@@ -199,5 +217,7 @@ object WebBundleManager {
                 entry = zip.nextEntry
             }
         }
+        SaveUtils.setKeyValue(NEED_APPLY_UPDATE_KEY, "true")
+        Log.d(TAG, "extractZipTempDir: 完成解压BundleZip")
     }
 }

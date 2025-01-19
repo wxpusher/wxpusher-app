@@ -5,19 +5,17 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.webkit.WebView
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
-import com.smjcco.wxpusher.ws.WsManager
 import com.smjcco.wxpusher.web.update.WebBundleManager
-import java.io.File
 
-class WebViewActivity : ComponentActivity(), WsManager.IWsConnectChangedListener {
+class WebViewActivity : ComponentActivity() {
     companion object {
         const val INTENT_KEY_URL = "url"
     }
@@ -55,7 +53,7 @@ class WebViewActivity : ComponentActivity(), WsManager.IWsConnectChangedListener
             // 启用数据库存储API
             databaseEnabled = true
         }
-        
+
         webview.webChromeClient = WebChromeClient()
 
         webview.webViewClient = object : WebViewClient() {
@@ -68,18 +66,15 @@ class WebViewActivity : ComponentActivity(), WsManager.IWsConnectChangedListener
                 super.onReceivedError(view, request, error)
             }
         }
-        
-        webview.addJavascriptInterface(WxPusherWebInterface, "wxPusherApi")
 
-        //链接成功，需要调用到容器，上报一下
-        WsManager.addConnectChangedListener(this)
+        webview.addJavascriptInterface(WxPusherWebInterface, "wxPusherApi")
 
         // 应用可能的更新
         WebBundleManager.applyUpdateIfAvailable()
         addOnNewIntentListener {
             openPageFromIntent(it)
         }
-        
+
         if (!openPageFromIntent(intent)) {
             webview.clearHistory()
             // 加载本地文件
@@ -99,11 +94,6 @@ class WebViewActivity : ComponentActivity(), WsManager.IWsConnectChangedListener
         return false
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        WsManager.removeConnectChangedListener(this)
-    }
-
     private fun mock() {
 //        webview.loadUrl("http://10.0.0.10:3000/home")
 //        web.loadUrl("http://10.0.0.10:3000/login/bind")
@@ -116,15 +106,6 @@ class WebViewActivity : ComponentActivity(), WsManager.IWsConnectChangedListener
             return
         }
         super.onBackPressed()
-    }
-
-
-    //把ws链接状态通知到容器里面，让容器再上报一次，避免pushToken变更，没有及时上报到服务器
-    override fun onChanged(connectStatus: Boolean) {
-        Log.d(TAG, "通知容器上报WS链接状态变化")
-        webview.evaluateJavascript("window.onWsConnect && window.onWsConnect(${connectStatus})") {
-
-        }
     }
 
 }

@@ -2,6 +2,7 @@ package com.smjcco.wxpusher.web
 
 import android.os.Build
 import android.webkit.JavascriptInterface
+import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
@@ -13,6 +14,11 @@ object WxPusherWebInterface {
     @JavascriptInterface
     fun showToast(toast: String?) {
         WxPusherUtils.toast(toast)
+    }
+
+    @JavascriptInterface
+    fun updateDeviceInfo() {
+        DeviceApi.updateDeviceInfoAsync()
     }
 
     @JavascriptInterface

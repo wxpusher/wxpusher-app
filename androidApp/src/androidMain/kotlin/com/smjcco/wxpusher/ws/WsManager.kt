@@ -44,10 +44,9 @@ object WsManager {
             while (true) {
                 if (connectStatus.get() == WsConnectStatus.NotConnect) {
                     connectInner()
-                } else {
-                    Log.d(TAG, "延迟10秒检查链接")
-                    delay(10 * 1000)
                 }
+                Log.d(TAG, "延迟10秒检查链接")
+                delay(10 * 1000)
             }
         }
     }
@@ -78,6 +77,10 @@ object WsManager {
             }
             if (connectStatus.get() == WsConnectStatus.Closing) {
                 Log.d(TAG, "connect: 关闭中，不进行链接")
+                return
+            }
+            if (AppDataUtils.getLoginInfo()?.deviceId.isNullOrEmpty()) {
+                Log.d(TAG, "connect: 没有deviceId（可能没有登录），不进行链接")
                 return
             }
             Log.d(TAG, "connect: 开始WS长链接")

@@ -2,6 +2,7 @@ package com.smjcco.wxpusher
 
 import android.app.Application
 import android.util.Log
+import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.ws.KeepWsConnectService
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotification
@@ -21,9 +22,9 @@ class WxPusherApplication : Application() {
         super.onCreate()
         ApplicationUtils.application = this
         SaveUtils.init()
+        initBiz()
         WsManager.init()
         NotificationManager.init()
-        initBiz()
         KeepWsConnectService.start(this)
         WebBundleManager.init()
     }
@@ -41,6 +42,7 @@ class WxPusherApplication : Application() {
             override fun onMessage(message: InitDeviceMsg) {
                 AppDataUtils.savePushToken(message.pushToken)
                 Log.d(TAG, "收到长链接Ws的pushToken=${message.pushToken}")
+                DeviceApi.updateDeviceInfoAsync()
             }
         }
         WsManager.addMsgListener(WsMessageTypeEnum.DEVICE_INIT.code, pushTokenListener)
