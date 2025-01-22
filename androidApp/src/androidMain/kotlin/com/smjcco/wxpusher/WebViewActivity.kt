@@ -31,7 +31,6 @@ class WebViewActivity : ComponentActivity() {
         Log.d(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
         setContentView(R.layout.web_activity)
         initWebView()
-        mock()
         requestPermission()
     }
 
@@ -101,12 +100,6 @@ class WebViewActivity : ComponentActivity() {
         return "http://10.0.0.10:3000/"
 //        val webDir = WebBundleManager.getWebFileDir()
 //        return "file://${webDir.absolutePath}/index.html"
-    }
-
-    private fun mock() {
-//        webview.loadUrl("http://10.0.0.10:3000/home")
-//        web.loadUrl("http://10.0.0.10:3000/login/bind")
-//        web.loadUrl("https://m.baidu.com")
     }
 
     override fun onBackPressed() {
