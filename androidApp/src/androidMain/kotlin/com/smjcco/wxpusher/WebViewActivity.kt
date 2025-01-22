@@ -24,6 +24,11 @@ class WebViewActivity : ComponentActivity() {
     lateinit var webview: WebView;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //避免申请权限的时候，重复调用创建方法
+        if (savedInstanceState != null) {
+            return
+        }
+        Log.d(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
         setContentView(R.layout.web_activity)
         initWebView()
         mock()
@@ -78,8 +83,7 @@ class WebViewActivity : ComponentActivity() {
         if (!openPageFromIntent(intent)) {
             webview.clearHistory()
             // 加载本地文件
-            val webDir = WebBundleManager.getWebFileDir()
-            webview.loadUrl("file://${webDir.absolutePath}/index.html#/home")
+            webview.loadUrl("${getWebPageUrl()}#/home")
         }
     }
 
@@ -87,11 +91,16 @@ class WebViewActivity : ComponentActivity() {
         val url = intent?.getStringExtra(INTENT_KEY_URL)
         if (!url.isNullOrEmpty()) {
             webview.clearHistory()
-            val webDir = WebBundleManager.getWebFileDir()
-            webview.loadUrl("file://${webDir.absolutePath}/index.html#/home?url=${url}")
+            webview.loadUrl("${getWebPageUrl()}#/home?url=${url}")
             return true
         }
         return false
+    }
+
+    private fun getWebPageUrl(): String {
+        return "http://10.0.0.10:3000/"
+//        val webDir = WebBundleManager.getWebFileDir()
+//        return "file://${webDir.absolutePath}/index.html"
     }
 
     private fun mock() {
