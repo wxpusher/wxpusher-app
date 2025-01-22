@@ -21,14 +21,15 @@ class WebViewActivity : ComponentActivity() {
     }
 
     private val TAG: String = "WebViewActivity"
-    lateinit var webview: WebView;
+    lateinit var webview: WebView
+    private var pressBackTime = System.currentTimeMillis();
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
         //避免申请权限的时候，重复调用创建方法
         if (savedInstanceState != null) {
             return
         }
-        Log.d(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
         setContentView(R.layout.web_activity)
         initWebView()
         requestPermission()
@@ -103,6 +104,12 @@ class WebViewActivity : ComponentActivity() {
     }
 
     override fun onBackPressed() {
+        if (System.currentTimeMillis() - pressBackTime < 400) {
+            //连续点击返回，直接返回页面
+            finish()
+            return
+        }
+        pressBackTime = System.currentTimeMillis()
         if (webview.canGoBack()) {
             webview.goBack()
             return
