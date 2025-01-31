@@ -3,6 +3,7 @@ package com.smjcco.wxpusher
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
 import android.webkit.WebChromeClient
@@ -117,4 +118,41 @@ class WebViewActivity : ComponentActivity() {
         super.onBackPressed()
     }
 
+    /**
+     * 监听主题颜色的变化
+     */
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        // 检查配置变化是否是UI模式（深色/浅色模式）的变化
+        if (newConfig.uiMode != resources.configuration.uiMode) {
+            checkNightMode()
+        }
+    }
+
+    private fun checkNightMode() {
+        val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        when (currentNightMode) {
+            Configuration.UI_MODE_NIGHT_NO -> {
+                // 浅色模式
+                onUiModeChanged(false)
+            }
+
+            Configuration.UI_MODE_NIGHT_YES -> {
+                // 深色模式
+                onUiModeChanged(true)
+            }
+
+            Configuration.UI_MODE_NIGHT_UNDEFINED -> {
+                //其他未指定模式
+                onUiModeChanged(false)
+            }
+        }
+    }
+
+    private fun onUiModeChanged(night: Boolean) {
+        Log.d(TAG, "onUiModeChanged() called with: night = $night")
+        WxPusherWebInterface.uiModeIsNight = night
+        webview.evaluateJavascript("window.onUiModeChanged && window.onUiModeChanged(${night})") {
+        }
+    }
 }

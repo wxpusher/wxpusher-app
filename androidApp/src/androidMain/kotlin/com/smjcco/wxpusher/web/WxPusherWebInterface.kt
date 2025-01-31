@@ -12,6 +12,8 @@ import com.smjcco.wxpusher.ws.WsManager
  * web服务的接口
  */
 object WxPusherWebInterface {
+    var uiModeIsNight = false
+
     @JavascriptInterface
     fun showToast(toast: String?) {
         WxPusherUtils.toast(toast)
@@ -62,4 +64,7 @@ object WxPusherWebInterface {
 
     @JavascriptInterface
     fun getWsConnectStatus() = WsManager.getConnectStatus().code
+
+    @JavascriptInterface
+    fun uiModeIsNight() = uiModeIsNight
 }
