@@ -33,6 +33,9 @@ object WsManager {
 
     //是否已经链接
     private var connectStatus = AtomicReference(WsConnectStatus.NotConnect)
+
+    private var webSocket: WebSocket? = null
+
     private var init = AtomicBoolean(false)
 
     fun init() {
@@ -80,9 +83,14 @@ object WsManager {
                 return
             }
             if (AppDataUtils.getLoginInfo()?.deviceId.isNullOrEmpty()) {
-                Log.d(TAG, "connect: 没有deviceId（可能没有登录），不进行链接")
+                Log.d(TAG, "connect: 没有deviceId（设备未注册），不进行链接")
                 return
             }
+            if (AppDataUtils.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
+                Log.d(TAG, "connect: 没有deviceToken（可能没有登录/已经退出登录），不进行链接")
+                return
+            }
+            disconnect()
             Log.d(TAG, "connect: 开始WS长链接")
             setConnectStatus(WsConnectStatus.Connecting)
             val wsUrl = getHostUrl()
@@ -90,7 +98,7 @@ object WsManager {
             val request: Request = Request.Builder()
                 .url(wsUrl)
                 .build()
-            client.newWebSocket(request, WsListener())
+            webSocket = client.newWebSocket(request, WsListener())
         }
     }
 
@@ -114,6 +122,16 @@ object WsManager {
     private fun setConnectStatus(status: WsConnectStatus) {
         notifyConnectedChanged(status)
         connectStatus.set(status)
+    }
+
+    fun getConnectStatus(): WsConnectStatus = connectStatus.get()
+
+    /**
+     * 关闭链接
+     */
+    fun disconnect() {
+        Log.d(TAG, "disconnect() called,主动断开ws链接")
+        webSocket?.close(1000, null)
     }
 
     /**

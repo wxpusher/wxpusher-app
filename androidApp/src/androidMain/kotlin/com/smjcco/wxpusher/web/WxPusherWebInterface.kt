@@ -6,6 +6,7 @@ import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
+import com.smjcco.wxpusher.ws.WsManager
 
 /**
  * web服务的接口
@@ -50,4 +51,15 @@ object WxPusherWebInterface {
     fun saveLoginInfo(loginInfoStr: String?) {
         AppDataUtils.saveLoginInfo(loginInfoStr)
     }
+
+    /**
+     * 退出登录的时候，断开WS长链接
+     */
+    @JavascriptInterface
+    fun wsDisconnect() {
+        WsManager.disconnect()
+    }
+
+    @JavascriptInterface
+    fun getWsConnectStatus() = WsManager.getConnectStatus().code
 }
