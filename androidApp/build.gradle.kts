@@ -25,6 +25,10 @@ kotlin {
             implementation("androidx.work:work-runtime-ktx:2.10.0")
             implementation("com.squareup.okhttp3:okhttp:4.12.0")
             implementation("com.google.code.gson:gson:2.10.1")
+            //腾讯shiply https://shiply.tds.qq.com/docs/doc?id=4008331373
+            implementation("com.tencent.shiply:upgrade:2.2.0")
+            implementation("com.tencent.shiply:upgrade-ui:2.2.0")
+
         }
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -48,8 +52,8 @@ android {
         applicationId = "com.smjcco.wxpusher"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = 2
+        versionName = "0.0.2"
     }
     packaging {
         resources {

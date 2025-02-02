@@ -15,6 +15,10 @@ import androidx.activity.ComponentActivity
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 import com.smjcco.wxpusher.web.update.WebBundleManager
+import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback
+import com.tencent.upgrade.core.UpgradeManager
+
+
 
 class WebViewActivity : ComponentActivity() {
     companion object {
@@ -34,8 +38,14 @@ class WebViewActivity : ComponentActivity() {
         setContentView(R.layout.web_activity)
         initWebView()
         requestPermission()
+        checkUpdate()
     }
 
+    //应用内检查升级
+    private fun checkUpdate(){
+        UpgradeManager.getInstance()
+            .checkUpgrade(false, null, DefaultUpgradeStrategyRequestCallback())
+    }
     private fun requestPermission() {
         PermissionUtils.request(
             this, Manifest.permission.POST_NOTIFICATIONS,

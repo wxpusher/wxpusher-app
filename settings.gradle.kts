@@ -25,6 +25,10 @@ dependencyResolutionManagement {
             }
         }
         mavenCentral()
+
+        maven {
+            setUrl("https://tencent-tds-maven.pkg.coding.net/repository/shiply/repo")
+        }
     }
 }
 
