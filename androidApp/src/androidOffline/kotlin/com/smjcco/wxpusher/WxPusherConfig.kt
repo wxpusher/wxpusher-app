@@ -1,7 +1,7 @@
 package com.smjcco.wxpusher
 
 object WxPusherConfig {
-    const val offline = true
+    const val Offline = true
 
     private const val Host = "10.0.0.10"
 

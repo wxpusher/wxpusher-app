@@ -1,11 +1,10 @@
 package com.smjcco.wxpusher
 
 object WxPusherConfig {
-     const val offline = true
+     const val Offline = false
 
     const val Host = "wxpusher.zjiecode.com"
     const val WsUrl = "wss://${Host}"
     const val ApiUrl = "https://${Host}"
-//    const val WebUrl = "https://static.zjiecode.com/wxpusher/web-app/"
-    const val WebUrl = "http://10.0.0.10:8080"
+    const val WebUrl = "https://static.zjiecode.com/wxpusher/web-app/"
 }
