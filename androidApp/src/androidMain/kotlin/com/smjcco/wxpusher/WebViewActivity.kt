@@ -19,7 +19,6 @@ import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback
 import com.tencent.upgrade.core.UpgradeManager
 
 
-
 class WebViewActivity : ComponentActivity() {
     companion object {
         const val INTENT_KEY_URL = "url"
@@ -42,10 +41,11 @@ class WebViewActivity : ComponentActivity() {
     }
 
     //应用内检查升级
-    private fun checkUpdate(){
+    private fun checkUpdate() {
         UpgradeManager.getInstance()
             .checkUpgrade(false, null, DefaultUpgradeStrategyRequestCallback())
     }
+
     private fun requestPermission() {
         PermissionUtils.request(
             this, Manifest.permission.POST_NOTIFICATIONS,
@@ -109,9 +109,9 @@ class WebViewActivity : ComponentActivity() {
     }
 
     private fun getWebPageUrl(): String {
-        return "http://10.0.0.10:3000/"
-//        val webDir = WebBundleManager.getWebFileDir()
-//        return "file://${webDir.absolutePath}/index.html"
+//        return "http://10.0.0.10:3000/"
+        val webDir = WebBundleManager.getWebFileDir()
+        return "file://${webDir.absolutePath}/index.html"
     }
 
     override fun onBackPressed() {

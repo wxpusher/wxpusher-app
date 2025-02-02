@@ -25,9 +25,17 @@ kotlin {
             implementation("androidx.work:work-runtime-ktx:2.10.0")
             implementation("com.squareup.okhttp3:okhttp:4.12.0")
             implementation("com.google.code.gson:gson:2.10.1")
+            implementation("androidx.fragment:fragment:1.7.0")
+            implementation("androidx.appcompat:appcompat:1.7.0")
+
             //腾讯shiply https://shiply.tds.qq.com/docs/doc?id=4008331373
-            implementation("com.tencent.shiply:upgrade:2.2.0")
-            implementation("com.tencent.shiply:upgrade-ui:2.2.0")
+            implementation("com.tencent.shiply:upgrade:2.2.0"){
+                exclude(group="androidx.appcompat", module = "appcompat")
+                exclude(group="androidx.fragment", module = "fragment")
+            }
+            implementation("com.tencent.shiply:upgrade-ui:2.2.0"){
+                exclude(group="com.tencent.shiply", module = "upgrade")
+            }
 
         }
         commonMain.dependencies {
@@ -52,8 +60,8 @@ android {
         applicationId = "com.smjcco.wxpusher"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 2
-        versionName = "0.0.2"
+        versionCode = 1
+        versionName = "0.0.1"
     }
     packaging {
         resources {
@@ -62,7 +70,12 @@ android {
     }
     buildTypes {
         getByName("release") {
+            // true - 打开混淆
             isMinifyEnabled = true
+            // true - 打开资源压缩
+            isShrinkResources = true
+            // 指定ProGuard规则文件
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
     compileOptions {

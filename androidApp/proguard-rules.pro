@@ -1,0 +1,89 @@
+
+# 通用混淆规则
+-keep public class * extends java.lang.Exception
+
+ -keepclasseswithmembers class * {
+     native <methods>;
+ }
+ # 保持 Native 方法不被混淆
+ -keepclasseswithmembernames class * {
+     native <methods>;
+ }
+
+ -keepclasseswithmembers class * {
+     public <init>(...);
+ }
+
+
+# 保持所有 R 类（资源类）不被混淆
+-keep class **.R$* {
+    *;
+}
+
+# 保持所有注解类不被混淆
+-keep @interface * {
+    *;
+}
+
+# 保持
+
+# 保持所有公共类及其公共成员（方法和字段）不被混淆
+-keep public class * {
+    public protected *;
+}
+
+# 保持自定义的 Application 类不被混淆
+-keep public class * extends android.app.Application {
+    public protected *;
+}
+
+# 保持 Activity、Service、BroadcastReceiver、ContentProvider 及其方法不被混淆
+-keep public class * extends android.app.Activity
+-keep public class * extends android.app.Service
+-keep public class * extends android.content.BroadcastReceiver
+-keep public class * extends android.content.ContentProvider
+{
+    public protected *;
+    public *;
+}
+
+# 保持 View 及其子类不被混淆（注意：有时需要根据具体 View 类调整）
+-keep public class * extends android.view.View {
+    public protected *;
+    public static ** get*(...);
+    public static ** findById(...);
+}
+
+# 保持 Serializable 序列化的类不被混淆
+-keep class * implements java.io.Serializable {
+    !static !transient <fields>;
+}
+
+
+
+# 保持第三方库不被混淆（以 Gson 为例）
+-keep class com.google.gson.** { *; }
+-keep interface com.google.gson.** { *; }
+
+# 保持第三方库（如 Retrofit、OkHttp）不被混淆
+-keep class retrofit2.** { *; }
+-keep interface retrofit2.** { *; }
+-keepattributes Signature
+-keepattributes RuntimeVisibleAnnotations
+-keepattributes RuntimeInvisibleAnnotations
+-keepattributes RuntimeVisibleParameterAnnotations
+-keepattributes RuntimeInvisibleParameterAnnotations
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+-dontwarn okhttp3.**
+-dontwarn retrofit2.**
+-dontwarn okio.**
+
+-keep class * extends java.lang.annotation.Annotation { *; }
+-keep interface * extends java.lang.annotation.Annotation { *; }
+
+-keep class com.tencent.** { *; }
+-keep interface com.tencent.** { *; }
+-dontwarn com.tencent.beacon.event.UserAction
+-dontwarn com.tencent.raft.measure.RAFTMeasure
+-dontwarn com.tencent.raft.measure.config.RAFTComConfig
