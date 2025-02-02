@@ -7,12 +7,14 @@ import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.ws.WsManager
+import kotlinx.coroutines.launch
 
 /**
  * web服务的接口
  */
 object WxPusherWebInterface {
     var uiModeIsNight = false
+    var onWebLoadFinish: (() -> Unit?)? = null
 
     @JavascriptInterface
     fun showToast(toast: String?) {
@@ -67,4 +69,11 @@ object WxPusherWebInterface {
 
     @JavascriptInterface
     fun uiModeIsNight() = uiModeIsNight
+
+    @JavascriptInterface
+    fun loadFinish() {
+        WxPusherUtils.getMainScope().launch {
+            onWebLoadFinish?.invoke()
+        }
+    }
 }

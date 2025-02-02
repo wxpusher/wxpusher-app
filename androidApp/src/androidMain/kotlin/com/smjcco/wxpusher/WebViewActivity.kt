@@ -25,8 +25,9 @@ class WebViewActivity : ComponentActivity() {
     }
 
     private val TAG: String = "WebViewActivity"
-    lateinit var webview: WebView
-    private var pressBackTime = System.currentTimeMillis();
+    private var webview: WebView? = null
+    private var pressBackTime = System.currentTimeMillis()
+    private var preUiMode = -1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Log.d(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
@@ -59,7 +60,7 @@ class WebViewActivity : ComponentActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     private fun initWebView() {
         webview = findViewById(R.id.web)
-        webview.settings.apply {
+        webview?.settings?.apply {
             javaScriptEnabled = true
             allowFileAccess = true
             allowFileAccessFromFileURLs = true
@@ -70,9 +71,9 @@ class WebViewActivity : ComponentActivity() {
             databaseEnabled = true
         }
 
-        webview.webChromeClient = WebChromeClient()
+        webview?.webChromeClient = WebChromeClient()
 
-        webview.webViewClient = object : WebViewClient() {
+        webview?.webViewClient = object : WebViewClient() {
             override fun onReceivedError(
                 view: WebView?,
                 request: WebResourceRequest?,
@@ -83,26 +84,31 @@ class WebViewActivity : ComponentActivity() {
             }
         }
 
-        webview.addJavascriptInterface(WxPusherWebInterface, "wxPusherApi")
+        webview?.addJavascriptInterface(WxPusherWebInterface, "wxPusherApi")
 
         // 应用可能的更新
         WebBundleManager.applyUpdateIfAvailable()
+
+        WxPusherWebInterface.onWebLoadFinish = {
+            checkNightMode()
+        }
         addOnNewIntentListener {
             openPageFromIntent(it)
         }
 
         if (!openPageFromIntent(intent)) {
-            webview.clearHistory()
+            webview?.clearHistory()
             // 加载本地文件
-            webview.loadUrl("${getWebPageUrl()}#/home")
+            webview?.loadUrl("${getWebPageUrl()}#/home")
         }
     }
 
     private fun openPageFromIntent(intent: Intent?): Boolean {
+
         val url = intent?.getStringExtra(INTENT_KEY_URL)
         if (!url.isNullOrEmpty()) {
-            webview.clearHistory()
-            webview.loadUrl("${getWebPageUrl()}#/home?url=${url}")
+            webview?.clearHistory()
+            webview?.loadUrl("${getWebPageUrl()}#/home?url=${url}")
             return true
         }
         return false
@@ -121,8 +127,8 @@ class WebViewActivity : ComponentActivity() {
             return
         }
         pressBackTime = System.currentTimeMillis()
-        if (webview.canGoBack()) {
-            webview.goBack()
+        if (webview?.canGoBack() == true) {
+            webview?.goBack()
             return
         }
         super.onBackPressed()
@@ -133,14 +139,16 @@ class WebViewActivity : ComponentActivity() {
      */
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        // 检查配置变化是否是UI模式（深色/浅色模式）的变化
-        if (newConfig.uiMode != resources.configuration.uiMode) {
-            checkNightMode()
-        }
+        checkNightMode()
     }
 
     private fun checkNightMode() {
         val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        //UI模式没变，就不调用
+        if (preUiMode == currentNightMode) {
+            return
+        }
+        preUiMode = currentNightMode
         when (currentNightMode) {
             Configuration.UI_MODE_NIGHT_NO -> {
                 // 浅色模式
@@ -162,7 +170,7 @@ class WebViewActivity : ComponentActivity() {
     private fun onUiModeChanged(night: Boolean) {
         Log.d(TAG, "onUiModeChanged() called with: night = $night")
         WxPusherWebInterface.uiModeIsNight = night
-        webview.evaluateJavascript("window.onUiModeChanged && window.onUiModeChanged(${night})") {
+        webview?.evaluateJavascript("window.onUiModeChanged && window.onUiModeChanged(${night})") {
         }
     }
 }
