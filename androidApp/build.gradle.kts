@@ -29,11 +29,11 @@ kotlin {
             implementation("androidx.appcompat:appcompat:1.7.0")
 
             //腾讯shiply https://shiply.tds.qq.com/docs/doc?id=4008331373
-            implementation("com.tencent.shiply:upgrade:2.2.0"){
+            implementation("com.tencent.shiply:upgrade:2.2.1-RC01"){
                 exclude(group="androidx.appcompat", module = "appcompat")
                 exclude(group="androidx.fragment", module = "fragment")
             }
-            implementation("com.tencent.shiply:upgrade-ui:2.2.0"){
+            implementation("com.tencent.shiply:upgrade-ui:2.2.1-RC01"){
                 exclude(group="com.tencent.shiply", module = "upgrade")
             }
 

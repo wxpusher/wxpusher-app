@@ -43,7 +43,7 @@ class WebViewActivity : ComponentActivity() {
     //应用内检查升级
     private fun checkUpdate() {
         UpgradeManager.getInstance()
-            .checkUpgrade(false, null, DefaultUpgradeStrategyRequestCallback())
+            .checkUpgrade(true, null, DefaultUpgradeStrategyRequestCallback())
     }
 
     private fun requestPermission() {

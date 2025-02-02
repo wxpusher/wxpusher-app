@@ -9,7 +9,6 @@ import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotifi
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.SaveUtils
-import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.update.WebBundleManager
 import com.smjcco.wxpusher.ws.IWsMessageListener
 import com.smjcco.wxpusher.ws.InitDeviceMsg
@@ -56,13 +55,13 @@ class WxPusherApplication : Application() {
 
     //腾讯应用内升级服务
     private fun initTbs() {
-        val uid = if (WxPusherConfig.Offline) "uid_offline" else AppDataUtils.getLoginInfo()?.uid
         val builder: UpgradeConfig.Builder = UpgradeConfig.Builder()
         val config = builder.appId("e4aa22fece")
             .appKey("2809e5bc-5ec5-486b-85ba-1d2ec5d5a106")
             .allowDownloadOverMobile(true)
             .systemVersion(Build.VERSION.SDK_INT.toString())
-            .userId(uid)
+            .userId(AppDataUtils.getLoginInfo()?.uid)
+//            .printInternalLog(true)
             .build()
         UpgradeManager.getInstance().init(this, config)
 
