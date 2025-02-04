@@ -26,6 +26,7 @@ object PermissionUtils {
         explainMessage: String,
         guideTitle: String,
         guideMessage: String,
+        requestSuccessRun: (() -> Unit)? = null
     ) {
         Log.d(TAG, "request: 请求用户授权${permission}")
         if (ContextCompat.checkSelfPermission(
@@ -33,6 +34,7 @@ object PermissionUtils {
                 permission
             ) == PackageManager.PERMISSION_GRANTED
         ) {
+            requestSuccessRun?.invoke()
             return
         }
         var requester: ActivityResultLauncher<String>? = null
@@ -40,6 +42,7 @@ object PermissionUtils {
             activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                 if (it) {
                     Log.d(TAG, "requestPermission: Ok")
+                    requestSuccessRun?.invoke()
                     return@registerForActivityResult
                 }
                 if (ActivityCompat.shouldShowRequestPermissionRationale(

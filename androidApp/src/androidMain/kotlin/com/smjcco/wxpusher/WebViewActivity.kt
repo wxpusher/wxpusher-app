@@ -12,11 +12,15 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
+import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.utils.PermissionUtils
+import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 import com.smjcco.wxpusher.web.update.WebBundleManager
 import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback
 import com.tencent.upgrade.core.UpgradeManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class WebViewActivity : ComponentActivity() {
@@ -54,7 +58,9 @@ class WebViewActivity : ComponentActivity() {
             "WxPusher是一个消息推送平台，当有新消息到达的时候，我们会第一时间给你发送通知，因此需要你授予发送通知的权限，否则我们无法发送消息通知，你可能会因此遗漏消息，是否授予权限？",
             "缺少通知权限",
             "本应用核心功能是发送消息通知，缺少通知权限会导致你遗漏消息。\n\n打开方式：点击“去设置”-“通知管理”-打开允许通知"
-        )
+        ) {
+            NotificationManager.init()
+        }
     }
 
     @SuppressLint("SetJavaScriptEnabled")

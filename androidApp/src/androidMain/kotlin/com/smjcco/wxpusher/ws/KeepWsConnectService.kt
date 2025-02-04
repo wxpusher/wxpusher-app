@@ -1,5 +1,6 @@
 package com.smjcco.wxpusher.ws
 
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -9,7 +10,10 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
+import com.smjcco.wxpusher.WebViewActivity
+import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.notification.NotificationManager
+import com.smjcco.wxpusher.utils.ApplicationUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -40,6 +44,16 @@ class KeepWsConnectService : Service() {
     }
 
     fun foreground() {
+        // 创建Intent，用于在点击通知时启动Activity
+        val intent = Intent(ApplicationUtils.application, WebViewActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        val pendingIntent = PendingIntent.getActivity(
+            ApplicationUtils.application,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
         val notification =
             NotificationCompat.Builder(
                 applicationContext,
@@ -49,6 +63,7 @@ class KeepWsConnectService : Service() {
                 .setContentText("保持本通知以及时接收消息")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setOngoing(true)
+                .setContentIntent(pendingIntent)
                 .build()
         startForeground(NotificationManager.WxPusherSystemForegroundNotificationId, notification)
     }

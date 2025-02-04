@@ -17,8 +17,10 @@ import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
+import com.smjcco.wxpusher.ws.KeepWsConnectService
 import com.smjcco.wxpusher.ws.PushMsgDeviceMsg
 import kotlinx.coroutines.launch
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 
@@ -26,11 +28,16 @@ object NotificationManager {
     private const val TAG = "WxPusherWebInterface"
 
     private var messageId = AtomicInteger(10000)
-    private const val UnknownChannelId = "test-1231"
-    const val WxPusherSystemChannelId = "test-wxp1"
+    private const val UnknownChannelId = "test-123112"
+    const val WxPusherSystemChannelId = "test-wxp112"
     const val WxPusherSystemForegroundNotificationId = 1
     private lateinit var sysNotificationManager: NotificationManager
+    private var init = AtomicBoolean(false)
     fun init() {
+        if (init.get()) {
+            return
+        }
+        init.set(true)
         sysNotificationManager =
             ApplicationUtils.application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         initNotificationChannelGrouop()
@@ -41,7 +48,8 @@ object NotificationManager {
             "WxPusher的公告、升级通知、异常提醒、订阅通知等"
         )
         initSubscribeChannel()
-
+        //只有拿到了通知栏权限，并且创建了消息通知channel，才可以启动service
+        KeepWsConnectService.start(ApplicationUtils.application)
     }
 
     /**
@@ -121,6 +129,8 @@ object NotificationManager {
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setPriority(NotificationCompat.FLAG_HIGH_PRIORITY)
+                //显示更多文本，点击可以展开
+                .setStyle(NotificationCompat.BigTextStyle().bigText(message.summary))
                 .build()
         notification.flags =
             NotificationCompat.FLAG_SHOW_LIGHTS or NotificationCompat.FLAG_HIGH_PRIORITY or NotificationCompat.DEFAULT_SOUND
