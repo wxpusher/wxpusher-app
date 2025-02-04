@@ -8,6 +8,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
@@ -24,9 +25,10 @@ import java.util.concurrent.atomic.AtomicInteger
 object NotificationManager {
     private const val TAG = "WxPusherWebInterface"
 
-    private var messageId = AtomicInteger(1000)
-    private const val UnknownChannelId = "unknown"
-    private const val WxPusherSystem = "WxPusherSystem"
+    private var messageId = AtomicInteger(10000)
+    private const val UnknownChannelId = "test-1231"
+    const val WxPusherSystemChannelId = "test-wxp1"
+    const val WxPusherSystemForegroundNotificationId = 1
     private lateinit var sysNotificationManager: NotificationManager
     fun init() {
         sysNotificationManager =
@@ -34,7 +36,7 @@ object NotificationManager {
         initNotificationChannelGrouop()
         createBizPushChannel(UnknownChannelId, "未分类的消息", "用于接收没有指定分类的消息")
         createWxPusherSystemChannel(
-            WxPusherSystem,
+            WxPusherSystemChannelId,
             "WxPusher系统公告和通知",
             "WxPusher的公告、升级通知、异常提醒、订阅通知等"
         )
@@ -55,7 +57,7 @@ object NotificationManager {
                     val nowHasChannelIdList =
                         subscribeListOrder.map { it.getChannelId() }.toMutableList()
                     //系统缺省的不能删除了
-                    nowHasChannelIdList.add(WxPusherSystem)
+                    nowHasChannelIdList.add(WxPusherSystemChannelId)
                     nowHasChannelIdList.add(UnknownChannelId)
                     sysNotificationManager.notificationChannels.filterNot {
                         nowHasChannelIdList.contains(it.id)
@@ -117,7 +119,11 @@ object NotificationManager {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
+                .setDefaults(Notification.DEFAULT_ALL)
+                .setPriority(NotificationCompat.FLAG_HIGH_PRIORITY)
                 .build()
+        notification.flags =
+            NotificationCompat.FLAG_SHOW_LIGHTS or NotificationCompat.FLAG_HIGH_PRIORITY or NotificationCompat.DEFAULT_SOUND
         sendNotification(notification)
     }
 
@@ -137,7 +143,12 @@ object NotificationManager {
         channel.description = des
         channel.enableLights(true)
         channel.enableVibration(true)
+        channel.vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
         channel.setShowBadge(true)
+        channel.setSound(
+            Settings.System.DEFAULT_NOTIFICATION_URI,
+            Notification.AUDIO_ATTRIBUTES_DEFAULT
+        )
         channel.group = ChannelGroup.SubscribeMessage.id
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             channel.setAllowBubbles(true)
@@ -155,6 +166,10 @@ object NotificationManager {
         channel.enableLights(true)
         channel.enableVibration(true)
         channel.setShowBadge(true)
+        channel.setSound(
+            Settings.System.DEFAULT_NOTIFICATION_URI,
+            Notification.AUDIO_ATTRIBUTES_DEFAULT
+        )
         channel.group = ChannelGroup.WxPusherSystem.id
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             channel.setAllowBubbles(true)
