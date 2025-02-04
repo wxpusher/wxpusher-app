@@ -35,7 +35,7 @@ open class UpdateVersionMsg(
     var content: String,//内容描述
     var version: String,//新的版本号
     var must: Boolean,//是否必须升级
-    var url: Int,//升级url
+    var url: String,//升级url
     msgType: Int, createTime: Long
 ) :
     BaseWsMsg(msgType, createTime)

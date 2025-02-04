@@ -1,8 +1,10 @@
 package com.smjcco.wxpusher.web
 
 import android.os.Build
+import android.util.Log
 import android.webkit.JavascriptInterface
 import com.smjcco.wxpusher.api.DeviceApi
+import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
@@ -13,6 +15,7 @@ import kotlinx.coroutines.launch
  * web服务的接口
  */
 object WxPusherWebInterface {
+    private const val TAG="WxPusherWebInterface"
     var uiModeIsNight = false
     var onWebLoadFinish: (() -> Unit?)? = null
 
@@ -57,10 +60,20 @@ object WxPusherWebInterface {
     }
 
     /**
-     * 退出登录的时候，断开WS长链接
+     * 登录成功的时候调用
      */
     @JavascriptInterface
-    fun wsDisconnect() {
+    fun loginSuccess() {
+        Log.d(TAG, "loginSuccess() called")
+        NotificationManager.initSubscribeChannel()
+    }
+
+    /**
+     * 退出登录
+     */
+    @JavascriptInterface
+    fun logout() {
+        Log.d(TAG, "logout() called")
         WsManager.disconnect()
     }
 

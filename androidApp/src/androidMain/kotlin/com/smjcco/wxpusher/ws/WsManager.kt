@@ -38,6 +38,9 @@ object WsManager {
 
     private var init = AtomicBoolean(false)
 
+    //拒绝链接
+    private var disableConnect = false
+
     fun init() {
         if (init.get()) {
             return
@@ -88,6 +91,10 @@ object WsManager {
             }
             if (AppDataUtils.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
                 Log.d(TAG, "connect: 没有deviceToken（可能没有登录/已经退出登录），不进行链接")
+                return
+            }
+            if (disableConnect) {
+                Log.d(TAG, "connect:客户端版本低，不进行链接")
                 return
             }
             disconnect()
@@ -200,6 +207,9 @@ object WsManager {
             if (bizMsg == null) {
                 Log.d(TAG, "onMessage() 消息反序列化错误：text=${text}")
                 return
+            }
+            if (bizMsg.msgType == WsMessageTypeEnum.UPDATE_CLIENT.code) {
+                disableConnect = true
             }
             val listenerList: MutableList<IWsMessageListener<*>>? =
                 msgListenerMap.get(baseWsMsg.msgType)

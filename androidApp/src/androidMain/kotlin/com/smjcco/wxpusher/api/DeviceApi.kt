@@ -1,6 +1,7 @@
 package com.smjcco.wxpusher.api
 
 import android.util.Log
+import com.google.gson.reflect.TypeToken
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.GsonUtils
@@ -13,6 +14,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.Response
+import java.util.Collections
 
 object DeviceApi {
     private const val TAG = "DeviceApi"
@@ -26,6 +28,48 @@ object DeviceApi {
         WxPusherUtils.getIoScopeScope().launch {
             updateDeviceInfo()
         }
+    }
+
+    /**
+     * 获取订单的列表
+     * 主要用来创建通知的channel
+     */
+    suspend fun getSubscribeList(): List<SubscribeListItem> {
+        val deviceToken = AppDataUtils.getLoginInfo()?.deviceToken
+        if (deviceToken.isNullOrEmpty()) {
+            Log.d(TAG, "getSubscribeList: 没有deviceToken")
+            return Collections.emptyList()
+        }
+
+        try {
+            return withContext(Dispatchers.IO) {
+                val url = "$BASE_URL/api/need-login/device/subscribe-list"
+                val request = Request.Builder()
+                    .url(url)
+                    .method("GET", null)
+                    .header("deviceToken", deviceToken)
+                    .build()
+                client.newCall(request).execute().use { response: Response ->
+                    val status = response.isSuccessful
+                    if (!status) {
+                        return@use Collections.emptyList()
+                    }
+                    val bodyByte = response.body?.bytes()
+                    val bodyStr = bodyByte?.let { String(it) }
+                    Log.d(TAG, "获取订阅列表,结果=${bodyStr}")
+                    val type = object : TypeToken<BaseResp<List<SubscribeListItem>>>() {}.type
+                    val respData: BaseResp<List<SubscribeListItem>>? =
+                        GsonUtils.toObj(bodyStr, type)
+                    if (respData?.isSuccess() == true) {
+                        return@use respData.data
+                    }
+                    return@use Collections.emptyList()
+                }
+            }
+        } catch (e: Throwable) {
+            e.printStackTrace()
+        }
+        return Collections.emptyList()
     }
 
     /**

@@ -8,16 +8,22 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WebViewActivity
 import com.smjcco.wxpusher.WxPusherConfig
+import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.ws.PushMsgDeviceMsg
+import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicInteger
 
 
 object NotificationManager {
+    private const val TAG = "WxPusherWebInterface"
+
     private var messageId = AtomicInteger(1000)
     private const val UnknownChannelId = "unknown"
     private const val WxPusherSystem = "WxPusherSystem"
@@ -26,27 +32,60 @@ object NotificationManager {
         sysNotificationManager =
             ApplicationUtils.application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         initNotificationChannelGrouop()
-        createBizPushChannel(UnknownChannelId, "未归类的消息", "用于接收没有指定分类的消息")
+        createBizPushChannel(UnknownChannelId, "未分类的消息", "用于接收没有指定分类的消息")
         createWxPusherSystemChannel(
             WxPusherSystem,
             "WxPusher系统公告和通知",
             "WxPusher的公告、升级通知、异常提醒、订阅通知等"
         )
+        initSubscribeChannel()
 
     }
 
+    /**
+     * 通过网络拉取用户订阅的内容，然后创建推送通道
+     */
+    fun initSubscribeChannel() {
+        WxPusherUtils.getIoScopeScope().launch {
+            val subscribeList = DeviceApi.getSubscribeList()
+            val subscribeListOrder = subscribeList.reversed()
+            for (subscribeListItem in subscribeListOrder) {
+                Log.d(
+                    TAG, "创建通知通道，ChannelId = ${subscribeListItem.getChannelId()}," +
+                            "subscribeListItem.name=${subscribeListItem.name}"
+                )
+                createBizPushChannel(
+                    subscribeListItem.getChannelId(),
+                    subscribeListItem.name,
+                    ""
+                )
+            }
+        }
+
+    }
+
+    /**
+     * 发送业务消息推送通知
+     */
     fun sendBizMessageNotification(message: PushMsgDeviceMsg) {
         var channel: String = UnknownChannelId
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
             && message.sourceID.isNotEmpty()
-            && sysNotificationManager.getNotificationChannel(message.sourceID) != null
         ) {
-            channel = message.sourceID
+            if (sysNotificationManager.getNotificationChannel(message.sourceID) != null) {
+                channel = message.sourceID
+            } else {
+                //遇到没有创建的主题，补偿创建一次，下次生效
+                initSubscribeChannel()
+            }
         }
 
         // 创建Intent，用于在点击通知时启动Activity
         val intent = Intent(ApplicationUtils.application, WebViewActivity::class.java)
-        intent.putExtra(WebViewActivity.INTENT_KEY_URL, "${WxPusherConfig.ApiUrl}/api/message/${message.qid}")
+        intent.putExtra(
+            WebViewActivity.INTENT_KEY_URL,
+            "${WxPusherConfig.ApiUrl}/api/message/${message.qid}"
+        )
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         val pendingIntent = PendingIntent.getActivity(
             ApplicationUtils.application,
