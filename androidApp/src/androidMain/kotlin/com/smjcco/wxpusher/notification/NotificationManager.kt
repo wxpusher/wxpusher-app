@@ -49,6 +49,15 @@ object NotificationManager {
         WxPusherUtils.getIoScopeScope().launch {
             val subscribeList = DeviceApi.getSubscribeList()
             val subscribeListOrder = subscribeList.reversed()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                //已经删除的订阅，把推送通道也删除了
+                val nowHasChannelIdList = subscribeListOrder.map { it.getChannelId() }
+                sysNotificationManager.notificationChannels.filterNot {
+                    nowHasChannelIdList.contains(it.id)
+                }.forEach {
+                    sysNotificationManager.deleteNotificationChannel(it.id)
+                }
+            }
             for (subscribeListItem in subscribeListOrder) {
                 Log.d(
                     TAG, "创建通知通道，ChannelId = ${subscribeListItem.getChannelId()}," +
@@ -60,6 +69,7 @@ object NotificationManager {
                     ""
                 )
             }
+
         }
 
     }
