@@ -5,10 +5,15 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.notification.ChannelGroup
+import com.smjcco.wxpusher.notification.NotificationManager
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class KeepWsConnectService : Service() {
     val TAG = "KeepWsConnectService"
@@ -24,19 +29,28 @@ class KeepWsConnectService : Service() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
-        foreground()
         WsManager.init()
+        CoroutineScope(Dispatchers.IO).launch {
+            while (true) {
+                Log.d(TAG, "onCreate: KeepWsConnectService-RUN")
+                delay(1000)
+            }
+        }
+        foreground()
     }
 
     fun foreground() {
-        val notification = NotificationCompat.Builder(applicationContext, "123")
-            .setChannelId(ChannelGroup.WxPusherSystem.id)
-            .setContentTitle("WxPusher消息推送平台")
-            .setContentText("消息监听中")
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setOngoing(true)
-            .build()
-        startForeground(1, notification)
+        val notification =
+            NotificationCompat.Builder(
+                applicationContext,
+                NotificationManager.WxPusherSystemChannelId
+            )
+                .setContentTitle("WxPusher消息推送平台")
+                .setContentText("保持本通知以及时接收消息")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setOngoing(true)
+                .build()
+        startForeground(NotificationManager.WxPusherSystemForegroundNotificationId, notification)
     }
 
 }
