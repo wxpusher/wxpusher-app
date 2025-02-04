@@ -48,28 +48,33 @@ object NotificationManager {
     fun initSubscribeChannel() {
         WxPusherUtils.getIoScopeScope().launch {
             val subscribeList = DeviceApi.getSubscribeList()
-            val subscribeListOrder = subscribeList.reversed()
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                //已经删除的订阅，把推送通道也删除了
-                val nowHasChannelIdList = subscribeListOrder.map { it.getChannelId() }
-                sysNotificationManager.notificationChannels.filterNot {
-                    nowHasChannelIdList.contains(it.id)
-                }.forEach {
-                    sysNotificationManager.deleteNotificationChannel(it.id)
+            WxPusherUtils.getMainScope().launch {
+                val subscribeListOrder = subscribeList.reversed()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    //已经删除的订阅，把推送通道也删除了
+                    val nowHasChannelIdList =
+                        subscribeListOrder.map { it.getChannelId() }.toMutableList()
+                    //系统缺省的不能删除了
+                    nowHasChannelIdList.add(WxPusherSystem)
+                    nowHasChannelIdList.add(UnknownChannelId)
+                    sysNotificationManager.notificationChannels.filterNot {
+                        nowHasChannelIdList.contains(it.id)
+                    }.forEach {
+                        sysNotificationManager.deleteNotificationChannel(it.id)
+                    }
+                }
+                for (subscribeListItem in subscribeListOrder) {
+                    Log.d(
+                        TAG, "创建通知通道，ChannelId = ${subscribeListItem.getChannelId()}," +
+                                "subscribeListItem.name=${subscribeListItem.name}"
+                    )
+                    createBizPushChannel(
+                        subscribeListItem.getChannelId(),
+                        subscribeListItem.name,
+                        ""
+                    )
                 }
             }
-            for (subscribeListItem in subscribeListOrder) {
-                Log.d(
-                    TAG, "创建通知通道，ChannelId = ${subscribeListItem.getChannelId()}," +
-                            "subscribeListItem.name=${subscribeListItem.name}"
-                )
-                createBizPushChannel(
-                    subscribeListItem.getChannelId(),
-                    subscribeListItem.name,
-                    ""
-                )
-            }
-
         }
 
     }
