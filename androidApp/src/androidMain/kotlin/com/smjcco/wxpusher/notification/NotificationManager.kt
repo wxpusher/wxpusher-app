@@ -118,7 +118,7 @@ object NotificationManager {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         val pendingIntent = PendingIntent.getActivity(
             ApplicationUtils.application,
-            0,
+            messageId.get(),
             intent,
             PendingIntent.FLAG_IMMUTABLE
         )

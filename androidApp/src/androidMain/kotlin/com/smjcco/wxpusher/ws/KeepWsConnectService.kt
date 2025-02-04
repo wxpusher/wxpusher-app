@@ -34,12 +34,6 @@ class KeepWsConnectService : Service() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         WsManager.init()
-        CoroutineScope(Dispatchers.IO).launch {
-            while (true) {
-                Log.d(TAG, "onCreate: KeepWsConnectService-RUN")
-                delay(1000)
-            }
-        }
         foreground()
     }
 
