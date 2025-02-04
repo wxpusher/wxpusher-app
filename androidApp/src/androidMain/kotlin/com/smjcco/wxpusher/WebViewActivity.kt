@@ -2,7 +2,10 @@ package com.smjcco.wxpusher
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
@@ -12,12 +15,17 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
+import androidx.core.content.ContextCompat
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.utils.PermissionUtils
+import com.smjcco.wxpusher.utils.SaveUtils
+import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 import com.smjcco.wxpusher.web.update.WebBundleManager
 import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback
 import com.tencent.upgrade.core.UpgradeManager
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class WebViewActivity : ComponentActivity() {
@@ -57,7 +65,29 @@ class WebViewActivity : ComponentActivity() {
             "本应用核心功能是发送消息通知，缺少通知权限会导致你遗漏消息。\n\n打开方式：点击“去设置”-“通知管理”-打开允许通知"
         ) {
             NotificationManager.init()
+            gotoNotificationSetting()
         }
+    }
+
+    private fun gotoNotificationSetting() {
+        if (SaveUtils.getByKey("NotificationSetting") == "1") {
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle("打开通知提醒")
+            .setMessage("由于Android的系统限制，默认消息可能不会提醒，请你前往应用详情-通知管理，找到页面下方的消息分类，打开声音、震动等全部提醒方式。")
+            .setPositiveButton(
+                "去设置"
+            ) { dialog, which ->
+                dialog?.dismiss()
+                WxPusherUtils.gotoNotificationSettingPage()
+            }
+            .setCancelable(false)
+            .setNegativeButton("不再提醒") { dialog, _ ->
+                dialog?.dismiss()
+                SaveUtils.setKeyValue("NotificationSetting", "1")
+            }
+            .create().show()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
