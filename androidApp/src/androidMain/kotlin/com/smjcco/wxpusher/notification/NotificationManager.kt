@@ -28,8 +28,8 @@ object NotificationManager {
     private const val TAG = "WxPusherWebInterface"
 
     private var messageId = AtomicInteger(10000)
-    private const val UnknownChannelId = "test-112"
-    const val WxPusherSystemChannelId = "test-1121"
+    private const val UnknownChannelId = "UnknownChannelId"
+    const val WxPusherSystemChannelId = "WxPusherSystemChannelId"
     const val WxPusherSystemForegroundNotificationId = 1
     private lateinit var sysNotificationManager: NotificationManager
     private var init = AtomicBoolean(false)
