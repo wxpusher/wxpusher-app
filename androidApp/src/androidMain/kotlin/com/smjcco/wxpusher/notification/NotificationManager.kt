@@ -132,12 +132,11 @@ object NotificationManager {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_ALL)
-                .setPriority(NotificationCompat.FLAG_HIGH_PRIORITY)
-                //显示更多文本，点击可以展开
+                .setPriority(Notification.PRIORITY_MAX)
+                //显示更多文本，长按可以展开
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message.summary))
                 .build()
-        notification.flags =
-            NotificationCompat.FLAG_SHOW_LIGHTS or NotificationCompat.FLAG_HIGH_PRIORITY or NotificationCompat.DEFAULT_SOUND
+
         sendNotification(notification)
     }
 
