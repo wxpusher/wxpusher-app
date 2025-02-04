@@ -1,10 +1,12 @@
 package com.smjcco.wxpusher.utils
 
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Looper
+import android.provider.Settings
 import android.widget.Toast
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -78,5 +80,20 @@ object WxPusherUtils {
                         || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
                         || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
                 )
+    }
+
+    /**
+     * 打开通知设置页面
+     */
+    fun gotoNotificationSettingPage() {
+        val intent = Intent()
+        intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+        intent.putExtra(Settings.EXTRA_APP_PACKAGE, ApplicationUtils.application.getPackageName())
+        intent.putExtra(
+            Settings.EXTRA_CHANNEL_ID,
+            ApplicationUtils.application.applicationInfo.uid
+        )
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        ApplicationUtils.application.startActivity(intent)
     }
 }

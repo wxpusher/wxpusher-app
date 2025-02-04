@@ -14,13 +14,10 @@ import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.utils.PermissionUtils
-import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 import com.smjcco.wxpusher.web.update.WebBundleManager
 import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback
 import com.tencent.upgrade.core.UpgradeManager
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 class WebViewActivity : ComponentActivity() {

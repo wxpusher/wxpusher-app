@@ -28,8 +28,8 @@ object NotificationManager {
     private const val TAG = "WxPusherWebInterface"
 
     private var messageId = AtomicInteger(10000)
-    private const val UnknownChannelId = "test-123112"
-    const val WxPusherSystemChannelId = "test-wxp112"
+    private const val UnknownChannelId = "test-112"
+    const val WxPusherSystemChannelId = "test-1121"
     const val WxPusherSystemForegroundNotificationId = 1
     private lateinit var sysNotificationManager: NotificationManager
     private var init = AtomicBoolean(false)
@@ -41,11 +41,14 @@ object NotificationManager {
         sysNotificationManager =
             ApplicationUtils.application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         initNotificationChannelGrouop()
-        createBizPushChannel(UnknownChannelId, "未分类的消息", "用于接收没有指定分类的消息")
-        createWxPusherSystemChannel(
+        createNotificationChannel(
+            UnknownChannelId,
+            ChannelGroup.SubscribeMessage, "未分类的消息", "用于接收没有指定分类的消息"
+        )
+        createNotificationChannel(
             WxPusherSystemChannelId,
-            "WxPusher系统公告和通知",
-            "WxPusher的公告、升级通知、异常提醒、订阅通知等"
+            ChannelGroup.WxPusherSystem,
+            "WxPusher系统公告和通知", "WxPusher的公告、升级通知、异常提醒、订阅通知等",
         )
         initSubscribeChannel()
         //只有拿到了通知栏权限，并且创建了消息通知channel，才可以启动service
@@ -78,8 +81,9 @@ object NotificationManager {
                         TAG, "创建通知通道，ChannelId = ${subscribeListItem.getChannelId()}," +
                                 "subscribeListItem.name=${subscribeListItem.name}"
                     )
-                    createBizPushChannel(
+                    createNotificationChannel(
                         subscribeListItem.getChannelId(),
+                        ChannelGroup.SubscribeMessage,
                         subscribeListItem.name,
                         ""
                     )
@@ -145,7 +149,12 @@ object NotificationManager {
     /**
      * 创建业务消息的通知渠道
      */
-    private fun createBizPushChannel(id: String, name: String, des: String) {
+    private fun createNotificationChannel(
+        id: String,
+        group: ChannelGroup,
+        name: String,
+        des: String
+    ) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return
         }
@@ -159,28 +168,7 @@ object NotificationManager {
             Settings.System.DEFAULT_NOTIFICATION_URI,
             Notification.AUDIO_ATTRIBUTES_DEFAULT
         )
-        channel.group = ChannelGroup.SubscribeMessage.id
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            channel.setAllowBubbles(true)
-        }
-        channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-        createNotificationChannel(channel)
-    }
-
-    private fun createWxPusherSystemChannel(id: String, name: String, des: String) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            return
-        }
-        val channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH)
-        channel.description = des
-        channel.enableLights(true)
-        channel.enableVibration(true)
-        channel.setShowBadge(true)
-        channel.setSound(
-            Settings.System.DEFAULT_NOTIFICATION_URI,
-            Notification.AUDIO_ATTRIBUTES_DEFAULT
-        )
-        channel.group = ChannelGroup.WxPusherSystem.id
+        channel.group = group.id
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             channel.setAllowBubbles(true)
         }
