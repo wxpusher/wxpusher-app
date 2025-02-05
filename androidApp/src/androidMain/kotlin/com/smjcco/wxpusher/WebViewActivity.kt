@@ -7,12 +7,16 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
@@ -29,6 +33,7 @@ class WebViewActivity : ComponentActivity() {
 
     private val TAG: String = "WebViewActivity"
     private var webview: WebView? = null
+    private var webContainer: View? = null
     private var pressBackTime = System.currentTimeMillis()
     private var preUiMode = -1
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +44,8 @@ class WebViewActivity : ComponentActivity() {
             return
         }
         setContentView(R.layout.web_activity)
+        webContainer = findViewById(R.id.web_container)
+        enableEdgeToEdge()
         initWebView()
         requestPermission()
         checkUpdate()
@@ -195,6 +202,11 @@ class WebViewActivity : ComponentActivity() {
 
     private fun onUiModeChanged(night: Boolean) {
         Log.d(TAG, "onUiModeChanged() called with: night = $night")
+        //设置容器背景颜色，保持顶部状态栏好看
+        val color: Int = resources.getColor(R.color.dark_bg)
+        val bgColor = if (night) color else Color.White.toArgb()
+        webContainer?.setBackgroundColor(bgColor)
+
         WxPusherWebInterface.uiModeIsNight = night
         webview?.evaluateJavascript("window.onUiModeChanged && window.onUiModeChanged(${night})") {
         }
