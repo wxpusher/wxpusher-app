@@ -27,7 +27,8 @@ kotlin {
             implementation("com.google.code.gson:gson:2.10.1")
             implementation("androidx.fragment:fragment:1.7.0")
             implementation("androidx.appcompat:appcompat:1.7.0")
-            implementation("androidx.webkit:webkit:1.4.0")
+//            implementation("androidx.webkit:webkit:1.9.0")
+            implementation("com.google.android.material:material:1.12.0")
 
 
 

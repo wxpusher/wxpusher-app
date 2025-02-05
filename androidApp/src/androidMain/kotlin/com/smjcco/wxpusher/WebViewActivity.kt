@@ -5,20 +5,14 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.Configuration
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
-import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.webkit.WebSettingsCompat
-import androidx.webkit.WebViewFeature
-import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
@@ -117,21 +111,6 @@ class WebViewActivity : ComponentActivity() {
         }
 
         webview?.addJavascriptInterface(WxPusherWebInterface, "wxPusherApi")
-
-//        if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
-//            val nightModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-//            if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
-//                WebSettingsCompat.setForceDark(webview?.settings!!, WebSettingsCompat.FORCE_DARK_ON)
-//            } else {
-//                WebSettingsCompat.setForceDark(webview?.settings!!, WebSettingsCompat.FORCE_DARK_OFF)
-//            }
-//
-//            WebSettingsCompat.setForceDarkStrategy(
-//                webview?.settings!!,
-//                WebSettingsCompat.DARK_STRATEGY_WEB_THEME_DARKENING_ONLY
-//            )
-//        }
-
         // 应用可能的更新
         WebBundleManager.applyUpdateIfAvailable()
 
