@@ -1,15 +1,24 @@
 package com.smjcco.wxpusher.ws
 
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.content.pm.ServiceInfo
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import androidx.work.BackoffPolicy
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ForegroundInfo
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkRequest
 import androidx.work.WorkerParameters
+import com.smjcco.wxpusher.R
+import com.smjcco.wxpusher.WebViewActivity
+import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.utils.ApplicationUtils
+import kotlinx.coroutines.delay
 import java.util.concurrent.TimeUnit
 
 
@@ -20,45 +29,42 @@ class KeepWsConnectWork(appContext: Context, workerParams: WorkerParameters) :
     override suspend fun doWork(): Result {
         Log.d(TAG, Thread.currentThread().name + ":doWork() called")
         WsManager.init();
-//        setForeground(getForegroundInfo())
+        setForeground(getForegroundInfo())
+        for (i in 0..15 * 60) {
+            delay(1000)
+            WsManager.init();
+        }
         return Result.success()
     }
 
-//    override suspend fun getForegroundInfo(): ForegroundInfo {
-//        // Create a Notification channel if necessary
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-//            createChannel()
-//        }
-//        val notification = NotificationCompat.Builder(applicationContext, "123")
-//            .setChannelId("WorkManager")
-//            .setContentTitle("WorkManager-Set")
-//            .setTicker("setTicker")
-//            .setContentText("WorkManager的前台通知")
-//            .setSmallIcon(R.mipmap.ic_launcher)
-//            .setOngoing(true)
-//            // Add the cancel action to the notification which can
-//            // be used to cancel the worker
-//            .build()
-//        return ForegroundInfo(
-//            1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_REMOTE_MESSAGING
-//        )
-//    }
-//
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    fun createChannel() {
-//        val channel = NotificationChannel(
-//            "WorkManager", "WorkManager消息通知",
-//            NotificationManager.IMPORTANCE_HIGH
-//        )
-//        channel.description = "用户监听WxPusher消息通知"
-//        channel.enableLights(true)
-//        channel.enableVibration(true)
-//        channel.lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-//
-//        val notificationManager =
-//            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//        notificationManager.createNotificationChannel(channel)
-//    }
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        // 创建Intent，用于在点击通知时启动Activity
+        val intent = Intent(ApplicationUtils.application, WebViewActivity::class.java)
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        val pendingIntent = PendingIntent.getActivity(
+            ApplicationUtils.application,
+            0,
+            intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+
+        val notification =
+            NotificationCompat.Builder(
+                applicationContext,
+                NotificationManager.WxPusherSystemChannelId
+            )
+                .setContentTitle("WxPusher消息推送平台")
+                .setContentText("保持本通知以及时接收消息")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setOngoing(true)
+                .setContentIntent(pendingIntent)
+                .build()
+        return ForegroundInfo(
+            NotificationManager.WxPusherSystemForegroundNotificationId,
+            notification,
+            ServiceInfo.FOREGROUND_SERVICE_TYPE_REMOTE_MESSAGING
+        )
+    }
 
 
 }

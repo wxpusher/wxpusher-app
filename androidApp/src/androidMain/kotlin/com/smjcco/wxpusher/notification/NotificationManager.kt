@@ -17,8 +17,8 @@ import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
-import com.smjcco.wxpusher.ws.KeepWsConnectService
 import com.smjcco.wxpusher.ws.PushMsgDeviceMsg
+import com.smjcco.wxpusher.ws.WsWorkManager
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -52,7 +52,8 @@ object NotificationManager {
         )
         initSubscribeChannel()
         //只有拿到了通知栏权限，并且创建了消息通知channel，才可以启动service
-        KeepWsConnectService.start(ApplicationUtils.application)
+//        KeepWsConnectService.start(ApplicationUtils.application)
+        WsWorkManager.startPeriodicJob()
     }
 
     /**

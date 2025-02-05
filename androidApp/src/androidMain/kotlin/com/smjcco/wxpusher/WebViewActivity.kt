@@ -3,19 +3,21 @@ package com.smjcco.wxpusher
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.DialogInterface
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
-import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.webkit.WebSettingsCompat
+import androidx.webkit.WebViewFeature
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.SaveUtils
@@ -24,8 +26,6 @@ import com.smjcco.wxpusher.web.WxPusherWebInterface
 import com.smjcco.wxpusher.web.update.WebBundleManager
 import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback
 import com.tencent.upgrade.core.UpgradeManager
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 class WebViewActivity : ComponentActivity() {
@@ -64,7 +64,6 @@ class WebViewActivity : ComponentActivity() {
             "缺少通知权限",
             "本应用核心功能是发送消息通知，缺少通知权限会导致你遗漏消息。\n\n打开方式：点击“去设置”-“通知管理”-打开允许通知"
         ) {
-            NotificationManager.init()
             gotoNotificationSetting()
         }
     }
@@ -119,6 +118,20 @@ class WebViewActivity : ComponentActivity() {
 
         webview?.addJavascriptInterface(WxPusherWebInterface, "wxPusherApi")
 
+//        if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+//            val nightModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+//            if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
+//                WebSettingsCompat.setForceDark(webview?.settings!!, WebSettingsCompat.FORCE_DARK_ON)
+//            } else {
+//                WebSettingsCompat.setForceDark(webview?.settings!!, WebSettingsCompat.FORCE_DARK_OFF)
+//            }
+//
+//            WebSettingsCompat.setForceDarkStrategy(
+//                webview?.settings!!,
+//                WebSettingsCompat.DARK_STRATEGY_WEB_THEME_DARKENING_ONLY
+//            )
+//        }
+
         // 应用可能的更新
         WebBundleManager.applyUpdateIfAvailable()
 
@@ -133,6 +146,7 @@ class WebViewActivity : ComponentActivity() {
             webview?.clearHistory()
             // 加载本地文件
             webview?.loadUrl("${getWebPageUrl()}#/home")
+//            webview?.loadUrl("https://wxpusher.zjiecode.com/admin/agreement/index-argeement.html#qqq")
         }
     }
 

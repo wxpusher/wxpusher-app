@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.Build
 import android.util.Log
 import com.smjcco.wxpusher.api.DeviceApi
+import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotification
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
@@ -22,11 +23,13 @@ class WxPusherApplication : Application() {
     private val TAG = "AppInit"
     override fun onCreate() {
         super.onCreate()
+        Log.d(TAG, "应用启动")
         ApplicationUtils.application = this
         SaveUtils.init()
         initBiz()
         WsManager.init()
         WebBundleManager.init()
+        NotificationManager.init()
         initTbs()
     }
 
