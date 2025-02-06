@@ -26,7 +26,7 @@ object WsManager {
     private val connectListenerList = mutableListOf<IWsConnectChangedListener>()
     private val client = OkHttpClient
         .Builder()
-        .pingInterval(10, TimeUnit.SECONDS)
+        .pingInterval(25, TimeUnit.SECONDS)
         .connectTimeout(10, TimeUnit.SECONDS) // 设置连接超时时间
         .readTimeout(10, TimeUnit.SECONDS)    // 设置读取超时时间
         .build()
