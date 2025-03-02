@@ -6,18 +6,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.IBinder
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WebViewActivity
-import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.utils.ApplicationUtils
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class KeepWsConnectService : Service() {
     val TAG = "KeepWsConnectService"

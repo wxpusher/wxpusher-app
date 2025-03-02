@@ -65,7 +65,7 @@ object WxPusherWebInterface {
     @JavascriptInterface
     fun loginSuccess() {
         Log.d(TAG, "loginSuccess() called")
-        NotificationManager.initSubscribeChannel()
+//        NotificationManager.initSubscribeChannel()
     }
 
     /**

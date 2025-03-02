@@ -50,7 +50,7 @@ object NotificationManager {
             ChannelGroup.WxPusherSystem,
             "WxPusher系统公告和通知", "WxPusher的公告、升级通知、异常提醒、订阅通知等",
         )
-        initSubscribeChannel()
+//        initSubscribeChannel()
         //只有拿到了通知栏权限，并且创建了消息通知channel，才可以启动service
 //        KeepWsConnectService.start(ApplicationUtils.application)
         WsWorkManager.startPeriodicJob()
@@ -98,17 +98,17 @@ object NotificationManager {
      * 发送业务消息推送通知
      */
     fun sendBizMessageNotification(message: PushMsgDeviceMsg) {
-        var channel: String = UnknownChannelId
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
-            && message.sourceID.isNotEmpty()
-        ) {
-            if (sysNotificationManager.getNotificationChannel(message.sourceID) != null) {
-                channel = message.sourceID
-            } else {
-                //遇到没有创建的主题，补偿创建一次，下次生效
-                initSubscribeChannel()
-            }
-        }
+        var channel: String = WxPusherSystemChannelId
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
+//            && message.sourceID.isNotEmpty()
+//        ) {
+//            if (sysNotificationManager.getNotificationChannel(message.sourceID) != null) {
+//                channel = message.sourceID
+//            } else {
+//                //遇到没有创建的主题，补偿创建一次，下次生效
+//                initSubscribeChannel()
+//            }
+//        }
 
         // 创建Intent，用于在点击通知时启动Activity
         val intent = Intent(ApplicationUtils.application, WebViewActivity::class.java)
