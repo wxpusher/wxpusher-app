@@ -1,11 +1,13 @@
 package com.smjcco.wxpusher.web
 
+import android.content.Intent
 import android.os.Build
 import android.util.Log
 import android.webkit.JavascriptInterface
 import com.smjcco.wxpusher.api.DeviceApi
-import com.smjcco.wxpusher.notification.NotificationManager
+import com.smjcco.wxpusher.page.CheckActivity
 import com.smjcco.wxpusher.utils.AppDataUtils
+import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.ws.WsManager
@@ -15,7 +17,7 @@ import kotlinx.coroutines.launch
  * web服务的接口
  */
 object WxPusherWebInterface {
-    private const val TAG="WxPusherWebInterface"
+    private const val TAG = "WxPusherWebInterface"
     var uiModeIsNight = false
     var onWebLoadFinish: (() -> Unit?)? = null
 
@@ -88,5 +90,12 @@ object WxPusherWebInterface {
         WxPusherUtils.getMainScope().launch {
             onWebLoadFinish?.invoke()
         }
+    }
+
+    @JavascriptInterface
+    fun togoCheckPermission() {
+        val intent = Intent(ApplicationUtils.application, CheckActivity::class.java)
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        ApplicationUtils.application.startActivity(intent)
     }
 }

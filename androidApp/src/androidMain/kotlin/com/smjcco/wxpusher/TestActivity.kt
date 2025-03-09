@@ -22,7 +22,7 @@ class TestActivity : ComponentActivity() {
 
     private val requester = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         if (it) {
-            Log.d("TestActivity", "requestPermission: Ok")
+            Log.d("TestActivity", "requestPermission: Ok。")
         } else if (!ActivityCompat.shouldShowRequestPermissionRationale(
                 this,
                 Manifest.permission.POST_NOTIFICATIONS

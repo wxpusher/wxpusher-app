@@ -41,10 +41,10 @@ object NotificationManager {
         sysNotificationManager =
             ApplicationUtils.application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         initNotificationChannelGrouop()
-        createNotificationChannel(
-            UnknownChannelId,
-            ChannelGroup.SubscribeMessage, "未分类的消息", "用于接收没有指定分类的消息"
-        )
+//        createNotificationChannel(
+//            UnknownChannelId,
+//            ChannelGroup.SubscribeMessage, "未分类的消息", "用于接收没有指定分类的消息"
+//        )
         createNotificationChannel(
             WxPusherSystemChannelId,
             ChannelGroup.WxPusherSystem,

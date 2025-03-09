@@ -82,18 +82,4 @@ object WxPusherUtils {
                 )
     }
 
-    /**
-     * 打开通知设置页面
-     */
-    fun gotoNotificationSettingPage() {
-        val intent = Intent()
-        intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-        intent.putExtra(Settings.EXTRA_APP_PACKAGE, ApplicationUtils.application.getPackageName())
-        intent.putExtra(
-            Settings.EXTRA_CHANNEL_ID,
-            ApplicationUtils.application.applicationInfo.uid
-        )
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        ApplicationUtils.application.startActivity(intent)
-    }
 }

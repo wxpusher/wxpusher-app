@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.Configuration
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -17,6 +18,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
@@ -58,14 +60,19 @@ class WebViewActivity : ComponentActivity() {
     }
 
     private fun requestPermission() {
-        PermissionUtils.request(
-            this, Manifest.permission.POST_NOTIFICATIONS,
+        val permission =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS else "android.permission.POST_NOTIFICATIONS"
+        PermissionRequester(
+            this, permission,
             "需要发送通知权限",
             "WxPusher是一个消息推送平台，当有新消息到达的时候，我们会第一时间给你发送通知，因此需要你授予发送通知的权限，否则我们无法发送消息通知，你可能会因此遗漏消息，是否授予权限？",
             "缺少通知权限",
             "本应用核心功能是发送消息通知，缺少通知权限会导致你遗漏消息。\n\n打开方式：点击“去设置”-“通知管理”-打开允许通知"
         ) {
-            gotoNotificationSetting()
+
+            PermissionUtils.gotoNotificationSettingPage()
+        }.request {
+
         }
     }
 
@@ -80,7 +87,7 @@ class WebViewActivity : ComponentActivity() {
                 "去设置"
             ) { dialog, which ->
                 dialog?.dismiss()
-                WxPusherUtils.gotoNotificationSettingPage()
+                PermissionUtils.gotoNotificationSettingPage()
             }
             .setCancelable(false)
             .setNegativeButton("不再提醒") { dialog, _ ->
