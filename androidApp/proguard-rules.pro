@@ -87,3 +87,4 @@
 -dontwarn com.tencent.beacon.event.UserAction
 -dontwarn com.tencent.raft.measure.RAFTMeasure
 -dontwarn com.tencent.raft.measure.config.RAFTComConfig
+-dontwarn javax.lang.model.element.Modifier

@@ -121,7 +121,7 @@ object WebBundleManager {
     private fun checkUpdate() {
         WxPusherUtils.getIoScopeScope().launch {
             try {
-                val serverVersion = URL("${WxPusherConfig.WebUrl}/version.txt").readText()
+                val serverVersion = URL("${WxPusherConfig.WebUrl}${VERSION_FILE}").readText()
                 val localVersion = getNowVersion()
                 if (isVersionGreater(serverVersion, localVersion)) {
                     Log.d(TAG, "检查到新版本，开始下载,version=${serverVersion}")
