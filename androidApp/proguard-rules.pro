@@ -59,7 +59,24 @@
     !static !transient <fields>;
 }
 
+# 保留 androidx.annotation.Keep 注解类
+-keep class androidx.annotation.Keep {
+    *;
+}
+# 保留被 @Keep 注解的类
+-keep @androidx.annotation.Keep class * {
+    *;
+}
 
+# 保留被 @Keep 注解的方法
+-keepclassmembers class * {
+    @androidx.annotation.Keep *;
+}
+
+# 保留被 @Keep 注解的字段
+-keepclassmembers class * {
+    @androidx.annotation.Keep <fields>;
+}
 
 # 保持第三方库不被混淆（以 Gson 为例）
 -keep class com.google.gson.** { *; }
