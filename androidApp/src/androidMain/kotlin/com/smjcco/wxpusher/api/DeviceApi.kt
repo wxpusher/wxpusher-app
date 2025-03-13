@@ -1,6 +1,7 @@
 package com.smjcco.wxpusher.api
 
 import android.util.Log
+import androidx.annotation.Keep
 import com.google.gson.reflect.TypeToken
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.utils.AppDataUtils
@@ -128,6 +129,7 @@ object DeviceApi {
         return false
     }
 
+    @Keep
     data class UpdateDeviceInfoReq(
         val deviceUuid: String,
         val pushToken: String

@@ -1,5 +1,6 @@
 package com.smjcco.wxpusher.utils
 
+import android.util.Log
 import com.smjcco.wxpusher.bean.LoginInfo
 
 /**

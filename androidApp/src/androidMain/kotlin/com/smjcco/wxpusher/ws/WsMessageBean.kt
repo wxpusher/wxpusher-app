@@ -1,22 +1,29 @@
 package com.smjcco.wxpusher.ws
 
+import androidx.annotation.Keep
+
 /**
  * WS消息的基类
  */
+@Keep
 open class BaseWsMsg(var msgType: Int, var createTime: Long)
 
 //心跳类
+@Keep
 open class HeartMsg(msgType: Int, createTime: Long) : BaseWsMsg(msgType, createTime)
 
 //设备初始化消息
+@Keep
 open class InitDeviceMsg(var pushToken: String, msgType: Int, createTime: Long) :
     BaseWsMsg(msgType, createTime)
 
 //错误信息
+@Keep
 open class ErrorMsg(var msg: String, msgType: Int, createTime: Long) :
     BaseWsMsg(msgType, createTime)
 
 //推送消息
+@Keep
 open class PushMsgDeviceMsg(
     var mid: Long,
     var sourceID: String,
@@ -30,6 +37,7 @@ open class PushMsgDeviceMsg(
     BaseWsMsg(msgType, createTime)
 
 //升级的消息推送
+@Keep
 open class UpdateVersionMsg(
     var title: String,//标题
     var content: String,//内容描述

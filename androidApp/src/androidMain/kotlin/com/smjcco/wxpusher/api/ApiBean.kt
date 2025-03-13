@@ -1,6 +1,9 @@
 package com.smjcco.wxpusher.api
 
+import androidx.annotation.Keep
 
+
+@Keep
 data class SubscribeListItem(
     val type: Int,
     val id: Long,
