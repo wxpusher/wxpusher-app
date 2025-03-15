@@ -18,6 +18,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import com.smjcco.wxpusher.page.CheckActivity
+import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.SaveUtils
@@ -51,6 +53,7 @@ class WebViewActivity : ComponentActivity() {
         initWebView()
         requestPermission()
         checkUpdate()
+        noteKeepAlive()
     }
 
     //应用内检查升级
@@ -76,23 +79,27 @@ class WebViewActivity : ComponentActivity() {
         }
     }
 
-    private fun gotoNotificationSetting() {
-        if (SaveUtils.getByKey("NotificationSetting") == "1") {
+    /**
+     * 提示保活
+     */
+    private fun noteKeepAlive() {
+        if (SaveUtils.getByKey("noteKeepAlive") == "1") {
             return
         }
         AlertDialog.Builder(this)
-            .setTitle("打开通知提醒")
-            .setMessage("由于Android的系统限制，默认消息可能不会提醒，请你前往应用详情-通知管理，找到页面下方的消息分类，打开声音、震动等全部提醒方式。")
+            .setTitle("保活提示")
+            .setMessage("由于Android的系统限制，应用在后台会被限制允许，导致收不到消息 ，请打开后台限制。")
             .setPositiveButton(
                 "去设置"
             ) { dialog, which ->
                 dialog?.dismiss()
-                PermissionUtils.gotoNotificationSettingPage()
+                val intent = Intent(ApplicationUtils.application, CheckActivity::class.java)
+                startActivity(intent)
             }
             .setCancelable(false)
             .setNegativeButton("不再提醒") { dialog, _ ->
                 dialog?.dismiss()
-                SaveUtils.setKeyValue("NotificationSetting", "1")
+                SaveUtils.setKeyValue("noteKeepAlive", "1")
             }
             .create().show()
     }
