@@ -39,17 +39,19 @@
             android:name=".page.CheckActivity"
             android:exported="true">
         </activity>
-
+        <activity
+            android:name=".page.AgreePrivateActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".WebViewActivity"
             android:configChanges="uiMode"
             android:exported="true"
             android:launchMode="singleTask">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
 
         <receiver

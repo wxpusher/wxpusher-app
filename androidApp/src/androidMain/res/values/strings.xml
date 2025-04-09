@@ -20,4 +20,13 @@
     
     <!-- 操作提示 -->
     <string name="check_click_to_set">点击设置</string>
+    
+    <!-- 隐私协议页面 -->
+    <string name="privacy_title">用户协议与隐私政策</string>
+    <string name="privacy_content">欢迎使用WxPusher！在使用我们的服务前，请您仔细阅读并同意以下协议：\n\n我们非常重视您的个人信息和隐私保护。为了更好地保障您的权益，请您认真阅读《用户协议》和《隐私政策》的全部内容，同意并接受全部条款后开始使用我们的产品和服务。\n\n1. 我们可能会收集您的设备信息、操作日志等信息，用于向您提供消息推送服务；\n2. 我们会采取业界先进的安全措施保护您的信息安全；</string>
+    <string name="privacy_user_agreement">《用户协议》</string>
+    <string name="privacy_policy">《隐私政策》</string>
+    <string name="privacy_agree">同意并继续</string>
+    <string name="privacy_disagree">不同意</string>
+    <string name="privacy_key">privacy_agreed</string>
 </resources>
