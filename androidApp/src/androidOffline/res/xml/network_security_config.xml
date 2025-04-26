@@ -3,6 +3,7 @@
     <domain-config cleartextTrafficPermitted="true">
         <domain includeSubdomains="true">192.168.0.102</domain>
         <domain includeSubdomains="true">10.0.0.10</domain>
+        <domain includeSubdomains="true">10.0.0.213</domain>
         <domain includeSubdomains="true">wxpusher.test.zjiecode.com</domain>
     </domain-config>
 </network-security-config>

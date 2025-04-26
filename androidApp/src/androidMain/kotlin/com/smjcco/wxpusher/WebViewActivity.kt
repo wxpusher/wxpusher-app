@@ -162,9 +162,9 @@ class WebViewActivity : ComponentActivity() {
     }
 
     private fun getWebPageUrl(): String {
-//        return "http://10.0.0.10:3000/"
-        val webDir = WebBundleManager.getWebFileDir()
-        return "file://${webDir.absolutePath}/index.html"
+        return "http://10.0.0.213:3000/"
+//        val webDir = WebBundleManager.getWebFileDir()
+//        return "file://${webDir.absolutePath}/index.html"
     }
 
     override fun onBackPressed() {

@@ -5,9 +5,11 @@ import android.os.Build
 import android.util.Log
 import android.webkit.JavascriptInterface
 import com.smjcco.wxpusher.api.DeviceApi
+import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.page.CheckActivity
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.ws.WsManager
@@ -37,7 +39,12 @@ object WxPusherWebInterface {
     }
 
     @JavascriptInterface
-    fun getDeviceType() = "Android"
+    fun getDeviceType(): String {
+        if (DeviceUtils.isMIUI()) {
+            return DevicePlatform.Android_XIAOMI.getPlatform()
+        }
+        return DevicePlatform.Android.getPlatform()
+    }
 
     @JavascriptInterface
     fun getDeviceName() = Build.BRAND + " " + Build.MODEL
@@ -67,7 +74,7 @@ object WxPusherWebInterface {
     @JavascriptInterface
     fun loginSuccess() {
         Log.d(TAG, "loginSuccess() called")
-//        NotificationManager.initSubscribeChannel()
+        ApplicationUtils.regPushChannel()
     }
 
     /**
@@ -76,7 +83,7 @@ object WxPusherWebInterface {
     @JavascriptInterface
     fun logout() {
         Log.d(TAG, "logout() called")
-        WsManager.disconnect()
+       ApplicationUtils.unRegPushChannel()
     }
 
     @JavascriptInterface

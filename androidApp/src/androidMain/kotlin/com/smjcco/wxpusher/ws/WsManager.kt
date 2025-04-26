@@ -3,6 +3,7 @@ package com.smjcco.wxpusher.ws
 import android.util.Log
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.utils.AppDataUtils
+import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
@@ -42,6 +43,10 @@ object WsManager {
     private var disableConnect = false
 
     fun init() {
+        if (DeviceUtils.isMIUI()) {
+            Log.d(TAG, "init: 小米设备，不初始化长链接")
+            return
+        }
         if (init.get()) {
             return
         }

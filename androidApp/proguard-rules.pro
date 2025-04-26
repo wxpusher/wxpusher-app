@@ -105,3 +105,6 @@
 -dontwarn com.tencent.raft.measure.RAFTMeasure
 -dontwarn com.tencent.raft.measure.config.RAFTComConfig
 -dontwarn javax.lang.model.element.Modifier
+
+#xiaomi推送
+ -keep class com.smjcco.wxpusher.push.xiaomi.XiaomiPushMessageReceiver {*;}

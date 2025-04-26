@@ -94,7 +94,7 @@ android {
     productFlavors {
         create("offline") {
             dimension = "env"
-            applicationIdSuffix = ".test"
+//            applicationIdSuffix = ".test"
             versionNameSuffix = ".test"
         }
         create("prod") {
@@ -105,6 +105,10 @@ android {
 }
 
 dependencies {
+    implementation(fileTree("libs") {
+        include("*.jar")
+        include("*.aar")
+    })
     implementation(libs.androidx.core)
     debugImplementation(compose.uiTooling)
 }

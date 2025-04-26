@@ -37,8 +37,7 @@
         </activity>
         <activity
             android:name=".page.CheckActivity"
-            android:exported="true">
-        </activity>
+            android:exported="true"></activity>
         <activity
             android:name=".page.AgreePrivateActivity"
             android:exported="true">
@@ -51,8 +50,7 @@
             android:name=".WebViewActivity"
             android:configChanges="uiMode"
             android:exported="true"
-            android:launchMode="singleTask">
-        </activity>
+            android:launchMode="singleTask"></activity>
 
         <receiver
             android:name=".receiver.ScreenUnlockReceiver"
@@ -61,6 +59,34 @@
                 <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
+
+        <receiver
+            android:name=".push.xiaomi.XiaomiPushMessageReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.RECEIVE_MESSAGE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.MESSAGE_ARRIVED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.ERROR" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.xiaomi.push.service.XMJobService"
+            android:process=":mipush"
+            tools:replace="android:process" />
+        <service
+            android:name="com.xiaomi.push.service.XMPushService"
+            android:process=":mipush"
+            tools:replace="android:process" />
+
+        <receiver
+            android:name="com.xiaomi.push.service.receivers.PingReceiver"
+            android:process=":mipush"
+            tools:replace="android:process" />
     </application>
 
 </manifest>
