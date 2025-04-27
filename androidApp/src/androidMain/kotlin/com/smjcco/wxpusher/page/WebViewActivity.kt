@@ -59,7 +59,7 @@ class WebViewActivity : ComponentActivity() {
         initWebView()
         requestPermission()
         checkUpdate()
-        noteKeepAlive()
+//        noteKeepAlive()
     }
 
     /**
