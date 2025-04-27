@@ -28,6 +28,7 @@ class WxPusherApplication : Application() {
         Log.d(TAG, "应用启动")
         ApplicationUtils.application = this
         SaveUtils.init()
+        WxPusherConfig.init()
         if (!ApplicationUtils.isMainProcess()) {
             return
         }

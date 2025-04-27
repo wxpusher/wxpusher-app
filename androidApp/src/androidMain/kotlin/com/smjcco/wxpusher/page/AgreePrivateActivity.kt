@@ -3,12 +3,10 @@ package com.smjcco.wxpusher.page
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.WebViewActivity
 import com.smjcco.wxpusher.utils.SaveUtils
 
 class AgreePrivateActivity : ComponentActivity() {
@@ -20,12 +18,6 @@ class AgreePrivateActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
-        // 检查用户是否已经同意过隐私政策
-        if (SaveUtils.getByKey(getString(R.string.privacy_key)) == "1") {
-            startMainActivity()
-            return
-        }
         
         setContentView(R.layout.agree_private_activity)
         

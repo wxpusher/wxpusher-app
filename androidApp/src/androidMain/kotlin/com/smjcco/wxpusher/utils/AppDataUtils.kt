@@ -1,6 +1,5 @@
 package com.smjcco.wxpusher.utils
 
-import android.util.Log
 import com.smjcco.wxpusher.bean.LoginInfo
 
 /**
@@ -9,6 +8,9 @@ import com.smjcco.wxpusher.bean.LoginInfo
 object AppDataUtils {
     private const val SaveLoginInfoKey = "SaveLoginInfoKey"
     private const val PushTokenKey = "PushTokenKey"
+    private const val ApiUrl = "ApiUrl"
+    private const val WebKey = "WebKey"
+    private const val WsUrlKey = "WsUrlKey"
 
 
     /**
@@ -44,4 +46,34 @@ object AppDataUtils {
     fun savePushToken(pushToken: String?) {
         SaveUtils.setKeyValue(PushTokenKey, pushToken)
     }
+
+    /**
+     * 保存后端api接口
+     */
+    fun saveApiUrl(pushToken: String?) {
+        SaveUtils.setKeyValue(ApiUrl, pushToken)
+    }
+
+    fun getApiUrl(): String = SaveUtils.getByKey(ApiUrl) ?: "https://wxpusher.zjiecode.com"
+
+
+    /**
+     * 保存web加载地址
+     */
+    fun saveWebUrl(pushToken: String?) {
+        SaveUtils.setKeyValue(WebKey, pushToken)
+    }
+
+    fun getWebUrl(): String =
+        SaveUtils.getByKey(WebKey) ?: "https://static.zjiecode.com/wxpusher/web-app"
+
+    /**
+     * 保存websocket连接地址
+     */
+    fun saveWsUrl(wsUrl: String?) {
+        SaveUtils.setKeyValue(WsUrlKey, wsUrl)
+    }
+
+    fun getWsUrl(): String =
+        SaveUtils.getByKey(WsUrlKey) ?: "wss://wxpusher.zjiecode.com"
 }

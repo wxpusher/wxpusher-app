@@ -28,5 +28,5 @@
     <string name="privacy_policy">《隐私政策》</string>
     <string name="privacy_agree">同意并继续</string>
     <string name="privacy_disagree">不同意</string>
-    <string name="privacy_key">privacy_agreed</string>
+    <string name="privacy_key">privacy_agreed_key</string>
 </resources>

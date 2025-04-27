@@ -12,10 +12,11 @@ import android.provider.Settings
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.WebViewActivity
+import com.smjcco.wxpusher.page.WebViewActivity
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.ws.PushMsgDeviceMsg
 import com.smjcco.wxpusher.ws.WsWorkManager
@@ -53,7 +54,9 @@ object NotificationManager {
 //        initSubscribeChannel()
         //只有拿到了通知栏权限，并且创建了消息通知channel，才可以启动service
 //        KeepWsConnectService.start(ApplicationUtils.application)
-        WsWorkManager.startPeriodicJob()
+        if (!DeviceUtils.isMIUI()) {
+            WsWorkManager.startPeriodicJob()
+        }
     }
 
     /**

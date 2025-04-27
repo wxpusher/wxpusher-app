@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import android.webkit.JavascriptInterface
+import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.page.CheckActivity
@@ -105,4 +106,7 @@ object WxPusherWebInterface {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         ApplicationUtils.application.startActivity(intent)
     }
+    @JavascriptInterface
+    fun getApiUrl() = WxPusherConfig.ApiUrl
+
 }

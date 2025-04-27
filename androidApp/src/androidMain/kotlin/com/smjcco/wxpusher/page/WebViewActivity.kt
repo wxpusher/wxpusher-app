@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher
+package com.smjcco.wxpusher.page
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -18,16 +18,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.smjcco.wxpusher.page.CheckActivity
+import com.smjcco.wxpusher.R
+import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.SaveUtils
-import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 import com.smjcco.wxpusher.web.update.WebBundleManager
 import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback
 import com.tencent.upgrade.core.UpgradeManager
+import com.xiaomi.mipush.sdk.MiPushMessage
+import com.xiaomi.mipush.sdk.PushMessageHelper
 
 
 class WebViewActivity : ComponentActivity() {
@@ -47,6 +49,10 @@ class WebViewActivity : ComponentActivity() {
         if (savedInstanceState != null) {
             return
         }
+        if (SaveUtils.getByKey(getString(R.string.privacy_key)) != "1") {
+            startMainActivity()
+            return
+        }
         setContentView(R.layout.web_activity)
         webContainer = findViewById(R.id.web_container)
         enableEdgeToEdge()
@@ -54,6 +60,15 @@ class WebViewActivity : ComponentActivity() {
         requestPermission()
         checkUpdate()
         noteKeepAlive()
+    }
+
+    /**
+     * 启动隐私
+     */
+    private fun startMainActivity() {
+        val intent = Intent(this, AgreePrivateActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 
     //应用内检查升级
@@ -158,13 +173,27 @@ class WebViewActivity : ComponentActivity() {
             webview?.loadUrl("${getWebPageUrl()}#/home?url=${url}")
             return true
         }
+        //小米推送的消息，如果有 url，直接打开地址
+        val miPushMessage =
+            intent?.getSerializableExtra(PushMessageHelper.KEY_MESSAGE) as MiPushMessage?
+        val miPushUrl = miPushMessage?.extra?.get("messageUrl")
+        if (miPushUrl?.isNotEmpty() == true) {
+            webview?.clearHistory()
+            webview?.loadUrl("${getWebPageUrl()}#/home?url=${miPushUrl}")
+            return true
+        }
+
         return false
     }
 
     private fun getWebPageUrl(): String {
-        return "http://10.0.0.213:3000/"
-//        val webDir = WebBundleManager.getWebFileDir()
-//        return "file://${webDir.absolutePath}/index.html"
+        //如果是一个网址，那就是正式环境，加载bundle
+        if (WxPusherConfig.WebUrl.contains("zjiecode.com")) {
+            val webDir = WebBundleManager.getWebFileDir()
+            return "file://${webDir.absolutePath}/index.html"
+        }
+        //否则是测试环境，直接加载url
+        return WxPusherConfig.WebUrl
     }
 
     override fun onBackPressed() {

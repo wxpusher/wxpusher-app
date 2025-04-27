@@ -102,6 +102,11 @@ android {
         }
     }
 
+    sourceSets {
+        getByName("offline") {
+            manifest.srcFile("src/androidOffline/AndroidManifest.xml")
+        }
+    }
 }
 
 dependencies {

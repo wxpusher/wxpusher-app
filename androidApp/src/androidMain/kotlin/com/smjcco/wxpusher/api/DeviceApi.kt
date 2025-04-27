@@ -20,7 +20,6 @@ import java.util.Collections
 object DeviceApi {
     private const val TAG = "DeviceApi"
     private val client = OkHttpClient()
-    private const val BASE_URL = WxPusherConfig.ApiUrl // 替换为你的服务器地址
 
     //记录一下上报的数据，如果变化，就不用再次上报
     private var updateDataCache = "";
@@ -44,7 +43,7 @@ object DeviceApi {
 
         try {
             return withContext(Dispatchers.IO) {
-                val url = "$BASE_URL/api/need-login/device/subscribe-list"
+                val url = "${WxPusherConfig.ApiUrl}/api/need-login/device/subscribe-list"
                 val request = Request.Builder()
                     .url(url)
                     .method("GET", null)
@@ -99,7 +98,7 @@ object DeviceApi {
         }
         try {
             return withContext(Dispatchers.IO) {
-                val url = "$BASE_URL/api/need-login/device/update-device-info"
+                val url = "${WxPusherConfig.ApiUrl}/api/need-login/device/update-device-info"
                 val requestBody = reqBody.toRequestBody("application/json".toMediaType())
                 val request = Request.Builder()
                     .url(url)
