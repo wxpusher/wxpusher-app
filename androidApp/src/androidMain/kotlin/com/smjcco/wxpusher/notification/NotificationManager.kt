@@ -41,16 +41,16 @@ object NotificationManager {
         init.set(true)
         sysNotificationManager =
             ApplicationUtils.application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        initNotificationChannelGrouop()
+//        initNotificationChannelGrouop()
 //        createNotificationChannel(
 //            UnknownChannelId,
 //            ChannelGroup.SubscribeMessage, "未分类的消息", "用于接收没有指定分类的消息"
 //        )
-        createNotificationChannel(
-            WxPusherSystemChannelId,
-            ChannelGroup.WxPusherSystem,
-            "WxPusher系统公告和通知", "WxPusher的公告、升级通知、异常提醒、订阅通知等",
-        )
+//        createNotificationChannel(
+//            WxPusherSystemChannelId,
+//            ChannelGroup.WxPusherSystem,
+//            "WxPusher系统公告和通知", "WxPusher的公告、升级通知、异常提醒、订阅通知等",
+//        )
 //        initSubscribeChannel()
         //只有拿到了通知栏权限，并且创建了消息通知channel，才可以启动service
 //        KeepWsConnectService.start(ApplicationUtils.application)
@@ -214,6 +214,16 @@ object NotificationManager {
         }
         val group = NotificationChannelGroup(id, name)
         sysNotificationManager.createNotificationChannelGroup(group)
+    }
+
+    /**
+     * 是否有某个通知通道
+     */
+    fun hasNotificationChannel(id: String): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            return true
+        }
+        return sysNotificationManager.getNotificationChannel(id) != null
     }
 }
 

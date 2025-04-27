@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WxPusherConfig
+import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
@@ -60,6 +61,7 @@ class WebViewActivity : ComponentActivity() {
         requestPermission()
         checkUpdate()
 //        noteKeepAlive()
+        showSettingGuide()
     }
 
     /**
@@ -115,6 +117,34 @@ class WebViewActivity : ComponentActivity() {
             .setNegativeButton("不再提醒") { dialog, _ ->
                 dialog?.dismiss()
                 SaveUtils.setKeyValue("noteKeepAlive", "1")
+            }
+            .create().show()
+    }
+
+    /**
+     * 提示保活
+     */
+    private fun showSettingGuide() {
+        //针对小米，还没有创建推送通道 ，就不进行提醒
+        if (!NotificationManager.hasNotificationChannel("mipush|com.smjcco.wxpusher|135072")) {
+            return
+        }
+        if (SaveUtils.getByKey("alertTips") == "1") {
+            return
+        }
+        AlertDialog.Builder(this)
+            .setTitle("请打开锁屏提醒")
+            .setMessage("为了避免锁屏遗漏通知，请点击「去设置」，选择「订阅消息」-「在锁定屏幕上」设置为【显示通知】\n\n在设置里，你还可以自定义提示铃声。")
+            .setPositiveButton(
+                "去设置"
+            ) { dialog, which ->
+                dialog?.dismiss()
+                PermissionUtils.gotoNotificationSettingPage()
+            }
+            .setCancelable(false)
+            .setNegativeButton("不再提醒") { dialog, _ ->
+                dialog?.dismiss()
+                SaveUtils.setKeyValue("alertTips", "1")
             }
             .create().show()
     }
