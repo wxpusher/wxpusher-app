@@ -12,6 +12,7 @@ import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
@@ -152,6 +153,8 @@ class WebViewActivity : ComponentActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     private fun initWebView() {
         webview = findViewById(R.id.web)
+
+        WebView.setWebContentsDebuggingEnabled(true)
         webview?.settings?.apply {
             javaScriptEnabled = true
             allowFileAccess = true
@@ -161,6 +164,8 @@ class WebViewActivity : ComponentActivity() {
             domStorageEnabled = true
             // 启用数据库存储API
             databaseEnabled = true
+            //在https里面允许加载http的内容
+            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         }
 
         webview?.webChromeClient = WebChromeClient()
