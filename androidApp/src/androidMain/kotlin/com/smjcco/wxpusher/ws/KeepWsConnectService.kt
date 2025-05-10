@@ -45,18 +45,18 @@ class KeepWsConnectService : Service() {
             PendingIntent.FLAG_IMMUTABLE
         )
 
-        val notification =
-            NotificationCompat.Builder(
-                applicationContext,
-                NotificationManager.WxPusherSystemChannelId
-            )
-                .setContentTitle("WxPusher消息推送平台")
-                .setContentText("保持本通知以及时接收消息")
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setOngoing(true)
-                .setContentIntent(pendingIntent)
-                .build()
-        startForeground(NotificationManager.WxPusherSystemForegroundNotificationId, notification)
+//        val notification =
+//            NotificationCompat.Builder(
+//                applicationContext,
+//                NotificationManager.WxPusherSystemChannelId
+//            )
+//                .setContentTitle("WxPusher消息推送平台")
+//                .setContentText("保持本通知以及时接收消息")
+//                .setSmallIcon(R.mipmap.ic_launcher)
+//                .setOngoing(true)
+//                .setContentIntent(pendingIntent)
+//                .build()
+//        startForeground(NotificationManager.WxPusherSystemForegroundNotificationId, notification)
     }
 
 }

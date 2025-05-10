@@ -1,3 +1,9 @@
+buildscript {
+    dependencies {
+        classpath("com.huawei.agconnect:agcp:1.9.1.301")
+        classpath("com.android.tools.build:gradle:8.5.2")
+    }
+}
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader

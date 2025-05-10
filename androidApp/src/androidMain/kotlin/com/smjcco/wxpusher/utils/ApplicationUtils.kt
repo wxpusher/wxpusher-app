@@ -5,6 +5,7 @@ import android.app.Application
 import android.content.Context
 import android.os.Process
 import android.util.Log
+import com.huawei.hms.push.HmsMessaging
 import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotification
 import com.smjcco.wxpusher.ws.IWsMessageListener
@@ -44,6 +45,9 @@ object ApplicationUtils {
         }
         if (DeviceUtils.isMIUI()) {
             regMiPush()
+        } else if (DeviceUtils.isHuawei()) {
+            //只有华为设备，才需要自动初始化
+            HmsMessaging.getInstance(application).isAutoInitEnabled = true
         } else {
             initSelfWsBiz()
         }
@@ -55,6 +59,8 @@ object ApplicationUtils {
     fun unRegPushChannel() {
         if (DeviceUtils.isMIUI()) {
             MiPushClient.unregisterPush(application)
+        } else if (DeviceUtils.isHuawei()) {
+            HmsMessaging.getInstance(application).turnOffPush()
         } else {
             WsManager.disconnect()
         }

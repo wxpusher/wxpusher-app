@@ -30,9 +30,9 @@ class KeepWsConnectWork(appContext: Context, workerParams: WorkerParameters) :
     override suspend fun doWork(): Result {
         Log.d(TAG, Thread.currentThread().name + ":doWork() called")
         WsManager.init();
-        if (!DeviceUtils.isMIUI()) {
-            setForeground(getForegroundInfo())
-        }
+//        if (!DeviceUtils.isMIUI()) {
+//            setForeground(getForegroundInfo())
+//        }
         for (i in 0..15 * 60) {
             delay(1000)
             WsManager.init();
@@ -40,34 +40,35 @@ class KeepWsConnectWork(appContext: Context, workerParams: WorkerParameters) :
         return Result.success()
     }
 
-    override suspend fun getForegroundInfo(): ForegroundInfo {
-        // 创建Intent，用于在点击通知时启动Activity
-        val intent = Intent(ApplicationUtils.application, WebViewActivity::class.java)
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        val pendingIntent = PendingIntent.getActivity(
-            ApplicationUtils.application,
-            0,
-            intent,
-            PendingIntent.FLAG_IMMUTABLE
-        )
-
-        val notification =
-            NotificationCompat.Builder(
-                applicationContext,
-                NotificationManager.WxPusherSystemChannelId
-            )
-                .setContentTitle("WxPusher消息推送平台")
-                .setContentText("保持本通知以及时接收消息")
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setOngoing(true)
-                .setContentIntent(pendingIntent)
-                .build()
-        return ForegroundInfo(
-            NotificationManager.WxPusherSystemForegroundNotificationId,
-            notification,
-            ServiceInfo.FOREGROUND_SERVICE_TYPE_REMOTE_MESSAGING
-        )
-    }
+//    override suspend fun getForegroundInfo(): ForegroundInfo {
+//        // 创建Intent，用于在点击通知时启动Activity
+//        val intent = Intent(ApplicationUtils.application, WebViewActivity::class.java)
+//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+//        val pendingIntent = PendingIntent.getActivity(
+//            ApplicationUtils.application,
+//            0,
+//            intent,
+//            PendingIntent.FLAG_IMMUTABLE
+//        )
+//
+//        val notification =
+//            NotificationCompat.Builder(
+//                applicationContext,
+//                NotificationManager.WxPusherSystemChannelId
+//            )
+//                .setContentTitle("WxPusher消息推送平台")
+//                .setContentText("保持本通知以及时接收消息")
+//                .setSmallIcon(R.mipmap.ic_launcher)
+//                .setOngoing(true)
+//                .setContentIntent(pendingIntent)
+//                .build()
+//        return ForegroundInfo(
+//            NotificationManager.WxPusherSystemForegroundNotificationId,
+//            notification,
+//            ServiceInfo.FOREGROUND_SERVICE_TYPE_REMOTE_MESSAGING
+//        )
+//
+//    }
 
 
 }

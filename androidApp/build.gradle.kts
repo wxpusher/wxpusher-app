@@ -6,6 +6,8 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+//    alias(libs.plugins.huawei.agconnect)
+    id("com.huawei.agconnect")
 }
 
 kotlin {
@@ -31,7 +33,6 @@ kotlin {
             implementation("com.google.android.material:material:1.12.0")
 
 
-
             //腾讯shiply https://shiply.tds.qq.com/docs/doc?id=4008331373
             implementation("com.tencent.shiply:upgrade:2.2.1-RC01"){
                 exclude(group="androidx.appcompat", module = "appcompat")
@@ -40,7 +41,9 @@ kotlin {
             implementation("com.tencent.shiply:upgrade-ui:2.2.1-RC01"){
                 exclude(group="com.tencent.shiply", module = "upgrade")
             }
-
+            //华为推送
+            implementation(libs.huawei.push)
+//            implementation("com.huawei.hms:push:6.13.0.300")
         }
         commonMain.dependencies {
             implementation(compose.runtime)

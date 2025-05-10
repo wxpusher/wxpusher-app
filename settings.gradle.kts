@@ -12,7 +12,13 @@ pluginManagement {
         }
         mavenCentral()
         gradlePluginPortal()
+
+        //华为推送
+        maven {
+            setUrl("https://developer.huawei.com/repo/")
+        }
     }
+
 }
 
 dependencyResolutionManagement {
@@ -25,12 +31,18 @@ dependencyResolutionManagement {
             }
         }
 
+
+
         mavenCentral()
+
+        //华为推送
+        maven {
+            setUrl("https://developer.huawei.com/repo/")
+        }
 
         maven {
             setUrl("https://tencent-tds-maven.pkg.coding.net/repository/shiply/repo")
         }
-
     }
 }
 

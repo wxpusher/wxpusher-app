@@ -5,4 +5,8 @@ object DeviceUtils {
     fun isMIUI(): Boolean {
         return "Xiaomi".equals(android.os.Build.MANUFACTURER, true)
     }
+
+    fun isHuawei(): Boolean {
+        return "Xiaomi".equals(android.os.Build.MANUFACTURER, true)
+    }
 }

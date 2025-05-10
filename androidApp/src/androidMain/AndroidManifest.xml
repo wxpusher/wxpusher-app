@@ -66,6 +66,16 @@
             </intent-filter>
         </receiver>
 
+        <!--        华为推送-->
+        <service
+            android:name=".push.huawei.HWHmsMessageService"
+            android:directBootAware="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <!--        小米推送-->
         <receiver
             android:name=".push.xiaomi.XiaomiPushMessageReceiver"
             android:exported="true">

@@ -1,4 +1,11 @@
 
+ -ignorewarnings
+ -keepattributes *Annotation*
+ -keepattributes Exceptions
+ -keepattributes InnerClasses
+ -keepattributes Signature
+ -keepattributes SourceFile,LineNumberTable
+
 # 通用混淆规则
 -keep public class * extends java.lang.Exception
 
@@ -108,3 +115,8 @@
 
 #xiaomi推送
  -keep class com.smjcco.wxpusher.push.xiaomi.XiaomiPushMessageReceiver {*;}
+
+ #华为推送
+ -keep class com.huawei.hianalytics.**{*;}
+ -keep class com.huawei.updatesdk.**{*;}
+ -keep class com.huawei.hms.**{*;}
