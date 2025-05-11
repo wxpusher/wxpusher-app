@@ -34,12 +34,12 @@ kotlin {
 
 
             //腾讯shiply https://shiply.tds.qq.com/docs/doc?id=4008331373
-            implementation("com.tencent.shiply:upgrade:2.2.1-RC01"){
-                exclude(group="androidx.appcompat", module = "appcompat")
-                exclude(group="androidx.fragment", module = "fragment")
+            implementation("com.tencent.shiply:upgrade:2.2.1-RC01") {
+                exclude(group = "androidx.appcompat", module = "appcompat")
+                exclude(group = "androidx.fragment", module = "fragment")
             }
-            implementation("com.tencent.shiply:upgrade-ui:2.2.1-RC01"){
-                exclude(group="com.tencent.shiply", module = "upgrade")
+            implementation("com.tencent.shiply:upgrade-ui:2.2.1-RC01") {
+                exclude(group = "com.tencent.shiply", module = "upgrade")
             }
             //华为推送
             implementation(libs.huawei.push)
@@ -82,13 +82,28 @@ android {
             // true - 打开资源压缩
             isShrinkResources = true
             // 指定ProGuard规则文件
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
         }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.jks")
+            storePassword = "jz19941002"
+            keyAlias = "smjcco"
+            keyPassword = "jz19941002"
+        }
+    }
+
 
     // 定义flavor维度
     flavorDimensions.add("env")

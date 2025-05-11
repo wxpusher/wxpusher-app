@@ -6,7 +6,6 @@ import com.smjcco.wxpusher.push.PushManager
 
 
 class HuaweiHmsMessageService : HmsMessageService() {
-
     override fun onNewToken(s: String) {
         PushManager.onGetPushToken(s, DevicePlatform.Android_HUAWEI)
     }

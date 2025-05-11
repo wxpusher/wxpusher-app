@@ -11,17 +11,18 @@ import com.smjcco.wxpusher.utils.WxPusherUtils
 import kotlinx.coroutines.launch
 
 object HuaweiPushUtils {
+    private final val TAG = "Huawei"
     fun initPushToken(application: Application) {
         WxPusherUtils.getIoScopeScope().launch {
             try {
                 val token = HmsInstanceId.getInstance(application)
                     .getToken("114073793", "HCM")
-                Log.i("HMS", "Get token: $token")
+                Log.i(TAG, "Get token: $token")
                 if (!TextUtils.isEmpty(token)) {
                     PushManager.onGetPushToken(token, DevicePlatform.Android_HUAWEI)
                 }
             } catch (e: ApiException) {
-                Log.e("HMS", "Get token failed, $e")
+                Log.e(TAG, "Get token failed, $e")
             }
         }
     }
