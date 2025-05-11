@@ -8,12 +8,12 @@ import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.page.CheckActivity
+import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
-import com.smjcco.wxpusher.ws.WsManager
 import kotlinx.coroutines.launch
 
 /**
@@ -43,6 +43,8 @@ object WxPusherWebInterface {
     fun getDeviceType(): String {
         if (DeviceUtils.isMIUI()) {
             return DevicePlatform.Android_XIAOMI.getPlatform()
+        } else if (DeviceUtils.isHuaweiMobileServicesAvailable()) {
+            return DevicePlatform.Android_HUAWEI.getPlatform()
         }
         return DevicePlatform.Android.getPlatform()
     }
@@ -75,7 +77,6 @@ object WxPusherWebInterface {
     @JavascriptInterface
     fun loginSuccess() {
         Log.d(TAG, "loginSuccess() called")
-        ApplicationUtils.regPushChannel()
     }
 
     /**
@@ -84,7 +85,6 @@ object WxPusherWebInterface {
     @JavascriptInterface
     fun logout() {
         Log.d(TAG, "logout() called")
-       ApplicationUtils.unRegPushChannel()
     }
 
     @JavascriptInterface
@@ -106,6 +106,7 @@ object WxPusherWebInterface {
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         ApplicationUtils.application.startActivity(intent)
     }
+
     @JavascriptInterface
     fun getApiUrl() = WxPusherConfig.ApiUrl
 

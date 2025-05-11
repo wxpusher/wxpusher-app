@@ -14,8 +14,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.smjcco.wxpusher.ws.KeepWsConnectService
-import com.smjcco.wxpusher.ws.WsWorkManager
+import com.smjcco.wxpusher.push.ws.KeepWsConnectService
 
 
 class TestActivity : ComponentActivity() {
@@ -77,7 +76,6 @@ class TestActivity : ComponentActivity() {
         val btn: Button = findViewById(R.id.ws)
         btn.setOnClickListener {
             startService(Intent(this, KeepWsConnectService::class.java))
-            WsWorkManager.startPeriodicJob()
         }
         val permission: Button = findViewById(R.id.permission)
         permission.setOnClickListener {

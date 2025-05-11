@@ -1,9 +1,13 @@
-package com.smjcco.wxpusher.ws
+package com.smjcco.wxpusher.push.ws
 
 import android.util.Log
 import com.smjcco.wxpusher.WxPusherConfig
+import com.smjcco.wxpusher.api.DeviceApi
+import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.notification.NotificationManager
+import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotification
+import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.AppDataUtils
-import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
@@ -43,14 +47,14 @@ object WsManager {
     private var disableConnect = false
 
     fun init() {
-        if (DeviceUtils.isMIUI()) {
-            Log.d(TAG, "init: 小米设备，不初始化长链接")
-            return
-        }
         if (init.get()) {
             return
         }
         init.set(true)
+        NotificationManager.init()
+        //初始化监听器
+        initMsgListener()
+        //开始死循环监听链接状态
         WxPusherUtils.getIoScopeScope().launch {
             while (true) {
                 if (connectStatus.get() == WsConnectStatus.NotConnect) {
@@ -60,6 +64,30 @@ object WsManager {
                 delay(10 * 1000)
             }
         }
+    }
+
+    private fun initMsgListener() {
+        //当收到消息的时候，发送到通知栏
+        val pushListener = object : IWsMessageListener<PushMsgDeviceMsg> {
+            override fun onMessage(message: PushMsgDeviceMsg) {
+                sendBizMessageNotification(message)
+            }
+        }
+        addMsgListener(WsMessageTypeEnum.PUSH_NOTE.code, pushListener)
+        val pushTokenListener = object : IWsMessageListener<InitDeviceMsg> {
+            override fun onMessage(message: InitDeviceMsg) {
+                Log.d(TAG, "收到自建长链接Ws的pushToken=${message.pushToken}")
+                if (AppDataUtils.getPushToken() == message.pushToken) {
+                    Log.d(
+                        TAG,
+                        "自建长链接token未变化，不用更新 pushToken=${message.pushToken}"
+                    )
+                    return
+                }
+                PushManager.onGetPushToken(message.pushToken, DevicePlatform.Android)
+            }
+        }
+        addMsgListener(WsMessageTypeEnum.DEVICE_INIT.code, pushTokenListener)
     }
 
     private fun getHostUrl(): String {

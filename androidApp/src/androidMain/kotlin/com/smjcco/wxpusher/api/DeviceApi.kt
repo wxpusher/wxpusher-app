@@ -5,8 +5,11 @@ import androidx.annotation.Keep
 import com.google.gson.reflect.TypeToken
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.utils.AppDataUtils
+import com.smjcco.wxpusher.utils.DateUtils
 import com.smjcco.wxpusher.utils.GsonUtils
+import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
+import com.smjcco.wxpusher.web.WxPusherWebInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -19,6 +22,7 @@ import java.util.Collections
 
 object DeviceApi {
     private const val TAG = "DeviceApi"
+    private const val UpDateTokenDate = "UpDateTokenDate"
     private val client = OkHttpClient()
 
     //记录一下上报的数据，如果变化，就不用再次上报
@@ -91,8 +95,13 @@ object DeviceApi {
             Log.d(TAG, "updateDeviceInfo: 没有deviceUuid")
             return false
         }
-        val reqBody = GsonUtils.toJson(UpdateDeviceInfoReq(deviceUuid, pushToken))
-        if (reqBody == updateDataCache) {
+        val reqBody = GsonUtils.toJson(
+            UpdateDeviceInfoReq(
+                deviceUuid, pushToken,
+                WxPusherWebInterface.getDeviceType()
+            )
+        )
+        if (reqBody == updateDataCache && SaveUtils.getByKey(UpDateTokenDate) == DateUtils.getDate()) {
             Log.d(TAG, "updateDeviceInfo: 数据为变更，无需上报")
             return false
         }
@@ -116,6 +125,7 @@ object DeviceApi {
                     Log.d(TAG, "updateDeviceInfo: 上报更新PT,结果=${bodyStr}")
                     val respData = GsonUtils.toObj(bodyStr, BaseResp::class)
                     if (respData?.isSuccess() == true) {
+                        SaveUtils.setKeyValue(UpDateTokenDate, DateUtils.getDate())
                         updateDataCache = reqBody
                         return@use true
                     }
@@ -131,6 +141,7 @@ object DeviceApi {
     @Keep
     data class UpdateDeviceInfoReq(
         val deviceUuid: String,
-        val pushToken: String
+        val pushToken: String,
+        val platform: String
     )
 }

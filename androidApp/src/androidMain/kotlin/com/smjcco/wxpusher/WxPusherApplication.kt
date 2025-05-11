@@ -3,22 +3,14 @@ package com.smjcco.wxpusher
 import android.app.Application
 import android.os.Build
 import android.util.Log
-import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.notification.NotificationManager
-import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotification
+import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
-import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.web.update.WebBundleManager
-import com.smjcco.wxpusher.ws.IWsMessageListener
-import com.smjcco.wxpusher.ws.InitDeviceMsg
-import com.smjcco.wxpusher.ws.PushMsgDeviceMsg
-import com.smjcco.wxpusher.ws.WsManager
-import com.smjcco.wxpusher.ws.WsMessageTypeEnum
 import com.tencent.upgrade.bean.UpgradeConfig
 import com.tencent.upgrade.core.UpgradeManager
-import com.xiaomi.mipush.sdk.MiPushClient
 
 
 class WxPusherApplication : Application() {
@@ -33,9 +25,8 @@ class WxPusherApplication : Application() {
             return
         }
         WebBundleManager.init()
-        NotificationManager.init()
         initTbs()
-        ApplicationUtils.regPushChannel()
+        PushManager.init(this)
     }
 
 

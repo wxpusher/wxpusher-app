@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.ws
+package com.smjcco.wxpusher.push.ws
 
 import android.app.PendingIntent
 import android.app.Service
@@ -9,10 +9,9 @@ import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.page.WebViewActivity
 import com.smjcco.wxpusher.notification.NotificationManager
+import com.smjcco.wxpusher.page.WebViewActivity
 import com.smjcco.wxpusher.utils.ApplicationUtils
-import com.smjcco.wxpusher.utils.DeviceUtils
 
 class KeepWsConnectService : Service() {
     val TAG = "KeepWsConnectService"
@@ -29,9 +28,7 @@ class KeepWsConnectService : Service() {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         WsManager.init()
-        if (!DeviceUtils.isMIUI()) {
-            foreground()
-        }
+        foreground()
     }
 
     fun foreground() {
@@ -45,18 +42,18 @@ class KeepWsConnectService : Service() {
             PendingIntent.FLAG_IMMUTABLE
         )
 
-//        val notification =
-//            NotificationCompat.Builder(
-//                applicationContext,
-//                NotificationManager.WxPusherSystemChannelId
-//            )
-//                .setContentTitle("WxPusher消息推送平台")
-//                .setContentText("保持本通知以及时接收消息")
-//                .setSmallIcon(R.mipmap.ic_launcher)
-//                .setOngoing(true)
-//                .setContentIntent(pendingIntent)
-//                .build()
-//        startForeground(NotificationManager.WxPusherSystemForegroundNotificationId, notification)
+        val notification =
+            NotificationCompat.Builder(
+                applicationContext,
+                NotificationManager.WxPusherSystemChannelId
+            )
+                .setContentTitle("WxPusher消息推送平台")
+                .setContentText("保持本通知以及时接收消息")
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setOngoing(true)
+                .setContentIntent(pendingIntent)
+                .build()
+        startForeground(NotificationManager.WxPusherSystemForegroundNotificationId, notification)
     }
 
 }

@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.ws
+package com.smjcco.wxpusher.push.ws
 
 import androidx.annotation.Keep
 

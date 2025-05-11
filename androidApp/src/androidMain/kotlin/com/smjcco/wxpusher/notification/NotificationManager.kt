@@ -9,18 +9,12 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.provider.Settings
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.page.WebViewActivity
 import com.smjcco.wxpusher.WxPusherConfig
-import com.smjcco.wxpusher.api.DeviceApi
+import com.smjcco.wxpusher.page.WebViewActivity
+import com.smjcco.wxpusher.push.ws.PushMsgDeviceMsg
 import com.smjcco.wxpusher.utils.ApplicationUtils
-import com.smjcco.wxpusher.utils.DeviceUtils
-import com.smjcco.wxpusher.utils.WxPusherUtils
-import com.smjcco.wxpusher.ws.PushMsgDeviceMsg
-import com.smjcco.wxpusher.ws.WsWorkManager
-import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -32,80 +26,78 @@ object NotificationManager {
     private const val UnknownChannelId = "UnknownChannelId"
     const val WxPusherSystemChannelId = "WxPusherSystemChannelId"
     const val WxPusherSystemForegroundNotificationId = 1
-    private lateinit var sysNotificationManager: NotificationManager
+    private var sysNotificationManager: NotificationManager? = null
     private var init = AtomicBoolean(false)
+
     fun init() {
         if (init.get()) {
             return
         }
         init.set(true)
-        sysNotificationManager =
-            ApplicationUtils.application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-//        initNotificationChannelGrouop()
+        initNotificationChannelGroup()
+        createNotificationChannel(
+            WxPusherSystemChannelId,
+            ChannelGroup.WxPusherSystem,
+            "WxPusher系统公告和通知", "WxPusher的公告、升级通知、异常提醒、订阅通知等",
+        )
+
 //        createNotificationChannel(
 //            UnknownChannelId,
 //            ChannelGroup.SubscribeMessage, "未分类的消息", "用于接收没有指定分类的消息"
 //        )
-//        createNotificationChannel(
-//            WxPusherSystemChannelId,
-//            ChannelGroup.WxPusherSystem,
-//            "WxPusher系统公告和通知", "WxPusher的公告、升级通知、异常提醒、订阅通知等",
-//        )
 //        initSubscribeChannel()
         //只有拿到了通知栏权限，并且创建了消息通知channel，才可以启动service
 //        KeepWsConnectService.start(ApplicationUtils.application)
-        if (!DeviceUtils.isMIUI()) {
-            WsWorkManager.startPeriodicJob()
-        }
-    }
-
-    /**
-     * 通过网络拉取用户订阅的内容，然后创建推送通道
-     */
-    fun initSubscribeChannel() {
-        WxPusherUtils.getIoScopeScope().launch {
-            val subscribeList = DeviceApi.getSubscribeList()
-            WxPusherUtils.getMainScope().launch {
-                val subscribeListOrder = subscribeList.reversed()
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                    //已经删除的订阅，把推送通道也删除了
-                    val nowHasChannelIdList =
-                        subscribeListOrder.map { it.getChannelId() }.toMutableList()
-                    //系统缺省的不能删除了
-                    nowHasChannelIdList.add(WxPusherSystemChannelId)
-                    nowHasChannelIdList.add(UnknownChannelId)
-                    sysNotificationManager.notificationChannels.filterNot {
-                        nowHasChannelIdList.contains(it.id)
-                    }.forEach {
-                        sysNotificationManager.deleteNotificationChannel(it.id)
-                    }
-                }
-                for (subscribeListItem in subscribeListOrder) {
-                    Log.d(
-                        TAG, "创建通知通道，ChannelId = ${subscribeListItem.getChannelId()}," +
-                                "subscribeListItem.name=${subscribeListItem.name}"
-                    )
-                    createNotificationChannel(
-                        subscribeListItem.getChannelId(),
-                        ChannelGroup.SubscribeMessage,
-                        subscribeListItem.name,
-                        ""
-                    )
-                }
-            }
-        }
 
     }
+
+//    /**
+//     * 通过网络拉取用户订阅的内容，然后创建推送通道
+//     */
+//    fun initSubscribeChannel() {
+//        WxPusherUtils.getIoScopeScope().launch {
+//            val subscribeList = DeviceApi.getSubscribeList()
+//            WxPusherUtils.getMainScope().launch {
+//                val subscribeListOrder = subscribeList.reversed()
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//                    //已经删除的订阅，把推送通道也删除了
+//                    val nowHasChannelIdList =
+//                        subscribeListOrder.map { it.getChannelId() }.toMutableList()
+//                    //系统缺省的不能删除了
+//                    nowHasChannelIdList.add(WxPusherSystemChannelId)
+//                    nowHasChannelIdList.add(UnknownChannelId)
+//                    getSysNotificationManager().notificationChannels.filterNot {
+//                        nowHasChannelIdList.contains(it.id)
+//                    }.forEach {
+//                        getSysNotificationManager().deleteNotificationChannel(it.id)
+//                    }
+//                }
+//                for (subscribeListItem in subscribeListOrder) {
+//                    Log.d(
+//                        TAG, "创建通知通道，ChannelId = ${subscribeListItem.getChannelId()}," +
+//                                "subscribeListItem.name=${subscribeListItem.name}"
+//                    )
+//                    createNotificationChannel(
+//                        subscribeListItem.getChannelId(),
+//                        ChannelGroup.SubscribeMessage,
+//                        subscribeListItem.name,
+//                        ""
+//                    )
+//                }
+//            }
+//        }
+//
+//    }
 
     /**
      * 发送业务消息推送通知
      */
     fun sendBizMessageNotification(message: PushMsgDeviceMsg) {
-        var channel: String = WxPusherSystemChannelId
+        val channel: String = WxPusherSystemChannelId
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
 //            && message.sourceID.isNotEmpty()
 //        ) {
-//            if (sysNotificationManager.getNotificationChannel(message.sourceID) != null) {
+//            if (getSysNotificationManager().getNotificationChannel(message.sourceID) != null) {
 //                channel = message.sourceID
 //            } else {
 //                //遇到没有创建的主题，补偿创建一次，下次生效
@@ -146,7 +138,7 @@ object NotificationManager {
 
     private fun sendNotification(notification: Notification) {
         val id = messageId.incrementAndGet()
-        sysNotificationManager.notify(id, notification)
+        getSysNotificationManager().notify(id, notification)
     }
 
     /**
@@ -187,16 +179,16 @@ object NotificationManager {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             return
         }
-        if (sysNotificationManager.getNotificationChannel(channel.id) != null) {
+        if (getSysNotificationManager().getNotificationChannel(channel.id) != null) {
             return
         }
-        sysNotificationManager.createNotificationChannel(channel)
+        getSysNotificationManager().createNotificationChannel(channel)
     }
 
     /**
      * 初始化消息通知分组
      */
-    private fun initNotificationChannelGrouop() {
+    private fun initNotificationChannelGroup() {
         ChannelGroup.entries.forEach {
             createNotificationChannelGroup(it.id, it.title)
         }
@@ -209,11 +201,11 @@ object NotificationManager {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
             return
         }
-        if (sysNotificationManager.getNotificationChannelGroup(id) != null) {
+        if (getSysNotificationManager().getNotificationChannelGroup(id) != null) {
             return
         }
         val group = NotificationChannelGroup(id, name)
-        sysNotificationManager.createNotificationChannelGroup(group)
+        getSysNotificationManager().createNotificationChannelGroup(group)
     }
 
     /**
@@ -223,12 +215,20 @@ object NotificationManager {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
             return true
         }
-        return sysNotificationManager.getNotificationChannel(id) != null
+        return getSysNotificationManager().getNotificationChannel(id) != null
+    }
+
+    fun getSysNotificationManager(): NotificationManager {
+        if (sysNotificationManager == null) {
+            sysNotificationManager =
+                ApplicationUtils.application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        }
+        return sysNotificationManager!!
     }
 }
 
 enum class ChannelGroup(val id: String, val title: String) {
     WxPusherSystem("WxPusherSystem", "WxPusher平台消息"),
-    SubscribeMessage("SubscribeMessage", "你主动订阅的消息"),
-    Other("other", "其他"),
+//    SubscribeMessage("SubscribeMessage", "你主动订阅的消息"),
+//    Other("other", "其他"),
 }

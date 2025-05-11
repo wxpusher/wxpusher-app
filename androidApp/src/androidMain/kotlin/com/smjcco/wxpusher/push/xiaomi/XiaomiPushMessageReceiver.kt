@@ -2,8 +2,8 @@ package com.smjcco.wxpusher.push.xiaomi
 
 import android.content.Context
 import android.util.Log
-import com.smjcco.wxpusher.api.DeviceApi
-import com.smjcco.wxpusher.utils.AppDataUtils
+import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.push.PushManager
 import com.xiaomi.mipush.sdk.ErrorCode
 import com.xiaomi.mipush.sdk.MiPushClient
 import com.xiaomi.mipush.sdk.MiPushCommandMessage
@@ -19,9 +19,11 @@ class XiaomiPushMessageReceiver : PushMessageReceiver() {
         val arguments = message.getCommandArguments();
         if (message.getResultCode().toInt() == ErrorCode.SUCCESS) {
             val regID = arguments?.get(0);
-            Log.d(TAG, "收到MIUI mRegID=${regID}")
-            AppDataUtils.savePushToken(regID)
-            DeviceApi.updateDeviceInfoAsync()
+            if (regID.isNullOrEmpty()) {
+                Log.d(TAG, "收到MIUI pushToken为空， mRegID=${regID}")
+            } else {
+                PushManager.onGetPushToken(regID, DevicePlatform.Android_XIAOMI)
+            }
         }
     }
 }

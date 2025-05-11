@@ -62,7 +62,6 @@ class WebViewActivity : ComponentActivity() {
         requestPermission()
         checkUpdate()
 //        noteKeepAlive()
-        showSettingGuide()
     }
 
     /**
@@ -122,6 +121,10 @@ class WebViewActivity : ComponentActivity() {
             .create().show()
     }
 
+    override fun onResume() {
+        super.onResume()
+        showSettingGuide()
+    }
     /**
      * 提示保活
      */
