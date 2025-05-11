@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.annotation.Keep
 import com.google.gson.reflect.TypeToken
 import com.smjcco.wxpusher.WxPusherConfig
+import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.DateUtils
 import com.smjcco.wxpusher.utils.GsonUtils
@@ -28,9 +29,9 @@ object DeviceApi {
     //记录一下上报的数据，如果变化，就不用再次上报
     private var updateDataCache = "";
 
-    fun updateDeviceInfoAsync() {
+    fun updateDeviceInfoAsync(platform: DevicePlatform?) {
         WxPusherUtils.getIoScopeScope().launch {
-            updateDeviceInfo()
+            updateDeviceInfo(platform)
         }
     }
 
@@ -79,7 +80,7 @@ object DeviceApi {
     /**
      * 更新设备token
      */
-    private suspend fun updateDeviceInfo(): Boolean {
+    private suspend fun updateDeviceInfo(platform: DevicePlatform?): Boolean {
         val deviceToken = AppDataUtils.getLoginInfo()?.deviceToken
         if (deviceToken.isNullOrEmpty()) {
             Log.d(TAG, "updateDeviceInfo: 没有deviceToken")
@@ -98,7 +99,7 @@ object DeviceApi {
         val reqBody = GsonUtils.toJson(
             UpdateDeviceInfoReq(
                 deviceUuid, pushToken,
-                WxPusherWebInterface.getDeviceType()
+                platform?.getPlatform()
             )
         )
         if (reqBody == updateDataCache && SaveUtils.getByKey(UpDateTokenDate) == DateUtils.getDate()) {
@@ -142,6 +143,6 @@ object DeviceApi {
     data class UpdateDeviceInfoReq(
         val deviceUuid: String,
         val pushToken: String,
-        val platform: String
+        val platform: String?
     )
 }

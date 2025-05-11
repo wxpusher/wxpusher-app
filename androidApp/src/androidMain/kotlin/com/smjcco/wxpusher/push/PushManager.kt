@@ -51,7 +51,7 @@ object PushManager {
     fun onGetPushToken(token: String, platform: DevicePlatform) {
         Log.d(TAG, "收到设备token，platform=${platform}, token=${token}")
         AppDataUtils.savePushToken(token)
-        DeviceApi.updateDeviceInfoAsync()
+        DeviceApi.updateDeviceInfoAsync(platform)
     }
 
     /**

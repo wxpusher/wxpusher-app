@@ -31,7 +31,8 @@ object WxPusherWebInterface {
 
     @JavascriptInterface
     fun updateDeviceInfo() {
-        DeviceApi.updateDeviceInfoAsync()
+        Log.d(TAG, "web要求上报token")
+        DeviceApi.updateDeviceInfoAsync(null)
     }
 
     @JavascriptInterface
