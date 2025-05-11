@@ -32,6 +32,17 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="wxpusher.smjcco.com"
+                    android:path="/message"
+                    android:scheme="wxpusher" />
+            </intent-filter>
         </activity>
 
         <!--        暂时不用长链接服务-->

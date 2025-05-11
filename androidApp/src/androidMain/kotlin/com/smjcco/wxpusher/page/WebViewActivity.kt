@@ -125,6 +125,7 @@ class WebViewActivity : ComponentActivity() {
         super.onResume()
         showSettingGuide()
     }
+
     /**
      * 提示保活
      */
@@ -204,7 +205,7 @@ class WebViewActivity : ComponentActivity() {
     }
 
     private fun openPageFromIntent(intent: Intent?): Boolean {
-
+        //ws 和华为，直接读取url判断打开页面
         val url = intent?.getStringExtra(INTENT_KEY_URL)
         if (!url.isNullOrEmpty()) {
             webview?.clearHistory()
