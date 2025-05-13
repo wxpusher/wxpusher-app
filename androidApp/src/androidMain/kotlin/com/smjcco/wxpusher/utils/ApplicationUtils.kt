@@ -11,6 +11,7 @@ object ApplicationUtils {
 
     /**
      * 判断是不是主进程
+     * 感觉判断的有问题，先不用这个方法
      */
     fun isMainProcess(): Boolean {
         val am = (application.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager)

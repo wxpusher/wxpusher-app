@@ -24,10 +24,10 @@ object PushManager {
      * 初始化推送
      */
     fun init(application: Application) {
-        if (!ApplicationUtils.isMainProcess()) {
-            WxPusherLog.i(TAG, "非主进程，不初始化")
-            return
-        }
+//        if (!ApplicationUtils.isMainProcess()) {
+//            WxPusherLog.i(TAG, "非主进程，不初始化")
+//            return
+//        }
         if (DeviceUtils.isHuaweiMobileServicesAvailable()) {
             WxPusherLog.i(TAG, "初始化华为推送")
             HmsMessaging.getInstance(application).isAutoInitEnabled = true

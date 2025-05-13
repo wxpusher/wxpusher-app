@@ -22,6 +22,10 @@ class WxPusherApplication : Application() {
         WxPusherLog.init()
         WxPusherLog.i(TAG, "应用启动")
         WxPusherConfig.init()
+//        if (!ApplicationUtils.isMainProcess()) {
+//            WxPusherLog.i(TAG, "非主进程，不上报")
+//            return
+//        }
         WebBundleManager.init()
         initTbs()
         PushManager.init(this)
