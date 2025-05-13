@@ -1,7 +1,6 @@
 package com.smjcco.wxpusher.push.xiaomi
 
 import android.content.Context
-import android.util.Log
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.PushManager
