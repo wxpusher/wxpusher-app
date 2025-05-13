@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
+import com.smjcco.wxpusher.log.WxPusherLog
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
 
@@ -22,7 +23,7 @@ object GsonUtils {
             try {
                 return GSON.fromJson<T>(str, cls)
             } catch (e: Throwable) {
-                Log.d("GSON", "序列化错误", e)
+                WxPusherLog.w("GSON", "序列化错误", e)
             }
         }
         return null
@@ -37,7 +38,7 @@ object GsonUtils {
             try {
                 return GSON.fromJson(str, type) as T?
             } catch (e: Throwable) {
-                Log.d("GSON", "序列化错误", e)
+                WxPusherLog.w("GSON", "序列化错误", e)
             }
         }
         return null

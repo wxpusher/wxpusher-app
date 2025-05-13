@@ -19,8 +19,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.lifecycle.ReportFragment.Companion.reportFragment
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WxPusherConfig
+import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.PermissionRequester
@@ -46,7 +48,7 @@ class WebViewActivity : ComponentActivity() {
     private var preUiMode = -1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
+        WxPusherLog.i(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
         //避免申请权限的时候，重复调用创建方法
         if (savedInstanceState != null) {
             return
@@ -180,7 +182,7 @@ class WebViewActivity : ComponentActivity() {
                 request: WebResourceRequest?,
                 error: WebResourceError?
             ) {
-                Log.e(TAG, "加载页面错误: ${error?.description}")
+                WxPusherLog.e(TAG, "加载页面错误: ${error?.description}")
                 super.onReceivedError(view, request, error)
             }
         }
@@ -249,6 +251,11 @@ class WebViewActivity : ComponentActivity() {
         super.onBackPressed()
     }
 
+    override fun onPause() {
+        super.onPause()
+        WxPusherLog.flush()
+    }
+
     /**
      * 监听主题颜色的变化
      */
@@ -283,7 +290,7 @@ class WebViewActivity : ComponentActivity() {
     }
 
     private fun onUiModeChanged(night: Boolean) {
-        Log.d(TAG, "onUiModeChanged() called with: night = $night")
+        WxPusherLog.i(TAG, "onUiModeChanged() called with: night = $night")
         //设置容器背景颜色，保持顶部状态栏好看
         val color: Int = resources.getColor(R.color.dark_bg)
         val bgColor = if (night) color else Color.White.toArgb()

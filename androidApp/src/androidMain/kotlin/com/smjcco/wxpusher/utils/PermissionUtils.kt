@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.smjcco.wxpusher.log.WxPusherLog
 
 typealias PermissionRequesterCallback = ((Boolean) -> Unit)?
 typealias PermissionRequesterGotoSetting = (() -> Unit)?
@@ -39,7 +40,7 @@ class PermissionRequester(
         requester =
             activity.registerForActivityResult(ActivityResultContracts.RequestPermission()) {
                 if (it) {
-                    Log.d(TAG, "requestPermission: Ok")
+                    WxPusherLog.i(TAG, "requestPermission: Ok")
                     callback?.invoke(it)
                     return@registerForActivityResult
                 }
@@ -48,7 +49,7 @@ class PermissionRequester(
                         permission
                     )
                 ) {
-                    Log.d(TAG, "提示申请权限的原因，不需要跳转引导")
+                    WxPusherLog.i(TAG, "提示申请权限的原因，不需要跳转引导")
                     AlertDialog.Builder(activity)
                         .setTitle(explainTitle)
                         .setMessage(explainMessage)
@@ -75,7 +76,7 @@ class PermissionRequester(
                         .create().show()
 
                 } else {
-                    Log.d(TAG, "提示申请权限的原因，需要跳转引导")
+                    WxPusherLog.i(TAG, "提示申请权限的原因，需要跳转引导")
                     AlertDialog.Builder(activity)
                         .setTitle(guideTitle)
                         .setCancelable(false)
@@ -102,7 +103,7 @@ class PermissionRequester(
      * 申请一个权限
      */
     fun request(requestSuccessRun: PermissionRequesterCallback) {
-        Log.d(TAG, "request: 请求用户授权${permission}")
+        WxPusherLog.i(TAG, "request: 请求用户授权${permission}")
         if (ContextCompat.checkSelfPermission(
                 activity,
                 permission

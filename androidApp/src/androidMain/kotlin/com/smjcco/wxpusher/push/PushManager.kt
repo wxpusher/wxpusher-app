@@ -5,6 +5,7 @@ import android.util.Log
 import com.huawei.hms.push.HmsMessaging
 import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.huawei.HuaweiPushUtils
 import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.utils.AppDataUtils
@@ -24,22 +25,22 @@ object PushManager {
      */
     fun init(application: Application) {
         if (!ApplicationUtils.isMainProcess()) {
-            Log.d(TAG, "非主进程，不初始化")
+            WxPusherLog.i(TAG, "非主进程，不初始化")
             return
         }
         if (DeviceUtils.isHuaweiMobileServicesAvailable()) {
-            Log.d(TAG, "初始化华为推送")
+            WxPusherLog.i(TAG, "初始化华为推送")
             HmsMessaging.getInstance(application).isAutoInitEnabled = true
             HuaweiPushUtils.initPushToken(application)
         } else if (DeviceUtils.isMIUI()) {
-            Log.d(TAG, "初始化小米推送")
+            WxPusherLog.i(TAG, "初始化小米推送")
             MiPushClient.registerPush(
                 application,
                 "2882303761520373007",
                 "5932037320007"
             )
         } else {
-            Log.d(TAG, "初始化自建长链接")
+            WxPusherLog.i(TAG, "初始化自建长链接")
             WsManager.init()
         }
     }
@@ -49,7 +50,7 @@ object PushManager {
      * 当获取到推动token的时候，管理token的上报，更新
      */
     fun onGetPushToken(token: String, platform: DevicePlatform) {
-        Log.d(TAG, "收到设备token，platform=${platform}, token=${token}")
+        WxPusherLog.i(TAG, "收到设备token，platform=${platform}, token=${token}")
         AppDataUtils.savePushToken(token)
         DeviceApi.updateDeviceInfoAsync(platform)
     }

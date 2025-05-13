@@ -14,6 +14,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.ws.KeepWsConnectService
 
 
@@ -21,7 +22,7 @@ class TestActivity : ComponentActivity() {
 
     private val requester = registerForActivityResult(ActivityResultContracts.RequestPermission()) {
         if (it) {
-            Log.d("TestActivity", "requestPermission: Ok。")
+            WxPusherLog.i("TestActivity", "requestPermission: Ok。")
         } else if (!ActivityCompat.shouldShowRequestPermissionRationale(
                 this,
                 Manifest.permission.POST_NOTIFICATIONS

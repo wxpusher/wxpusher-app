@@ -73,7 +73,7 @@ object NotificationManager {
 //                    }
 //                }
 //                for (subscribeListItem in subscribeListOrder) {
-//                    Log.d(
+//                    WxPusherLog.i(
 //                        TAG, "创建通知通道，ChannelId = ${subscribeListItem.getChannelId()}," +
 //                                "subscribeListItem.name=${subscribeListItem.name}"
 //                    )

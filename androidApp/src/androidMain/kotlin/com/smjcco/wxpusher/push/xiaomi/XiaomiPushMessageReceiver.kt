@@ -3,6 +3,7 @@ package com.smjcco.wxpusher.push.xiaomi
 import android.content.Context
 import android.util.Log
 import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.PushManager
 import com.xiaomi.mipush.sdk.ErrorCode
 import com.xiaomi.mipush.sdk.MiPushClient
@@ -20,7 +21,7 @@ class XiaomiPushMessageReceiver : PushMessageReceiver() {
         if (message.getResultCode().toInt() == ErrorCode.SUCCESS) {
             val regID = arguments?.get(0);
             if (regID.isNullOrEmpty()) {
-                Log.d(TAG, "收到MIUI pushToken为空， mRegID=${regID}")
+                WxPusherLog.w(TAG, "小米获取 pushToken为空， mRegID=${regID}")
             } else {
                 PushManager.onGetPushToken(regID, DevicePlatform.Android_XIAOMI)
             }

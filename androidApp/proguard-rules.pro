@@ -120,3 +120,6 @@
  -keep class com.huawei.hianalytics.**{*;}
  -keep class com.huawei.updatesdk.**{*;}
  -keep class com.huawei.hms.**{*;}
+ #ali log
+-keep class com.aliyun.sls.android.producer.* { *; }
+-keep interface com.aliyun.sls.android.producer.* { *; }

@@ -5,6 +5,7 @@ import androidx.annotation.Keep
 import com.google.gson.reflect.TypeToken
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.DateUtils
 import com.smjcco.wxpusher.utils.GsonUtils
@@ -42,7 +43,7 @@ object DeviceApi {
     suspend fun getSubscribeList(): List<SubscribeListItem> {
         val deviceToken = AppDataUtils.getLoginInfo()?.deviceToken
         if (deviceToken.isNullOrEmpty()) {
-            Log.d(TAG, "getSubscribeList: 没有deviceToken")
+            WxPusherLog.i(TAG, "getSubscribeList: 没有deviceToken")
             return Collections.emptyList()
         }
 
@@ -61,7 +62,7 @@ object DeviceApi {
                     }
                     val bodyByte = response.body?.bytes()
                     val bodyStr = bodyByte?.let { String(it) }
-                    Log.d(TAG, "获取订阅列表,结果=${bodyStr}")
+                    WxPusherLog.i(TAG, "获取订阅列表,结果=${bodyStr}")
                     val type = object : TypeToken<BaseResp<List<SubscribeListItem>>>() {}.type
                     val respData: BaseResp<List<SubscribeListItem>>? =
                         GsonUtils.toObj(bodyStr, type)
@@ -83,17 +84,17 @@ object DeviceApi {
     private suspend fun updateDeviceInfo(platform: DevicePlatform?): Boolean {
         val deviceToken = AppDataUtils.getLoginInfo()?.deviceToken
         if (deviceToken.isNullOrEmpty()) {
-            Log.d(TAG, "updateDeviceInfo: 没有deviceToken")
+            WxPusherLog.i(TAG, "updateDeviceInfo: 没有deviceToken")
             return false
         }
         val pushToken = AppDataUtils.getPushToken()
         if (pushToken.isNullOrEmpty()) {
-            Log.d(TAG, "updateDeviceInfo: 没有pushToken")
+            WxPusherLog.i(TAG, "updateDeviceInfo: 没有pushToken")
             return false
         }
         val deviceUuid = AppDataUtils.getLoginInfo()?.deviceId
         if (deviceUuid.isNullOrEmpty()) {
-            Log.d(TAG, "updateDeviceInfo: 没有deviceUuid")
+            WxPusherLog.i(TAG, "updateDeviceInfo: 没有deviceUuid")
             return false
         }
         val reqBody = GsonUtils.toJson(
@@ -103,7 +104,7 @@ object DeviceApi {
             )
         )
         if (reqBody == updateDataCache && SaveUtils.getByKey(UpDateTokenDate) == DateUtils.getDate()) {
-            Log.d(TAG, "updateDeviceInfo: 数据为变更，无需上报")
+            WxPusherLog.i(TAG, "updateDeviceInfo: 数据为变更，无需上报")
             return false
         }
         try {
@@ -115,7 +116,7 @@ object DeviceApi {
                     .header("deviceToken", deviceToken)
                     .put(requestBody)
                     .build()
-                Log.d(TAG, "updateDeviceInfo: 开始上报更新PT,${reqBody}")
+                WxPusherLog.i(TAG, "updateDeviceInfo: 开始上报更新PT,${reqBody}")
                 client.newCall(request).execute().use { response: Response ->
                     val status = response.isSuccessful
                     if (!status) {
@@ -123,7 +124,7 @@ object DeviceApi {
                     }
                     val bodyByte = response.body?.bytes()
                     val bodyStr = bodyByte?.let { String(it) }
-                    Log.d(TAG, "updateDeviceInfo: 上报更新PT,结果=${bodyStr}")
+                    WxPusherLog.i(TAG, "updateDeviceInfo: 上报更新PT,结果=${bodyStr}")
                     val respData = GsonUtils.toObj(bodyStr, BaseResp::class)
                     if (respData?.isSuccess() == true) {
                         SaveUtils.setKeyValue(UpDateTokenDate, DateUtils.getDate())

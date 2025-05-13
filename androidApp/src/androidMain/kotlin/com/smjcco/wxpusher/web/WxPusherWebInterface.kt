@@ -7,6 +7,7 @@ import android.webkit.JavascriptInterface
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.page.CheckActivity
 import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.utils.AppDataUtils
@@ -31,7 +32,7 @@ object WxPusherWebInterface {
 
     @JavascriptInterface
     fun updateDeviceInfo() {
-        Log.d(TAG, "web要求上报token")
+        WxPusherLog.i(TAG, "web side要求上报token")
         DeviceApi.updateDeviceInfoAsync(null)
     }
 
@@ -77,7 +78,7 @@ object WxPusherWebInterface {
      */
     @JavascriptInterface
     fun loginSuccess() {
-        Log.d(TAG, "loginSuccess() called")
+        WxPusherLog.i(TAG, "loginSuccess() called")
     }
 
     /**
@@ -85,7 +86,7 @@ object WxPusherWebInterface {
      */
     @JavascriptInterface
     fun logout() {
-        Log.d(TAG, "logout() called")
+        WxPusherLog.i(TAG, "logout() called")
     }
 
     @JavascriptInterface

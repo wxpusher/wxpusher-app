@@ -2,6 +2,7 @@ package com.smjcco.wxpusher.web.update
 
 import android.util.Log
 import com.smjcco.wxpusher.WxPusherConfig
+import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
@@ -60,7 +61,7 @@ object WebBundleManager {
             getVersionFromZip(ApplicationUtils.application.assets.open(BUNDLE_NAME))
 
         if (isVersionGreater(insetZipVersion, nowVersion)) {
-            Log.d(TAG, "内置包更新，需要重新解压")
+            WxPusherLog.i(TAG, "内置包更新，需要重新解压")
             ApplicationUtils.application.assets.open(BUNDLE_NAME).use {
                 extractZipTempDir(it)
                 applyUpdateIfAvailable()
@@ -112,9 +113,9 @@ object WebBundleManager {
     }
 
     fun getWebFileDir(): File {
-        Log.d(TAG, "Web目录: ${webDir.absolutePath}")
-        Log.d(TAG, "Web目录是否存在: ${webDir.exists()}")
-        Log.d(TAG, "Web目录文件列表: ${webDir.list()?.joinToString()}")
+        WxPusherLog.i(TAG, "Web目录: ${webDir.absolutePath}")
+        WxPusherLog.i(TAG, "Web目录是否存在: ${webDir.exists()}")
+        WxPusherLog.i(TAG, "Web目录文件列表: ${webDir.list()?.joinToString()}")
         return webDir
     }
 
@@ -124,13 +125,13 @@ object WebBundleManager {
                 val serverVersion = URL("${WxPusherConfig.WebUrl}/${VERSION_FILE}").readText()
                 val localVersion = getNowVersion()
                 if (isVersionGreater(serverVersion, localVersion)) {
-                    Log.d(TAG, "检查到新版本，开始下载,version=${serverVersion}")
+                    WxPusherLog.i(TAG, "检查到新版本，开始下载,version=${serverVersion}")
                     downloadNewBundle(serverVersion)
                 } else {
-                    Log.d(TAG, "无新版本，跳过更新")
+                    WxPusherLog.i(TAG, "无新版本，跳过更新")
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "检查更新失败", e)
+                WxPusherLog.i(TAG, "检查更新失败")
             }
         }
     }
@@ -154,14 +155,14 @@ object WebBundleManager {
                         input.copyTo(output)
                     }
                 }
-                Log.d(TAG, "新版本下载完成,version=${serverVersion}")
+                WxPusherLog.i(TAG, "新版本下载完成,version=${serverVersion}")
                 bundleZip.inputStream().use {
                     extractZipTempDir(it)
                 }
                 bundleZip.delete()
-                Log.d(TAG, "新版本解压完成,version=${serverVersion}")
+                WxPusherLog.i(TAG, "新版本解压完成,version=${serverVersion}")
             } catch (e: Exception) {
-                Log.e(TAG, "下载新bundle失败", e)
+                WxPusherLog.w(TAG, "下载新bundle失败", e)
             }
         }
     }
@@ -172,7 +173,7 @@ object WebBundleManager {
     fun applyUpdateIfAvailable() {
         if (SaveUtils.getByKey(NEED_APPLY_UPDATE_KEY) == "true") {
             try {
-                Log.d(TAG, "删除老版本")
+                WxPusherLog.i(TAG, "删除老版本")
                 // 删除旧文件
                 webDir.deleteRecursively()
                 webDir.mkdirs()
@@ -185,10 +186,10 @@ object WebBundleManager {
                 // 清理
                 tempDir.deleteRecursively()
                 SaveUtils.setKeyValue(NEED_APPLY_UPDATE_KEY, "false")
-                Log.d(TAG, "应用新版本完成")
+                WxPusherLog.i(TAG, "应用新版本完成")
             } catch (e: Exception) {
                 //更新失败，重置一下版本号，下次启动会再次更新
-                Log.e(TAG, "应用更新失败", e)
+                WxPusherLog.w(TAG, "应用更新失败", e)
             }
         }
     }
@@ -197,7 +198,7 @@ object WebBundleManager {
      * 解压释放到临时目录，后面调用 applyUpdateIfAvailable 即可生效
      */
     private fun extractZipTempDir(input: InputStream) {
-        Log.d(TAG, "extractZipTempDir: 开始解压BundleZip")
+        WxPusherLog.i(TAG, "extractZipTempDir: 开始解压BundleZip")
         tempDir.deleteRecursively()
         tempDir.mkdirs()
         ZipInputStream(input).use { zip ->
@@ -218,6 +219,6 @@ object WebBundleManager {
             }
         }
         SaveUtils.setKeyValue(NEED_APPLY_UPDATE_KEY, "true")
-        Log.d(TAG, "extractZipTempDir: 完成解压BundleZip")
+        WxPusherLog.i(TAG, "extractZipTempDir: 完成解压BundleZip")
     }
 }

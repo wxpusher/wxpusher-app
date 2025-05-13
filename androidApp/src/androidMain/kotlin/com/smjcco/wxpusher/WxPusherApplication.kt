@@ -2,9 +2,8 @@ package com.smjcco.wxpusher
 
 import android.app.Application
 import android.os.Build
-import android.util.Log
 import com.smjcco.wxpusher.api.DeviceApi
-import com.smjcco.wxpusher.notification.NotificationManager
+import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
@@ -18,9 +17,10 @@ class WxPusherApplication : Application() {
     private val TAG = "AppInit"
     override fun onCreate() {
         super.onCreate()
-        Log.d(TAG, "应用启动")
         ApplicationUtils.application = this
         SaveUtils.init()
+        WxPusherLog.init()
+        WxPusherLog.i(TAG, "应用启动")
         WxPusherConfig.init()
         if (!ApplicationUtils.isMainProcess()) {
             return
@@ -29,7 +29,7 @@ class WxPusherApplication : Application() {
         initTbs()
         PushManager.init(this)
         //上报一次绑定关系，主要是为了更新设备活跃时间
-        Log.d(TAG, "应用初始化上报token")
+        WxPusherLog.i(TAG, "应用初始化上报token")
         DeviceApi.updateDeviceInfoAsync(null)
     }
 
