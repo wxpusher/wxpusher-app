@@ -18,12 +18,16 @@ object HuaweiPushUtils {
             try {
                 val token = HmsInstanceId.getInstance(application)
                     .getToken("114073793", "HCM")
-                WxPusherLog.i(TAG, "HuaweiPush 获取token=${token}")
                 if (!TextUtils.isEmpty(token)) {
+                    WxPusherLog.i(TAG, "HuaweiPush 获取token=${token}")
                     PushManager.onGetPushToken(token, DevicePlatform.Android_HUAWEI)
+                } else {
+                    WxPusherLog.i(TAG, "HuaweiPush 获取token失败，为空")
+                    PushManager.onGetPushTokenFail(DevicePlatform.Android_HUAWEI)
                 }
             } catch (e: ApiException) {
                 WxPusherLog.e(TAG, "HuaweiPush 获取token失败", e)
+                PushManager.onGetPushTokenFail(DevicePlatform.Android_HUAWEI)
             }
         }
     }

@@ -1,8 +1,6 @@
 package com.smjcco.wxpusher.push.ws
 
-import android.util.Log
 import com.smjcco.wxpusher.WxPusherConfig
-import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.notification.NotificationManager
@@ -61,7 +59,7 @@ object WsManager {
                 if (connectStatus.get() == WsConnectStatus.NotConnect) {
                     connectInner()
                 }
-                WxPusherLog.i(TAG, "延迟10秒检查链接")
+                WxPusherLog.d(TAG, "延迟10秒检查链接")
                 delay(10 * 1000)
             }
         }
@@ -98,7 +96,9 @@ object WsManager {
         sb.append("version=${WxPusherUtils.getVersionName()}")
         sb.append("&")
         sb.append("platform=${WxPusherWebInterface.getDeviceType()}")
-        if (!AppDataUtils.getPushToken().isNullOrEmpty()) {
+        if (!AppDataUtils.getPushToken().isNullOrEmpty()
+            && AppDataUtils.getPushToken()?.startsWith("PT_") == true
+        ) {
             sb.append("&")
             sb.append("pushToken=${AppDataUtils.getPushToken()}")
         }
@@ -131,7 +131,8 @@ object WsManager {
                 WxPusherLog.i(TAG, "connect:客户端版本低，不进行链接")
                 return
             }
-            disconnect()
+            webSocket?.close(1000, null)
+
             WxPusherLog.i(TAG, "connect: 开始WS长链接")
             setConnectStatus(WsConnectStatus.Connecting)
             val wsUrl = getHostUrl()
@@ -172,6 +173,7 @@ object WsManager {
      */
     fun disconnect() {
         WxPusherLog.i(TAG, "disconnect() called,主动断开ws链接")
+        disableConnect = true
         webSocket?.close(1000, null)
     }
 
@@ -215,7 +217,7 @@ object WsManager {
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
             WxPusherLog.i(TAG, "onClosing: code=${code},reason=${reason}")
-            setConnectStatus(WsConnectStatus.Closing)
+            setConnectStatus(WsConnectStatus.NotConnect)
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {

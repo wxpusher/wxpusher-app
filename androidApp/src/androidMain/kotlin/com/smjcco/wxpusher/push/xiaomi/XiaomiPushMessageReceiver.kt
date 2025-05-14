@@ -29,6 +29,7 @@ class XiaomiPushMessageReceiver : PushMessageReceiver() {
             val regID = arguments?.get(0);
             if (regID.isNullOrEmpty()) {
                 WxPusherLog.w(TAG, "小米获取 pushToken为空1， mRegID=${regID}")
+                PushManager.onGetPushTokenFail(DevicePlatform.Android_XIAOMI)
             } else {
                 PushManager.onGetPushToken(regID, DevicePlatform.Android_XIAOMI)
             }
@@ -37,6 +38,7 @@ class XiaomiPushMessageReceiver : PushMessageReceiver() {
                 TAG,
                 "小米获取 pushToken失败， reason=${message.reason},message=${GsonUtils.toJson(message)}"
             )
+            PushManager.onGetPushTokenFail(DevicePlatform.Android_XIAOMI)
         }
     }
 }

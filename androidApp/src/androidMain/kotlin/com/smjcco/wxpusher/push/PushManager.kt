@@ -1,7 +1,6 @@
 package com.smjcco.wxpusher.push
 
 import android.app.Application
-import android.util.Log
 import com.huawei.hms.push.HmsMessaging
 import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.bean.DevicePlatform
@@ -24,27 +23,37 @@ object PushManager {
      * 初始化推送
      */
     fun init(application: Application) {
-//        if (!ApplicationUtils.isMainProcess()) {
-//            WxPusherLog.i(TAG, "非主进程，不初始化")
-//            return
-//        }
-        if (DeviceUtils.isHuaweiMobileServicesAvailable()) {
-            WxPusherLog.i(TAG, "初始化华为推送")
-            HmsMessaging.getInstance(application).isAutoInitEnabled = true
-            HuaweiPushUtils.initPushToken(application)
-        } else if (DeviceUtils.isMIUI()) {
+        if (!ApplicationUtils.isMainProcess()) {
+            WxPusherLog.i(TAG, "非主进程，不初始化")
+            return
+        }
+
+        if (DeviceUtils.isMIUI()) {
             WxPusherLog.i(TAG, "初始化小米推送")
             MiPushClient.registerPush(
                 application,
                 "2882303761520373007",
                 "5932037320007"
             )
+        } else if (DeviceUtils.isHuaweiMobileServicesAvailable()) {
+            WxPusherLog.i(TAG, "初始化华为推送")
+            HmsMessaging.getInstance(application).isAutoInitEnabled = true
+            HuaweiPushUtils.initPushToken(application)
         } else {
             WxPusherLog.i(TAG, "初始化自建长链接")
             WsManager.init()
         }
     }
 
+    /**
+     * 当获取pushtoken失败的时候回调
+     */
+    fun onGetPushTokenFail(platform: DevicePlatform) {
+        if (platform != DevicePlatform.Android) {
+            WxPusherLog.i(TAG, "获取厂商pushToken失败，初始化自建长链接")
+            WsManager.init()
+        }
+    }
 
     /**
      * 当获取到推动token的时候，管理token的上报，更新
