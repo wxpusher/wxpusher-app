@@ -107,7 +107,7 @@ class WebViewActivity : ComponentActivity() {
         }
         AlertDialog.Builder(this)
             .setTitle("保活提示")
-            .setMessage("由于Android的系统限制，应用在后台会被限制运行，导致收不到消息 ，请打开后台限制。")
+            .setMessage("由于Android的系统限制，应用在后台会被限制运行，导致收不到消息，请打开后台限制。")
             .setPositiveButton(
                 "去设置"
             ) { dialog, which ->
