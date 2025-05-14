@@ -24,6 +24,7 @@ import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.notification.NotificationManager
+import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
@@ -63,7 +64,6 @@ class WebViewActivity : ComponentActivity() {
         initWebView()
         requestPermission()
         checkUpdate()
-//        noteKeepAlive()
     }
 
     /**
@@ -107,7 +107,7 @@ class WebViewActivity : ComponentActivity() {
         }
         AlertDialog.Builder(this)
             .setTitle("保活提示")
-            .setMessage("由于Android的系统限制，应用在后台会被限制允许，导致收不到消息 ，请打开后台限制。")
+            .setMessage("由于Android的系统限制，应用在后台会被限制运行，导致收不到消息 ，请打开后台限制。")
             .setPositiveButton(
                 "去设置"
             ) { dialog, which ->
@@ -125,7 +125,12 @@ class WebViewActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        showSettingGuide()
+        //自建通道需要提醒保活
+        if (AppDataUtils.getPushToken()?.startsWith("PT_") == true) {
+            noteKeepAlive()
+        } else {
+            showSettingGuide()
+        }
     }
 
     /**
