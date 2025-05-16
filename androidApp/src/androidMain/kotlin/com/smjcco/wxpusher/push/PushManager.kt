@@ -6,11 +6,13 @@ import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.huawei.HuaweiPushUtils
+import com.smjcco.wxpusher.push.vivo.VIVOPushUtils
 import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils.application
 import com.smjcco.wxpusher.utils.DeviceUtils
+import com.vivo.push.PushClient
 import com.xiaomi.mipush.sdk.MiPushClient
 
 /**
@@ -35,10 +37,13 @@ object PushManager {
                 "2882303761520373007",
                 "5932037320007"
             )
+        } else if (PushClient.getInstance(ApplicationUtils.application).isSupport()) {
+            WxPusherLog.i(TAG, "初始化VIVO推送")
+            VIVOPushUtils.init(ApplicationUtils.application)
         } else if (DeviceUtils.isHuaweiMobileServicesAvailable()) {
             WxPusherLog.i(TAG, "初始化华为推送")
             HmsMessaging.getInstance(application).isAutoInitEnabled = true
-            HuaweiPushUtils.initPushToken(application)
+            HuaweiPushUtils.init(application)
         } else {
             WxPusherLog.i(TAG, "初始化自建长链接")
             WsManager.init()

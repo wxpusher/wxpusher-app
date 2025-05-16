@@ -8,6 +8,7 @@ enum class DevicePlatform(private val platform: String) {
     Android("Android"),
     Android_XIAOMI("Android_Xiaomi"),
     Android_HUAWEI("Android_Huawei"),
+    Android_VIVO("Android_Vivo"),
     Mac("Mac"),
     Windows("Windows"),
     Linux("Linux"),

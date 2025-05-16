@@ -2,7 +2,6 @@ package com.smjcco.wxpusher.push.huawei
 
 import android.app.Application
 import android.text.TextUtils
-import android.util.Log
 import com.huawei.hms.aaid.HmsInstanceId
 import com.huawei.hms.common.ApiException
 import com.smjcco.wxpusher.bean.DevicePlatform
@@ -12,8 +11,8 @@ import com.smjcco.wxpusher.utils.WxPusherUtils
 import kotlinx.coroutines.launch
 
 object HuaweiPushUtils {
-    private final val TAG = "Huawei"
-    fun initPushToken(application: Application) {
+    private  val TAG = "Huawei"
+    fun init(application: Application) {
         WxPusherUtils.getIoScopeScope().launch {
             try {
                 val token = HmsInstanceId.getInstance(application)
