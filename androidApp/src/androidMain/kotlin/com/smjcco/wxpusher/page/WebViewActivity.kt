@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -19,7 +18,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.lifecycle.ReportFragment.Companion.reportFragment
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.log.WxPusherLog
@@ -30,6 +28,7 @@ import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.SaveUtils
+import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 import com.smjcco.wxpusher.web.update.WebBundleManager
 import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback
@@ -187,6 +186,38 @@ class WebViewActivity : ComponentActivity() {
         webview?.webChromeClient = WebChromeClient()
 
         webview?.webViewClient = object : WebViewClient() {
+            override fun shouldOverrideUrlLoading(
+                view: WebView?,
+                request: WebResourceRequest?
+            ): Boolean {
+                val uri = request!!.url
+                if (uri.scheme == "http" || uri.scheme == "https") {
+                    return false
+                }
+                //提示打开外部应用
+                AlertDialog.Builder(this@WebViewActivity)
+                    .setTitle("是否打开【外部应用】")
+                    .setMessage("当前链接引导你打开外部应用，是否打开？")
+                    .setPositiveButton(
+                        "打开"
+                    ) { dialog, which ->
+                        dialog?.dismiss()
+                        try {
+                            val intent = Intent(Intent.ACTION_VIEW, uri)
+                            startActivity(intent)
+                        } catch (e: Exception) {
+                            WxPusherLog.w(TAG, "打开特定scheme错误", e)
+                            WxPusherUtils.toast("打开${uri.scheme}错误")
+                        }
+                    }
+                    .setCancelable(true)
+                    .setNegativeButton("取消") { dialog, _ ->
+                        dialog?.dismiss()
+                    }
+                    .create().show()
+                return true
+            }
+
             override fun onReceivedError(
                 view: WebView?,
                 request: WebResourceRequest?,
@@ -211,8 +242,8 @@ class WebViewActivity : ComponentActivity() {
         if (!openPageFromIntent(intent)) {
             webview?.clearHistory()
             // 加载本地文件
-            webview?.loadUrl("${getWebPageUrl()}#/home")
-//            webview?.loadUrl("https://wxpusher.zjiecode.com/admin/agreement/index-argeement.html#qqq")
+//            webview?.loadUrl("${getWebPageUrl()}#/home")
+            webview?.loadUrl("https://wxpusher.zjiecode.com/api/message/7n6xOIvhQ5ObfYkDHcdhbbQFxywOipAa")
         }
     }
 
