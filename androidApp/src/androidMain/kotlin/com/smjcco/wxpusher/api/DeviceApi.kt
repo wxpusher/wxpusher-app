@@ -1,6 +1,5 @@
 package com.smjcco.wxpusher.api
 
-import android.util.Log
 import androidx.annotation.Keep
 import com.google.gson.reflect.TypeToken
 import com.smjcco.wxpusher.WxPusherConfig
@@ -11,7 +10,6 @@ import com.smjcco.wxpusher.utils.DateUtils
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
-import com.smjcco.wxpusher.web.WxPusherWebInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -114,6 +112,7 @@ object DeviceApi {
                 val request = Request.Builder()
                     .url(url)
                     .header("deviceToken", deviceToken)
+                    .header("versionName", WxPusherUtils.getVersionName())
                     .put(requestBody)
                     .build()
                 WxPusherLog.i(TAG, "updateDeviceInfo: 开始上报更新PT,${reqBody}")

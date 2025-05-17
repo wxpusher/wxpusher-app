@@ -26,6 +26,7 @@ import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.SaveUtils
@@ -137,8 +138,12 @@ class WebViewActivity : ComponentActivity() {
      * 提示保活
      */
     private fun showSettingGuide() {
+        //没有登录不提醒
+        if (AppDataUtils.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
+            return
+        }
         //针对小米，还没有创建推送通道 ，就不进行提醒
-        if (!NotificationManager.hasNotificationChannel("mipush|com.smjcco.wxpusher|135072")) {
+        if (DeviceUtils.isMIUI() && !NotificationManager.hasNotificationChannel("mipush|com.smjcco.wxpusher|135072")) {
             return
         }
         if (SaveUtils.getByKey("alertTips") == "1") {
