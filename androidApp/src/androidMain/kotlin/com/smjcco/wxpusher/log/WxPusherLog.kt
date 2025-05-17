@@ -137,7 +137,7 @@ object WxPusherLog {
         log.putContent("did", AppDataUtils.getLoginInfo()?.deviceId)
         log.putContent("version", WxPusherUtils.getVersionName())
         //用户没有登录的时候，没有uid，所以用一个logID关联，可以通过uid查询到logid，再通过logid查询所有日志
-        log.putContent("LogId", logId)
+        log.putContent("logid", logId)
         aliLogClient.addLog(log)
     }
 
