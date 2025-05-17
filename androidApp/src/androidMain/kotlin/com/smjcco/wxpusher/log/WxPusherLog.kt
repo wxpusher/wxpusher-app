@@ -6,6 +6,8 @@ import com.aliyun.sls.android.producer.LogProducerConfig
 import com.aliyun.sls.android.producer.LogProducerResult
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.utils.RandomUtils
+import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -13,8 +15,15 @@ import java.io.StringWriter
 
 object WxPusherLog {
     private lateinit var aliLogClient: LogProducerClient
+    private lateinit var logId: String
+    private val logIdKey = "logIdKey"
 
     fun init() {
+        logId = SaveUtils.getByKey(logIdKey) ?: ""
+        if (logId.isEmpty()) {
+            logId = "LogId_" + RandomUtils.generateRandomString(26)
+            SaveUtils.setKeyValue(logIdKey, logId)
+        }
         // endpoint前需要加 https://
         val endpoint = "https://cn-hangzhou.log.aliyuncs.com"
         val project = "wxpusher-app-log"
@@ -127,6 +136,8 @@ object WxPusherLog {
         log.putContent("uid", AppDataUtils.getLoginInfo()?.uid)
         log.putContent("did", AppDataUtils.getLoginInfo()?.deviceId)
         log.putContent("version", WxPusherUtils.getVersionName())
+        //用户没有登录的时候，没有uid，所以用一个logID关联，可以通过uid查询到logid，再通过logid查询所有日志
+        log.putContent("LogId", logId)
         aliLogClient.addLog(log)
     }
 
