@@ -1,6 +1,9 @@
 package com.smjcco.wxpusher.utils
 
 import com.huawei.hms.api.HuaweiApiAvailability
+import com.smjcco.wxpusher.Platform
+import com.smjcco.wxpusher.bean.DevicePlatform
+import com.vivo.push.PushClient
 
 object DeviceUtils {
     //是否是小米设备
@@ -17,4 +20,16 @@ object DeviceUtils {
         return 0 == HuaweiApiAvailability.getInstance()
             .isHuaweiMobileServicesAvailable(ApplicationUtils.application)
     }
+
+    fun getPlatform(): DevicePlatform {
+        if (isMIUI()) {
+            return DevicePlatform.Android_XIAOMI
+        } else if (PushClient.getInstance(ApplicationUtils.application).isSupport()) {
+            return DevicePlatform.Android_VIVO
+        } else if (isHuaweiMobileServicesAvailable()) {
+            return DevicePlatform.Android_HUAWEI
+        }
+        return DevicePlatform.Android
+    }
+
 }

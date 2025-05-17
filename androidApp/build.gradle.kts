@@ -68,8 +68,8 @@ android {
         applicationId = "com.smjcco.wxpusher"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 10107
-        versionName = "1.1.7"
+        versionCode = 10200
+        versionName = "1.2.0"
     }
     packaging {
         resources {

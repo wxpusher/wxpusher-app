@@ -20,7 +20,7 @@ class TestPanelActivity : ComponentActivity() {
         const val DEFAULT_WS_URL = "wss://wxpusher.zjiecode.com"
 
         const val TEST_HOST = "http://wxpusher.test.zjiecode.com"
-        const val TEST_WEB_URL = "http://10.0.0.10:3000"
+        const val TEST_WEB_URL = "http://10.0.0.11:3000"
         const val TEST_WS_URL = "ws://wxpusher.test.zjiecode.com"
     }
 

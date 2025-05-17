@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -44,6 +45,7 @@ class WebViewActivity : ComponentActivity() {
 
     private val TAG: String = "WebViewActivity"
     private var webview: WebView? = null
+    private lateinit var wxPusherWebInterface: WxPusherWebInterface
     private var webContainer: View? = null
     private var pressBackTime = System.currentTimeMillis()
     private var preUiMode = -1
@@ -168,7 +170,7 @@ class WebViewActivity : ComponentActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     private fun initWebView() {
         webview = findViewById(R.id.web)
-
+        wxPusherWebInterface = WxPusherWebInterface(webview!!)
         WebView.setWebContentsDebuggingEnabled(true)
         webview?.settings?.apply {
             javaScriptEnabled = true
@@ -191,7 +193,9 @@ class WebViewActivity : ComponentActivity() {
                 request: WebResourceRequest?
             ): Boolean {
                 val uri = request!!.url
-                if (uri.scheme == "http" || uri.scheme == "https") {
+                if (uri.scheme == "http" || uri.scheme == "https"
+                    || uri.scheme == "about" || uri.scheme == "file"
+                ) {
                     return false
                 }
                 //提示打开外部应用
@@ -218,6 +222,11 @@ class WebViewActivity : ComponentActivity() {
                 return true
             }
 
+            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+                super.onPageStarted(view, url, favicon)
+                wxPusherWebInterface.setCurrentWebUrl(url)
+            }
+
             override fun onReceivedError(
                 view: WebView?,
                 request: WebResourceRequest?,
@@ -228,11 +237,12 @@ class WebViewActivity : ComponentActivity() {
             }
         }
 
-        webview?.addJavascriptInterface(WxPusherWebInterface, "wxPusherApi")
+
+        webview?.addJavascriptInterface(wxPusherWebInterface, "wxPusherApi")
         // 应用可能的更新
         WebBundleManager.applyUpdateIfAvailable()
 
-        WxPusherWebInterface.onWebLoadFinish = {
+        wxPusherWebInterface.onWebLoadFinish = {
             checkNightMode()
         }
         addOnNewIntentListener {
@@ -337,7 +347,7 @@ class WebViewActivity : ComponentActivity() {
         val bgColor = if (night) color else Color.White.toArgb()
         webContainer?.setBackgroundColor(bgColor)
 
-        WxPusherWebInterface.uiModeIsNight = night
+        wxPusherWebInterface.uiModeIsNight = night
         webview?.evaluateJavascript("window.onUiModeChanged && window.onUiModeChanged(${night})") {
         }
     }

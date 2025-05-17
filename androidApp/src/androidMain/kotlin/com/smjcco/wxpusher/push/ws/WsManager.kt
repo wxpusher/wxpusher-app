@@ -7,6 +7,7 @@ import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotification
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.AppDataUtils
+import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
@@ -95,7 +96,7 @@ object WsManager {
         sb.append("/ws?")
         sb.append("version=${WxPusherUtils.getVersionName()}")
         sb.append("&")
-        sb.append("platform=${WxPusherWebInterface.getDeviceType()}")
+        sb.append("platform=${DeviceUtils.getPlatform().getPlatform()}")
         if (!AppDataUtils.getPushToken().isNullOrEmpty()
             && AppDataUtils.getPushToken()?.startsWith("PT_") == true
         ) {

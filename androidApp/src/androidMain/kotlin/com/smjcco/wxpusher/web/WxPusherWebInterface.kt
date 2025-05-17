@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import android.webkit.JavascriptInterface
+import android.webkit.WebView
 import com.huawei.hms.push.HmsMessaging
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.api.DeviceApi
@@ -26,10 +27,20 @@ import kotlinx.coroutines.launch
 /**
  * web服务的接口
  */
-object WxPusherWebInterface {
-    private const val TAG = "WxPusherWebInterface"
+class WxPusherWebInterface {
+    private var webView: WebView;
+    private val TAG = "WxPusherWebInterface"
     var uiModeIsNight = false
     var onWebLoadFinish: (() -> Unit?)? = null
+    var webUrl: String? = null
+
+    constructor(webView: WebView) {
+        this.webView = webView
+    }
+
+    fun setCurrentWebUrl(url: String?) {
+        webUrl = url
+    }
 
     @JavascriptInterface
     fun showToast(toast: String?) {
@@ -48,16 +59,7 @@ object WxPusherWebInterface {
     }
 
     @JavascriptInterface
-    fun getDeviceType(): String {
-        if (DeviceUtils.isMIUI()) {
-            return DevicePlatform.Android_XIAOMI.getPlatform()
-        } else if (PushClient.getInstance(ApplicationUtils.application).isSupport()) {
-            return DevicePlatform.Android_VIVO.getPlatform()
-        } else if (DeviceUtils.isHuaweiMobileServicesAvailable()) {
-            return DevicePlatform.Android_HUAWEI.getPlatform()
-        }
-        return DevicePlatform.Android.getPlatform()
-    }
+    fun getPlatform(): String = DeviceUtils.getPlatform().getPlatform()
 
     @JavascriptInterface
     fun getDeviceName() = Build.BRAND + " " + Build.MODEL
@@ -120,5 +122,64 @@ object WxPusherWebInterface {
 
     @JavascriptInterface
     fun getApiUrl() = WxPusherConfig.ApiUrl
+
+
+    /**
+     * 分享内容
+     */
+    @JavascriptInterface
+    fun share(content: String?) {
+        if (content.isNullOrEmpty()) {
+            WxPusherLog.w(TAG, "复制失败，content=null")
+            return
+        }
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "text/plain"
+        intent.putExtra(Intent.EXTRA_TEXT, content)
+        val chooser = Intent.createChooser(intent, "分享到")
+        chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        ApplicationUtils.application.startActivity(chooser)
+    }
+
+    /**
+     * 在浏览器中打开这个url
+     */
+    @JavascriptInterface
+    fun openInBrowser(url: String?) {
+        if (url.isNullOrEmpty()) {
+            WxPusherLog.w(TAG, "openInBrowser失败，url=null")
+            return
+        }
+        try {
+            val intent = Intent(Intent.ACTION_VIEW)
+            intent.data = android.net.Uri.parse(url)
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            ApplicationUtils.application.startActivity(intent)
+        } catch (e: Exception) {
+            WxPusherLog.w(TAG, "打开浏览器失败: ${e.message}")
+            WxPusherUtils.toast("打开浏览器失败")
+        }
+    }
+
+    /**
+     * 复制内容到剪贴板
+     */
+    @JavascriptInterface
+    fun copy(text: String?) {
+        if (text.isNullOrEmpty()) {
+            WxPusherLog.w(TAG, "复制失败，text=null")
+            return
+        }
+        val clipboardManager =
+            ApplicationUtils.application.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+        val clipData = android.content.ClipData.newPlainText("WxPusher", text)
+        clipboardManager.setPrimaryClip(clipData)
+    }
+
+    /**
+     * 获取浏览器当前的url
+     */
+    @JavascriptInterface
+    fun getCurrentWebUrl(): String? = webUrl
 
 }
