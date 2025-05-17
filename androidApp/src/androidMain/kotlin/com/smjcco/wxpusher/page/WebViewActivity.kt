@@ -237,8 +237,8 @@ class WebViewActivity : ComponentActivity() {
         if (!openPageFromIntent(intent)) {
             webview?.clearHistory()
             // 加载本地文件
-//            webview?.loadUrl("${getWebPageUrl()}#/home")
-            webview?.loadUrl("https://wxpusher.zjiecode.com/api/message/7n6xOIvhQ5ObfYkDHcdhbbQFxywOipAa")
+            webview?.loadUrl("${getWebPageUrl()}#/home")
+//            webview?.loadUrl("https://wxpusher.zjiecode.com/api/message/7n6xOIvhQ5ObfYkDHcdhbbQFxywOipAa")
         }
     }
 
