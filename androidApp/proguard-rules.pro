@@ -130,3 +130,6 @@
 -keep class com.smjcco.wxpusher.push.vivo.VIVOClientPushMessageReceiver{*;}
 #荣耀
 -keep class com.hihonor.push.**{*;}
+#oppo
+-keep public class * extends android.app.Service
+-keep class com.heytap.msp.** { *;}

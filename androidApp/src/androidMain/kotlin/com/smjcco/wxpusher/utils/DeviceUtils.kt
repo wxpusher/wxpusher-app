@@ -1,5 +1,6 @@
 package com.smjcco.wxpusher.utils
 
+import com.heytap.msp.push.HeytapPushManager
 import com.hihonor.push.sdk.HonorPushClient
 import com.huawei.hms.api.HuaweiApiAvailability
 import com.smjcco.wxpusher.bean.DevicePlatform
@@ -35,6 +36,11 @@ object DeviceUtils {
                 && PushClient.getInstance(ApplicationUtils.application).isSupport()
     }
 
+    fun isOppo(): Boolean {
+        return ConfigManager.getCurrentConfig().vivoPush
+                && HeytapPushManager.isSupportPush(ApplicationUtils.application)
+    }
+
     fun getPlatform(): DevicePlatform {
         if (isMIUI()) {
             return DevicePlatform.Android_XIAOMI
@@ -44,6 +50,8 @@ object DeviceUtils {
             return DevicePlatform.Android_HONOR
         } else if (isHuaweiMobileServicesAvailable()) {
             return DevicePlatform.Android_HUAWEI
+        } else if (isOppo()) {
+            return DevicePlatform.Android_OPPO
         }
         return DevicePlatform.Android
     }

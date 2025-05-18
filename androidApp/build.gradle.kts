@@ -35,8 +35,8 @@ kotlin {
             implementation("androidx.appcompat:appcompat:1.7.0")
 //            implementation("androidx.webkit:webkit:1.9.0")
             implementation("com.google.android.material:material:1.12.0")
-
             implementation("com.aliyun.openservices:aliyun-log-android-sdk:2.6.2")
+            implementation("commons-codec:commons-codec:1.6")
 
             //腾讯shiply https://shiply.tds.qq.com/docs/doc?id=4008331373
             implementation("com.tencent.shiply:upgrade:2.2.1-RC01") {

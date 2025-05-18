@@ -6,6 +6,7 @@ import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.honor.HonorPushUtils
 import com.smjcco.wxpusher.push.huawei.HuaweiPushUtils
+import com.smjcco.wxpusher.push.oppo.OppoPushUtils
 import com.smjcco.wxpusher.push.vivo.VIVOPushUtils
 import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.utils.AppDataUtils
@@ -45,6 +46,9 @@ object PushManager {
         } else if (platform == DevicePlatform.Android_HUAWEI) {
             WxPusherLog.i(TAG, "初始化华为推送")
             HuaweiPushUtils.init(application)
+        } else if (platform == DevicePlatform.Android_OPPO) {
+            WxPusherLog.i(TAG, "初始化OPPO推送")
+            OppoPushUtils.init(application)
         } else {
             WxPusherLog.i(TAG, "初始化自建长链接")
             WsManager.init()
