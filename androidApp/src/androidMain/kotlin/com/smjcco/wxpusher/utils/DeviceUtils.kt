@@ -3,12 +3,14 @@ package com.smjcco.wxpusher.utils
 import com.hihonor.push.sdk.HonorPushClient
 import com.huawei.hms.api.HuaweiApiAvailability
 import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.config.ConfigManager
 import com.vivo.push.PushClient
 
 object DeviceUtils {
     //是否是小米设备
     fun isMIUI(): Boolean {
-        return "Xiaomi".equals(android.os.Build.MANUFACTURER, true)
+        return ConfigManager.getCurrentConfig().xiaomiPush
+                && "Xiaomi".equals(android.os.Build.MANUFACTURER, true)
     }
 
     /**
@@ -17,16 +19,28 @@ object DeviceUtils {
      * https://developer.huawei.com/consumer/cn/doc/hmscore-common-References/huaweiapiavailability-0000001050121134#section9492524178
      */
     fun isHuaweiMobileServicesAvailable(): Boolean {
-        return 0 == HuaweiApiAvailability.getInstance()
+        return ConfigManager.getCurrentConfig().huaweiPush
+                && 0 == HuaweiApiAvailability.getInstance()
             .isHuaweiMobileServicesAvailable(ApplicationUtils.application)
+    }
+
+    fun isHonor(): Boolean {
+        return ConfigManager.getCurrentConfig().honorPush
+                && HonorPushClient.getInstance()
+            .checkSupportHonorPush(ApplicationUtils.application)
+    }
+
+    fun isVivo(): Boolean {
+        return ConfigManager.getCurrentConfig().vivoPush
+                && PushClient.getInstance(ApplicationUtils.application).isSupport()
     }
 
     fun getPlatform(): DevicePlatform {
         if (isMIUI()) {
             return DevicePlatform.Android_XIAOMI
-        } else if (PushClient.getInstance(ApplicationUtils.application).isSupport()) {
+        } else if (isVivo()) {
             return DevicePlatform.Android_VIVO
-        } else if (HonorPushClient.getInstance().checkSupportHonorPush(ApplicationUtils.application)) {
+        } else if (isHonor()) {
             return DevicePlatform.Android_HONOR
         } else if (isHuaweiMobileServicesAvailable()) {
             return DevicePlatform.Android_HUAWEI

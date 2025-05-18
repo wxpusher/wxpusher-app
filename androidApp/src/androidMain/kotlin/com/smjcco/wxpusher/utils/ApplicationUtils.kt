@@ -8,6 +8,14 @@ import android.os.Process
 object ApplicationUtils {
     lateinit var application: Application
     private val TAG = "AppInit"
+    
+    /**
+     * 初始化ApplicationUtils
+     * @param app Application实例
+     */
+    fun init(app: Application) {
+        application = app
+    }
 
     /**
      * 判断是不是主进程

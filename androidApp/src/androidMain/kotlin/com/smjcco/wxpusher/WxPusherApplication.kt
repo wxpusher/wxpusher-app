@@ -3,6 +3,7 @@ package com.smjcco.wxpusher
 import android.app.Application
 import android.os.Build
 import com.smjcco.wxpusher.api.DeviceApi
+import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.AppDataUtils
@@ -26,6 +27,7 @@ class WxPusherApplication : Application() {
             WxPusherLog.i(TAG, "非主进程，不上报")
             return
         }
+        ConfigManager.init(this)
         WebBundleManager.init()
         initTbs()
         PushManager.init(this)
@@ -46,7 +48,5 @@ class WxPusherApplication : Application() {
 //            .printInternalLog(true)
             .build()
         UpgradeManager.getInstance().init(this, config)
-
     }
-
 }

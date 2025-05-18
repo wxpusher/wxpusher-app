@@ -1,8 +1,6 @@
 package com.smjcco.wxpusher.push
 
 import android.app.Application
-import com.hihonor.push.sdk.HonorPushClient
-import com.huawei.hms.push.HmsMessaging
 import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.log.WxPusherLog
@@ -12,7 +10,6 @@ import com.smjcco.wxpusher.push.vivo.VIVOPushUtils
 import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
-import com.smjcco.wxpusher.utils.ApplicationUtils.application
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.xiaomi.mipush.sdk.MiPushClient
 
@@ -92,16 +89,5 @@ object PushManager {
         DeviceApi.updateDeviceInfoAsync(platform)
     }
 
-    /**
-     * 反注册push，感觉应该用不到
-     */
-    fun disablePush() {
-        if (DeviceUtils.isMIUI()) {
-            MiPushClient.unregisterPush(application)
-        } else if (DeviceUtils.isHuaweiMobileServicesAvailable()) {
-            HmsMessaging.getInstance(application).turnOffPush()
-        } else {
-            WsManager.disconnect()
-        }
-    }
+
 }
