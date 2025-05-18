@@ -7,7 +7,11 @@ plugins {
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
 //    alias(libs.plugins.huawei.agconnect)
+    //华为推送
     id("com.huawei.agconnect")
+    //荣耀推送
+    id("com.hihonor.mcs.asplugin")
+
 }
 
 kotlin {
@@ -44,7 +48,7 @@ kotlin {
             }
             //华为推送
             implementation(libs.huawei.push)
-//            implementation("com.huawei.hms:push:6.13.0.300")
+            implementation("com.hihonor.mcs:push:8.0.12.307")
         }
         commonMain.dependencies {
             implementation(compose.runtime)

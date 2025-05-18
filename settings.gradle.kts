@@ -17,6 +17,10 @@ pluginManagement {
         maven {
             setUrl("https://developer.huawei.com/repo/")
         }
+        //荣耀推送
+        maven {
+            setUrl("https://developer.hihonor.com/repo/")
+        }
     }
 
 }
@@ -38,6 +42,10 @@ dependencyResolutionManagement {
         //华为推送
         maven {
             setUrl("https://developer.huawei.com/repo/")
+        }
+        //荣耀推送
+        maven {
+            setUrl("https://developer.hihonor.com/repo/")
         }
 
         maven {

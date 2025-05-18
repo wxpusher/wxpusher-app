@@ -115,7 +115,6 @@
 
 #xiaomi推送
  -keep class com.smjcco.wxpusher.push.xiaomi.XiaomiPushMessageReceiver {*;}
-
  #华为推送
  -keep class com.huawei.hianalytics.**{*;}
  -keep class com.huawei.updatesdk.**{*;}
@@ -123,3 +122,11 @@
  #ali log
 -keep class com.aliyun.sls.android.producer.* { *; }
 -keep interface com.aliyun.sls.android.producer.* { *; }
+
+#vivo推送
+-dontwarn com.vivo.push.**
+-keep class com.vivo.push.**{*; }
+-keep class com.vivo.vms.**{*; }
+-keep class com.smjcco.wxpusher.push.vivo.VIVOClientPushMessageReceiver{*;}
+#荣耀
+-keep class com.hihonor.push.**{*;}

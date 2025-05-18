@@ -126,6 +126,24 @@
                 <action android:name="com.vivo.pushclient.action.RECEIVE" />
             </intent-filter>
         </receiver>
+        <!--        荣耀推送-->
+        <meta-data
+            android:name="com.hihonor.push.app_id"
+            android:value="104500087" />
+        <service
+            android:name=".push.honor.HonorPushMessageService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.hihonor.push.action.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
     </application>
 
+    <!--荣耀推送-->
+    <queries>
+        <intent>
+            <action android:name="com.hihonor.push.action.BIND_PUSH_SERVICE" />
+        </intent>
+    </queries>
 </manifest>

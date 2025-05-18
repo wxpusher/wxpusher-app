@@ -1,7 +1,11 @@
 buildscript {
     dependencies {
-        classpath("com.huawei.agconnect:agcp:1.9.1.301")
+
         classpath("com.android.tools.build:gradle:8.5.2")
+        //荣耀AGP插件
+        classpath("com.hihonor.mcs:asplugin:2.0.1.300")
+        //华为AGP插件
+        classpath("com.huawei.agconnect:agcp:1.9.1.301")
     }
 }
 plugins {

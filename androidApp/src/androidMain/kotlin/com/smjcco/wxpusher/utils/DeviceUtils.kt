@@ -1,7 +1,7 @@
 package com.smjcco.wxpusher.utils
 
+import com.hihonor.push.sdk.HonorPushClient
 import com.huawei.hms.api.HuaweiApiAvailability
-import com.smjcco.wxpusher.Platform
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.vivo.push.PushClient
 
@@ -26,6 +26,8 @@ object DeviceUtils {
             return DevicePlatform.Android_XIAOMI
         } else if (PushClient.getInstance(ApplicationUtils.application).isSupport()) {
             return DevicePlatform.Android_VIVO
+        } else if (HonorPushClient.getInstance().checkSupportHonorPush(ApplicationUtils.application)) {
+            return DevicePlatform.Android_HONOR
         } else if (isHuaweiMobileServicesAvailable()) {
             return DevicePlatform.Android_HUAWEI
         }
