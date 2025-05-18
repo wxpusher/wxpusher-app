@@ -1,7 +1,6 @@
 package com.smjcco.wxpusher.config
 
 import androidx.annotation.Keep
-import java.lang.reflect.Constructor
 
 
 /**
