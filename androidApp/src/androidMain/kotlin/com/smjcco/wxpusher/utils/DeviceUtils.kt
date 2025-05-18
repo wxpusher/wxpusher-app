@@ -1,10 +1,12 @@
 package com.smjcco.wxpusher.utils
 
+import android.os.Build
 import com.heytap.msp.push.HeytapPushManager
 import com.hihonor.push.sdk.HonorPushClient
 import com.huawei.hms.api.HuaweiApiAvailability
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.config.ConfigManager
+import com.smjcco.wxpusher.log.WxPusherLog
 import com.vivo.push.PushClient
 
 object DeviceUtils {
@@ -25,10 +27,42 @@ object DeviceUtils {
             .isHuaweiMobileServicesAvailable(ApplicationUtils.application)
     }
 
-    fun isHonor(): Boolean {
+    /**
+     * 是否是荣耀设备
+     */
+    fun isHonorDevice(): Boolean {
+        return Build.MANUFACTURER.equals("HONOR", true)
+    }
+
+    /**
+     * 国内Magic UI 4.0及以上 支持荣耀推送
+     */
+    fun isMagicOs(): Boolean {
+        if (!isHonorDevice()) {
+            // 非荣耀设备，暂不支持
+            return false;
+        }
+
+        // Android Q版本对应MagicUI 4.0
+        if (Build.VERSION.SDK_INT > 29) {
+            return true;
+        }
+        // Android Q以下版本返回-1
+        return false
+    }
+
+    fun isHonorPush(): Boolean {
+        //这里很有问题，针对荣耀90/100（已知的），checkSupportHonorPush 为false，会走华为或者自建推送
+        //查询官网，国内Magic UI 4.0及以上 支持荣耀推送 ，所以再判断一下是不是Magic UI 4.0
+        //如果没有问题，后面判断isMagicOs的逻辑，可以删除掉
+        val supportPush =
+            HonorPushClient.getInstance().checkSupportHonorPush(ApplicationUtils.application)
+        WxPusherLog.i(
+            "honor",
+            "isHonorDevice=${isHonorDevice()},isMagicOs=${isMagicOs()},checkSupportHonorPush=${supportPush}"
+        )
         return ConfigManager.getCurrentConfig().honorPush
-                && HonorPushClient.getInstance()
-            .checkSupportHonorPush(ApplicationUtils.application)
+                && supportPush
     }
 
     fun isVivo(): Boolean {
@@ -46,8 +80,13 @@ object DeviceUtils {
             return DevicePlatform.Android_XIAOMI
         } else if (isVivo()) {
             return DevicePlatform.Android_VIVO
-        } else if (isHonor()) {
-            return DevicePlatform.Android_HONOR
+        } else if (isHonorPush()) {
+            //临时逻辑，判断是支持荣耀push，但是没有打开开关，就走自建，避免进入华为的逻辑
+            if (ConfigManager.getCurrentConfig().honorPush) {
+                return DevicePlatform.Android_HONOR
+            } else {
+                return DevicePlatform.Android
+            }
         } else if (isHuaweiMobileServicesAvailable()) {
             return DevicePlatform.Android_HUAWEI
         } else if (isOppo()) {
