@@ -13,7 +13,7 @@ data class ConfigItem(
     val xiaomiPush: Boolean = true,
     val vivoPush: Boolean = true,
     val huaweiPush: Boolean = true,
-    val oppoPush: Boolean = true,
+    val oppoPush: Boolean = false,
     val honorPush: Boolean = false,
 )
 
