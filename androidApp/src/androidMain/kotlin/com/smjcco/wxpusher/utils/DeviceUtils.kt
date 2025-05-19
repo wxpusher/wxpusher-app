@@ -71,7 +71,7 @@ object DeviceUtils {
     }
 
     fun isOppo(): Boolean {
-        return ConfigManager.getCurrentConfig().vivoPush
+        return ConfigManager.getCurrentConfig().oppoPush
                 && HeytapPushManager.isSupportPush(ApplicationUtils.application)
     }
 
