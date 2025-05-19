@@ -2,27 +2,22 @@ package com.smjcco.wxpusher.web
 
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import android.webkit.JavascriptInterface
 import android.webkit.WebView
-import com.huawei.hms.push.HmsMessaging
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.api.DeviceApi
-import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.page.CheckActivity
-import com.smjcco.wxpusher.push.PushManager
-import com.smjcco.wxpusher.push.huawei.HuaweiPushUtils
-import com.smjcco.wxpusher.push.vivo.VIVOPushUtils
 import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
-import com.vivo.push.PushClient
-import com.xiaomi.mipush.sdk.MiPushClient
+import com.tencent.upgrade.core.UpgradeManager
+import com.tencent.upgrade.core.UpgradeReqCallbackForUserManualCheck
 import kotlinx.coroutines.launch
+
 
 /**
  * web服务的接口
@@ -182,4 +177,13 @@ class WxPusherWebInterface {
     @JavascriptInterface
     fun getCurrentWebUrl(): String? = webUrl
 
+    @JavascriptInterface
+    fun checkAppUpdate() {
+        UpgradeManager.getInstance()
+            .checkUpgrade(true, null, object : UpgradeReqCallbackForUserManualCheck() {
+                override fun onReceivedNoStrategy() {
+                    WxPusherUtils.toast("已经是最新版本")
+                }
+            })
+    }
 }
