@@ -11,12 +11,15 @@ import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.notification.NotificationManager
+import com.smjcco.wxpusher.page.web.WebViewUtils
 import com.smjcco.wxpusher.page.web.WxPusherWebViewClient
+import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
@@ -36,104 +39,39 @@ class WebDetailActivity : ComponentActivity() {
     private var webContainer: View? = null
     private var pressBackTime = System.currentTimeMillis()
     private var preUiMode = -1
+
+    private lateinit var titleTV: AppCompatTextView
+    private lateinit var backTV: AppCompatTextView
+    private lateinit var optionTV: AppCompatTextView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.web_detail_activity)
         webContainer = findViewById(R.id.web_container)
+        initTitleBar()
         enableEdgeToEdge()
         initWebView()
     }
 
-    /**
-     * 提示保活
-     */
-    private fun noteKeepAlive() {
-        if (SaveUtils.getByKey("noteKeepAlive") == "1") {
-            return
+    private fun initTitleBar() {
+        titleTV = findViewById(R.id.title)
+        backTV = findViewById(R.id.back)
+        optionTV = findViewById(R.id.option)
+        titleTV.setOnClickListener {
+            onBackPressed()
         }
-        AlertDialog.Builder(this)
-            .setTitle("保活提示")
-            .setMessage("由于Android的系统限制，应用在后台会被限制运行，导致收不到消息，请打开后台限制。")
-            .setPositiveButton(
-                "去设置"
-            ) { dialog, which ->
-                dialog?.dismiss()
-                val intent = Intent(ApplicationUtils.application, CheckActivity::class.java)
-                startActivity(intent)
-            }
-            .setCancelable(false)
-            .setNegativeButton("不再提醒") { dialog, _ ->
-                dialog?.dismiss()
-                SaveUtils.setKeyValue("noteKeepAlive", "1")
-            }
-            .create().show()
     }
 
     override fun onResume() {
         super.onResume()
-        //自建通道需要提醒保活
-        if (AppDataUtils.getPushToken()?.startsWith("PT_") == true) {
-            noteKeepAlive()
-        } else {
-            showSettingGuide()
-        }
+        PushManager.showOpenNoteRemindSettingDialog(this)
     }
 
-    /**
-     * 提示保活
-     */
-    private fun showSettingGuide() {
-        //没有登录不提醒
-        if (AppDataUtils.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
-            return
-        }
-        //针对小米，还没有创建推送通道 ，就不进行提醒
-        if (DeviceUtils.isMIUI() && !NotificationManager.hasNotificationChannel("mipush|com.smjcco.wxpusher|135072")) {
-            return
-        }
-        if (SaveUtils.getByKey("alertTips") == "1") {
-            return
-        }
-        AlertDialog.Builder(this)
-            .setTitle("请打开锁屏提醒")
-            .setMessage("为了避免锁屏遗漏通知，请点击「去设置」，选择「订阅消息」-「在锁定屏幕上」设置为【显示通知】\n\n在设置里，你还可以自定义提示铃声。")
-            .setPositiveButton(
-                "去设置"
-            ) { dialog, which ->
-                dialog?.dismiss()
-                PermissionUtils.gotoNotificationSettingPage()
-            }
-            .setCancelable(false)
-            .setNegativeButton("不再提醒") { dialog, _ ->
-                dialog?.dismiss()
-                SaveUtils.setKeyValue("alertTips", "1")
-            }
-            .create().show()
-    }
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun initWebView() {
         webview = findViewById(R.id.web)
         wxPusherWebInterface = WxPusherWebInterface(webview)
-        webview.settings.apply {
-            javaScriptEnabled = true
-            allowFileAccess = true
-            allowFileAccessFromFileURLs = true
-            allowUniversalAccessFromFileURLs = true
-            // 启用DOM存储API
-            domStorageEnabled = true
-            // 启用数据库存储API
-            databaseEnabled = true
-            //在https里面允许加载http的内容
-            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-        }
-
-        webview.webChromeClient = WebChromeClient()
-
-        webview.webViewClient = WxPusherWebViewClient(this)
-
-        webview.addJavascriptInterface(wxPusherWebInterface, "wxPusherApi")
-
+        WebViewUtils.setupView(this, webview, wxPusherWebInterface, titleTV)
         wxPusherWebInterface.onWebLoadFinish = {
             checkNightMode()
         }
@@ -141,7 +79,6 @@ class WebDetailActivity : ComponentActivity() {
             webview.clearHistory()
             openPageFromIntent(it)
         }
-
         webview.clearHistory()
         if (!openPageFromIntent(intent)) {
             // TODO: 没有传入数据，打开一个默认页面

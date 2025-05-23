@@ -1,5 +1,6 @@
 package com.smjcco.wxpusher.push
 
+import android.app.Activity
 import android.app.Application
 import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.bean.DevicePlatform
@@ -9,10 +10,11 @@ import com.smjcco.wxpusher.push.huawei.HuaweiPushUtils
 import com.smjcco.wxpusher.push.oppo.OppoPushUtils
 import com.smjcco.wxpusher.push.vivo.VIVOPushUtils
 import com.smjcco.wxpusher.push.ws.WsManager
+import com.smjcco.wxpusher.push.ws.WsUtils
+import com.smjcco.wxpusher.push.xiaomi.XiaomiUtils
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
-import com.xiaomi.mipush.sdk.MiPushClient
 
 /**
  * 管理push的一堆事儿，对厂商和通道做抽象
@@ -32,11 +34,7 @@ object PushManager {
         val platform = DeviceUtils.getPlatform()
         if (platform == DevicePlatform.Android_XIAOMI) {
             WxPusherLog.i(TAG, "初始化小米推送")
-            MiPushClient.registerPush(
-                application,
-                "2882303761520373007",
-                "5932037320007"
-            )
+            XiaomiUtils.init(application)
         } else if (platform == DevicePlatform.Android_VIVO) {
             WxPusherLog.i(TAG, "初始化VIVO推送")
             VIVOPushUtils.init(ApplicationUtils.application)
@@ -93,5 +91,21 @@ object PushManager {
         DeviceApi.updateDeviceInfoAsync(platform)
     }
 
+    /**
+     * 显示打开通知提醒的弹窗
+     */
+    fun showOpenNoteRemindSettingDialog(activity: Activity) {
+        val platform = DeviceUtils.getPlatform()
+        if (platform == DevicePlatform.Android_XIAOMI) {
+            XiaomiUtils.showSettingGuide(activity)
+        } else if (platform == DevicePlatform.Android_VIVO) {
+
+        } else if (platform == DevicePlatform.Android_HONOR) {
+        } else if (platform == DevicePlatform.Android_HUAWEI) {
+        } else if (platform == DevicePlatform.Android_OPPO) {
+        } else {
+            WsUtils.showSettingGuide(activity)
+        }
+    }
 
 }

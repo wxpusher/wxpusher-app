@@ -2,19 +2,12 @@ package com.smjcco.wxpusher.page
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
-import android.webkit.WebSettings
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.Color
@@ -22,14 +15,11 @@ import androidx.compose.ui.graphics.toArgb
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.notification.NotificationManager
-import com.smjcco.wxpusher.utils.AppDataUtils
-import com.smjcco.wxpusher.utils.ApplicationUtils
-import com.smjcco.wxpusher.utils.DeviceUtils
+import com.smjcco.wxpusher.page.web.WebViewUtils
+import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.SaveUtils
-import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 import com.smjcco.wxpusher.web.update.WebBundleManager
 import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback
@@ -42,22 +32,24 @@ class WebViewActivity : ComponentActivity() {
     }
 
     private val TAG: String = "WebViewActivity"
-    private var webview: WebView? = null
+    private lateinit var webview: WebView
     private lateinit var wxPusherWebInterface: WxPusherWebInterface
     private var webContainer: View? = null
     private var pressBackTime = System.currentTimeMillis()
     private var preUiMode = -1
+    private var hasInit = false;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WxPusherLog.i(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
-        //避免申请权限的时候，重复调用创建方法
-        if (savedInstanceState != null) {
+        //避免申请权限的时候，重复调用
+        if (hasInit) {
             return
         }
         if (SaveUtils.getByKey(getString(R.string.privacy_key)) != "1") {
             startMainActivity()
-            return
         }
+
+        hasInit = true
         setContentView(R.layout.web_activity)
         webContainer = findViewById(R.id.web_container)
         enableEdgeToEdge()
@@ -98,145 +90,17 @@ class WebViewActivity : ComponentActivity() {
         }
     }
 
-    /**
-     * 提示保活
-     */
-    private fun noteKeepAlive() {
-        if (SaveUtils.getByKey("noteKeepAlive") == "1") {
-            return
-        }
-        AlertDialog.Builder(this)
-            .setTitle("保活提示")
-            .setMessage("由于Android的系统限制，应用在后台会被限制运行，导致收不到消息，请打开后台限制。")
-            .setPositiveButton(
-                "去设置"
-            ) { dialog, which ->
-                dialog?.dismiss()
-                val intent = Intent(ApplicationUtils.application, CheckActivity::class.java)
-                startActivity(intent)
-            }
-            .setCancelable(false)
-            .setNegativeButton("不再提醒") { dialog, _ ->
-                dialog?.dismiss()
-                SaveUtils.setKeyValue("noteKeepAlive", "1")
-            }
-            .create().show()
-    }
 
     override fun onResume() {
         super.onResume()
-        //自建通道需要提醒保活
-        if (AppDataUtils.getPushToken()?.startsWith("PT_") == true) {
-            noteKeepAlive()
-        } else {
-            showSettingGuide()
-        }
-    }
-
-    /**
-     * 提示保活
-     */
-    private fun showSettingGuide() {
-        //没有登录不提醒
-        if (AppDataUtils.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
-            return
-        }
-        //针对小米，还没有创建推送通道 ，就不进行提醒
-        if (DeviceUtils.isMIUI() && !NotificationManager.hasNotificationChannel("mipush|com.smjcco.wxpusher|135072")) {
-            return
-        }
-        if (SaveUtils.getByKey("alertTips") == "1") {
-            return
-        }
-        AlertDialog.Builder(this)
-            .setTitle("请打开锁屏提醒")
-            .setMessage("为了避免锁屏遗漏通知，请点击「去设置」，选择「订阅消息」-「在锁定屏幕上」设置为【显示通知】\n\n在设置里，你还可以自定义提示铃声。")
-            .setPositiveButton(
-                "去设置"
-            ) { dialog, which ->
-                dialog?.dismiss()
-                PermissionUtils.gotoNotificationSettingPage()
-            }
-            .setCancelable(false)
-            .setNegativeButton("不再提醒") { dialog, _ ->
-                dialog?.dismiss()
-                SaveUtils.setKeyValue("alertTips", "1")
-            }
-            .create().show()
+        PushManager.showOpenNoteRemindSettingDialog(this)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
     private fun initWebView() {
         webview = findViewById(R.id.web)
-        wxPusherWebInterface = WxPusherWebInterface(webview!!)
-        WebView.setWebContentsDebuggingEnabled(true)
-        webview?.settings?.apply {
-            javaScriptEnabled = true
-            allowFileAccess = true
-            allowFileAccessFromFileURLs = true
-            allowUniversalAccessFromFileURLs = true
-            // 启用DOM存储API
-            domStorageEnabled = true
-            // 启用数据库存储API
-            databaseEnabled = true
-            //在https里面允许加载http的内容
-            mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-        }
-
-        webview?.webChromeClient = WebChromeClient()
-
-        webview?.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(
-                view: WebView?,
-                request: WebResourceRequest?
-            ): Boolean {
-                val uri = request!!.url
-                if (uri.scheme == "http" || uri.scheme == "https"
-                    || uri.scheme == "about" || uri.scheme == "file"
-                ) {
-                    return false
-                }
-                //提示打开外部应用
-                AlertDialog.Builder(this@WebViewActivity)
-                    .setTitle("是否打开【外部应用】")
-                    .setMessage("当前链接引导你打开外部应用，是否打开？")
-                    .setPositiveButton(
-                        "打开"
-                    ) { dialog, which ->
-                        dialog?.dismiss()
-                        try {
-                            val intent = Intent(Intent.ACTION_VIEW, uri)
-                            startActivity(intent)
-                        } catch (e: Exception) {
-                            WxPusherLog.w(TAG, "打开特定scheme错误", e)
-                            WxPusherUtils.toast("打开${uri.scheme}错误")
-                        }
-                    }
-                    .setCancelable(true)
-                    .setNegativeButton("取消") { dialog, _ ->
-                        dialog?.dismiss()
-                    }
-                    .create().show()
-                return true
-            }
-
-            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                super.onPageStarted(view, url, favicon)
-                wxPusherWebInterface.setCurrentWebUrl(url)
-            }
-
-            override fun onReceivedError(
-                view: WebView?,
-                request: WebResourceRequest?,
-                error: WebResourceError?
-            ) {
-                WxPusherLog.e(TAG, "加载页面错误: ${error?.description}")
-                super.onReceivedError(view, request, error)
-            }
-        }
-
-
-        webview?.addJavascriptInterface(wxPusherWebInterface, "wxPusherApi")
+        wxPusherWebInterface = WxPusherWebInterface(webview)
+        WebViewUtils.setupView(this, webview, wxPusherWebInterface)
         // 应用可能的更新
         WebBundleManager.applyUpdateIfAvailable()
 
@@ -247,7 +111,7 @@ class WebViewActivity : ComponentActivity() {
             openPageFromIntent(it)
         }
         //加载页面主体框架
-        webview?.loadUrl("${getWebPageUrl()}#/home")
+        webview.loadUrl("${getWebPageUrl()}#/home")
         openPageFromIntent(intent)
     }
 
