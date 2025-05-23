@@ -45,6 +45,12 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".page.WebDetailActivity"
+            android:configChanges="uiMode"
+            android:exported="true"
+            android:launchMode="singleTask" />
+
         <!--        暂时不用长链接服务-->
         <!--        <service-->
         <!--            android:name=".push.ws.KeepWsConnectService"-->

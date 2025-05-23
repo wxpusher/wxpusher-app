@@ -1,101 +1,47 @@
 package com.smjcco.wxpusher.page
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Bitmap
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.webkit.WebChromeClient
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
-import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.notification.NotificationManager
+import com.smjcco.wxpusher.page.web.WxPusherWebViewClient
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
-import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.SaveUtils
-import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
-import com.smjcco.wxpusher.web.update.WebBundleManager
-import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback
-import com.tencent.upgrade.core.UpgradeManager
 
 
-class WebViewActivity : ComponentActivity() {
+class WebDetailActivity : ComponentActivity() {
     companion object {
         const val INTENT_KEY_URL = "url"
     }
 
-    private val TAG: String = "WebViewActivity"
-    private var webview: WebView? = null
+    private val TAG: String = "WebDetailActivity"
+    private lateinit var webview: WebView
     private lateinit var wxPusherWebInterface: WxPusherWebInterface
     private var webContainer: View? = null
     private var pressBackTime = System.currentTimeMillis()
     private var preUiMode = -1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WxPusherLog.i(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
-        //避免申请权限的时候，重复调用创建方法
-        if (savedInstanceState != null) {
-            return
-        }
-        if (SaveUtils.getByKey(getString(R.string.privacy_key)) != "1") {
-            startMainActivity()
-            return
-        }
-        setContentView(R.layout.web_activity)
+        setContentView(R.layout.web_detail_activity)
         webContainer = findViewById(R.id.web_container)
         enableEdgeToEdge()
         initWebView()
-        requestPermission()
-        checkUpdate()
-    }
-
-    /**
-     * 启动隐私
-     */
-    private fun startMainActivity() {
-        val intent = Intent(this, AgreePrivateActivity::class.java)
-        startActivity(intent)
-        finish()
-    }
-
-    //应用内检查升级
-    private fun checkUpdate() {
-        UpgradeManager.getInstance()
-            .checkUpgrade(true, null, DefaultUpgradeStrategyRequestCallback())
-    }
-
-    private fun requestPermission() {
-        val permission =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) Manifest.permission.POST_NOTIFICATIONS else "android.permission.POST_NOTIFICATIONS"
-        PermissionRequester(
-            this, permission,
-            "需要发送通知权限",
-            "WxPusher是一个消息推送平台，当有新消息到达的时候，我们会第一时间给你发送通知，因此需要你授予发送通知的权限，否则我们无法发送消息通知，你可能会因此遗漏消息，是否授予权限？",
-            "缺少通知权限",
-            "本应用核心功能是发送消息通知，缺少通知权限会导致你遗漏消息。\n\n打开方式：点击“去设置”-“通知管理”-打开允许通知"
-        ) {
-
-            PermissionUtils.gotoNotificationSettingPage()
-        }.request {
-
-        }
     }
 
     /**
@@ -168,9 +114,8 @@ class WebViewActivity : ComponentActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     private fun initWebView() {
         webview = findViewById(R.id.web)
-        wxPusherWebInterface = WxPusherWebInterface(webview!!)
-        WebView.setWebContentsDebuggingEnabled(true)
-        webview?.settings?.apply {
+        wxPusherWebInterface = WxPusherWebInterface(webview)
+        webview.settings.apply {
             javaScriptEnabled = true
             allowFileAccess = true
             allowFileAccessFromFileURLs = true
@@ -183,97 +128,36 @@ class WebViewActivity : ComponentActivity() {
             mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
         }
 
-        webview?.webChromeClient = WebChromeClient()
+        webview.webChromeClient = WebChromeClient()
 
-        webview?.webViewClient = object : WebViewClient() {
-            override fun shouldOverrideUrlLoading(
-                view: WebView?,
-                request: WebResourceRequest?
-            ): Boolean {
-                val uri = request!!.url
-                if (uri.scheme == "http" || uri.scheme == "https"
-                    || uri.scheme == "about" || uri.scheme == "file"
-                ) {
-                    return false
-                }
-                //提示打开外部应用
-                AlertDialog.Builder(this@WebViewActivity)
-                    .setTitle("是否打开【外部应用】")
-                    .setMessage("当前链接引导你打开外部应用，是否打开？")
-                    .setPositiveButton(
-                        "打开"
-                    ) { dialog, which ->
-                        dialog?.dismiss()
-                        try {
-                            val intent = Intent(Intent.ACTION_VIEW, uri)
-                            startActivity(intent)
-                        } catch (e: Exception) {
-                            WxPusherLog.w(TAG, "打开特定scheme错误", e)
-                            WxPusherUtils.toast("打开${uri.scheme}错误")
-                        }
-                    }
-                    .setCancelable(true)
-                    .setNegativeButton("取消") { dialog, _ ->
-                        dialog?.dismiss()
-                    }
-                    .create().show()
-                return true
-            }
+        webview.webViewClient = WxPusherWebViewClient(this)
 
-            override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                super.onPageStarted(view, url, favicon)
-                wxPusherWebInterface.setCurrentWebUrl(url)
-            }
-
-            override fun onReceivedError(
-                view: WebView?,
-                request: WebResourceRequest?,
-                error: WebResourceError?
-            ) {
-                WxPusherLog.e(TAG, "加载页面错误: ${error?.description}")
-                super.onReceivedError(view, request, error)
-            }
-        }
-
-
-        webview?.addJavascriptInterface(wxPusherWebInterface, "wxPusherApi")
-        // 应用可能的更新
-        WebBundleManager.applyUpdateIfAvailable()
+        webview.addJavascriptInterface(wxPusherWebInterface, "wxPusherApi")
 
         wxPusherWebInterface.onWebLoadFinish = {
             checkNightMode()
         }
         addOnNewIntentListener {
+            webview.clearHistory()
             openPageFromIntent(it)
         }
-        //加载页面主体框架
-        webview?.loadUrl("${getWebPageUrl()}#/home")
-        openPageFromIntent(intent)
+
+        webview.clearHistory()
+        if (!openPageFromIntent(intent)) {
+            // TODO: 没有传入数据，打开一个默认页面
+//            webview.lo
+        }
     }
 
-    /**
-     * 如果intent里面有网址，就需要打开具体页面
-     */
-    private fun openPageFromIntent(intent: Intent?) {
+    private fun openPageFromIntent(intent: Intent?): Boolean {
         val url = intent?.getStringExtra(INTENT_KEY_URL)
-        if (url.isNullOrEmpty()) {
-            WxPusherLog.i(TAG, "跳转url为空")
-            return;
+        if (!url.isNullOrEmpty()) {
+            webview.loadUrl(url)
+            return true
         }
-        val urlIntent = Intent(this, WebDetailActivity::class.java)
-        urlIntent.putExtra(INTENT_KEY_URL, url)
-        startActivity(urlIntent)
+        return false
     }
 
-    private fun getWebPageUrl(): String {
-        //如果是一个网址，那就是正式环境，加载bundle
-        if (WxPusherConfig.WebUrl.contains("zjiecode.com")) {
-            val webDir = WebBundleManager.getWebFileDir()
-            return "file://${webDir.absolutePath}/index.html"
-        }
-        //否则是测试环境，直接加载url
-        return WxPusherConfig.WebUrl
-    }
 
     override fun onBackPressed() {
         if (System.currentTimeMillis() - pressBackTime < 400) {
@@ -282,16 +166,11 @@ class WebViewActivity : ComponentActivity() {
             return
         }
         pressBackTime = System.currentTimeMillis()
-        if (webview?.canGoBack() == true) {
-            webview?.goBack()
+        if (webview.canGoBack() == true) {
+            webview.goBack()
             return
         }
         super.onBackPressed()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        WxPusherLog.flush()
     }
 
     /**
@@ -335,7 +214,7 @@ class WebViewActivity : ComponentActivity() {
         webContainer?.setBackgroundColor(bgColor)
 
         wxPusherWebInterface.uiModeIsNight = night
-        webview?.evaluateJavascript("window.onUiModeChanged && window.onUiModeChanged(${night})") {
+        webview.evaluateJavascript("window.onUiModeChanged && window.onUiModeChanged(${night})") {
         }
     }
 }
