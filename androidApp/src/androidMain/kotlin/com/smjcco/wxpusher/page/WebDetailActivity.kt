@@ -1,13 +1,10 @@
 package com.smjcco.wxpusher.page
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
-import android.webkit.WebChromeClient
-import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
@@ -16,15 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.notification.NotificationManager
-import com.smjcco.wxpusher.page.web.WebViewUtils
-import com.smjcco.wxpusher.page.web.WxPusherWebViewClient
+import com.smjcco.wxpusher.web.WebViewUtils
 import com.smjcco.wxpusher.push.PushManager
-import com.smjcco.wxpusher.utils.AppDataUtils
-import com.smjcco.wxpusher.utils.ApplicationUtils
-import com.smjcco.wxpusher.utils.DeviceUtils
-import com.smjcco.wxpusher.utils.PermissionUtils
-import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 
 

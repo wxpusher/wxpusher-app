@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.page.web
+package com.smjcco.wxpusher.web
 
 import android.app.Activity
 import android.app.AlertDialog

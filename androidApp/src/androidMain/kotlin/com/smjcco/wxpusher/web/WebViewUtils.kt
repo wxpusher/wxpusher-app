@@ -1,11 +1,10 @@
-package com.smjcco.wxpusher.page.web
+package com.smjcco.wxpusher.web
 
 import android.app.Activity
 import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.appcompat.widget.AppCompatTextView
-import com.smjcco.wxpusher.web.WxPusherWebInterface
 
 object WebViewUtils {
     fun setupView(
