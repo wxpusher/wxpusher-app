@@ -83,6 +83,7 @@ class WebDetailActivity : FragmentActivity() {
                         ApplicationUtils.application.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
                     val clipData = android.content.ClipData.newPlainText("WxPusher", url)
                     clipboardManager.setPrimaryClip(clipData)
+                    WxPusherUtils.toast("复制成功")
                 },
                 ActionSheetItem("分享") {
                     if (url.isEmpty()) {
