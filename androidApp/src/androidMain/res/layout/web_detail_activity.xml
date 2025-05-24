@@ -31,6 +31,7 @@
             android:ellipsize="middle"
             android:gravity="center"
             android:text="加载中"
+            android:maxLines="1"
             android:textColor="@color/text_fit_theme_first"
             android:textSize="20sp" />
 
