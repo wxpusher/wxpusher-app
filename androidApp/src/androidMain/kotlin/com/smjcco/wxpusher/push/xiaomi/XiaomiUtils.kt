@@ -11,6 +11,9 @@ import com.xiaomi.mipush.sdk.MiPushClient
 object XiaomiUtils {
     private val SAVE_SHOW_KEY = "Xiaomi_alertTips"
 
+    //本地打开应用是否已经提示过了
+    private var hasShow = false
+
     fun init(application: Application) {
         MiPushClient.registerPush(
             application,
@@ -24,6 +27,9 @@ object XiaomiUtils {
      */
     fun showSettingGuide(activity: Activity) {
         if (SaveUtils.getByKey(SAVE_SHOW_KEY) == "1") {
+            return
+        }
+        if (hasShow) {
             return
         }
         val dialog = AlertDialog.Builder(activity)
@@ -44,6 +50,7 @@ object XiaomiUtils {
                 SaveUtils.setKeyValue(SAVE_SHOW_KEY, "1")
             }
             .create()
+        hasShow = true
         DialogManager.show(activity, dialog)
     }
 }

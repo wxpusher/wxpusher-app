@@ -11,11 +11,17 @@ import com.smjcco.wxpusher.utils.SaveUtils
 object WsUtils {
     private val SAVE_SHOW_KEY = "ws_keep_alive_tips_dialog"
 
+    //本地打开应用是否已经提示过了
+    private var hasShow = false
+
     /**
      * 提示保活
      */
     fun showSettingGuide(activity: Activity) {
         if (SaveUtils.getByKey(SAVE_SHOW_KEY) == "1") {
+            return
+        }
+        if (hasShow) {
             return
         }
         val dialog = AlertDialog.Builder(activity)
@@ -37,6 +43,7 @@ object WsUtils {
                 SaveUtils.setKeyValue(SAVE_SHOW_KEY, "1")
             }
             .create()
+        hasShow = true
         DialogManager.show(activity, dialog)
     }
 }
