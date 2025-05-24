@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/web_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/bg_fit_theme_first"
     android:fitsSystemWindows="true"
     android:orientation="vertical">
 
@@ -15,23 +14,34 @@
         android:layout_height="50dp"
         android:orientation="horizontal">
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/back"
             android:layout_width="50dp"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:padding="12dp"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/img_back" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/title"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
+            android:ellipsize="middle"
             android:gravity="center"
-            tools:text="加载中" />
+            android:text="加载中"
+            android:textColor="@color/text_fit_theme_first"
+            android:textSize="20sp" />
 
-        <androidx.appcompat.widget.AppCompatTextView
+        <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/option"
             android:layout_width="50dp"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="@null"
+            android:padding="12dp"
+            android:scaleType="centerInside"
+            app:srcCompat="@drawable/img_options" />
     </LinearLayout>
 
     <ProgressBar

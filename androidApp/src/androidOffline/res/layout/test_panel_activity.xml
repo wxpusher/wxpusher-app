@@ -135,7 +135,7 @@
                 android:id="@+id/web_url_test"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="测试环境 (http://10.0.0.10:3000)" />
+                android:text="测试环境 (http://10.0.0.11:3000)" />
 
             <RadioButton
                 android:id="@+id/web_url_custom"

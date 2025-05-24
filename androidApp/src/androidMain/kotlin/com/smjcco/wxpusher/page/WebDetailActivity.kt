@@ -13,8 +13,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.web.WebViewUtils
 import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.web.WebViewUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 
 
@@ -31,8 +31,8 @@ class WebDetailActivity : ComponentActivity() {
     private var preUiMode = -1
 
     private lateinit var titleTV: AppCompatTextView
-    private lateinit var backTV: AppCompatTextView
-    private lateinit var optionTV: AppCompatTextView
+    private lateinit var backView: View
+    private lateinit var optionView: View
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.web_detail_activity)
@@ -44,9 +44,10 @@ class WebDetailActivity : ComponentActivity() {
 
     private fun initTitleBar() {
         titleTV = findViewById(R.id.title)
-        backTV = findViewById(R.id.back)
-        optionTV = findViewById(R.id.option)
-        titleTV.setOnClickListener {
+        backView = findViewById(R.id.back)
+        optionView = findViewById(R.id.option)
+
+        backView.setOnClickListener {
             onBackPressed()
         }
     }
@@ -60,7 +61,7 @@ class WebDetailActivity : ComponentActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     private fun initWebView() {
         webview = findViewById(R.id.web)
-        wxPusherWebInterface = WxPusherWebInterface(webview)
+        wxPusherWebInterface = WxPusherWebInterface(this, webview)
         WebViewUtils.setupView(this, webview, wxPusherWebInterface, titleTV)
         wxPusherWebInterface.onWebLoadFinish = {
             checkNightMode()

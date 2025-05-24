@@ -1,5 +1,6 @@
 package com.smjcco.wxpusher.web
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Build
 import android.webkit.JavascriptInterface
@@ -8,6 +9,7 @@ import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.api.DeviceApi
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.page.CheckActivity
+import com.smjcco.wxpusher.page.WebDetailActivity
 import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.ApplicationUtils
@@ -28,9 +30,11 @@ class WxPusherWebInterface {
     var uiModeIsNight = false
     var onWebLoadFinish: (() -> Unit?)? = null
     var webUrl: String? = null
+    var activity: Activity
 
-    constructor(webView: WebView) {
+    constructor(activity: Activity,webView: WebView) {
         this.webView = webView
+        this.activity = activity
     }
 
     fun setCurrentWebUrl(url: String?) {
@@ -185,5 +189,15 @@ class WxPusherWebInterface {
                     WxPusherUtils.toast("已经是最新版本")
                 }
             })
+    }
+
+    @JavascriptInterface
+    fun openUrl(url: String?) {
+        if (url.isNullOrEmpty()) {
+            return
+        }
+        val intent = Intent(activity, WebDetailActivity::class.java)
+        intent.putExtra(WebDetailActivity.INTENT_KEY_URL, url)
+        activity.startActivity(intent)
     }
 }

@@ -9,4 +9,7 @@
     <color name="check_item_bg">#FFFFFF</color>
     <color name="check_text_color">#333333</color>
     <color name="check_description_color">#757575</color>
+
+    <color name="text_fit_theme_first">#030303</color>
+    <color name="bg_fit_theme_first">#FFFFFF</color>
 </resources>

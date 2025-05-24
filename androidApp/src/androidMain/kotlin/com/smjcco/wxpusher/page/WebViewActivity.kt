@@ -100,7 +100,7 @@ class WebViewActivity : ComponentActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     private fun initWebView() {
         webview = findViewById(R.id.web)
-        wxPusherWebInterface = WxPusherWebInterface(webview)
+        wxPusherWebInterface = WxPusherWebInterface(this, webview)
         WebViewUtils.setupView(this, webview, wxPusherWebInterface)
         // 应用可能的更新
         WebBundleManager.applyUpdateIfAvailable()
