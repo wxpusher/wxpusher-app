@@ -4,7 +4,6 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.Application
 import com.smjcco.wxpusher.dialog.DialogManager
-import com.smjcco.wxpusher.push.ws.WsUtils
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.xiaomi.mipush.sdk.MiPushClient
@@ -37,7 +36,10 @@ object XiaomiUtils {
                 PermissionUtils.gotoNotificationSettingPage()
             }
             .setCancelable(false)
-            .setNegativeButton("不再提醒") { dialog, _ ->
+            .setNegativeButton("关闭") { dialog, _ ->
+                dialog?.dismiss()
+            }
+            .setNeutralButton("不再提醒") { dialog, _ ->
                 dialog?.dismiss()
                 SaveUtils.setKeyValue(SAVE_SHOW_KEY, "1")
             }

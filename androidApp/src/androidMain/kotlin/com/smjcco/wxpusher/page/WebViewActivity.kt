@@ -47,6 +47,7 @@ class WebViewActivity : ComponentActivity() {
         }
         if (SaveUtils.getByKey(getString(R.string.privacy_key)) != "1") {
             startMainActivity()
+            return
         }
 
         hasInit = true

@@ -9,13 +9,13 @@ import com.smjcco.wxpusher.utils.ApplicationUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 
 object WsUtils {
-    private val SAVE_SHOW_KEY = "alertTips"
+    private val SAVE_SHOW_KEY = "ws_keep_alive_tips_dialog"
 
     /**
      * 提示保活
      */
     fun showSettingGuide(activity: Activity) {
-        if (SaveUtils.getByKey("noteKeepAlive") == "1") {
+        if (SaveUtils.getByKey(SAVE_SHOW_KEY) == "1") {
             return
         }
         val dialog = AlertDialog.Builder(activity)
@@ -29,9 +29,12 @@ object WsUtils {
                 activity.startActivity(intent)
             }
             .setCancelable(false)
-            .setNegativeButton("不再提醒") { dialog, _ ->
+            .setNegativeButton("关闭") { dialog, _ ->
                 dialog?.dismiss()
-                SaveUtils.setKeyValue("noteKeepAlive", "1")
+            }
+            .setNeutralButton("不再提醒") { dialog, _ ->
+                dialog?.dismiss()
+                SaveUtils.setKeyValue(SAVE_SHOW_KEY, "1")
             }
             .create()
         DialogManager.show(activity, dialog)
