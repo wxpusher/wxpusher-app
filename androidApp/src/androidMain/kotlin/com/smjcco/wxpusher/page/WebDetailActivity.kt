@@ -1,24 +1,30 @@
 package com.smjcco.wxpusher.page
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.webkit.WebView
-import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.fragment.app.FragmentActivity
 import com.smjcco.wxpusher.R
+import com.smjcco.wxpusher.dialog.ActionSheetDialogFragment
+import com.smjcco.wxpusher.dialog.ActionSheetItem
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WebViewUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 
 
-class WebDetailActivity : ComponentActivity() {
+class WebDetailActivity : FragmentActivity() {
     companion object {
         const val INTENT_KEY_URL = "url"
     }
@@ -49,6 +55,49 @@ class WebDetailActivity : ComponentActivity() {
 
         backView.setOnClickListener {
             onBackPressed()
+        }
+        optionView.setOnClickListener {
+            val url = webview.url ?: (intent?.getStringExtra(INTENT_KEY_URL) ?: "")
+            val items = listOf(
+                ActionSheetItem("在浏览器中打开") {
+                    if (url.isEmpty()) {
+                        WxPusherLog.w(TAG, "在浏览器中打开失败，url=null")
+                        return@ActionSheetItem
+                    }
+                    try {
+                        val intent = Intent(Intent.ACTION_VIEW)
+                        intent.data = Uri.parse(url)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        ApplicationUtils.application.startActivity(intent)
+                    } catch (e: Exception) {
+                        WxPusherLog.w(TAG, "打开浏览器失败: ${e.message}")
+                        WxPusherUtils.toast("打开浏览器失败")
+                    }
+                },
+                ActionSheetItem("复制链接") {
+                    if (url.isEmpty()) {
+                        WxPusherLog.w(TAG, "复制失败，url=null")
+                        return@ActionSheetItem
+                    }
+                    val clipboardManager =
+                        ApplicationUtils.application.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                    val clipData = android.content.ClipData.newPlainText("WxPusher", url)
+                    clipboardManager.setPrimaryClip(clipData)
+                },
+                ActionSheetItem("分享") {
+                    if (url.isEmpty()) {
+                        WxPusherLog.w(TAG, "复制失败，url=null")
+                        return@ActionSheetItem
+                    }
+                    val intent = Intent(Intent.ACTION_SEND)
+                    intent.type = "text/plain"
+                    intent.putExtra(Intent.EXTRA_TEXT, url)
+                    val chooser = Intent.createChooser(intent, "分享到")
+                    chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    ApplicationUtils.application.startActivity(chooser)
+                }
+            )
+            ActionSheetDialogFragment(listOf(items)).show(supportFragmentManager, "action_sheet")
         }
     }
 
