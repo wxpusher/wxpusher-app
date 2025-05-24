@@ -16,6 +16,7 @@ class HonorPushMessageService : HonorMessageService() {
             WxPusherLog.w(TAG, "荣耀推送-onNewToken=null")
             return
         }
+        WxPusherLog.i(TAG, "荣耀推送-通过HonorPushMessageService获取token")
         PushManager.onGetPushToken(s, DevicePlatform.Android_HONOR)
 
         HonorPushClient.getInstance().turnOnNotificationCenter(object : HonorPushCallback<Void?> {
