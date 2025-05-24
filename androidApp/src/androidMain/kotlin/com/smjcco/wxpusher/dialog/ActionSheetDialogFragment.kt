@@ -17,6 +17,11 @@ class ActionSheetDialogFragment(
     private val showCancel: Boolean = true
 ) : DialogFragment() {
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NORMAL, R.style.DialogTheme)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -94,6 +99,9 @@ class ActionSheetDialogFragment(
             setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
             setGravity(Gravity.BOTTOM)
             setBackgroundDrawableResource(android.R.color.transparent)
+            attributes = attributes.apply {
+                windowAnimations = R.style.DialogAnimation
+            }
         }
     }
 
