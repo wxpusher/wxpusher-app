@@ -9,7 +9,7 @@ import android.content.DialogInterface
  * 根据加入的顺序，依次弹窗
  */
 object DialogManager {
-    private val pageDialogList: Map<Activity, MutableList<Dialog>> = HashMap()
+    private val pageDialogList: MutableMap<Activity, MutableList<Dialog>> = HashMap()
     private val dialogOnShowPage: MutableList<Activity> = ArrayList()
 
     /**
@@ -26,7 +26,7 @@ object DialogManager {
             dialogList.remove(dialog)
             dismissListener?.onDismiss(dialog)
             if (dialogList.isNotEmpty()) {
-                show(activity, dialogList.first())
+                dialogList.first().show()
             }
         }
 
@@ -40,6 +40,7 @@ object DialogManager {
         var dialogList = pageDialogList.get(activity)
         if (dialogList.isNullOrEmpty()) {
             dialogList = ArrayList()
+            pageDialogList.put(activity, dialogList)
         }
         //当页面弹窗关闭的时候，触发下一个弹窗
         dialog.setOnDismissListener(DialogDismissWrapper(dialogList, activity, dismissListener))

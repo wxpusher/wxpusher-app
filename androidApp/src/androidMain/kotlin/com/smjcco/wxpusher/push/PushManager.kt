@@ -52,24 +52,6 @@ object PushManager {
             WsManager.init()
         }
 
-//        if (DeviceUtils.isMIUI()) {
-//            WxPusherLog.i(TAG, "初始化小米推送")
-//            MiPushClient.registerPush(
-//                application,
-//                "2882303761520373007",
-//                "5932037320007"
-//            )
-//        } else if (PushClient.getInstance(ApplicationUtils.application).isSupport()) {
-//            WxPusherLog.i(TAG, "初始化VIVO推送")
-//            VIVOPushUtils.init(ApplicationUtils.application)
-//        } else if (DeviceUtils.isHuaweiMobileServicesAvailable()) {
-//            WxPusherLog.i(TAG, "初始化华为推送")
-//            HmsMessaging.getInstance(application).isAutoInitEnabled = true
-//            HuaweiPushUtils.init(application)
-//        } else {
-//            WxPusherLog.i(TAG, "初始化自建长链接")
-//            WsManager.init()
-//        }
     }
 
     /**
@@ -106,6 +88,13 @@ object PushManager {
         } else {
             WsUtils.showSettingGuide(activity)
         }
+    }
+
+    fun getGuidePageUrl(): String {
+        val platform = DeviceUtils.getPlatform()
+        return "https://wxpusher.zjiecode.com/docs/open-app-note/index.html?brand=%s".format(
+            platform.getPlatform()
+        )
     }
 
 }

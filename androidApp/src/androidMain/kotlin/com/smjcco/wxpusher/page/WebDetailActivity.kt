@@ -1,6 +1,7 @@
 package com.smjcco.wxpusher.page
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -27,6 +28,11 @@ import com.smjcco.wxpusher.web.WxPusherWebInterface
 class WebDetailActivity : FragmentActivity() {
     companion object {
         const val INTENT_KEY_URL = "url"
+        fun openUrl(activity: Activity, url: String) {
+            val intent = Intent(activity, WebDetailActivity::class.java)
+            intent.putExtra(INTENT_KEY_URL, url)
+            activity.startActivity(intent)
+        }
     }
 
     private val TAG: String = "WebDetailActivity"
@@ -39,6 +45,8 @@ class WebDetailActivity : FragmentActivity() {
     private lateinit var titleTV: AppCompatTextView
     private lateinit var backView: View
     private lateinit var optionView: View
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.web_detail_activity)
