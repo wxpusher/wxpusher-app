@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.log.WxPusherLog
 
 typealias PermissionRequesterCallback = ((Boolean) -> Unit)?
@@ -50,7 +51,7 @@ class PermissionRequester(
                     )
                 ) {
                     WxPusherLog.i(TAG, "提示申请权限的原因，不需要跳转引导")
-                    AlertDialog.Builder(activity)
+                    val dialog = AlertDialog.Builder(activity)
                         .setTitle(explainTitle)
                         .setMessage(explainMessage)
                         .setPositiveButton("授权", object : DialogInterface.OnClickListener {
@@ -73,11 +74,12 @@ class PermissionRequester(
                                 callback?.invoke(false)
                             }
                         }
-                        .create().show()
+                        .create()
+                    DialogManager.show(activity, dialog)
 
                 } else {
                     WxPusherLog.i(TAG, "提示申请权限的原因，需要跳转引导")
-                    AlertDialog.Builder(activity)
+                    val dialog = AlertDialog.Builder(activity)
                         .setTitle(guideTitle)
                         .setCancelable(false)
                         .setMessage(guideMessage)
@@ -94,7 +96,8 @@ class PermissionRequester(
                             }
 
                         }
-                        .show()
+                        .create()
+                    DialogManager.show(activity, dialog)
                 }
             }
     }

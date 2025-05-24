@@ -8,6 +8,7 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.WxPusherUtils
 
@@ -24,7 +25,7 @@ class WxPusherWebViewClient(val activity: Activity) : WebViewClient() {
             return false
         }
         //提示打开外部应用
-        AlertDialog.Builder(activity)
+        val dialog = AlertDialog.Builder(activity)
             .setTitle("是否打开【外部应用】")
             .setMessage("当前链接引导你打开外部应用，是否打开？")
             .setPositiveButton(
@@ -43,7 +44,8 @@ class WxPusherWebViewClient(val activity: Activity) : WebViewClient() {
             .setNegativeButton("取消") { dialog, _ ->
                 dialog?.dismiss()
             }
-            .create().show()
+            .create()
+        DialogManager.show(activity, dialog)
         return true
     }
 
