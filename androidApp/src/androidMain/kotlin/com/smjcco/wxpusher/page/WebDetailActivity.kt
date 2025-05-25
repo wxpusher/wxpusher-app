@@ -137,8 +137,8 @@ class WebDetailActivity : FragmentActivity() {
         }
         webview.clearHistory()
         if (!openPageFromIntent(intent)) {
-            // TODO: 没有传入数据，打开一个默认页面
-//            webview.lo
+            WxPusherUtils.toast("没有需要打开的页面地址")
+            finish()
         }
     }
 
