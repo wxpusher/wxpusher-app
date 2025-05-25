@@ -19,7 +19,7 @@ import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.tencent.upgrade.core.UpgradeManager
 import com.tencent.upgrade.core.UpgradeReqCallbackForUserManualCheck
 import kotlinx.coroutines.launch
-
+import java.net.URI
 
 /**
  * web服务的接口
@@ -32,9 +32,37 @@ class WxPusherWebInterface {
     var webUrl: String? = null
     var activity: Activity
 
-    constructor(activity: Activity,webView: WebView) {
+    companion object {
+        // 白名单域名列表
+        private val WHITELIST_HOSTS = setOf(
+            "wxpusher.zjiecode.com",
+            "wxpusher.test.zjiecode.com"
+        )
+    }
+
+    constructor(activity: Activity, webView: WebView) {
         this.webView = webView
         this.activity = activity
+    }
+
+    private fun isHostAllowed(): Boolean {
+        val currentUrl = webUrl ?: return false
+        return try {
+            val uri = URI(currentUrl)
+            val host = uri.host
+            WHITELIST_HOSTS.contains(host)
+        } catch (e: Exception) {
+            WxPusherLog.e(TAG, "验证host失败: ${e.message}")
+            false
+        }
+    }
+
+    private fun checkSecurity(): Boolean {
+        if (!isHostAllowed()) {
+            WxPusherLog.w(TAG, "非白名单域名访问接口: $webUrl")
+            return false
+        }
+        return true
     }
 
     fun setCurrentWebUrl(url: String?) {
@@ -43,42 +71,62 @@ class WxPusherWebInterface {
 
     @JavascriptInterface
     fun showToast(toast: String?) {
+        if (!checkSecurity()) return
         WxPusherUtils.toast(toast)
     }
 
     @JavascriptInterface
     fun updateDeviceInfo() {
+        if (!checkSecurity()) return
         WxPusherLog.i(TAG, "web side要求上报token")
         DeviceApi.updateDeviceInfoAsync(null)
     }
 
     @JavascriptInterface
     fun getVersionName(): String {
+        if (!checkSecurity()) return ""
         return WxPusherUtils.getVersionName()
     }
 
     @JavascriptInterface
-    fun getPlatform(): String = DeviceUtils.getPlatform().getPlatform()
+    fun getPlatform(): String {
+        if (!checkSecurity()) return ""
+        return DeviceUtils.getPlatform().getPlatform()
+    }
 
     @JavascriptInterface
-    fun getDeviceName() = Build.BRAND + " " + Build.MODEL
+    fun getDeviceName(): String {
+        if (!checkSecurity()) return ""
+        return Build.BRAND + " " + Build.MODEL
+    }
 
     @JavascriptInterface
-    fun getPushToken() = AppDataUtils.getPushToken()
+    fun getPushToken(): String? {
+        if (!checkSecurity()) return null
+        return AppDataUtils.getPushToken()
+    }
 
     @JavascriptInterface
-    fun getByKey(key: String): String? = SaveUtils.getByKey(key)
+    fun getByKey(key: String): String? {
+        if (!checkSecurity()) return null
+        return SaveUtils.getByKey(key)
+    }
 
     @JavascriptInterface
     fun setKeyValue(key: String, value: String) {
+        if (!checkSecurity()) return
         SaveUtils.setKeyValue(key, value)
     }
 
     @JavascriptInterface
-    fun getLoginInfo(): String? = AppDataUtils.getLoginInfoStr()
+    fun getLoginInfo(): String? {
+        if (!checkSecurity()) return null
+        return AppDataUtils.getLoginInfoStr()
+    }
 
     @JavascriptInterface
     fun saveLoginInfo(loginInfoStr: String?) {
+        if (!checkSecurity()) return
         AppDataUtils.saveLoginInfo(loginInfoStr)
     }
 
@@ -87,6 +135,7 @@ class WxPusherWebInterface {
      */
     @JavascriptInterface
     fun loginSuccess() {
+        if (!checkSecurity()) return
         WxPusherLog.i(TAG, "loginSuccess() called")
         DeviceApi.updateDeviceInfoAsync(null)
     }
@@ -96,17 +145,25 @@ class WxPusherWebInterface {
      */
     @JavascriptInterface
     fun logout() {
+        if (!checkSecurity()) return
         WxPusherLog.i(TAG, "logout() called")
     }
 
     @JavascriptInterface
-    fun getWsConnectStatus() = WsManager.getConnectStatus().code
+    fun getWsConnectStatus(): Int {
+        if (!checkSecurity()) return -1
+        return WsManager.getConnectStatus().code
+    }
 
     @JavascriptInterface
-    fun uiModeIsNight() = uiModeIsNight
+    fun uiModeIsNight(): Boolean {
+        if (!checkSecurity()) return false
+        return uiModeIsNight
+    }
 
     @JavascriptInterface
     fun loadFinish() {
+        if (!checkSecurity()) return
         WxPusherUtils.getMainScope().launch {
             onWebLoadFinish?.invoke()
         }
@@ -114,13 +171,17 @@ class WxPusherWebInterface {
 
     @JavascriptInterface
     fun togoCheckPermission() {
+        if (!checkSecurity()) return
         val intent = Intent(ApplicationUtils.application, CheckActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         ApplicationUtils.application.startActivity(intent)
     }
 
     @JavascriptInterface
-    fun getApiUrl() = WxPusherConfig.ApiUrl
+    fun getApiUrl(): String {
+        if (!checkSecurity()) return ""
+        return WxPusherConfig.ApiUrl
+    }
 
 
     /**
@@ -128,6 +189,7 @@ class WxPusherWebInterface {
      */
     @JavascriptInterface
     fun share(content: String?) {
+        if (!checkSecurity()) return
         if (content.isNullOrEmpty()) {
             WxPusherLog.w(TAG, "复制失败，content=null")
             return
@@ -145,6 +207,7 @@ class WxPusherWebInterface {
      */
     @JavascriptInterface
     fun openInBrowser(url: String?) {
+        if (!checkSecurity()) return
         if (url.isNullOrEmpty()) {
             WxPusherLog.w(TAG, "openInBrowser失败，url=null")
             return
@@ -165,6 +228,7 @@ class WxPusherWebInterface {
      */
     @JavascriptInterface
     fun copy(text: String?) {
+        if (!checkSecurity()) return
         if (text.isNullOrEmpty()) {
             WxPusherLog.w(TAG, "复制失败，text=null")
             return
@@ -179,10 +243,14 @@ class WxPusherWebInterface {
      * 获取浏览器当前的url
      */
     @JavascriptInterface
-    fun getCurrentWebUrl(): String? = webUrl
+    fun getCurrentWebUrl(): String? {
+        if (!checkSecurity()) return null
+        return webUrl
+    }
 
     @JavascriptInterface
     fun checkAppUpdate() {
+        if (!checkSecurity()) return
         UpgradeManager.getInstance()
             .checkUpgrade(true, null, object : UpgradeReqCallbackForUserManualCheck() {
                 override fun onReceivedNoStrategy() {
@@ -193,6 +261,7 @@ class WxPusherWebInterface {
 
     @JavascriptInterface
     fun openUrl(url: String?) {
+        if (!checkSecurity()) return
         if (url.isNullOrEmpty()) {
             return
         }
