@@ -77,6 +77,12 @@ object PushManager {
      * 显示打开通知提醒的弹窗
      */
     fun showOpenNoteRemindSettingDialog(activity: Activity) {
+        if (AppDataUtils.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
+            return
+        }
+        if (AppDataUtils.getPushToken().isNullOrEmpty()) {
+            return
+        }
         val platform = DeviceUtils.getPlatform()
         if (platform == DevicePlatform.Android_XIAOMI) {
             XiaomiUtils.showSettingGuide(activity)

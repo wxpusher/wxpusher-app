@@ -38,7 +38,7 @@ object WebViewUtils {
         }
 
 
-        webview.webViewClient = WxPusherWebViewClient(activity)
+        webview.webViewClient = WxPusherWebViewClient(activity, wxPusherWebInterface)
 
         webview.addJavascriptInterface(wxPusherWebInterface, "wxPusherApi")
     }

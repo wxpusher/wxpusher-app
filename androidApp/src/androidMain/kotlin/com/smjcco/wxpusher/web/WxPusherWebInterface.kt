@@ -29,13 +29,14 @@ class WxPusherWebInterface {
     private val TAG = "WxPusherWebInterface"
     var uiModeIsNight = false
     var onWebLoadFinish: (() -> Unit?)? = null
-    var webUrl: String? = null
     var activity: Activity
+    var webUrl: String? = null
 
     companion object {
         // 白名单域名列表
         private val WHITELIST_HOSTS = setOf(
             "wxpusher.zjiecode.com",
+            "static.zjiecode.com",
             "wxpusher.test.zjiecode.com"
         )
     }
@@ -45,10 +46,14 @@ class WxPusherWebInterface {
         this.activity = activity
     }
 
-    private fun isHostAllowed(): Boolean {
-        val currentUrl = webUrl ?: return false
+    private fun isHostAllowed(url: String?): Boolean {
+        val currentUrl = url ?: return false
         return try {
             val uri = URI(currentUrl)
+            //加载本地资源
+            if (uri.path != null && uri.scheme == "file" && uri.path.startsWith("/data/user/0/${ApplicationUtils.application.packageName}")) {
+                return true
+            }
             val host = uri.host
             WHITELIST_HOSTS.contains(host)
         } catch (e: Exception) {
@@ -58,15 +63,11 @@ class WxPusherWebInterface {
     }
 
     private fun checkSecurity(): Boolean {
-        if (!isHostAllowed()) {
+        if (!isHostAllowed(webUrl)) {
             WxPusherLog.w(TAG, "非白名单域名访问接口: $webUrl")
             return false
         }
         return true
-    }
-
-    fun setCurrentWebUrl(url: String?) {
-        webUrl = url
     }
 
     @JavascriptInterface
@@ -245,7 +246,7 @@ class WxPusherWebInterface {
     @JavascriptInterface
     fun getCurrentWebUrl(): String? {
         if (!checkSecurity()) return null
-        return webUrl
+        return webView.url
     }
 
     @JavascriptInterface

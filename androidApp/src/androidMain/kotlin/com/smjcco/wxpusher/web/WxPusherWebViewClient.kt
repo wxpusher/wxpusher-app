@@ -12,7 +12,10 @@ import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.WxPusherUtils
 
-class WxPusherWebViewClient(val activity: Activity) : WebViewClient() {
+class WxPusherWebViewClient(
+    val activity: Activity,
+    val wxPusherWebInterface: WxPusherWebInterface
+) : WebViewClient() {
     private val TAG = "WxPusherWebViewClient"
     override fun shouldOverrideUrlLoading(
         view: WebView,
@@ -51,6 +54,7 @@ class WxPusherWebViewClient(val activity: Activity) : WebViewClient() {
 
     override fun onPageStarted(view: WebView, url: String?, favicon: Bitmap?) {
         super.onPageStarted(view, url, favicon)
+        wxPusherWebInterface.webUrl = url
     }
 
     override fun onReceivedError(
