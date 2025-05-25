@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.webkit.WebView
+import android.widget.ProgressBar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.compose.ui.graphics.Color
@@ -45,6 +46,7 @@ class WebDetailActivity : FragmentActivity() {
     private lateinit var titleTV: AppCompatTextView
     private lateinit var backView: View
     private lateinit var optionView: View
+    private lateinit var progress: ProgressBar
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +62,7 @@ class WebDetailActivity : FragmentActivity() {
         titleTV = findViewById(R.id.title)
         backView = findViewById(R.id.back)
         optionView = findViewById(R.id.option)
+        progress = findViewById(R.id.progress)
 
         backView.setOnClickListener {
             onBackPressed()
@@ -127,7 +130,7 @@ class WebDetailActivity : FragmentActivity() {
     private fun initWebView() {
         webview = findViewById(R.id.web)
         wxPusherWebInterface = WxPusherWebInterface(this, webview)
-        WebViewUtils.setupView(this, webview, wxPusherWebInterface, titleTV)
+        WebViewUtils.setupView(this, webview, wxPusherWebInterface, progress, titleTV)
         wxPusherWebInterface.onWebLoadFinish = {
             checkNightMode()
         }

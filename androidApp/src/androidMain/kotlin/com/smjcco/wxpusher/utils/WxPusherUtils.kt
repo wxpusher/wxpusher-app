@@ -1,12 +1,9 @@
 package com.smjcco.wxpusher.utils
 
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.drawable.Drawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import android.net.Uri
 import android.os.Looper
 import android.widget.Toast
 import kotlinx.coroutines.CoroutineScope

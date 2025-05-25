@@ -8,13 +8,15 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ProgressBar
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.WxPusherUtils
 
 class WxPusherWebViewClient(
     val activity: Activity,
-    val wxPusherWebInterface: WxPusherWebInterface
+    val progress: ProgressBar?,
+    val wxPusherWebInterface: WxPusherWebInterface,
 ) : WebViewClient() {
     private val TAG = "WxPusherWebViewClient"
     override fun shouldOverrideUrlLoading(
@@ -65,4 +67,5 @@ class WxPusherWebViewClient(
         WxPusherLog.e(TAG, "加载页面错误: ${error?.description}")
         super.onReceivedError(view, request, error)
     }
+
 }

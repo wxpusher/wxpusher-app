@@ -30,8 +30,8 @@
             android:layout_weight="1"
             android:ellipsize="middle"
             android:gravity="center"
-            android:text="加载中"
             android:maxLines="1"
+            android:text="加载中"
             android:textColor="@color/text_fit_theme_first"
             android:textSize="20sp" />
 
@@ -46,8 +46,12 @@
     </LinearLayout>
 
     <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="1dp" />
+        android:layout_height="1dp"
+        android:max="100"
+        android:progressTint="@color/accent" />
 
     <WebView
         android:id="@+id/web"

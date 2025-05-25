@@ -103,7 +103,7 @@ class WebViewActivity : ComponentActivity() {
         webview = findViewById(R.id.web)
 
         wxPusherWebInterface = WxPusherWebInterface(this, webview)
-        WebViewUtils.setupView(this, webview, wxPusherWebInterface)
+        WebViewUtils.setupView(this, webview,  wxPusherWebInterface)
         // 应用可能的更新
         WebBundleManager.applyUpdateIfAvailable()
 
