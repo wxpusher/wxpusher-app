@@ -159,6 +159,13 @@ class WebDetailActivity : FragmentActivity() {
         super.onBackPressed()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        if(webview.isActivated){
+            webview.destroy()
+        }
+    }
+
     /**
      * 监听主题颜色的变化
      */

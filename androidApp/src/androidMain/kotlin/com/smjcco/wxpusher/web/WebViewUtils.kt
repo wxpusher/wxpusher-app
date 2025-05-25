@@ -5,6 +5,7 @@ import android.webkit.WebChromeClient
 import android.webkit.WebSettings
 import android.webkit.WebView
 import androidx.appcompat.widget.AppCompatTextView
+import com.smjcco.wxpusher.BuildConfig
 
 object WebViewUtils {
     fun setupView(
@@ -13,6 +14,9 @@ object WebViewUtils {
         wxPusherWebInterface: WxPusherWebInterface,
         titleTV: AppCompatTextView? = null
     ) {
+        if (!BuildConfig.online) {
+            WebView.setWebContentsDebuggingEnabled(true)
+        }
         webview.settings.apply {
             javaScriptEnabled = true
             allowFileAccess = true
