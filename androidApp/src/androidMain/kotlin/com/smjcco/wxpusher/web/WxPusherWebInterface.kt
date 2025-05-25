@@ -37,7 +37,8 @@ class WxPusherWebInterface {
         private val WHITELIST_HOSTS = setOf(
             "wxpusher.zjiecode.com",
             "static.zjiecode.com",
-            "wxpusher.test.zjiecode.com"
+            "wxpusher.test.zjiecode.com",
+            "10.0.0.11",
         )
     }
 
@@ -57,7 +58,7 @@ class WxPusherWebInterface {
             val host = uri.host
             WHITELIST_HOSTS.contains(host)
         } catch (e: Exception) {
-            WxPusherLog.e(TAG, "验证host失败: ${e.message}")
+            WxPusherLog.w(TAG, "验证host失败: ${e.message}")
             false
         }
     }

@@ -87,10 +87,13 @@ object PushManager {
         if (platform == DevicePlatform.Android_XIAOMI) {
             XiaomiUtils.showSettingGuide(activity)
         } else if (platform == DevicePlatform.Android_VIVO) {
-
+            CommonUtils.showSettingGuide(activity)
         } else if (platform == DevicePlatform.Android_HONOR) {
+            CommonUtils.showSettingGuide(activity)
         } else if (platform == DevicePlatform.Android_HUAWEI) {
+            CommonUtils.showSettingGuide(activity)
         } else if (platform == DevicePlatform.Android_OPPO) {
+            WsUtils.showSettingGuide(activity)
         } else {
             WsUtils.showSettingGuide(activity)
         }

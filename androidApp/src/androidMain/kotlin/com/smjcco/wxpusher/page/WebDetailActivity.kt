@@ -104,6 +104,13 @@ class WebDetailActivity : FragmentActivity() {
                     val chooser = Intent.createChooser(intent, "分享到")
                     chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                     ApplicationUtils.application.startActivity(chooser)
+                },
+                ActionSheetItem("重新加载") {
+                    if (url.isEmpty()) {
+                        WxPusherLog.w(TAG, "重新加载，url=null")
+                        return@ActionSheetItem
+                    }
+                    webview.reload()
                 }
             )
             ActionSheetDialogFragment(listOf(items)).show(supportFragmentManager, "action_sheet")
@@ -161,7 +168,7 @@ class WebDetailActivity : FragmentActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if(webview.isActivated){
+        if (webview.isActivated) {
             webview.destroy()
         }
     }

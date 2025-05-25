@@ -13,6 +13,7 @@ import com.vivo.push.listener.IPushQueryActionListener
 object VIVOPushUtils {
     private val TAG = "VIVO"
     private val TurnOnPushSaveKey = "Vivo-turnOnPush"
+
     fun init(application: Application) {
         try {
             //初始化设置
@@ -61,4 +62,5 @@ object VIVOPushUtils {
                 }
             })
     }
+
 }
