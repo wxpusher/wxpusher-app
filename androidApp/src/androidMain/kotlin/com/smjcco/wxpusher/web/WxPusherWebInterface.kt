@@ -181,7 +181,6 @@ class WxPusherWebInterface {
 
     @JavascriptInterface
     fun getApiUrl(): String {
-        if (!checkSecurity()) return ""
         return WxPusherConfig.ApiUrl
     }
 

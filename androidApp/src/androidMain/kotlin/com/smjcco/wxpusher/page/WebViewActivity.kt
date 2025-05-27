@@ -12,19 +12,20 @@ import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import com.smjcco.wxpusher.BuildConfig
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.web.WebViewUtils
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.SaveUtils
+import com.smjcco.wxpusher.web.WebViewUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 import com.smjcco.wxpusher.web.update.WebBundleManager
 import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback
 import com.tencent.upgrade.core.UpgradeManager
+import com.xiaomi.mipush.sdk.MiPushMessage
+import com.xiaomi.mipush.sdk.PushMessageHelper
 
 
 class WebViewActivity : ComponentActivity() {
@@ -103,7 +104,7 @@ class WebViewActivity : ComponentActivity() {
         webview = findViewById(R.id.web)
 
         wxPusherWebInterface = WxPusherWebInterface(this, webview)
-        WebViewUtils.setupView(this, webview,  wxPusherWebInterface)
+        WebViewUtils.setupView(this, webview, wxPusherWebInterface)
         // 应用可能的更新
         WebBundleManager.applyUpdateIfAvailable()
 
@@ -123,13 +124,19 @@ class WebViewActivity : ComponentActivity() {
      */
     private fun openPageFromIntent(intent: Intent?) {
         val url = intent?.getStringExtra(INTENT_KEY_URL)
-        if (url.isNullOrEmpty()) {
-            WxPusherLog.i(TAG, "跳转url为空")
-            return;
+        if (!url.isNullOrEmpty()) {
+            WebDetailActivity.openUrl(this, url)
+            return
         }
-        val urlIntent = Intent(this, WebDetailActivity::class.java)
-        urlIntent.putExtra(INTENT_KEY_URL, url)
-        startActivity(urlIntent)
+
+        //小米推送的消息，如果有 url，直接打开地址
+        val miPushMessage =
+            intent?.getSerializableExtra(PushMessageHelper.KEY_MESSAGE) as MiPushMessage?
+        val miPushUrl = miPushMessage?.extra?.get("messageUrl")
+        if (!miPushUrl.isNullOrEmpty()) {
+            WebDetailActivity.openUrl(this, miPushUrl)
+        }
+
     }
 
     private fun getWebPageUrl(): String {
