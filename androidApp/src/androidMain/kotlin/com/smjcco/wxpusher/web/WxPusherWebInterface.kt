@@ -79,26 +79,22 @@ class WxPusherWebInterface {
 
     @JavascriptInterface
     fun updateDeviceInfo() {
-        if (!checkSecurity()) return
         WxPusherLog.i(TAG, "web side要求上报token")
-        DeviceApi.updateDeviceInfoAsync(null)
+        DeviceApi.updateDeviceInfoAsync(DeviceUtils.getPlatform())
     }
 
     @JavascriptInterface
     fun getVersionName(): String {
-        if (!checkSecurity()) return ""
         return WxPusherUtils.getVersionName()
     }
 
     @JavascriptInterface
     fun getPlatform(): String {
-        if (!checkSecurity()) return ""
         return DeviceUtils.getPlatform().getPlatform()
     }
 
     @JavascriptInterface
     fun getDeviceName(): String {
-        if (!checkSecurity()) return ""
         return Build.BRAND + " " + Build.MODEL
     }
 
@@ -139,7 +135,7 @@ class WxPusherWebInterface {
     fun loginSuccess() {
         if (!checkSecurity()) return
         WxPusherLog.i(TAG, "loginSuccess() called")
-        DeviceApi.updateDeviceInfoAsync(null)
+        DeviceApi.updateDeviceInfoAsync(DeviceUtils.getPlatform())
     }
 
     /**
@@ -159,13 +155,11 @@ class WxPusherWebInterface {
 
     @JavascriptInterface
     fun uiModeIsNight(): Boolean {
-        if (!checkSecurity()) return false
         return uiModeIsNight
     }
 
     @JavascriptInterface
     fun loadFinish() {
-        if (!checkSecurity()) return
         WxPusherUtils.getMainScope().launch {
             onWebLoadFinish?.invoke()
         }
