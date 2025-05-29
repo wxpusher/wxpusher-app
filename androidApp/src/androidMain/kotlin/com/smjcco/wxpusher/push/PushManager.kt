@@ -93,7 +93,7 @@ object PushManager {
         } else if (platform == DevicePlatform.Android_HUAWEI) {
             CommonUtils.showSettingGuide(activity)
         } else if (platform == DevicePlatform.Android_OPPO) {
-            WsUtils.showSettingGuide(activity)
+            CommonUtils.showSettingGuide(activity)
         } else {
             WsUtils.showSettingGuide(activity)
         }
