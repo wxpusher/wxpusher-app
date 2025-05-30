@@ -52,7 +52,10 @@ class WxPusherWebInterface {
         return try {
             val uri = URI(currentUrl)
             //加载本地资源
-            if (uri.path != null && uri.scheme == "file" && uri.path.startsWith("/data/user/0/${ApplicationUtils.application.packageName}")) {
+            if (uri.path != null && uri.scheme == "file"
+                && uri.path.startsWith("/data/user/")
+                && uri.path.contains("${ApplicationUtils.application.packageName}")
+            ) {
                 return true
             }
             val host = uri.host
