@@ -7,7 +7,7 @@ import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.AppDataUtils
-import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.base.ApplicationUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.web.update.WebBundleManager
 import com.tencent.upgrade.bean.UpgradeConfig

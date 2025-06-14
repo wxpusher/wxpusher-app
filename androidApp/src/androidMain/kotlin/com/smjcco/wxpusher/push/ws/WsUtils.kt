@@ -5,7 +5,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.page.CheckActivity
-import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.base.WxpSaveService
 import com.smjcco.wxpusher.utils.SaveUtils
 
 object WsUtils {
@@ -18,7 +19,7 @@ object WsUtils {
      * 提示保活
      */
     fun showSettingGuide(activity: Activity) {
-        if (SaveUtils.getByKey(SAVE_SHOW_KEY) == "1") {
+        if (WxpSaveService.get(SAVE_SHOW_KEY, "") == "1") {
             return
         }
         if (hasShow) {

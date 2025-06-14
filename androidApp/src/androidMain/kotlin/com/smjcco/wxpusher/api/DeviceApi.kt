@@ -3,6 +3,7 @@ package com.smjcco.wxpusher.api
 import androidx.annotation.Keep
 import com.google.gson.reflect.TypeToken
 import com.smjcco.wxpusher.WxPusherConfig
+import com.smjcco.wxpusher.base.WxpSaveService
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.AppDataUtils
@@ -101,7 +102,7 @@ object DeviceApi {
                 platform?.getPlatform()
             )
         )
-        if (reqBody == updateDataCache && SaveUtils.getByKey(UpDateTokenDate) == DateUtils.getDate()) {
+        if (reqBody == updateDataCache && WxpSaveService.get(UpDateTokenDate,"") == DateUtils.getDate()) {
             WxPusherLog.i(TAG, "updateDeviceInfo: 数据为变更，无需上报")
             return false
         }

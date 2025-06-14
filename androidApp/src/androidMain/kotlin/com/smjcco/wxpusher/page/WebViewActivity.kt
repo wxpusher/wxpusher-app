@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.webkit.WebView
 import androidx.activity.ComponentActivity
@@ -14,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WxPusherConfig
+import com.smjcco.wxpusher.base.WxpSaveService
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.PermissionRequester
@@ -28,6 +30,7 @@ import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback
 import com.tencent.upgrade.core.UpgradeManager
 import com.xiaomi.mipush.sdk.MiPushMessage
 import com.xiaomi.mipush.sdk.PushMessageHelper
+import kotlinx.coroutines.launch
 
 
 class WebViewActivity : ComponentActivity() {
@@ -49,7 +52,7 @@ class WebViewActivity : ComponentActivity() {
         if (hasInit) {
             return
         }
-        if (SaveUtils.getByKey(getString(R.string.privacy_key)) != "1") {
+        if (WxpSaveService.get(getString(R.string.privacy_key), "") != "1") {
             startMainActivity()
             return
         }
@@ -61,7 +64,10 @@ class WebViewActivity : ComponentActivity() {
         initWebView()
         requestPermission()
         checkUpdate()
-        WxPusherUtils.toast(Greeting().greet())
+        WxPusherUtils.getIoScopeScope().launch {
+            val resp = Greeting().greeting()
+            Log.d(TAG, "onCreate() called,resp=" + resp)
+        }
     }
 
     /**

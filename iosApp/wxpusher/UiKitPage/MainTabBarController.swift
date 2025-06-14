@@ -1,5 +1,6 @@
 import UIKit
 import Toaster
+import shared
 class MainTabBarController: UITabBarController {
     
     override func viewDidLoad() {
@@ -31,6 +32,7 @@ class MainTabBarController: UITabBarController {
         self.selectedIndex = 0
         self.title = controllers[self.selectedIndex].title
         
+        Greeting().toast()
     }
     
     private func setupAppearance() {

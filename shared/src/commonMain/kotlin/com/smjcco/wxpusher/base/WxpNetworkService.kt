@@ -2,6 +2,7 @@ package com.smjcco.wxpusher.base
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.http.headers
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
@@ -14,6 +15,11 @@ class WxpNetworkService {
                     prettyPrint = true
                     ignoreUnknownKeys = true
                 })
+                headers {
+                    append("X-App-Version", "1.0.0")
+                    append("X-Device-Type", "Android")
+                    append("Authorization", "Bearer your_token_here")
+                }
             }
         }
 

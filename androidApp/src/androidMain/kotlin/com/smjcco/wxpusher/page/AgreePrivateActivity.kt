@@ -7,7 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.utils.SaveUtils
+import com.smjcco.wxpusher.base.WxpSaveService
 
 class AgreePrivateActivity : ComponentActivity() {
     
@@ -34,7 +34,7 @@ class AgreePrivateActivity : ComponentActivity() {
         // 设置同意按钮点击事件
         findViewById<Button>(R.id.btn_agree).setOnClickListener {
             // 保存用户已同意隐私政策
-            SaveUtils.setKeyValue(getString(R.string.privacy_key), "1")
+            WxpSaveService.get(getString(R.string.privacy_key),"1")
             startMainActivity()
         }
         

@@ -1,6 +1,7 @@
 package com.smjcco.wxpusher.web
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.webkit.JavascriptInterface
@@ -12,7 +13,7 @@ import com.smjcco.wxpusher.page.CheckActivity
 import com.smjcco.wxpusher.page.WebDetailActivity
 import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.utils.AppDataUtils
-import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.base.ApplicationUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
@@ -232,7 +233,7 @@ class WxPusherWebInterface {
             return
         }
         val clipboardManager =
-            ApplicationUtils.application.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            ApplicationUtils.application.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
         val clipData = android.content.ClipData.newPlainText("WxPusher", text)
         clipboardManager.setPrimaryClip(clipData)
     }

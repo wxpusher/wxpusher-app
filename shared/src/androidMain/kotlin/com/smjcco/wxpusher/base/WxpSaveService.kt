@@ -5,11 +5,11 @@ import android.content.SharedPreferences
 
 private lateinit var WxpSaveServiceAndroidSP: SharedPreferences
 
-actual fun WxpSaveService_get(key: String): String? {
+actual fun ExpWxpSaveService_get(key: String): String? {
     return WxpSaveServiceAndroidSP.getString(key, null)
 }
 
-actual fun WxpSaveService_set(key: String, value: String?) {
+actual fun ExpWxpSaveService_set(key: String, value: String?) {
     if (value.isNullOrEmpty()) {
         WxpSaveServiceAndroidSP.edit().remove(key).apply()
     } else {
@@ -17,9 +17,13 @@ actual fun WxpSaveService_set(key: String, value: String?) {
     }
 }
 
-actual fun WxpSaveService_init() {
+actual fun ExpWxpSaveService_init() {
     WxpSaveServiceAndroidSP =
         ApplicationUtils.application.getSharedPreferences("wxpusher-kv", Context.MODE_PRIVATE)
+}
+
+actual fun ExpWxpSaveService_remove(key: String) {
+    WxpSaveServiceAndroidSP.edit().remove(key).apply()
 }
 
 

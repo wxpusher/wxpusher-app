@@ -1,13 +1,21 @@
 package com.smjcco.wxpusher.base
 
-actual fun WxpSaveService_get(key: String): String? {
-    return ""
+import platform.Foundation.NSUserDefaults
+
+actual fun ExpWxpSaveService_get(key: String): String? {
+    return NSUserDefaults.standardUserDefaults.stringForKey(key)
 }
 
-actual fun WxpSaveService_set(key: String, value: String?) {
+actual fun ExpWxpSaveService_set(key: String, value: String?) {
+    NSUserDefaults.standardUserDefaults.setObject(value, forKey = key)
+    NSUserDefaults.standardUserDefaults.synchronize()
+}
+
+actual fun ExpWxpSaveService_init() {
 
 }
 
-actual fun WxpSaveService_init() {
-
+actual fun ExpWxpSaveService_remove(key: String) {
+    NSUserDefaults.standardUserDefaults.removeObjectForKey(key)
+    NSUserDefaults.standardUserDefaults.synchronize()
 }

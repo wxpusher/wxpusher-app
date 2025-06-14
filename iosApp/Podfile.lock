@@ -7,7 +7,8 @@ PODS:
     - Moya/Core
     - RxSwift (~> 6.0)
   - RxSwift (6.6.0)
-  - shared (1.0)
+  - shared (1.0):
+    - Toaster (= 2.3.0)
   - Toaster (2.3.0)
 
 DEPENDENCIES:
@@ -33,7 +34,7 @@ SPEC CHECKSUMS:
   ExytePopupView: e0554c9713665a386a54b356c596858811e84621
   Moya: 138f0573e53411fb3dc17016add0b748dfbd78ee
   RxSwift: a4b44f7d24599f674deebd1818eab82e58410632
-  shared: 96c066cfd2b0eab0963c51fee6cb6673e8cbba1a
+  shared: bb99336657928a21d484b5db2f4d3baf6f5febce
   Toaster: c3473963c78e8cabbf6ea6f11ad0fdaae6f54987
 
 PODFILE CHECKSUM: 6e60988bb911e308564a7d8fe79b618ad16d3286

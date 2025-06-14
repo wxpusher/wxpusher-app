@@ -5,7 +5,8 @@ import com.aliyun.sls.android.producer.LogProducerClient
 import com.aliyun.sls.android.producer.LogProducerConfig
 import com.aliyun.sls.android.producer.LogProducerResult
 import com.smjcco.wxpusher.utils.AppDataUtils
-import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.base.WxpSaveService
 import com.smjcco.wxpusher.utils.RandomUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
@@ -19,7 +20,7 @@ object WxPusherLog {
     private val logIdKey = "logIdKey"
 
     fun init() {
-        logId = SaveUtils.getByKey(logIdKey) ?: ""
+        logId = WxpSaveService.get(logIdKey,"")
         if (logId.isEmpty()) {
             logId = "LogId_" + RandomUtils.generateRandomString(26)
             SaveUtils.setKeyValue(logIdKey, logId)

@@ -31,8 +31,13 @@ kotlin {
             baseName = "shared"
             isStatic = true
         }
+        pod("Toaster") {
+            version = "2.3.0"
+            extraOpts += listOf("-compiler-option", "-fmodules")
+        }
+
     }
-    
+
     sourceSets {
         commonMain.dependencies {
             implementation(libs.ktor.client.core)

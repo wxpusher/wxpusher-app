@@ -2,6 +2,7 @@ package com.smjcco.wxpusher.push
 
 import android.app.Activity
 import android.app.AlertDialog
+import com.smjcco.wxpusher.base.WxpSaveService
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.page.WebDetailActivity
 import com.smjcco.wxpusher.utils.PermissionUtils
@@ -18,7 +19,8 @@ object CommonUtils {
      * 提示保活
      */
     fun showSettingGuide(activity: Activity) {
-        if (SaveUtils.getByKey(SAVE_SHOW_KEY) == "1") {
+
+        if (WxpSaveService.get(SAVE_SHOW_KEY, "") == "1") {
             return
         }
         if (hasShow) {

@@ -1,6 +1,7 @@
 package com.smjcco.wxpusher.push.vivo
 
 import android.app.Application
+import com.smjcco.wxpusher.base.WxpSaveService
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.PushManager
@@ -23,7 +24,7 @@ object VIVOPushUtils {
             PushClient.getInstance(application).initialize(config)
 
             //已经打开过推送了，直接获取pushToken
-            if (SaveUtils.getByKey(TurnOnPushSaveKey) == "true") {
+            if (WxpSaveService.get(TurnOnPushSaveKey, "") == "true") {
                 getPushToken(application)
             } else {
                 //第一次打开的时候 ，先打开推送，不然获取pushToken 可能为空

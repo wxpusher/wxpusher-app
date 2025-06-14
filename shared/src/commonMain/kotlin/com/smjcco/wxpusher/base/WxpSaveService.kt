@@ -1,8 +1,10 @@
 package com.smjcco.wxpusher.base
 
-expect fun WxpSaveService_get(key: String): String?
-expect fun WxpSaveService_set(key: String, value: String?)
-expect fun WxpSaveService_init()
+expect fun ExpWxpSaveService_get(key: String): String?
+expect fun ExpWxpSaveService_set(key: String, value: String?)
+
+expect fun ExpWxpSaveService_remove(key: String)
+expect fun ExpWxpSaveService_init()
 
 /**
  * 数据存储服务，提供基础的数据持久化存储
@@ -10,15 +12,15 @@ expect fun WxpSaveService_init()
 object WxpSaveService {
 
     fun init() {
-        WxpSaveService_init()
+        ExpWxpSaveService_init()
     }
 
     fun get(key: String, value: String): String {
-        return WxpSaveService_get(key) ?: value
+        return ExpWxpSaveService_get(key) ?: value
     }
 
     fun set(key: String, value: String?) {
-        WxpSaveService_set(key, value)
+        ExpWxpSaveService_set(key, value)
     }
 
     fun get(key: String, value: Boolean): Boolean {
@@ -30,7 +32,7 @@ object WxpSaveService {
     }
 
     fun set(key: String, value: Boolean) {
-        WxpSaveService_set(key, value.toString())
+        ExpWxpSaveService_set(key, value.toString())
     }
 
     fun get(key: String, value: Int): Int {
@@ -42,7 +44,7 @@ object WxpSaveService {
     }
 
     fun set(key: String, value: Int) {
-        WxpSaveService_set(key, value.toString())
+        ExpWxpSaveService_set(key, value.toString())
     }
 
 }

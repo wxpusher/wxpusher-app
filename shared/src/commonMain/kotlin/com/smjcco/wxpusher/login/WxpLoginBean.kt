@@ -1,0 +1,13 @@
+package com.smjcco.wxpusher.login
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class WxpLoginSendVerifyCodeResp(
+    val phoneHasRegister: Boolean,
+    //电话号码没有注册，可以和公众号绑定或者注册，通过这个code可以验证用户手机号，（手机号+验证码的base64编码）
+    val phoneVerifyCode: String?,
+    val deviceToken: String?,
+    val deviceId: String?,
+    val uid: String?,
+)
