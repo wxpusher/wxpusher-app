@@ -14,7 +14,7 @@ import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.page.WebViewActivity
 import com.smjcco.wxpusher.push.ws.PushMsgDeviceMsg
-import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.base.ApplicationUtils
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 

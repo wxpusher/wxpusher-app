@@ -20,7 +20,7 @@ import com.smjcco.wxpusher.dialog.ActionSheetDialogFragment
 import com.smjcco.wxpusher.dialog.ActionSheetItem
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.PushManager
-import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.base.ApplicationUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WebViewUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
@@ -91,7 +91,7 @@ class WebDetailActivity : FragmentActivity() {
                         return@ActionSheetItem
                     }
                     val clipboardManager =
-                        ApplicationUtils.application.getSystemService(android.content.Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                        ApplicationUtils.application.getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
                     val clipData = android.content.ClipData.newPlainText("WxPusher", url)
                     clipboardManager.setPrimaryClip(clipData)
                     WxPusherUtils.toast("复制成功")

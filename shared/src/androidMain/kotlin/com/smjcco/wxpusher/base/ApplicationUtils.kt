@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.utils
+package com.smjcco.wxpusher.base
 
 import android.app.ActivityManager
 import android.app.Application
@@ -8,7 +8,7 @@ import android.os.Process
 object ApplicationUtils {
     lateinit var application: Application
     private val TAG = "AppInit"
-    
+
     /**
      * 初始化ApplicationUtils
      * @param app Application实例

@@ -3,7 +3,7 @@ package com.smjcco.wxpusher.web.update
 import android.util.Log
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.base.ApplicationUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import kotlinx.coroutines.launch

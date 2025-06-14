@@ -16,6 +16,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import com.smjcco.wxpusher.base.ApplicationUtils
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.log.WxPusherLog
 

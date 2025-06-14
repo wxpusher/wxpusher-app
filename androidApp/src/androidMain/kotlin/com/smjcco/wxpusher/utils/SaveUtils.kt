@@ -2,6 +2,7 @@ package com.smjcco.wxpusher.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import com.smjcco.wxpusher.base.ApplicationUtils
 
 object SaveUtils {
     private lateinit var sp: SharedPreferences

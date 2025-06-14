@@ -13,7 +13,7 @@ import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.push.ws.WsUtils
 import com.smjcco.wxpusher.push.xiaomi.XiaomiUtils
 import com.smjcco.wxpusher.utils.AppDataUtils
-import com.smjcco.wxpusher.utils.ApplicationUtils
+import com.smjcco.wxpusher.base.ApplicationUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
 
 /**
