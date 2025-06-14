@@ -1,0 +1,242 @@
+import UIKit
+import Moya
+import RxSwift
+import Toaster
+
+class WxpLoginViewController: UIViewController {
+    
+    // MARK: - Properties
+    private let provider = MoyaProvider<WxPusherApi>(plugins: [NetworkLoggerPlugin()])
+    private let viewModel = LoginViewVM()
+    private let loginService = WxpLoginService()
+    
+    // MARK: - UI Components
+    private lazy var titleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "用户登录"
+        label.font = .systemFont(ofSize: 34, weight: .bold)
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var subtitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "首次登录自动注册"
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = .gray
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var phoneTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "手机号"
+        textField.borderStyle = .roundedRect
+        textField.keyboardType = .numberPad
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
+    
+    private lazy var codeTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "验证码"
+        textField.borderStyle = .roundedRect
+        textField.keyboardType = .numberPad
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
+    
+    private lazy var getCodeButton: WxpCountdownButton = {
+        let button = WxpCountdownButton(type: .system)
+        button.setTitle("获取验证码", for: .normal)
+        button.backgroundColor = .systemBlue
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 4
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private lazy var loginButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("登录", for: .normal)
+        button.backgroundColor = .systemBlue
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 4
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private lazy var privacyCheckbox: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(systemName: "circle"), for: .normal)
+        button.setImage(UIImage(systemName: "checkmark.circle.fill"), for: .selected)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private lazy var privacyLabel: UILabel = {
+        let label = UILabel()
+        let attrText = NSMutableAttributedString()
+        attrText.append(NSAttributedString(string: "同意《"))
+        let titleText = "隐私协议和用户协议"
+        attrText.append(NSAttributedString(string: titleText, attributes: [.foregroundColor:UIColor.defAccentPrimaryColor,.link:true]))
+        attrText.append(NSAttributedString(string: "》"))
+        
+        label.attributedText = attrText
+        label.font = .systemFont(ofSize: 14)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.isUserInteractionEnabled = true
+        return label
+    }()
+    
+    private lazy var copyrightLabel: UILabel = {
+        let label = UILabel()
+        label.text = "© 2025 WxPusher"
+        label.font = .systemFont(ofSize: 12)
+        label.textColor = .gray
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    
+    // MARK: - Lifecycle
+    override func viewWillAppear(_ animated: Bool) {
+        navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        title = "登录"
+        setupUI()
+    }
+    
+    // MARK: - Setup
+    private func setupUI() {
+        view.backgroundColor = .systemBackground
+        
+        // Add subviews
+        view.addSubview(titleLabel)
+        view.addSubview(subtitleLabel)
+        view.addSubview(phoneTextField)
+        view.addSubview(codeTextField)
+        view.addSubview(getCodeButton)
+        view.addSubview(loginButton)
+        view.addSubview(privacyCheckbox)
+        view.addSubview(privacyLabel)
+        view.addSubview(copyrightLabel)
+        
+        // Setup constraints
+        NSLayoutConstraint.activate([
+            // 版权信息固定在底部
+            copyrightLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
+            copyrightLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            // 主体内容垂直居中
+            titleLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -120),
+            titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
+            subtitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
+            phoneTextField.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 24),
+            phoneTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            phoneTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            
+            codeTextField.topAnchor.constraint(equalTo: phoneTextField.bottomAnchor, constant: 12),
+            codeTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            codeTextField.trailingAnchor.constraint(equalTo: getCodeButton.leadingAnchor, constant: -12),
+            
+            getCodeButton.centerYAnchor.constraint(equalTo: codeTextField.centerYAnchor),
+            getCodeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            getCodeButton.widthAnchor.constraint(equalToConstant: 130),
+            getCodeButton.heightAnchor.constraint(equalToConstant: 40),
+            
+            loginButton.topAnchor.constraint(equalTo: codeTextField.bottomAnchor, constant: 12),
+            loginButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            loginButton.heightAnchor.constraint(equalToConstant: 40),
+            
+            privacyCheckbox.topAnchor.constraint(equalTo: loginButton.bottomAnchor, constant: 12),
+            privacyCheckbox.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+            
+            privacyLabel.centerYAnchor.constraint(equalTo: privacyCheckbox.centerYAnchor),
+            privacyLabel.leadingAnchor.constraint(equalTo: privacyCheckbox.trailingAnchor, constant: 8)
+        ])
+        
+        // Add actions
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(jumpPrivacy))
+        privacyLabel.addGestureRecognizer(tapGesture)
+        
+        getCodeButton.addTarget(self, action: #selector(getCodeButtonTapped), for: .touchUpInside)
+        loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
+        privacyCheckbox.addTarget(self, action: #selector(privacyCheckboxTapped), for: .touchUpInside)
+    }
+    
+   
+    
+    // MARK: - Actions
+    @objc private func jumpPrivacy(){
+        self.navigationController?.pushViewController(WebViewController(url: URL(string:StringConstants.privateUrl)!), animated: true)
+    }
+    
+    @objc private func getCodeButtonTapped() {
+        guard let phone = phoneTextField.text else { return }
+        if phone.isEmpty {
+            Toast(text:"请输入手机号").show()
+            return
+        }
+        (getCodeButton as UIButton).showLoading()
+        loginService.login(phone: phone) { [weak self] (result:Bool,error:String )in
+            (self?.getCodeButton as? UIButton)?.hideLoading()
+            if(result){
+                self?.getCodeButton.startCountdown(seconds: 120)
+                Toast(text: "发送成功").show()
+            }else{
+                Toast(text: error).show()
+            }
+        }
+    }
+    
+    @objc private func loginButtonTapped() {
+        guard let phone = phoneTextField.text else { return }
+        guard let code = codeTextField.text else { return }
+        
+        if phone.isEmpty {
+            Toast(text:"请输入手机号").show()
+            return
+        }
+        if code.isEmpty {
+            Toast(text:"请输入验证码").show()
+            return
+        }
+        
+        if code.count != 6{
+            Toast(text:"验证码错误").show()
+            return
+        }
+        
+        if !privacyCheckbox.isSelected {
+            Toast(text:"请先同意用户和隐私协议").show()
+            return
+        }
+        
+        loginButton.showLoading()
+        loginService.verifyCodeLogin(phone: phone, code: code) {[weak self] resp, error in
+            self?.loginButton.hideLoading()
+            if(error.count > 0){
+                Toast(text: error).show()
+            }else if(resp?.phoneHasRegister == true){
+                self?.navigationController?.setViewControllers([MainTabBarController()], animated: true)
+            }else if(resp?.phoneHasRegister == false){
+                self?.navigationController?.setViewControllers([WxpBindPhoneViewController(phone: phone, code: code, phoneVerifyCode: resp?.phoneVerifyCode ?? "")], animated: true)
+            }
+        }
+        
+    }
+    
+    @objc private func privacyCheckboxTapped() {
+        privacyCheckbox.isSelected.toggle()
+    }
+} 

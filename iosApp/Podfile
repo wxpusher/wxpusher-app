@@ -1,5 +1,50 @@
-target 'iosApp' do
-  use_frameworks!
-  platform :ios, '16.0'
-  pod 'shared', :path => '../shared'
+
+inhibit_all_warnings!
+use_modular_headers!
+
+def pods
+  pod 'Moya/RxSwift', '15.0.0'
+  pod 'ExytePopupView','1.2.1'
+
+  #    pod 'SnapKit'
+  #    pod 'Material'
+  #    pod 'KVOController'
+  #    pod 'SVProgressHUD'
+  #    pod 'FDFullscreenPopGesture'
+  #    pod 'Moya/RxSwift'
+  #    pod 'ObjectMapper'
+  #    pod 'SwiftyJSON'
+  #    pod 'DeviceKit'
+  #    pod 'IceCream'
+  #    pod 'CryptoSwift'
+  #    pod 'IQKeyboardManagerSwift'
+  #
+  #    pod 'RxSwift'
+  #    pod 'RxCocoa'
+  #    pod 'RxGesture'
+  #    pod 'RxDataSources'
+  #    pod 'NSObject+Rx'
+  #
+  #    pod 'MJRefresh'
+  #    pod 'Kingfisher'
+  #    pod 'DropDown'
 end
+
+
+target 'WxPusher-iOS' do
+  platform:ios,'13.0'
+  project "wxpusher/wxpusher.xcodeproj"
+  pods
+  pod 'Toaster', '2.3.0'
+  pod 'shared', :path => '../shared'
+  
+end
+
+target 'WxPusher-Mac' do
+  platform :osx, '11.0'
+  project "wxpusher/wxpusher.xcodeproj"
+  pods
+  
+end
+
+
