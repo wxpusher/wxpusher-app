@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher
+package com.smjcco.wxpusher_app
 
 interface Platform {
     val name: String

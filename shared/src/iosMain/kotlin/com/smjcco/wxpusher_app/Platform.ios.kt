@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher
+package com.smjcco.wxpusher_app
 
 import platform.UIKit.UIDevice
 

@@ -4,8 +4,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.composeMultiplatform)
-    alias(libs.plugins.composeCompiler)
 //    alias(libs.plugins.huawei.agconnect)
     //华为推送
     id("com.huawei.agconnect")
@@ -26,7 +24,6 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.androidx.activity.compose)
-            implementation(compose.preview)
             implementation(libs.androidx.core.ktx)
             implementation("androidx.work:work-runtime-ktx:2.10.0")
             implementation("com.squareup.okhttp3:okhttp:4.12.0")
@@ -51,12 +48,6 @@ kotlin {
             implementation("com.hihonor.mcs:push:8.0.12.307")
         }
         commonMain.dependencies {
-            implementation(compose.runtime)
-            implementation(compose.foundation)
-            implementation(compose.material)
-            implementation(compose.ui)
-            implementation(compose.components.resources)
-            implementation(compose.components.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(projects.shared)
@@ -138,6 +129,5 @@ dependencies {
         include("*.aar")
     })
     implementation(libs.androidx.core)
-    debugImplementation(compose.uiTooling)
 }
 

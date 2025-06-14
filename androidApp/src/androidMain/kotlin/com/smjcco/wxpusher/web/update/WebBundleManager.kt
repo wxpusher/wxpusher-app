@@ -105,7 +105,11 @@ object WebBundleManager {
      */
     private fun getNowVersion(): String {
         try {
-            return File(webDir, VERSION_FILE).readText()
+            val  text = File(webDir, VERSION_FILE).readText()
+            if(text.isEmpty()){
+                return "0.0.0"
+            }
+            return text
         } catch (e: Throwable) {
             e.printStackTrace()
         }
