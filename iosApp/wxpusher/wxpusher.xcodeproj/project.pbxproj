@@ -53,7 +53,6 @@
 		1A9C3E862DF5BB4A00A25249 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E852DF5BB4A00A25249 /* ProfileViewController.swift */; };
 		1A9C3E892DF5CB9800A25249 /* UIColor+Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E882DF5CB8F00A25249 /* UIColor+Color.swift */; };
 		1A9C3E8D2DF5DA8600A25249 /* WxpBindPhoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E8A2DF5DA8600A25249 /* WxpBindPhoneViewController.swift */; };
-		1A9C3E902DF72E1800A25249 /* WxpBindPhoneService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E8F2DF72E1800A25249 /* WxpBindPhoneService.swift */; };
 		1A9C3E922DF7352500A25249 /* UIButton+Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */; };
 		1A9C3E942DF9D66600A25249 /* WxpMessageListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E932DF9D66600A25249 /* WxpMessageListService.swift */; };
 		1A9C3E972DFE80E600A25249 /* WxpBaseMvpUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */; };
@@ -123,7 +122,6 @@
 		1A9C3E852DF5BB4A00A25249 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		1A9C3E882DF5CB8F00A25249 /* UIColor+Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Color.swift"; sourceTree = "<group>"; };
 		1A9C3E8A2DF5DA8600A25249 /* WxpBindPhoneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBindPhoneViewController.swift; sourceTree = "<group>"; };
-		1A9C3E8F2DF72E1800A25249 /* WxpBindPhoneService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBindPhoneService.swift; sourceTree = "<group>"; };
 		1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Loading.swift"; sourceTree = "<group>"; };
 		1A9C3E932DF9D66600A25249 /* WxpMessageListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpMessageListService.swift; sourceTree = "<group>"; };
 		1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBaseMvpUIViewController.swift; sourceTree = "<group>"; };
@@ -310,7 +308,6 @@
 		1A9C3E8C2DF5DA8600A25249 /* BindPhone */ = {
 			isa = PBXGroup;
 			children = (
-				1A9C3E8F2DF72E1800A25249 /* WxpBindPhoneService.swift */,
 				1A9C3E8A2DF5DA8600A25249 /* WxpBindPhoneViewController.swift */,
 			);
 			path = BindPhone;
@@ -598,7 +595,6 @@
 				1A5164722B14DD6F0000BA90 /* ProfileViewVM.swift in Sources */,
 				1A4715572AF782710089D7A7 /* NetError.swift in Sources */,
 				1ACCD5582AF9267B00841714 /* VerifyCodeLoginBean.swift in Sources */,
-				1A9C3E902DF72E1800A25249 /* WxpBindPhoneService.swift in Sources */,
 				1A9C3E7C2DF5A5B300A25249 /* WxpNetworkConstants.swift in Sources */,
 				1A51646F2B137E650000BA90 /* ProfileView.swift in Sources */,
 				1A9C3E782DF5A02E00A25249 /* MessageListViewController.swift in Sources */,

@@ -5,11 +5,8 @@ import Toaster
 import shared
 
 class WxpBindPhoneViewController: WxpBaseMvpUIViewController<IWxpBindPresenter>,IWxpBindView  {
-   
-    
     
     // MARK: - Properties
-    private let bindService = WxpBindPhoneService()
     private let phone: String
     private let code: String
     private var phoneVerifyCode: String
@@ -217,17 +214,11 @@ class WxpBindPhoneViewController: WxpBaseMvpUIViewController<IWxpBindPresenter>,
     // MARK: - Actions
     @objc private func copyCodeTapped() {
         UIPasteboard.general.string = phoneVerifyCode
-        Toast(text: "复制成功").show()
+        WxpToastUtils.shared.showToast(msg: "复制成功")
     }
     
     @objc private func checkStatusTapped() {
         presenter.queryBindStatus(phone: phone, verifyCode: code)
-//        bindService.loginWithVerifyCode(phone: phone, code: code) { success in
-//            if(success){
-//                self.navigationController?.setViewControllers([MainTabBarController()], animated: false)
-//            }
-//        }
-        
     }
     
     // MARK: - Helper Methods
