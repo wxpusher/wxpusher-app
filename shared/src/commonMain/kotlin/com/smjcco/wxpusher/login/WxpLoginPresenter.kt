@@ -1,20 +1,98 @@
 package com.smjcco.wxpusher.login
 
+import com.smjcco.wxpusher.api.WxpApiService
+import com.smjcco.wxpusher.base.WxpBaseInfoService
 import com.smjcco.wxpusher.base.WxpBaseMvpPresenter
+import com.smjcco.wxpusher.base.WxpScopeUtils
+import com.smjcco.wxpusher.base.WxpToastUtils
+import com.smjcco.wxpusher.base.runAtMainSuspend
+import com.smjcco.wxpusher.biz.common.WxpAppDataService
+import com.smjcco.wxpusher_app.Platform
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class WxpLoginPresenter(view: IWxpLoginView) : WxpBaseMvpPresenter<IWxpLoginView>(view),
     IWxpLoginPresenter {
+    //是否可以发送验证码
+    private var canSendVerifyCode = true
     override fun init() {
+        view?.onSendButtonText("发送验证码", false)
     }
 
-    override suspend fun sendVerifyCode(phone: String) {
+    fun sendTimeWait() {
+        runAtMainSuspend {
+            canSendVerifyCode = false
+            for (i in 120 downTo 0) {
+                if (i <= 0) {
+                    canSendVerifyCode = true
+                    view?.onSendButtonText("发送验证码", false)
+                    break
+                }
+                view?.onSendButtonText("${i}S", false)
+                delay(1000)
+            }
+        }
     }
 
-    override suspend fun verifyCodeLogin(
-        phone: String,
-        verifyCode: String
-    ): WxpLoginSendVerifyCodeResp {
-        TODO("Not yet implemented")
+    /**
+     * 发送验证码
+     */
+    override fun sendVerifyCode(phone: String?) {
+        if (!canSendVerifyCode) {
+            return
+        }
+        if (phone.isNullOrEmpty()) {
+            WxpToastUtils.showToast("请输入手机号")
+            return
+        }
+        runAtMainSuspend {
+            view?.onSendButtonText("发送中", true)
+            if (WxpApiService.sendVerifyCode(phone) == true) {
+                WxpToastUtils.showToast("发送成功")
+                sendTimeWait()
+            } else {
+                view?.onSendButtonText("发送验证码", false)
+            }
+        }
     }
 
+    /**
+     * 通过验证码登录
+     */
+    override fun verifyCodeLogin(
+        phone: String?,
+        verifyCode: String?
+    ) {
+        if (phone.isNullOrEmpty()) {
+            WxpToastUtils.showToast("请输入手机号")
+            return
+        }
+        if (verifyCode.isNullOrEmpty()) {
+            WxpToastUtils.showToast("请输入验证码")
+            return
+        }
+        if (verifyCode.length != 6) {
+            WxpToastUtils.showToast("验证码错误")
+            return
+        }
+
+        val req = WxpLoginSendVerifyCodeReq(
+            phone = phone,
+            code = verifyCode,
+            deviceId = WxpAppDataService.getLoginInfo()?.deviceId,
+            deviceName = WxpBaseInfoService.getDeviceName(),
+            pushToken = WxpAppDataService.getPushToken()
+        )
+
+        runAtMainSuspend {
+            val loginData = WxpApiService.verifyCodeLogin(req)
+            loginData?.let {
+                if (it.phoneHasRegister) {
+                    view?.onGoMain()
+                } else {
+                    view?.onGoBind(phone = phone, code = verifyCode, data = it)
+                }
+            }
+        }
+    }
 }

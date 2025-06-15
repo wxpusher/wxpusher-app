@@ -6,7 +6,7 @@ import com.smjcco.wxpusher.login.IWxpLoginView
 import com.smjcco.wxpusher.login.WxpLoginPresenter
 import com.smjcco.wxpusher.login.WxpLoginSendVerifyCodeResp
 
-class LoginActivity : WxpBaseActivity<IWxpLoginPresenter>(), IWxpLoginView {
+class LoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,15 +18,16 @@ class LoginActivity : WxpBaseActivity<IWxpLoginPresenter>(), IWxpLoginView {
         return WxpLoginPresenter(this)
     }
 
-    override fun sendButtonText(msg: String, loading: Boolean) {
+    override fun onSendButtonText(msg: String, loading: Boolean) {
         TODO("Not yet implemented")
     }
 
-    override fun goBind(data: WxpLoginSendVerifyCodeResp) {
+    override fun onGoBind(phone: String, code: String, data: WxpLoginSendVerifyCodeResp) {
         TODO("Not yet implemented")
     }
 
-    override fun goMain() {
+    override fun onGoMain() {
         TODO("Not yet implemented")
     }
+
 }

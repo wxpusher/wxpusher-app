@@ -2,8 +2,33 @@ import UIKit
 import Moya
 import RxSwift
 import Toaster
-
-class WxpLoginViewController: UIViewController {
+import shared
+class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWxpLoginView {
+    func createPresenter() -> Any? {
+        WxpLoginPresenter(view: self)
+    }
+    
+    func onGoBind(phone: String, code: String, data: WxpLoginSendVerifyCodeResp) {
+        navigationController?.setViewControllers([WxpBindPhoneViewController(phone: phone, code: code, phoneVerifyCode: data.phoneVerifyCode ?? "")], animated: true)
+    }
+    
+    func onGoMain() {
+        navigationController?.setViewControllers([MainTabBarController()], animated: true)
+    }
+    
+    func onSendButtonText(msg: String, loading: Bool) {
+        if(loading){
+            getCodeButton.showLoading()
+        }else{
+            getCodeButton.hideLoading()
+            getCodeButton.setTitle(msg, for: .normal)
+        }
+        
+    }
+    override func createPresenter() -> any IWxpLoginPresenter {
+        WxpLoginPresenter(view: self)
+    }
+    
     
     // MARK: - Properties
     private let provider = MoyaProvider<WxPusherApi>(plugins: [NetworkLoggerPlugin()])
@@ -183,25 +208,32 @@ class WxpLoginViewController: UIViewController {
     
     @objc private func getCodeButtonTapped() {
         guard let phone = phoneTextField.text else { return }
-        if phone.isEmpty {
-            Toast(text:"请输入手机号").show()
-            return
-        }
-        (getCodeButton as UIButton).showLoading()
-        loginService.login(phone: phone) { [weak self] (result:Bool,error:String )in
-            (self?.getCodeButton as? UIButton)?.hideLoading()
-            if(result){
-                self?.getCodeButton.startCountdown(seconds: 120)
-                Toast(text: "发送成功").show()
-            }else{
-                Toast(text: error).show()
-            }
-        }
+        presenter.sendVerifyCode(phone: phone)
+//        if phone.isEmpty {
+//            Toast(text:"请输入手机号").show()
+//            return
+//        }
+//        (getCodeButton as UIButton).showLoading()
+//        loginService.login(phone: phone) { [weak self] (result:Bool,error:String )in
+//            (self?.getCodeButton as? UIButton)?.hideLoading()
+//            if(result){
+//                self?.getCodeButton.startCountdown(seconds: 120)
+//                Toast(text: "发送成功").show()
+//            }else{
+//                Toast(text: error).show()
+//            }
+//        }
     }
     
     @objc private func loginButtonTapped() {
         guard let phone = phoneTextField.text else { return }
         guard let code = codeTextField.text else { return }
+        
+        if !privacyCheckbox.isSelected {
+            WxpToastUtils.shared.showToast(msg: "请先同意用户和隐私协议")
+            return
+        }
+        
         
         if phone.isEmpty {
             Toast(text:"请输入手机号").show()
@@ -217,10 +249,7 @@ class WxpLoginViewController: UIViewController {
             return
         }
         
-        if !privacyCheckbox.isSelected {
-            Toast(text:"请先同意用户和隐私协议").show()
-            return
-        }
+        presenter.verifyCodeLogin(phone: phone, verifyCode: code)
         
         loginButton.showLoading()
         loginService.verifyCodeLogin(phone: phone, code: code) {[weak self] resp, error in

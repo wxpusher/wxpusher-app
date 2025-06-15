@@ -1,6 +1,7 @@
 import UIKit
 import UserNotifications
 import Toaster
+import shared
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -12,12 +13,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         let sceneConfig = UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
        sceneConfig.delegateClass = SceneDelegate.self
-        
        return sceneConfig
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        print("[push]begin register push")
+        
+         //初始化
+         WxpConfig.shared.baseUrl = "https://wxpusher.zjiecode.com"
         // 设置根视图控制器
 //        let mainTabBarController = MainTabBarController()
 //        let navigationController = UINavigationController(rootViewController: mainTabBarController)

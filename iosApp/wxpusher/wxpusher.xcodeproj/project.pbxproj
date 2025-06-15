@@ -58,6 +58,7 @@
 		1A9C3E902DF72E1800A25249 /* WxpBindPhoneService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E8F2DF72E1800A25249 /* WxpBindPhoneService.swift */; };
 		1A9C3E922DF7352500A25249 /* UIButton+Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */; };
 		1A9C3E942DF9D66600A25249 /* WxpMessageListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E932DF9D66600A25249 /* WxpMessageListService.swift */; };
+		1A9C3E972DFE80E600A25249 /* WxpBaseMvpUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */; };
 		1AAD926C2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AAD926B2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift */; };
 		1AAD926D2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AAD926B2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift */; };
 		1AC210D82ACC57F1008D86EA /* CommonExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC210D72ACC57F1008D86EA /* CommonExt.swift */; };
@@ -129,6 +130,7 @@
 		1A9C3E8F2DF72E1800A25249 /* WxpBindPhoneService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBindPhoneService.swift; sourceTree = "<group>"; };
 		1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Loading.swift"; sourceTree = "<group>"; };
 		1A9C3E932DF9D66600A25249 /* WxpMessageListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpMessageListService.swift; sourceTree = "<group>"; };
+		1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBaseMvpUIViewController.swift; sourceTree = "<group>"; };
 		1AAD926B2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckBoxToggleStyle.swift; sourceTree = "<group>"; };
 		1AC210D72ACC57F1008D86EA /* CommonExt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommonExt.swift; sourceTree = "<group>"; };
 		1AC210DA2ACC581C008D86EA /* HomeTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
@@ -190,6 +192,7 @@
 				1A447DEF2DF53ECD005C402F /* MainTabBarController.swift */,
 				1A447DF12DF53ECD005C402F /* MessageService.swift */,
 				1A447DF32DF53ECD005C402F /* WebViewController.swift */,
+				1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */,
 			);
 			path = UiKitPage;
 			sourceTree = "<group>";
@@ -630,6 +633,7 @@
 				1A47154A2AED41550089D7A7 /* BaseResp.swift in Sources */,
 				1ADEF6A82ACDC0CF002FEB57 /* TestView.swift in Sources */,
 				1A7D79C82B086E9300C5F4F1 /* MessageListView.swift in Sources */,
+				1A9C3E972DFE80E600A25249 /* WxpBaseMvpUIViewController.swift in Sources */,
 				1A0EE8B02ACED91D004CCAD5 /* MessageHistoryView.swift in Sources */,
 				1AC210EC2ACD6DB6008D86EA /* ColorExt.swift in Sources */,
 				1A9C3E862DF5BB4A00A25249 /* ProfileViewController.swift in Sources */,
