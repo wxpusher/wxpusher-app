@@ -2,8 +2,10 @@ import UIKit
 import Moya
 import RxSwift
 import Toaster
+import shared
 
-class WxpBindPhoneViewController: UIViewController {
+class WxpBindPhoneViewController: WxpBaseMvpUIViewController<IWxpBindPresenter>,IWxpBindView  {
+   
     
     
     // MARK: - Properties
@@ -219,11 +221,12 @@ class WxpBindPhoneViewController: UIViewController {
     }
     
     @objc private func checkStatusTapped() {
-        bindService.loginWithVerifyCode(phone: phone, code: code) { success in
-            if(success){
-                self.navigationController?.setViewControllers([MainTabBarController()], animated: false)
-            }
-        }
+        presenter.queryBindStatus(phone: phone, verifyCode: code)
+//        bindService.loginWithVerifyCode(phone: phone, code: code) { success in
+//            if(success){
+//                self.navigationController?.setViewControllers([MainTabBarController()], animated: false)
+//            }
+//        }
         
     }
     
@@ -260,4 +263,11 @@ class WxpBindPhoneViewController: UIViewController {
         
         return container
     }
-} 
+    func onGoMain() {
+        navigationController?.setViewControllers([MainTabBarController()], animated: false)
+    }
+    
+    override func createPresenter() -> Any? {
+        WxpBindPresenter(view: self)
+    }
+}

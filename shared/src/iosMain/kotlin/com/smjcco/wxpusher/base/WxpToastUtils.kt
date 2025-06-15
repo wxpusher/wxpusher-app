@@ -5,7 +5,7 @@ import kotlinx.cinterop.ExperimentalForeignApi
 
 @OptIn(ExperimentalForeignApi::class)
 actual fun ExpWxpToastUtils_showToast(msg: String){
-    Toast(text = msg, delay = 0.0, duration = 3.0).show()
+    Toast(text = msg, delay = 0.0, duration = 2.0).show()
 //    val toast = Toast()
 //    toast.setText(msg)
 //    toast.show()
