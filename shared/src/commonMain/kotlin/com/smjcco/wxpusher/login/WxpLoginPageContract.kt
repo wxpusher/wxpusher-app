@@ -21,7 +21,7 @@ interface IWxpLoginView : IWxpBaseMvpView<IWxpLoginPresenter> {
     fun onGoMain()
 }
 
-interface IWxpLoginPresenter : IWxpBaseMvpPresenter<IWxpLoginView> {
+interface IWxpLoginPresenter : IWxpBaseMvpPresenter<IWxpLoginView, IWxpLoginPresenter> {
     /**
      * 初始化
      */

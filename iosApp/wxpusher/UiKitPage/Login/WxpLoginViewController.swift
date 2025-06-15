@@ -4,9 +4,6 @@ import RxSwift
 import Toaster
 import shared
 class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWxpLoginView {
-    func createPresenter() -> Any? {
-        WxpLoginPresenter(view: self)
-    }
     
     func onGoBind(phone: String, code: String, data: WxpLoginSendVerifyCodeResp) {
         navigationController?.setViewControllers([WxpBindPhoneViewController(phone: phone, code: code, phoneVerifyCode: data.phoneVerifyCode ?? "")], animated: true)
@@ -25,7 +22,7 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         }
         
     }
-    override func createPresenter() -> any IWxpLoginPresenter {
+    override func createPresenter() -> Any? {
         WxpLoginPresenter(view: self)
     }
     

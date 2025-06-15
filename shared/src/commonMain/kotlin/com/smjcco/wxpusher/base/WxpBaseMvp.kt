@@ -5,12 +5,13 @@ interface IWxpBaseMvpView<P> {
     fun createPresenter(): P
 }
 
-interface IWxpBaseMvpPresenter<V : IWxpBaseMvpView<*>> {
+interface IWxpBaseMvpPresenter<V : IWxpBaseMvpView<P>, P> {
     fun onShow()
     fun onDestroy()
 }
 
-abstract class WxpBaseMvpPresenter<V : IWxpBaseMvpView<*>>(var view: V?) : IWxpBaseMvpPresenter<V> {
+abstract class WxpBaseMvpPresenter<V : IWxpBaseMvpView<P>, P>(var view: V?) :
+    IWxpBaseMvpPresenter<V, P> {
     override fun onShow() {
 
     }

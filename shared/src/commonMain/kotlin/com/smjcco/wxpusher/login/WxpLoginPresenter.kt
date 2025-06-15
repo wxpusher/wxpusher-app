@@ -11,7 +11,7 @@ import com.smjcco.wxpusher_app.Platform
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-class WxpLoginPresenter(view: IWxpLoginView) : WxpBaseMvpPresenter<IWxpLoginView>(view),
+class WxpLoginPresenter(view: IWxpLoginView) : WxpBaseMvpPresenter<IWxpLoginView, IWxpLoginPresenter>(view),
     IWxpLoginPresenter {
     //是否可以发送验证码
     private var canSendVerifyCode = true

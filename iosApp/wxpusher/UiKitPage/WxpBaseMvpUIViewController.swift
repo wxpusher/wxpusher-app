@@ -16,7 +16,8 @@ class WxpBaseMvpUIViewController<P: IWxpBaseMvpPresenter>: UIViewController {
     var presenter: P!
     
     // 创建 Presenter 的方法 - 子类必须实现
-    func createPresenter() -> P {
+    // 这里主要是为了和IVew匹配，所以返回 Any? 后面强制转型一下
+    func createPresenter() -> Any? {
         fatalError("Must override createPresenter()")
     }
     
@@ -26,7 +27,7 @@ class WxpBaseMvpUIViewController<P: IWxpBaseMvpPresenter>: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        presenter = createPresenter()
+        presenter = (createPresenter() as! P)
         
     }
     
