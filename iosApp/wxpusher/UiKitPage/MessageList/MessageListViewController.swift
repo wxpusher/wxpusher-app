@@ -1,8 +1,10 @@
 import UIKit
 import Moya
 import RxSwift
+import shared
 
-class MessageListViewController: UIViewController {
+class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPresenter>,IWxpMessageListView  {
+    
     
     private let tableView = UITableView()
     private let refreshControl = UIRefreshControl()
@@ -50,19 +52,19 @@ class MessageListViewController: UIViewController {
         initNavigationBar()
         hideSearchBar()
         
-        loadData()
+        presenter.refresh(key:nil)
     }
     
     
     private func initNavigationBar() {
         let searchButton = UIBarButtonItem(image: UIImage(systemName: "magnifyingglass"),
-                                         style: .plain,
-                                         target: self,
-                                         action: #selector(showSearchBar))
+                                           style: .plain,
+                                           target: self,
+                                           action: #selector(showSearchBar))
         let optionsButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"),
-                                          style: .plain,
-                                          target: self,
-                                          action: #selector(optionsTapped))
+                                            style: .plain,
+                                            target: self,
+                                            action: #selector(optionsTapped))
         self.originalRightBarItems = [optionsButton, searchButton]
         self.mainTabVC.navigationItem.rightBarButtonItems = self.originalRightBarItems
         self.titleView = self.mainTabVC.navigationItem.titleView
@@ -88,7 +90,7 @@ class MessageListViewController: UIViewController {
     private func hideSearchBar() {
         UIView.animate(withDuration: 0.3) {
             self.searchBar.alpha = 0
-//            self.searchBar.text = ""
+            //            self.searchBar.text = ""
             self.searchBar.resignFirstResponder()
             self.mainTabVC.navigationItem.rightBarButtonItems = self.originalRightBarItems
             self.mainTabVC.navigationItem.titleView = self.titleView
@@ -169,9 +171,7 @@ class MessageListViewController: UIViewController {
     }
     
     @objc private func refreshData() {
-        currentPage = 1
-        hasMore = true
-        loadData()
+        presenter.refresh(key:nil)
     }
     
     private func loadDataFinish(){
@@ -214,7 +214,30 @@ class MessageListViewController: UIViewController {
     }
     private func gotoLogin(){
         self.navigationController?.setViewControllers([WxpLoginViewController()], animated: false)
-            //  self.navigationController?.setViewControllers([WxpBindPhoneViewController(phone: "1", code: "111112", phoneVerifyCode: "3")], animated: false)
+        //  self.navigationController?.setViewControllers([WxpBindPhoneViewController(phone: "1", code: "111112", phoneVerifyCode: "3")], animated: false)
+    }
+    
+    // MARK: - MVP-VIEW
+    
+    func onMessageList(data: [WxpMessageListMessage]) {
+        
+    }
+    
+    func showMessageMoreLoading(loading: Bool) {
+        
+    }
+    
+    func showMessageRefreshing(refreshing: Bool) {
+        if(refreshing){
+            refreshControl.attributedTitle = NSAttributedString(string: "刷新中...")
+            refreshControl.beginRefreshing()
+        }else{
+            loadDataFinish()
+        }
+    }
+    
+    override func createPresenter() -> Any? {
+        WxpMessageListPresenter(view: self)
     }
 }
 
@@ -227,7 +250,7 @@ extension MessageListViewController: UISearchBarDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         // 处理搜索
         print("搜索内容: \(searchBar.text ?? "")")
-//        hideSearchBar()
+        //        hideSearchBar()
     }
 }
 
@@ -261,9 +284,9 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         let contentHeight = scrollView.contentSize.height
         let screenHeight = scrollView.frame.size.height
         
-//        if offsetY > contentHeight - screenHeight * 1.5 {
-//            loadData()
-//        }
+        //        if offsetY > contentHeight - screenHeight * 1.5 {
+        //            loadData()
+        //        }
     }
 }
 
@@ -293,10 +316,10 @@ class MessageCell: UITableViewCell {
         containerView.layer.shadowRadius = 4
         
         titleLabel.numberOfLines = 2
-//        titleLabel.font = .headline
+        //        titleLabel.font = .headline
         titleLabel.textColor = .label
         
-//        sourceLabel.font = .subheadline
+        //        sourceLabel.font = .subheadline
         sourceLabel.textColor = .secondaryLabel
         
         contentView.addSubview(containerView)
@@ -328,4 +351,5 @@ class MessageCell: UITableViewCell {
         titleLabel.text = message.summary
         sourceLabel.text = "来源：\(message.name)"
     }
-} 
+    
+}

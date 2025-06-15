@@ -5,16 +5,16 @@ import com.smjcco.wxpusher.base.WxpNetworkService
 import com.smjcco.wxpusher.base.WxpToastUtils
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
+import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
+import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
 import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
-import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 
 class BizError(val code: Int, val msg: String) : RuntimeException()
 object WxpApiService {
@@ -65,6 +65,19 @@ object WxpApiService {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .post(WxpNetworkService.getUrl("/api/device/verify-code-login")) {
                     setBody(req)
+                }.body()
+        })
+    }
+
+    /**
+     * 获取消息列表的数据
+     */
+    suspend fun fetchMessageList(req: WxpMessageListReq): List<WxpMessageListMessage>? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .get(WxpNetworkService.getUrl("/api/need-login/device/message-list-v2")) {
+                    parameter("lastUserReceiveRecordId", req.lastUserReceiveRecordId)
+                    parameter("key", req.key)
                 }.body()
         })
     }

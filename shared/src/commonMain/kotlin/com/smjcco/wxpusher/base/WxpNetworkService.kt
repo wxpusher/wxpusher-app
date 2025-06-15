@@ -30,6 +30,7 @@ object WxpNetworkService {
             json(Json {
                 prettyPrint = true
                 ignoreUnknownKeys = true
+                explicitNulls = false
             })
         }
 
