@@ -1,7 +1,9 @@
 package com.smjcco.wxpusher.biz.common
 
+import com.smjcco.wxpusher.base.WxpBaseInfoService
 import com.smjcco.wxpusher.base.WxpSaveService
 import com.smjcco.wxpusher.biz.bean.WxpLoginInfo
+import com.smjcco.wxpusher.biz.bean.WxpPlatformEnum
 import kotlinx.serialization.json.Json
 
 object WxpAppDataService {
@@ -11,6 +13,27 @@ object WxpAppDataService {
     private const val WebKey = "WebKey"
     private const val WsUrlKey = "WsUrlKey"
 
+    private const val mergeIOSDataHasRun = "mergeIOSDataHasRun"
+
+    /**
+     * 针对iOS，第一次启动的时候，进行一次数据迁移，避免用户重新登录
+     */
+    fun mergeIOSData() {
+        if (WxpBaseInfoService.getPlatform() != WxpPlatformEnum.iOS.platform) {
+            return
+        }
+        if (WxpSaveService.get(mergeIOSDataHasRun, false)) {
+            return
+        }
+        //把iOS的数据，读取出来，存档到新的方式里面，避免用户重新登录
+        val uid = WxpSaveService.get("sp_uid", "")
+        val deviceId = WxpSaveService.get("deviceId", "")
+        val deviceToken = WxpSaveService.get("deviceToken", "")
+        val pushToken = WxpSaveService.get("pushToken", "")
+        saveLoginInfo(WxpLoginInfo(deviceToken, deviceId, uid))
+        savePushToken(pushToken)
+        WxpSaveService.set(mergeIOSDataHasRun, true)
+    }
 
     /**
      * 获取登陆信息
@@ -27,16 +50,16 @@ object WxpAppDataService {
     /**
      * 返回string类型，方便给到容器
      */
-    fun getLoginInfoStr(): String? {
+    private fun getLoginInfoStr(): String? {
         return WxpSaveService.get(SaveLoginInfoKey, "")
     }
 
-    /**
-     * 保存登陆信息
-     */
-    fun saveLoginInfo(loginInfoStr: String?) {
-        WxpSaveService.set(SaveLoginInfoKey, loginInfoStr)
-    }
+//    /**
+//     * 保存登陆信息
+//     */
+//    fun saveLoginInfo(loginInfoStr: String?) {
+//        WxpSaveService.set(SaveLoginInfoKey, loginInfoStr)
+//    }
 
     fun saveLoginInfo(loginInfo: WxpLoginInfo) {
         WxpSaveService.set(SaveLoginInfoKey, Json.encodeToString(loginInfo))

@@ -32,7 +32,6 @@ class MainTabBarController: UITabBarController {
         self.selectedIndex = 0
         self.title = controllers[self.selectedIndex].title
         
-        Greeting().toast()
     }
     
     private func setupAppearance() {

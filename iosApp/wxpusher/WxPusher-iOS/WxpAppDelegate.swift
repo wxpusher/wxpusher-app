@@ -18,8 +18,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
+        //迁移一次iOS的老版本的数据，避免用户重新登录
+        WxpAppDataService.shared.mergeIOSData()
+        
          //初始化
          WxpConfig.shared.baseUrl = "https://wxpusher.zjiecode.com"
+        
+        
 //        WxpConfig.shared.baseUrl = "http://127.0.0.1:6100"
         // 设置根视图控制器
 //        let mainTabBarController = MainTabBarController()

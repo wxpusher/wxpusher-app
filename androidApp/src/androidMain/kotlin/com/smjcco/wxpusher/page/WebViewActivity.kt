@@ -25,7 +25,6 @@ import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WebViewUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
 import com.smjcco.wxpusher.web.update.WebBundleManager
-import com.smjcco.wxpusher_app.Greeting
 import com.tencent.upgrade.core.DefaultUpgradeStrategyRequestCallback
 import com.tencent.upgrade.core.UpgradeManager
 import com.xiaomi.mipush.sdk.MiPushMessage
