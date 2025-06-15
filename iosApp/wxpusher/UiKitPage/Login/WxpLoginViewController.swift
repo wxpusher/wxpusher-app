@@ -5,33 +5,6 @@ import Toaster
 import shared
 class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWxpLoginView {
     
-    func onGoBind(phone: String, code: String, data: WxpLoginSendVerifyCodeResp) {
-        navigationController?.setViewControllers([WxpBindPhoneViewController(phone: phone, code: code, phoneVerifyCode: data.phoneVerifyCode ?? "")], animated: true)
-    }
-    
-    func onGoMain() {
-        navigationController?.setViewControllers([MainTabBarController()], animated: true)
-    }
-    
-    func onSendButtonText(msg: String, loading: Bool) {
-        if(loading){
-            getCodeButton.showLoading()
-        }else{
-            getCodeButton.hideLoading()
-            getCodeButton.setTitle(msg, for: .normal)
-        }
-        
-    }
-    override func createPresenter() -> Any? {
-        WxpLoginPresenter(view: self)
-    }
-    
-    
-    // MARK: - Properties
-    private let provider = MoyaProvider<WxPusherApi>(plugins: [NetworkLoggerPlugin()])
-    private let viewModel = LoginViewVM()
-    private let loginService = WxpLoginService()
-    
     // MARK: - UI Components
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -70,8 +43,8 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         return textField
     }()
     
-    private lazy var getCodeButton: WxpCountdownButton = {
-        let button = WxpCountdownButton(type: .system)
+    private lazy var getCodeButton: UIButton = {
+        let button = UIButton(type: .system)
         button.setTitle("获取验证码", for: .normal)
         button.backgroundColor = .systemBlue
         button.setTitleColor(.white, for: .normal)
@@ -206,20 +179,6 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
     @objc private func getCodeButtonTapped() {
         guard let phone = phoneTextField.text else { return }
         presenter.sendVerifyCode(phone: phone)
-//        if phone.isEmpty {
-//            Toast(text:"请输入手机号").show()
-//            return
-//        }
-//        (getCodeButton as UIButton).showLoading()
-//        loginService.login(phone: phone) { [weak self] (result:Bool,error:String )in
-//            (self?.getCodeButton as? UIButton)?.hideLoading()
-//            if(result){
-//                self?.getCodeButton.startCountdown(seconds: 120)
-//                Toast(text: "发送成功").show()
-//            }else{
-//                Toast(text: error).show()
-//            }
-//        }
     }
     
     @objc private func loginButtonTapped() {
@@ -231,38 +190,33 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
             return
         }
         
-        
-        if phone.isEmpty {
-            Toast(text:"请输入手机号").show()
-            return
-        }
-        if code.isEmpty {
-            Toast(text:"请输入验证码").show()
-            return
-        }
-        
-        if code.count != 6{
-            Toast(text:"验证码错误").show()
-            return
-        }
-        
         presenter.verifyCodeLogin(phone: phone, verifyCode: code)
-        
-        loginButton.showLoading()
-        loginService.verifyCodeLogin(phone: phone, code: code) {[weak self] resp, error in
-            self?.loginButton.hideLoading()
-            if(error.count > 0){
-                Toast(text: error).show()
-            }else if(resp?.phoneHasRegister == true){
-                self?.navigationController?.setViewControllers([MainTabBarController()], animated: true)
-            }else if(resp?.phoneHasRegister == false){
-                self?.navigationController?.setViewControllers([WxpBindPhoneViewController(phone: phone, code: code, phoneVerifyCode: resp?.phoneVerifyCode ?? "")], animated: true)
-            }
-        }
         
     }
     
     @objc private func privacyCheckboxTapped() {
         privacyCheckbox.isSelected.toggle()
     }
-} 
+    
+    // MARK: - MVP-VIEW
+    func onGoBind(phone: String, code: String, data: WxpLoginSendVerifyCodeResp) {
+        navigationController?.setViewControllers([WxpBindPhoneViewController(phone: phone, code: code, phoneVerifyCode: data.phoneVerifyCode ?? "")], animated: true)
+    }
+    
+    func onGoMain() {
+        navigationController?.setViewControllers([MainTabBarController()], animated: true)
+    }
+    
+    func onSendButtonText(msg: String, loading: Bool) {
+        if(loading){
+            getCodeButton.showLoading()
+        }else{
+            getCodeButton.hideLoading()
+            getCodeButton.setTitle(msg, for: .normal)
+        }
+        
+    }
+    override func createPresenter() -> Any? {
+        WxpLoginPresenter(view: self)
+    }
+}
