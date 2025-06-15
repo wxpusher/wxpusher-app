@@ -1,20 +1,20 @@
 package com.smjcco.wxpusher.api
 
-import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.base.BaseResp
 import com.smjcco.wxpusher.base.WxpNetworkService
 import com.smjcco.wxpusher.base.WxpToastUtils
-import com.smjcco.wxpusher.login.WxpLoginSendVerifyCodeReq
-import com.smjcco.wxpusher.login.WxpLoginSendVerifyCodeResp
+import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
+import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 import io.ktor.client.call.body
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import io.ktor.http.encodedPath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 
 class BizError(val code: Int, val msg: String) : RuntimeException()
 object WxpApiService {
@@ -55,7 +55,6 @@ object WxpApiService {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .post(WxpNetworkService.getUrl("/api/device/send-verify-code")) {
-                    contentType(ContentType.Application.Json)
                     setBody(mapOf("phone" to phone))
                 }.body()
         })
@@ -65,26 +64,8 @@ object WxpApiService {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .post(WxpNetworkService.getUrl("/api/device/verify-code-login")) {
-                    contentType(ContentType.Application.Json)
                     setBody(req)
                 }.body()
         })
     }
-
-    /**
-     * 验证码登录
-     */
-    suspend fun verifyCodeLogin(phone: String): Boolean? {
-        return commonRespDeal(block = {
-            return@commonRespDeal WxpNetworkService.getWxpHttpClient().post {
-                contentType(ContentType.Application.Json)
-                url {
-                    host = WxpConfig.baseUrl
-                    encodedPath = "api/device/verify-code-login"
-                }
-                setBody(mapOf("phone" to phone))
-            }.body()
-        })
-    }
-
 }

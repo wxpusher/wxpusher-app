@@ -105,6 +105,7 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         super.viewDidLoad()
         title = "登录"
         setupUI()
+        presenter.doInit()
     }
     
     // MARK: - Setup

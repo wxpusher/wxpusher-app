@@ -38,6 +38,10 @@ object WxpAppDataService {
         WxpSaveService.set(SaveLoginInfoKey, loginInfoStr)
     }
 
+    fun saveLoginInfo(loginInfo: WxpLoginInfo) {
+        WxpSaveService.set(SaveLoginInfoKey, Json.encodeToString(loginInfo))
+    }
+
     /**
      * 获取pushToken
      */

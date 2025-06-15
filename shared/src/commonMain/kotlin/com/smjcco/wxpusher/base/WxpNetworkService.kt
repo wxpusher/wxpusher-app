@@ -4,26 +4,38 @@ import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.biz.common.WxpAppDataService
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.DEFAULT
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.header
+import io.ktor.http.ContentType
 import io.ktor.http.URLBuilder
-import io.ktor.http.buildUrl
+import io.ktor.http.contentType
 import io.ktor.http.encodedPath
-import io.ktor.http.headers
-import io.ktor.http.parseUrl
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 
 object WxpNetworkService {
-    private val client = HttpClient() {
+    private val client = HttpClient {
+        defaultRequest {
+            contentType(ContentType.Application.Json)
+            header("deviceToken", WxpAppDataService.getLoginInfo()?.deviceToken ?: "")
+            header("versionName", WxpBaseInfoService.getAppVersionName())
+            header("platform", WxpBaseInfoService.getPlatform())
+        }
         install(ContentNegotiation) {
             json(Json {
                 prettyPrint = true
                 ignoreUnknownKeys = true
             })
-            headers {
-                append("deviceToken", WxpAppDataService.getLoginInfo()?.deviceToken ?: "")
-                append("versionName", WxpBaseInfoService.getAppVersionName())
-            }
+        }
+
+        install(Logging) {
+            level = LogLevel.ALL
+            logger = Logger.DEFAULT
         }
     }
 

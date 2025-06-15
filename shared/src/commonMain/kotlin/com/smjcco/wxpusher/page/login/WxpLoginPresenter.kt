@@ -1,17 +1,16 @@
-package com.smjcco.wxpusher.login
+package com.smjcco.wxpusher.page.login
 
 import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.WxpBaseInfoService
 import com.smjcco.wxpusher.base.WxpBaseMvpPresenter
-import com.smjcco.wxpusher.base.WxpScopeUtils
 import com.smjcco.wxpusher.base.WxpToastUtils
 import com.smjcco.wxpusher.base.runAtMainSuspend
+import com.smjcco.wxpusher.biz.bean.WxpLoginInfo
 import com.smjcco.wxpusher.biz.common.WxpAppDataService
-import com.smjcco.wxpusher_app.Platform
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
-class WxpLoginPresenter(view: IWxpLoginView) : WxpBaseMvpPresenter<IWxpLoginView, IWxpLoginPresenter>(view),
+class WxpLoginPresenter(view: IWxpLoginView) :
+    WxpBaseMvpPresenter<IWxpLoginView, IWxpLoginPresenter>(view),
     IWxpLoginPresenter {
     //是否可以发送验证码
     private var canSendVerifyCode = true
@@ -88,6 +87,12 @@ class WxpLoginPresenter(view: IWxpLoginView) : WxpBaseMvpPresenter<IWxpLoginView
             val loginData = WxpApiService.verifyCodeLogin(req)
             loginData?.let {
                 if (it.phoneHasRegister) {
+                    val loginInfo = WxpLoginInfo(
+                        deviceId = it.deviceId,
+                        deviceToken = it.deviceToken,
+                        uid = it.uid
+                    )
+                    WxpAppDataService.saveLoginInfo(loginInfo)
                     view?.onGoMain()
                 } else {
                     view?.onGoBind(phone = phone, code = verifyCode, data = it)

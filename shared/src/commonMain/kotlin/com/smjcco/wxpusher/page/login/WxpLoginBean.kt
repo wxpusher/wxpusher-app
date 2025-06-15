@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.login
+package com.smjcco.wxpusher.page.login
 
 import kotlinx.serialization.Serializable
 

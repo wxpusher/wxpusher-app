@@ -25,7 +25,7 @@ kotlin {
         summary = "Some description for the Shared Module"
         homepage = "Link to the Shared Module homepage"
         version = "1.0"
-        ios.deploymentTarget = "16.0"
+        ios.deploymentTarget = "13.0"
         podfile = project.file("../iosApp/Podfile")
         framework {
             baseName = "shared"
@@ -43,6 +43,7 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
             implementation(libs.kotlinx.coroutines.core)
             implementation(libs.kotlinx.coroutines.core)
         }

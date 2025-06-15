@@ -20,6 +20,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
          //初始化
          WxpConfig.shared.baseUrl = "https://wxpusher.zjiecode.com"
+//        WxpConfig.shared.baseUrl = "http://127.0.0.1:6100"
         // 设置根视图控制器
 //        let mainTabBarController = MainTabBarController()
 //        let navigationController = UINavigationController(rootViewController: mainTabBarController)

@@ -1,10 +1,10 @@
 package com.smjcco.wxpusher.v2
 
 import android.os.Bundle
-import com.smjcco.wxpusher.login.IWxpLoginPresenter
-import com.smjcco.wxpusher.login.IWxpLoginView
-import com.smjcco.wxpusher.login.WxpLoginPresenter
-import com.smjcco.wxpusher.login.WxpLoginSendVerifyCodeResp
+import com.smjcco.wxpusher.page.login.IWxpLoginPresenter
+import com.smjcco.wxpusher.page.login.IWxpLoginView
+import com.smjcco.wxpusher.page.login.WxpLoginPresenter
+import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 
 class LoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView {
 
