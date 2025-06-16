@@ -27,6 +27,16 @@ interface IWxpMessageListPresenter :
     IWxpBaseMvpPresenter<IWxpMessageListView, IWxpMessageListPresenter> {
 
     /**
+     * 初始化，使用本地数据渲染，在数据没有回来之前，把消息列表页面渲染出来
+     */
+    fun init()
+
+    /**
+     * 当收到新的消息，把数据插入到了列表里面
+     */
+    fun onReceiveNewMessage(message: WxpMessageListMessage);
+
+    /**
      * 如果关键字改变， 就调用这个方法，如果关键字改变了，就会刷新搜索
      */
     fun searchIfChanged(key: String?)

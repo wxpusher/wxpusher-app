@@ -15,6 +15,7 @@ import io.ktor.client.request.setBody
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
+import kotlinx.io.IOException
 
 class BizError(val code: Int, val msg: String) : RuntimeException()
 object WxpApiService {
@@ -39,7 +40,11 @@ object WxpApiService {
         } catch (e: Throwable) {
             e.printStackTrace()
             if (toastError) {
-                WxpToastUtils.showToast(e.message)
+                if (e is IOException) {
+                    WxpToastUtils.showToast("请检查网络")
+                } else {
+                    WxpToastUtils.showToast(e.message)
+                }
             } else {
                 errorBlock?.invoke(e)
             }

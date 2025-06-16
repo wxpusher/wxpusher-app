@@ -2,13 +2,19 @@ package com.smjcco.wxpusher.page.messagelist
 
 import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.WxpBaseMvpPresenter
+import com.smjcco.wxpusher.base.WxpSaveService
+import com.smjcco.wxpusher.base.letOnNotEmpty
 import com.smjcco.wxpusher.base.runAtMainSuspend
+import kotlinx.serialization.json.Json
 
 class WxpMessageListPresenter(view: IWxpMessageListView) :
     WxpBaseMvpPresenter<IWxpMessageListView, IWxpMessageListPresenter>(view),
     IWxpMessageListPresenter {
     //当前页面的列表的数据
     private var messageListData: MutableList<WxpMessageListMessage> = mutableListOf()
+
+    private val SaveCacheKey = "MessageSaveCacheKey"
+
 
     //前页面的最后一条消息id
     private var lastUserReceiveRecordId = Long.MAX_VALUE
@@ -20,6 +26,28 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             this.key = key
             refresh()
         }
+    }
+
+    override fun init() {
+        val messageDataStr = WxpSaveService.get(SaveCacheKey, "")
+        messageDataStr.letOnNotEmpty {
+            messageListData = Json.decodeFromString(it)
+            view?.onMessageList(messageListData.toList())
+        }
+    }
+
+    override fun onReceiveNewMessage(message: WxpMessageListMessage) {
+        // 找到第一个 id 小于新消息 id 的位置
+        val insertIndex = messageListData.indexOfFirst { it.id < message.id }
+        if (insertIndex == -1) {
+            // 如果没有找到更小的 id，说明新消息的 id 是最小的，添加到列表末尾
+            messageListData.add(message)
+        } else {
+            // 在找到的位置插入新消息
+            messageListData.add(insertIndex, message)
+        }
+        // 通知视图更新
+        view?.onMessageList(messageListData.toList())
     }
 
     override fun refresh() {
@@ -34,8 +62,17 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
                 lastUserReceiveRecordId = messageListData.lastOrNull()?.id ?: Long.MAX_VALUE
                 hasMore = true
                 view?.onMessageList(messageListData.toList())
+                saveRefreshListData()
             }
         }
+    }
+
+    /**
+     * 保存一下第一页的数据，方便下次启动的时候用缓存渲染
+     */
+    private fun saveRefreshListData() {
+        val dataStr = Json.encodeToString(messageListData)
+        WxpSaveService.set(SaveCacheKey, dataStr)
     }
 
     override fun loadMore() {

@@ -53,6 +53,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         initNavigationBar()
         hideSearchBar()
         
+        presenter.doInit()
         presenter.refresh()
     }
     
@@ -341,14 +342,14 @@ class MessageCell: UITableViewCell {
         
         NSLayoutConstraint.activate([
             // Unread dot constraints
-            unreadDot.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
-            unreadDot.lastBaselineAnchor.constraint(equalTo: messageLabel.firstBaselineAnchor),
+            unreadDot.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 6),
+            unreadDot.lastBaselineAnchor.constraint(equalTo: messageLabel.firstBaselineAnchor,constant: -3),
             unreadDot.widthAnchor.constraint(equalToConstant: 6),
             unreadDot.heightAnchor.constraint(equalToConstant: 6),
             
             // Message label constraints
             messageLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
-            messageLabel.leadingAnchor.constraint(equalTo: unreadDot.trailingAnchor, constant: 5),
+            messageLabel.leadingAnchor.constraint(equalTo: unreadDot.trailingAnchor, constant: 4),
             messageLabel.trailingAnchor.constraint(lessThanOrEqualTo: linkImageView.leadingAnchor, constant: -8),
             
             // Link image view constraints (与标题第一行对齐)

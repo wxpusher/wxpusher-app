@@ -1,6 +1,6 @@
 package com.smjcco.wxpusher.base
 
-public inline fun Any?.letOnNotEmpty(run: (Any) -> Unit) {
+inline fun <T> T?.letOnNotEmpty(run: (T) -> Unit) {
     if (this == null) {
         return
     }
