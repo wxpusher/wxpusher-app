@@ -115,11 +115,20 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         
         tableView.delegate = self
         tableView.dataSource = self
-        tableView.prefetchDataSource = self
+//        tableView.prefetchDataSource = self
         tableView.register(MessageCell.self, forCellReuseIdentifier: "MessageCell")
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 100
         tableView.separatorStyle = .none
+        
+        let footerView = UILabel()
+        footerView.text = "只保留最近7天消息，没有更多数据了"
+        footerView.textColor = UIColor.defFontSecondColor
+        footerView.font = .systemFont(ofSize: 12)
+        footerView.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 60)
+        footerView.textAlignment = .center
+        tableView.tableFooterView = footerView
+        
         
         // 添加空状态视图
         let emptyView = UIView()
@@ -252,24 +261,41 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
             let webVC = WebViewController(url: url)
             navigationController?.pushViewController(webVC, animated: true)
         }
+        
     }
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        if indexPath.row == messageList.count - 1 {
+            print("加载更多")
+        }
+    }
+//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+//        let offsetY = scrollView.contentOffset.y
+//        let contentHeight = scrollView.contentSize.height
+//        let scrollViewHeight = scrollView.frame.size.height
+//        
+//        // 当滚动到距离底部一定距离时加载（例如50pt）
+//        if offsetY > contentHeight - scrollViewHeight - 50 {
+////            presenter.loadMore()
+//            print("加载更多")
+//        }
+//    }
     
 }
 
-extension MessageListViewController: UITableViewDataSourcePrefetching {
-    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        let needLoad = indexPaths.contains { indexPath in
-            let lastSection = tableView.numberOfSections - 1
-            let lastRow = tableView.numberOfRows(inSection: lastSection) - 1
-            return indexPath.section == lastSection && indexPath.row == lastRow
-        }
-        
-        if needLoad {
-            print("加载更多")
-            presenter.loadMore()
-        }
-    }
-}
+//extension MessageListViewController: UITableViewDataSourcePrefetching {
+//    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+//        let needLoad = indexPaths.contains { indexPath in
+//            let lastSection = tableView.numberOfSections - 1
+//            let lastRow = tableView.numberOfRows(inSection: lastSection) - 1
+//            return indexPath.section == lastSection && indexPath.row == lastRow
+//        }
+//        
+//        if needLoad {
+//            print("加载更多")
+////            presenter.loadMore()
+//        }
+//    }
+//}
 
 import UIKit
 
@@ -372,7 +398,6 @@ class MessageCell: UITableViewCell {
     }
     
     // MARK: - Configuration
-    
     func configure(message:WxpMessageListMessage) {
         messageLabel.text = message.summary
         sourceLabel.text = "来源: \(message.name ?? "")"
@@ -382,67 +407,3 @@ class MessageCell: UITableViewCell {
         
     }
 }
-
-//class MessageCell: UITableViewCell {
-//    private let containerView = UIView()
-//    private let titleLabel = UILabel()
-//    private let sourceLabel = UILabel()
-//
-//    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-//        super.init(style: style, reuseIdentifier: reuseIdentifier)
-//        setupUI()
-//    }
-//
-//    required init?(coder: NSCoder) {
-//        fatalError("init(coder:) has not been implemented")
-//    }
-//
-//    private func setupUI() {
-//        selectionStyle = .none
-//        backgroundColor = .clear
-//
-//        containerView.backgroundColor = .systemBackground
-//        containerView.layer.cornerRadius = 8
-//        containerView.layer.shadowColor = UIColor.black.cgColor
-//        containerView.layer.shadowOffset = CGSize(width: 0, height: 2)
-//        containerView.layer.shadowOpacity = 0.1
-//        containerView.layer.shadowRadius = 4
-//
-//        titleLabel.numberOfLines = 2
-//        //        titleLabel.font = .headline
-//        titleLabel.textColor = .label
-//
-//        //        sourceLabel.font = .subheadline
-//        sourceLabel.textColor = .secondaryLabel
-//
-//        contentView.addSubview(containerView)
-//        containerView.addSubview(titleLabel)
-//        containerView.addSubview(sourceLabel)
-//
-//        containerView.translatesAutoresizingMaskIntoConstraints = false
-//        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-//        sourceLabel.translatesAutoresizingMaskIntoConstraints = false
-//
-//        NSLayoutConstraint.activate([
-//            containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-//            containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-//            containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-//            containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
-//
-//            titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12),
-//            titleLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-//            titleLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-//
-//            sourceLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
-//            sourceLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-//            sourceLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-//            sourceLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -12)
-//        ])
-//    }
-//
-//    func configure(with message: WxpMessageListMessage) {
-//        titleLabel.text = message.summary
-//        sourceLabel.text = "来源：\(message.name ?? "")"
-//    }
-//
-//}
