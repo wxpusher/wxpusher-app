@@ -15,8 +15,14 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     private var key: String? = null
     private var hasMore: Boolean = true
 
+    override fun searchIfChanged(key: String?) {
+        if (this.key != key) {
+            this.key = key
+            refresh()
+        }
+    }
 
-    override fun refresh(key: String?) {
+    override fun refresh() {
         runAtMainSuspend {
             view?.showMessageRefreshing(true)
             val req = WxpMessageListReq(Long.MAX_VALUE, key)

@@ -25,10 +25,16 @@ interface IWxpMessageListView : IWxpBaseMvpView<IWxpMessageListPresenter> {
 
 interface IWxpMessageListPresenter :
     IWxpBaseMvpPresenter<IWxpMessageListView, IWxpMessageListPresenter> {
+
+    /**
+     * 如果关键字改变， 就调用这个方法，如果关键字改变了，就会刷新搜索
+     */
+    fun searchIfChanged(key: String?)
+
     /**
      * 刷新数据
      */
-    fun refresh(key: String?)
+    fun refresh()
 
     /**
      * 加载更多数据

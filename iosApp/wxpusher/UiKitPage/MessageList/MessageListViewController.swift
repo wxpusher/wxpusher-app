@@ -1,4 +1,5 @@
 import UIKit
+import SwiftUICore
 import Moya
 import RxSwift
 import shared
@@ -11,7 +12,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     private let searchBar = UISearchBar()
     
     private let disposeBag = DisposeBag()
-    private var messageList: [WxpMessageItemBeam] = []
+    private var messageList: [WxpMessageListMessage] = []
     private var isLoading = false
     private var hasMore = true
     private var currentPage = 1
@@ -52,7 +53,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         initNavigationBar()
         hideSearchBar()
         
-        presenter.refresh(key:nil)
+        presenter.refresh()
     }
     
     
@@ -113,6 +114,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.prefetchDataSource = self
         tableView.register(MessageCell.self, forCellReuseIdentifier: "MessageCell")
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 100
@@ -167,11 +169,12 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         refreshControl.tintColor = .gray
         refreshControl.attributedTitle = NSAttributedString(string: "下拉刷新消息")
         refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
+        refreshControl.layer.zPosition = 1
         tableView.refreshControl = refreshControl
     }
     
     @objc private func refreshData() {
-        presenter.refresh(key:nil)
+        presenter.refresh()
     }
     
     private func loadDataFinish(){
@@ -181,37 +184,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         tableView.backgroundView?.isHidden = !messageList.isEmpty
         tableView.reloadData()
     }
-    private func loadData() {
-        guard !isLoading && hasMore else { return }
-        isLoading = true
-        refreshControl.attributedTitle = NSAttributedString(string: "刷新中...")
-        let provider = MoyaProvider<WxPusherApi>(plugins: [NetworkLoggerPlugin()])
-        provider.rx.http(.messageList(lastMessageId)).subscribe { [weak self](data:BaseResp<[WxpMessageItemBeam]>) in
-            var hisData = self?.messageList ?? []
-            let newData = data.data ??  [ ]
-            if (self?.lastMessageId == Int64.max ){
-                //刷新的时候清空老数据
-                hisData = []
-            }else if(newData.isEmpty){
-                //不是刷新，但是没有拉到数据， 就说明没有了
-                self?.hasMore = false
-            }
-            self?.messageList =  hisData + newData
-            self?.loadDataFinish()
-        } onError: {  [weak self] error in
-            self?.loadDataFinish()
-            if let netError = error as? NetError{
-                //身份过期，需要先登录
-                if(netError.code == WxpNetworkConstants.WxpNetworkConstantsNeedLogin){
-                    self?.gotoLogin()
-                    return
-                }
-            }
-            print("获取消息列表页面错误,e=" + error.localizedDescription)
-        }
-        .disposed(by: disposeBag)
-        
-    }
     private func gotoLogin(){
         self.navigationController?.setViewControllers([WxpLoginViewController()], animated: false)
         //  self.navigationController?.setViewControllers([WxpBindPhoneViewController(phone: "1", code: "111112", phoneVerifyCode: "3")], animated: false)
@@ -220,7 +192,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     // MARK: - MVP-VIEW
     
     func onMessageList(data: [WxpMessageListMessage]) {
-        
+        self.messageList = data
+        self.tableView.reloadData()
     }
     
     func showMessageMoreLoading(loading: Bool) {
@@ -245,12 +218,13 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
 extension MessageListViewController: UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         hideSearchBar()
+        presenter.searchIfChanged(key: "")
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         // 处理搜索
-        print("搜索内容: \(searchBar.text ?? "")")
-        //        hideSearchBar()
+        let key = searchBar.text ?? ""
+        presenter.searchIfChanged(key:key)
     }
 }
 
@@ -265,7 +239,7 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MessageCell", for: indexPath) as! MessageCell
         let message = messageList[indexPath.row]
-        cell.configure(with: message)
+        cell.configure(message: message)
         return cell
     }
     
@@ -279,22 +253,75 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         }
     }
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        let offsetY = scrollView.contentOffset.y
-        let contentHeight = scrollView.contentSize.height
-        let screenHeight = scrollView.frame.size.height
+}
+
+extension MessageListViewController: UITableViewDataSourcePrefetching {
+    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
+        let needLoad = indexPaths.contains { indexPath in
+            let lastSection = tableView.numberOfSections - 1
+            let lastRow = tableView.numberOfRows(inSection: lastSection) - 1
+            return indexPath.section == lastSection && indexPath.row == lastRow
+        }
         
-        //        if offsetY > contentHeight - screenHeight * 1.5 {
-        //            loadData()
-        //        }
+        if needLoad {
+            print("加载更多")
+            presenter.loadMore()
+        }
     }
 }
 
+import UIKit
+
 class MessageCell: UITableViewCell {
-    private let containerView = UIView()
-    private let titleLabel = UILabel()
-    private let sourceLabel = UILabel()
     
+    // MARK: - UI Elements
+    private let unreadDot: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.defAccentPrimaryColor
+        view.layer.cornerRadius = 3 // 小圆点半径
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    private let messageLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 16, weight: .regular)
+        label.textColor = UIColor.defFontPrimaryColor
+        label.numberOfLines = 2
+        label.lineBreakMode = .byTruncatingTail
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let sourceLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 12, weight: .light)
+        label.textColor = .gray
+        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let dateLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 12, weight: .light)
+        label.textColor = .gray
+        label.setContentCompressionResistancePriority(.required, for: .horizontal)
+        label.setContentHuggingPriority(.required, for: .horizontal)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private let linkImageView: UIImageView = {
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.image = UIImage(systemName: "link")?.withTintColor(UIColor.defAccentPrimaryColor)
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.isHidden = true
+        return imageView
+    }()
+    
+    // MARK: - Initialization
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
@@ -304,52 +331,117 @@ class MessageCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // MARK: - UI Setup
     private func setupUI() {
-        selectionStyle = .none
-        backgroundColor = .clear
-        
-        containerView.backgroundColor = .systemBackground
-        containerView.layer.cornerRadius = 8
-        containerView.layer.shadowColor = UIColor.black.cgColor
-        containerView.layer.shadowOffset = CGSize(width: 0, height: 2)
-        containerView.layer.shadowOpacity = 0.1
-        containerView.layer.shadowRadius = 4
-        
-        titleLabel.numberOfLines = 2
-        //        titleLabel.font = .headline
-        titleLabel.textColor = .label
-        
-        //        sourceLabel.font = .subheadline
-        sourceLabel.textColor = .secondaryLabel
-        
-        contentView.addSubview(containerView)
-        containerView.addSubview(titleLabel)
-        containerView.addSubview(sourceLabel)
-        
-        containerView.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        sourceLabel.translatesAutoresizingMaskIntoConstraints = false
+        contentView.addSubview(unreadDot)
+        contentView.addSubview(messageLabel)
+        contentView.addSubview(sourceLabel)
+        contentView.addSubview(dateLabel)
+        contentView.addSubview(linkImageView)
         
         NSLayoutConstraint.activate([
-            containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
-            containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+            // Unread dot constraints
+            unreadDot.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
+            unreadDot.lastBaselineAnchor.constraint(equalTo: messageLabel.firstBaselineAnchor),
+            unreadDot.widthAnchor.constraint(equalToConstant: 6),
+            unreadDot.heightAnchor.constraint(equalToConstant: 6),
             
-            titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12),
-            titleLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            titleLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+            // Message label constraints
+            messageLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            messageLabel.leadingAnchor.constraint(equalTo: unreadDot.trailingAnchor, constant: 5),
+            messageLabel.trailingAnchor.constraint(lessThanOrEqualTo: linkImageView.leadingAnchor, constant: -8),
             
-            sourceLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
-            sourceLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            sourceLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
-            sourceLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -12)
+            // Link image view constraints (与标题第一行对齐)
+//            linkImageView.centerYAnchor.constraint(equalTo: messageLabel.centerYAnchor),
+            linkImageView.lastBaselineAnchor.constraint(equalTo: messageLabel.firstBaselineAnchor),
+            linkImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            linkImageView.widthAnchor.constraint(equalToConstant: 20),
+            linkImageView.heightAnchor.constraint(equalToConstant: 20),
+            
+            // Source label constraints
+            sourceLabel.topAnchor.constraint(equalTo: messageLabel.bottomAnchor, constant: 8),
+            sourceLabel.leadingAnchor.constraint(equalTo: messageLabel.leadingAnchor),
+            sourceLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
+            sourceLabel.trailingAnchor.constraint(lessThanOrEqualTo: dateLabel.leadingAnchor, constant: -8),
+            
+            // Date label constraints
+            dateLabel.centerYAnchor.constraint(equalTo: sourceLabel.centerYAnchor),
+            dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
         ])
     }
     
-    func configure(with message: WxpMessageItemBeam) {
-        titleLabel.text = message.summary
-        sourceLabel.text = "来源：\(message.name)"
-    }
+    // MARK: - Configuration
     
+    func configure(message:WxpMessageListMessage) {
+        messageLabel.text = message.summary
+        sourceLabel.text = "来源: \(message.name ?? "")"
+        dateLabel.text = "2025-06-15 11:23:11"
+        linkImageView.isHidden = false
+        unreadDot.isHidden = false
+        
+    }
 }
+
+//class MessageCell: UITableViewCell {
+//    private let containerView = UIView()
+//    private let titleLabel = UILabel()
+//    private let sourceLabel = UILabel()
+//
+//    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+//        super.init(style: style, reuseIdentifier: reuseIdentifier)
+//        setupUI()
+//    }
+//
+//    required init?(coder: NSCoder) {
+//        fatalError("init(coder:) has not been implemented")
+//    }
+//
+//    private func setupUI() {
+//        selectionStyle = .none
+//        backgroundColor = .clear
+//
+//        containerView.backgroundColor = .systemBackground
+//        containerView.layer.cornerRadius = 8
+//        containerView.layer.shadowColor = UIColor.black.cgColor
+//        containerView.layer.shadowOffset = CGSize(width: 0, height: 2)
+//        containerView.layer.shadowOpacity = 0.1
+//        containerView.layer.shadowRadius = 4
+//
+//        titleLabel.numberOfLines = 2
+//        //        titleLabel.font = .headline
+//        titleLabel.textColor = .label
+//
+//        //        sourceLabel.font = .subheadline
+//        sourceLabel.textColor = .secondaryLabel
+//
+//        contentView.addSubview(containerView)
+//        containerView.addSubview(titleLabel)
+//        containerView.addSubview(sourceLabel)
+//
+//        containerView.translatesAutoresizingMaskIntoConstraints = false
+//        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+//        sourceLabel.translatesAutoresizingMaskIntoConstraints = false
+//
+//        NSLayoutConstraint.activate([
+//            containerView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
+//            containerView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+//            containerView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+//            containerView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
+//
+//            titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 12),
+//            titleLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+//            titleLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+//
+//            sourceLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
+//            sourceLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+//            sourceLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+//            sourceLabel.bottomAnchor.constraint(equalTo: containerView.bottomAnchor, constant: -12)
+//        ])
+//    }
+//
+//    func configure(with message: WxpMessageListMessage) {
+//        titleLabel.text = message.summary
+//        sourceLabel.text = "来源：\(message.name ?? "")"
+//    }
+//
+//}
