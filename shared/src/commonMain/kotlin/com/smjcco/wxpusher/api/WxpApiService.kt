@@ -34,9 +34,8 @@ object WxpApiService {
             }
             if (toastError) {
                 WxpToastUtils.showToast(resp.msg)
-            } else {
-                errorBlock?.invoke(BizError(resp.code, resp.msg))
             }
+            errorBlock?.invoke(BizError(resp.code, resp.msg))
         } catch (e: Throwable) {
             e.printStackTrace()
             if (toastError) {
@@ -45,9 +44,8 @@ object WxpApiService {
                 } else {
                     WxpToastUtils.showToast(e.message)
                 }
-            } else {
-                errorBlock?.invoke(e)
             }
+            errorBlock?.invoke(e)
         }
         return null
     }

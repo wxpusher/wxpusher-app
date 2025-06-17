@@ -96,7 +96,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     private fun saveRefreshListData() {
         val dataStr = Json.encodeToString(messageListData)
         WxpSaveService.set(SaveCacheKey, dataStr)
-        WxpSaveService.set(MessageRefreshTimeKey, Clock.System.now().toString())
+        WxpSaveService.set(MessageRefreshTimeKey, Clock.System.now().toEpochMilliseconds().toString())
     }
 
 
