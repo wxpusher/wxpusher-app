@@ -12,7 +12,7 @@ object WxpDateTimeUtils {
 
     fun getRelativeDateTime(timeStamp: Double): String {
         val nowInSeconds = Clock.System.now().toEpochMilliseconds()
-        val duration = abs(nowInSeconds - timeStamp) / 1000.0
+        val duration = (abs(nowInSeconds - timeStamp) / 1000).toInt()
         return when {
             duration < 60 -> "刚刚"
             duration < 3600 -> "${duration / 60}分钟前"
