@@ -40,7 +40,6 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             messageListData = Json.decodeFromString(it)
             view?.onMessageList(messageListData.toList())
         }
-        refresh()
     }
 
     override fun onReceiveNewMessage(message: WxpMessageListMessage) {

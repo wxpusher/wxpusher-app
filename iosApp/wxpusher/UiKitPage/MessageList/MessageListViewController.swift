@@ -14,7 +14,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     private let disposeBag = DisposeBag()
     private var messageList: [WxpMessageListMessage] = []
-    private var isLoading = false
+    
     private var hasMore = true
     private var currentPage = 1
     private var lastMessageId: Int64 = Int64.max
@@ -54,7 +54,10 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         initNavigationBar()
         hideSearchBar()
         
+        //页面加载的时候初始化,先显示缓存数据
         presenter.doInit()
+        //开始刷新，mj_header的回调回调用p层刷新
+        tableView.mj_header?.beginRefreshing();
     }
     
     
@@ -177,7 +180,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     private func setupRefreshControl() {
         tableViewRefreshHeader = MJRefreshNormalHeader(refreshingBlock: {
-//            self.presenter.refresh()
+            self.presenter.refresh()
         })
         
         tableViewRefreshHeader?.lastUpdatedTimeText = {[weak self] _ in
@@ -186,12 +189,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         tableView.mj_header = tableViewRefreshHeader
     }
     
-    private func loadDataFinish(){
-        isLoading = false
-        tableView.mj_header?.endRefreshing()
-        tableView.backgroundView?.isHidden = !messageList.isEmpty
-        tableView.reloadData()
-    }
+   
     private func gotoLogin(){
         self.navigationController?.setViewControllers([WxpLoginViewController()], animated: false)
         //  self.navigationController?.setViewControllers([WxpBindPhoneViewController(phone: "1", code: "111112", phoneVerifyCode: "3")], animated: false)
@@ -209,11 +207,15 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
     
     func showMessageRefreshing(refreshing: Bool) {
-        if(refreshing){
-            tableView.mj_header?.beginRefreshing();
-        }else{
+        if(!refreshing){
             loadDataFinish()
         }
+    }
+    
+    private func loadDataFinish(){
+        tableView.mj_header?.endRefreshing()
+        tableView.backgroundView?.isHidden = !messageList.isEmpty
+        tableView.reloadData()
     }
     
     override func createPresenter() -> Any? {
@@ -257,40 +259,14 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         }
     }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == messageList.count - 1 {
+        //滚动有一段距离，说明一页没有显示完，最后显示最后一条的时候 ，加载更多
+        if tableView.contentOffset.y > 50 && indexPath.row == messageList.count - 1 {
             print("加载更多")
         }
     }
-//    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-//        let offsetY = scrollView.contentOffset.y
-//        let contentHeight = scrollView.contentSize.height
-//        let scrollViewHeight = scrollView.frame.size.height
-//        
-//        // 当滚动到距离底部一定距离时加载（例如50pt）
-//        if offsetY > contentHeight - scrollViewHeight - 50 {
-////            presenter.loadMore()
-//            print("加载更多")
-//        }
-//    }
     
 }
 
-//extension MessageListViewController: UITableViewDataSourcePrefetching {
-//    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-//        let needLoad = indexPaths.contains { indexPath in
-//            let lastSection = tableView.numberOfSections - 1
-//            let lastRow = tableView.numberOfRows(inSection: lastSection) - 1
-//            return indexPath.section == lastSection && indexPath.row == lastRow
-//        }
-//        
-//        if needLoad {
-//            print("加载更多")
-////            presenter.loadMore()
-//        }
-//    }
-//}
-
-import UIKit
 
 class MessageCell: UITableViewCell {
     

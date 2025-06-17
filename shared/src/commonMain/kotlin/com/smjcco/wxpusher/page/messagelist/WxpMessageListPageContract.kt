@@ -28,6 +28,7 @@ interface IWxpMessageListPresenter :
 
     /**
      * 初始化，使用本地数据渲染，在数据没有回来之前，把消息列表页面渲染出来
+     * 内部不进行刷新，需要单独调用刷新
      */
     fun init()
 
