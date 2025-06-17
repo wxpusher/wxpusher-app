@@ -17,6 +17,15 @@ actual fun ExpWxpSaveService_set(key: String, value: String?) {
     }
 }
 
+actual fun ExpWxpSaveService_getDouble(key: String): Double? {
+    return ExpWxpSaveService_get(key)?.toDouble()
+}
+
+actual fun ExpWxpSaveService_setDouble(key: String, value: Double) {
+    ExpWxpSaveService_set(key, value.toString())
+}
+
+
 actual fun ExpWxpSaveService_init() {
     WxpSaveServiceAndroidSP =
         ApplicationUtils.application.getSharedPreferences("wxpusher-kv", Context.MODE_PRIVATE)

@@ -36,6 +36,7 @@ target 'WxPusher-iOS' do
   project "wxpusher/wxpusher.xcodeproj"
   pods
   pod 'Toaster', '2.3.0'
+  pod 'MJRefresh', '3.7.9'
   pod 'shared', :path => '../shared'
   
 end

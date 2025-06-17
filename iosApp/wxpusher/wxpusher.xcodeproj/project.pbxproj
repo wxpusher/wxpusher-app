@@ -448,14 +448,13 @@
 				1AC210C52ACC4CEB008D86EA /* Sources */,
 				1A56818E2A598A89003547E6 /* Frameworks */,
 				1A4715362AE801720089D7A7 /* Resources */,
+				D6BE32C233BE187DEE0CD685 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = "WxPusher-iOS";
-			packageProductDependencies = (
-			);
 			productName = wxpusher;
 			productReference = 1A3C056A2ACDCDA1006F7007 /* WxPusher-iOS.app */;
 			productType = "com.apple.product-type.application";
@@ -506,8 +505,6 @@
 				"zh-Hans",
 			);
 			mainGroup = 1A5681882A598A89003547E6;
-			packageReferences = (
-			);
 			productRefGroup = 1A5681882A598A89003547E6;
 			projectDirPath = "";
 			projectRoot = "";
@@ -573,6 +570,26 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D6BE32C233BE187DEE0CD685 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-WxPusher-iOS/Pods-WxPusher-iOS-resources.sh",
+				"${PODS_ROOT}/MJRefresh/MJRefresh/MJRefresh.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/MJRefresh/MJRefresh.Privacy.bundle",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MJRefresh.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MJRefresh.Privacy.bundle",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-WxPusher-iOS/Pods-WxPusher-iOS-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

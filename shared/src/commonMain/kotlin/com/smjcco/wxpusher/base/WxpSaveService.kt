@@ -3,6 +3,10 @@ package com.smjcco.wxpusher.base
 expect fun ExpWxpSaveService_get(key: String): String?
 expect fun ExpWxpSaveService_set(key: String, value: String?)
 
+
+expect fun ExpWxpSaveService_getDouble(key: String): Double?
+expect fun ExpWxpSaveService_setDouble(key: String, value: Double)
+
 expect fun ExpWxpSaveService_remove(key: String)
 expect fun ExpWxpSaveService_init()
 
@@ -45,6 +49,15 @@ object WxpSaveService {
 
     fun set(key: String, value: Int) {
         ExpWxpSaveService_set(key, value.toString())
+    }
+
+    fun get(key: String, value: Double): Double {
+        return ExpWxpSaveService_getDouble(key) ?: value
+    }
+
+    fun set(key: String, value: Double) {
+        ExpWxpSaveService_setDouble(key, value)
+
     }
 
 }

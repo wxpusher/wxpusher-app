@@ -11,6 +11,16 @@ actual fun ExpWxpSaveService_set(key: String, value: String?) {
     NSUserDefaults.standardUserDefaults.synchronize()
 }
 
+actual fun ExpWxpSaveService_getDouble(key: String): Double? {
+    return NSUserDefaults.standardUserDefaults.doubleForKey(key)
+}
+
+actual fun ExpWxpSaveService_setDouble(key: String, value: Double) {
+    NSUserDefaults.standardUserDefaults.setDouble(value, forKey = key)
+    NSUserDefaults.standardUserDefaults.synchronize()
+}
+
+
 actual fun ExpWxpSaveService_init() {
 
 }

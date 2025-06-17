@@ -3,12 +3,13 @@ import SwiftUICore
 import Moya
 import RxSwift
 import shared
+import MJRefresh
 
 class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPresenter>,IWxpMessageListView  {
     
     
     private let tableView = UITableView()
-    private let refreshControl = UIRefreshControl()
+    private var tableViewRefreshHeader:MJRefreshNormalHeader? = nil
     private let searchBar = UISearchBar()
     
     private let disposeBag = DisposeBag()
@@ -54,7 +55,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         hideSearchBar()
         
         presenter.doInit()
-        presenter.refresh()
     }
     
     
@@ -115,11 +115,11 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         
         tableView.delegate = self
         tableView.dataSource = self
-//        tableView.prefetchDataSource = self
         tableView.register(MessageCell.self, forCellReuseIdentifier: "MessageCell")
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 100
         tableView.separatorStyle = .none
+        
         
         let footerView = UILabel()
         footerView.text = "只保留最近7天消息，没有更多数据了"
@@ -176,21 +176,19 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
     
     private func setupRefreshControl() {
-        refreshControl.tintColor = .gray
-        refreshControl.attributedTitle = NSAttributedString(string: "下拉刷新消息")
-        refreshControl.addTarget(self, action: #selector(refreshData), for: .valueChanged)
-        refreshControl.layer.zPosition = 1
-        tableView.refreshControl = refreshControl
-    }
-    
-    @objc private func refreshData() {
-        presenter.refresh()
+        tableViewRefreshHeader = MJRefreshNormalHeader(refreshingBlock: {
+//            self.presenter.refresh()
+        })
+        
+        tableViewRefreshHeader?.lastUpdatedTimeText = {[weak self] _ in
+            return self?.presenter.getTipsOfLastRefreshTime() ?? "更新于 无"
+        }
+        tableView.mj_header = tableViewRefreshHeader
     }
     
     private func loadDataFinish(){
         isLoading = false
-        refreshControl.attributedTitle = NSAttributedString(string: "刷新完成")
-        refreshControl.endRefreshing()
+        tableView.mj_header?.endRefreshing()
         tableView.backgroundView?.isHidden = !messageList.isEmpty
         tableView.reloadData()
     }
@@ -212,8 +210,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     func showMessageRefreshing(refreshing: Bool) {
         if(refreshing){
-            refreshControl.attributedTitle = NSAttributedString(string: "刷新中...")
-            refreshControl.beginRefreshing()
+            tableView.mj_header?.beginRefreshing();
         }else{
             loadDataFinish()
         }
@@ -243,9 +240,6 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         return messageList.count
     }
     
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        refreshControl.attributedTitle = NSAttributedString(string: "下拉刷新消息")
-    }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MessageCell", for: indexPath) as! MessageCell
         let message = messageList[indexPath.row]
@@ -261,7 +255,6 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
             let webVC = WebViewController(url: url)
             navigationController?.pushViewController(webVC, animated: true)
         }
-        
     }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row == messageList.count - 1 {

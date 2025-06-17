@@ -1,6 +1,7 @@
 PODS:
   - Alamofire (5.8.0)
   - ExytePopupView (1.2.1)
+  - MJRefresh (3.7.9)
   - Moya/Core (15.0.0):
     - Alamofire (~> 5.0)
   - Moya/RxSwift (15.0.0):
@@ -13,6 +14,7 @@ PODS:
 
 DEPENDENCIES:
   - ExytePopupView (= 1.2.1)
+  - MJRefresh (= 3.7.9)
   - Moya/RxSwift (= 15.0.0)
   - shared (from `../shared`)
   - Toaster (= 2.3.0)
@@ -21,6 +23,7 @@ SPEC REPOS:
   trunk:
     - Alamofire
     - ExytePopupView
+    - MJRefresh
     - Moya
     - RxSwift
     - Toaster
@@ -32,11 +35,12 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Alamofire: 0e92e751b3e9e66d7982db43919d01f313b8eb91
   ExytePopupView: e0554c9713665a386a54b356c596858811e84621
+  MJRefresh: ff9e531227924c84ce459338414550a05d2aea78
   Moya: 138f0573e53411fb3dc17016add0b748dfbd78ee
   RxSwift: a4b44f7d24599f674deebd1818eab82e58410632
   shared: f70abb4412b47a88dd39768078ea98270a675a5a
   Toaster: c3473963c78e8cabbf6ea6f11ad0fdaae6f54987
 
-PODFILE CHECKSUM: 6e60988bb911e308564a7d8fe79b618ad16d3286
+PODFILE CHECKSUM: 46d87da5ad65f5e9e4f726f22f891b2759ca17aa
 
 COCOAPODS: 1.15.2

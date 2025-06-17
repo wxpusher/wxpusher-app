@@ -32,6 +32,10 @@ interface IWxpMessageListPresenter :
     fun init()
 
     /**
+     * 获取上次刷新时间
+     */
+    fun getTipsOfLastRefreshTime(): String
+    /**
      * 当收到新的消息，把数据插入到了列表里面
      */
     fun onReceiveNewMessage(message: WxpMessageListMessage);

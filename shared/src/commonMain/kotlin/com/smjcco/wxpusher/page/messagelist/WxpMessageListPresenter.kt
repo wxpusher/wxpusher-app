@@ -2,10 +2,13 @@ package com.smjcco.wxpusher.page.messagelist
 
 import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.WxpBaseMvpPresenter
+import com.smjcco.wxpusher.base.WxpDateTimeUtils
 import com.smjcco.wxpusher.base.WxpSaveService
 import com.smjcco.wxpusher.base.letOnNotEmpty
 import com.smjcco.wxpusher.base.runAtMainSuspend
 import kotlinx.serialization.json.Json
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 
 class WxpMessageListPresenter(view: IWxpMessageListView) :
     WxpBaseMvpPresenter<IWxpMessageListView, IWxpMessageListPresenter>(view),
@@ -13,13 +16,16 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     //当前页面的列表的数据
     private var messageListData: MutableList<WxpMessageListMessage> = mutableListOf()
 
-    private val SaveCacheKey = "MessageSaveCacheKey"
+    private val SaveCacheKey = "WxpMessageList_MessageSaveCacheKey"
+    private val MessageRefreshTimeKey = "WxpMessageList_MessageRefreshTimeKey"
 
 
     //前页面的最后一条消息id
     private var lastUserReceiveRecordId = Long.MAX_VALUE
     private var key: String? = null
     private var hasMore: Boolean = true
+
+    private var loading: Boolean = false
 
     override fun searchIfChanged(key: String?) {
         if (this.key != key) {
@@ -34,6 +40,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             messageListData = Json.decodeFromString(it)
             view?.onMessageList(messageListData.toList())
         }
+        refresh()
     }
 
     override fun onReceiveNewMessage(message: WxpMessageListMessage) {
@@ -48,10 +55,15 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         }
         // 通知视图更新
         view?.onMessageList(messageListData.toList())
+        saveRefreshListData()
     }
 
     override fun refresh() {
+        if (loading) {
+            return
+        }
         runAtMainSuspend {
+            loading = true
             view?.showMessageRefreshing(true)
             val req = WxpMessageListReq(Long.MAX_VALUE, key)
             val fetchResultList = WxpApiService.fetchMessageList(req)
@@ -64,19 +76,33 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
                 view?.onMessageList(messageListData.toList())
                 saveRefreshListData()
             }
+            loading = false
         }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    override fun getTipsOfLastRefreshTime(): String {
+        val time = WxpSaveService.get(MessageRefreshTimeKey, 0.0)
+        if (time <= 0.0) {
+            return "更新于 无"
+        }
+        return "更新于 " + WxpDateTimeUtils.getRelativeDateTime(time)
     }
 
     /**
      * 保存一下第一页的数据，方便下次启动的时候用缓存渲染
      */
+    @OptIn(ExperimentalTime::class)
     private fun saveRefreshListData() {
         val dataStr = Json.encodeToString(messageListData)
         WxpSaveService.set(SaveCacheKey, dataStr)
+        WxpSaveService.set(MessageRefreshTimeKey, Clock.System.now().toString())
     }
+
 
     override fun loadMore() {
         runAtMainSuspend {
+            loading = true
             view?.showMessageMoreLoading(true)
             val req = WxpMessageListReq(lastUserReceiveRecordId, key)
             val fetchResultList = WxpApiService.fetchMessageList(req)
@@ -91,6 +117,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
                     view?.onMessageList(messageListData.toList())
                 }
             }
+            loading = false
         }
     }
 }
