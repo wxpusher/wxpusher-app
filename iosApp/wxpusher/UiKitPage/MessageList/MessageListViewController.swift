@@ -7,10 +7,95 @@ import MJRefresh
 
 class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPresenter>,IWxpMessageListView  {
     
+    private class FooterLoadingView: UIView {
+        private let activityIndicator = UIActivityIndicatorView(style: .medium)
+        private let messageLabel = UILabel()
+        
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            setupUI()
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+        private func setupUI() {
+            addSubview(activityIndicator)
+            addSubview(messageLabel)
+            
+            activityIndicator.translatesAutoresizingMaskIntoConstraints = false
+            messageLabel.translatesAutoresizingMaskIntoConstraints = false
+            
+            // 创建一个容器视图来包含 activityIndicator 和 messageLabel
+            let containerView = UIView()
+            containerView.translatesAutoresizingMaskIntoConstraints = false
+            addSubview(containerView)
+            
+            containerView.addSubview(activityIndicator)
+            containerView.addSubview(messageLabel)
+            
+            NSLayoutConstraint.activate([
+                // 容器视图约束
+                containerView.centerXAnchor.constraint(equalTo: centerXAnchor),
+                containerView.centerYAnchor.constraint(equalTo: centerYAnchor),
+                
+                // activityIndicator 约束
+                activityIndicator.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+                activityIndicator.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+                activityIndicator.widthAnchor.constraint(equalToConstant: 20),
+                
+                // messageLabel 约束
+                messageLabel.leadingAnchor.constraint(equalTo: activityIndicator.trailingAnchor, constant: 8),
+                messageLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+                messageLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
+            ])
+            
+            messageLabel.textColor = UIColor.defFontSecondColor
+            messageLabel.font = .systemFont(ofSize: 12)
+            messageLabel.textAlignment = .left
+            
+            // 初始状态隐藏 loading
+            activityIndicator.isHidden = true
+            // 当 activityIndicator 隐藏时，移除其宽度约束
+            activityIndicator.widthAnchor.constraint(equalToConstant: 0).isActive = true
+        }
+        
+        func setMessage(_ message: String) {
+            messageLabel.text = message
+        }
+        
+        func startLoading() {
+            // 移除宽度为0的约束
+            activityIndicator.constraints.forEach { constraint in
+                if constraint.firstAttribute == .width && constraint.constant == 0 {
+                    constraint.isActive = false
+                }
+            }
+            // 添加正常宽度约束
+            activityIndicator.widthAnchor.constraint(equalToConstant: 20).isActive = true
+            activityIndicator.isHidden = false
+            activityIndicator.startAnimating()
+        }
+        
+        func stopLoading() {
+            activityIndicator.stopAnimating()
+            activityIndicator.isHidden = true
+            // 移除正常宽度约束
+            activityIndicator.constraints.forEach { constraint in
+                if constraint.firstAttribute == .width && constraint.constant == 20 {
+                    constraint.isActive = false
+                }
+            }
+            // 添加宽度为0的约束
+            activityIndicator.widthAnchor.constraint(equalToConstant: 0).isActive = true
+        }
+    }
     
     private let tableView = UITableView()
     private var tableViewRefreshHeader:MJRefreshNormalHeader? = nil
     private let searchBar = UISearchBar()
+    private let footerLoadingView = FooterLoadingView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 60))
     
     private let disposeBag = DisposeBag()
     private var messageList: [WxpMessageListMessage] = []
@@ -123,15 +208,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         tableView.estimatedRowHeight = 100
         tableView.separatorStyle = .none
         
-        
-        let footerView = UILabel()
-        footerView.text = "只保留最近7天消息，没有更多数据了"
-        footerView.textColor = UIColor.defFontSecondColor
-        footerView.font = .systemFont(ofSize: 12)
-        footerView.frame = CGRect(x: 0, y: 0, width: tableView.bounds.width, height: 60)
-        footerView.textAlignment = .center
-        tableView.tableFooterView = footerView
-        
+        footerLoadingView.setMessage("上滑加载更多")
+        tableView.tableFooterView = footerLoadingView
         
         // 添加空状态视图
         let emptyView = UIView()
@@ -202,7 +280,18 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         self.tableView.reloadData()
     }
     
-    func showMessageMoreLoading(loading: Bool) {
+    func showMessageMoreLoading(loading: Bool, hasMore: Bool) {
+        if(loading){
+            footerLoadingView.setMessage("加载中...")
+            footerLoadingView.startLoading()
+        }else{
+            if(hasMore){
+                footerLoadingView.setMessage("上滑加载更多")
+            }else{
+                footerLoadingView.setMessage("只保留最近7天消息，没有更多数据了")
+            }
+            footerLoadingView.stopLoading()
+        }
         
     }
     
@@ -261,7 +350,7 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         //滚动有一段距离，说明一页没有显示完，最后显示最后一条的时候 ，加载更多
         if tableView.contentOffset.y > 50 && indexPath.row == messageList.count - 1 {
-            print("加载更多")
+            presenter.loadMore()
         }
     }
     

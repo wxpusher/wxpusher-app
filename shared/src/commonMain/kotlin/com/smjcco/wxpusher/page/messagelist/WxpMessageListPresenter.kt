@@ -95,17 +95,23 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     private fun saveRefreshListData() {
         val dataStr = Json.encodeToString(messageListData)
         WxpSaveService.set(SaveCacheKey, dataStr)
-        WxpSaveService.set(MessageRefreshTimeKey, Clock.System.now().toEpochMilliseconds().toString())
+        WxpSaveService.set(
+            MessageRefreshTimeKey,
+            Clock.System.now().toEpochMilliseconds().toString()
+        )
     }
 
 
     override fun loadMore() {
+        if (!hasMore) {
+            println("没有更多数据了")
+            return
+        }
         runAtMainSuspend {
             loading = true
-            view?.showMessageMoreLoading(true)
+            view?.showMessageMoreLoading(true, hasMore)
             val req = WxpMessageListReq(lastUserReceiveRecordId, key)
             val fetchResultList = WxpApiService.fetchMessageList(req)
-            view?.showMessageMoreLoading(false)
             if (fetchResultList !== null) {
                 if (fetchResultList.isEmpty()) {
                     //为空，说明没有更多数据了
@@ -116,6 +122,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
                     view?.onMessageList(messageListData.toList())
                 }
             }
+            view?.showMessageMoreLoading(false, hasMore)
             loading = false
         }
     }

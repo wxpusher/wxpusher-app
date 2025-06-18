@@ -13,7 +13,7 @@ interface IWxpMessageListView : IWxpBaseMvpView<IWxpMessageListPresenter> {
     /**
      * 列表页面是否在加载中
      */
-    fun showMessageMoreLoading(loading: Boolean)
+    fun showMessageMoreLoading(loading: Boolean,hasMore: Boolean)
 
     /**
      * 列表页面的数据
