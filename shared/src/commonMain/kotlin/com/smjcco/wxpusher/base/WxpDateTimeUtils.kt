@@ -6,6 +6,9 @@ import kotlin.time.ExperimentalTime
 
 expect fun Double.toDateTimeString(): String
 
+fun Long.toDateTimeString(): String {
+    return this.toDouble().toDateTimeString()
+}
 
 object WxpDateTimeUtils {
     @OptIn(ExperimentalTime::class)
@@ -22,6 +25,10 @@ object WxpDateTimeUtils {
                 timeStamp.toDateTimeString()
             }
         }
+    }
+
+    fun formatDateTime(timeStamp: Long): String {
+        return timeStamp.toDateTimeString()
     }
 
 }

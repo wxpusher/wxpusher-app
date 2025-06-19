@@ -16,6 +16,6 @@ data class WxpMessageListMessage(
     val sourceUrl: String?,
     val summary: String,
     val name: String?,
-    val read: Boolean,
+    var read: Boolean,
     val createTime: Long,
 )

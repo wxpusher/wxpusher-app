@@ -345,6 +345,9 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         if let url = URL(string: urlString) {
             let webVC = WebViewController(url: url)
             navigationController?.pushViewController(webVC, animated: true)
+            //点击的时候，标记为已读
+            message.read = true
+            tableView.reloadData()
         }
     }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -459,9 +462,9 @@ class MessageCell: UITableViewCell {
     func configure(message:WxpMessageListMessage) {
         messageLabel.text = message.summary
         sourceLabel.text = "来源: \(message.name ?? "")"
-        dateLabel.text = "2025-06-15 11:23:11"
+        dateLabel.text = WxpDateTimeUtils.shared.formatDateTime(timeStamp: message.createTime)
         linkImageView.isHidden = false
-        unreadDot.isHidden = false
+        unreadDot.isHidden = message.read
         
     }
 }
