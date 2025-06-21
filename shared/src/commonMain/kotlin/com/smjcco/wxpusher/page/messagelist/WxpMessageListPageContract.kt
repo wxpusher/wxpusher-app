@@ -66,4 +66,10 @@ interface IWxpMessageListPresenter :
         id: Long? = null,
         read: Boolean
     )
+
+    /**
+     * 删除消息
+     * @param id 消息的消息id
+     */
+    fun deleteById(id: Long)
 }

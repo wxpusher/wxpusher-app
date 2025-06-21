@@ -167,61 +167,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         
     }
     
-    @objc private func showSearchBar() {
-        self.mainTabVC.navigationItem.titleView = searchBar
-        UIView.animate(withDuration: 0.3) {
-            self.mainTabVC.navigationItem.rightBarButtonItems = nil
-            self.searchBar.alpha = 1
-            self.searchBar.becomeFirstResponder()
-            self.searchShow = true
-        }
-    }
-    
-    private func hideSearchBar() {
-        UIView.animate(withDuration: 0.3) {
-            self.searchBar.alpha = 0
-            //            self.searchBar.text = ""
-            self.searchBar.resignFirstResponder()
-            self.mainTabVC.navigationItem.rightBarButtonItems = self.originalRightBarItems
-            self.mainTabVC.navigationItem.titleView = self.titleView
-            self.searchShow = false
-        }
-    }
-    
-    
-    @objc private func optionsTapped() {
-        let actionSheet = UIAlertController(title: nil,
-                                            message: nil,
-                                            preferredStyle: .actionSheet)
-        
-        
-        // 添加选项按钮
-        let option1 = UIAlertAction(title: "已读全部消息", style: .default) { [weak self]_ in
-            self?.presenter.markMessageReadStatus(id: nil, read: true)
-        }
-        
-        
-        let cancel = UIAlertAction(title: "取消", style: .cancel) { _ in
-            
-        }
-        
-        actionSheet.addAction(option1)
-        actionSheet.addAction(cancel)
-        
-        // 在 iPad 上需要设置弹出位置
-        if let popoverController = actionSheet.popoverPresentationController {
-            popoverController.sourceView = self.view
-            popoverController.sourceRect = CGRect(x: self.view.bounds.midX,
-                                                  y: self.view.bounds.midY,
-                                                  width: 0,
-                                                  height: 0)
-            popoverController.permittedArrowDirections = []
-        }
-        
-        // 显示 Action Sheet
-        present(actionSheet, animated: true, completion: nil)
-    }
-    
     
     private func setupUI() {
         title = "消息列表"
@@ -289,6 +234,63 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         tableView.addGestureRecognizer(longPressRecognizer)
     }
     
+    // MARK: - Page Action
+    @objc private func showSearchBar() {
+        self.mainTabVC.navigationItem.titleView = searchBar
+        UIView.animate(withDuration: 0.3) {
+            self.mainTabVC.navigationItem.rightBarButtonItems = nil
+            self.searchBar.alpha = 1
+            self.searchBar.becomeFirstResponder()
+            self.searchShow = true
+        }
+    }
+    
+    private func hideSearchBar() {
+        UIView.animate(withDuration: 0.3) {
+            self.searchBar.alpha = 0
+            //            self.searchBar.text = ""
+            self.searchBar.resignFirstResponder()
+            self.mainTabVC.navigationItem.rightBarButtonItems = self.originalRightBarItems
+            self.mainTabVC.navigationItem.titleView = self.titleView
+            self.searchShow = false
+        }
+    }
+    
+    
+    @objc private func optionsTapped() {
+        let actionSheet = UIAlertController(title: nil,
+                                            message: nil,
+                                            preferredStyle: .actionSheet)
+        
+        
+        // 添加选项按钮
+        let option1 = UIAlertAction(title: "已读全部消息", style: .default) { [weak self]_ in
+            self?.presenter.markMessageReadStatus(id: nil, read: true)
+        }
+        
+        
+        let cancel = UIAlertAction(title: "取消", style: .cancel) { _ in
+            
+        }
+        
+        actionSheet.addAction(option1)
+        actionSheet.addAction(cancel)
+        
+        // 在 iPad 上需要设置弹出位置
+        if let popoverController = actionSheet.popoverPresentationController {
+            popoverController.sourceView = self.view
+            popoverController.sourceRect = CGRect(x: self.view.bounds.midX,
+                                                  y: self.view.bounds.midY,
+                                                  width: 0,
+                                                  height: 0)
+            popoverController.permittedArrowDirections = []
+        }
+        
+        // 显示 Action Sheet
+        present(actionSheet, animated: true, completion: nil)
+    }
+    
+    
     @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
         // 确保手势已经开始
         guard gestureRecognizer.state == .began else { return }
@@ -308,8 +310,9 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         let option1 = UIAlertAction(title: readText, style: .default) { [weak self]_ in
             self?.presenter.markMessageReadStatus(id: KotlinLong.init(longLong: item.id), read: !item.read)
         }
+        
         let option2 = UIAlertAction(title: "删除", style: .destructive) { [weak self]_ in
-           
+            self?.showDeleteConfirmAlert(message: item)
         }
         
         
@@ -319,7 +322,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         
         actionSheet.addAction(option1)
         actionSheet.addAction(option2)
-        
         actionSheet.addAction(cancel)
         
         // 在 iPad 上需要设置弹出位置
@@ -335,6 +337,25 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         // 显示 Action Sheet
         present(actionSheet, animated: true, completion: nil)
         
+    }
+    /**
+     * 删除消息确认
+     */
+    func showDeleteConfirmAlert(message: WxpMessageListMessage) {
+        let alert = UIAlertController(
+            title: "删除消息确认",
+            message: "你确认删除此消息吗？删除后不可恢复",
+            preferredStyle: .alert
+        )
+        
+        // 添加删除按钮（使用.destructive样式）
+        alert.addAction(UIAlertAction(title: "删除", style: .destructive, handler: {[weak self] _ in
+            self?.presenter.deleteById(id: message.id)
+        }))
+        
+        alert.addAction(UIAlertAction(title: "取消", style: .cancel))
+        
+        present(alert, animated: true)
     }
     
     private func setupRefreshControl() {

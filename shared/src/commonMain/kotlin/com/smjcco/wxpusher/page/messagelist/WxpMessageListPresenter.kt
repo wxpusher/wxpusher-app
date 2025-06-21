@@ -131,14 +131,23 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     override fun markMessageReadStatus(id: Long?, read: Boolean) {
         runAtMainSuspend {
             WxpApiService.markMessageReadStatus(id, read) {
-                if(id==null){
+                if (id == null) {
                     messageListData.forEach {
                         it.read = read
                     }
-                }else{
+                } else {
                     messageListData.find { it.id == id }?.read = read
                 }
 
+                view?.onMessageList(messageListData)
+            }
+        }
+    }
+
+    override fun deleteById(id: Long) {
+        runAtMainSuspend {
+            WxpApiService.deleteMessageById(id) {
+                messageListData.removeAll { it.id == id }
                 view?.onMessageList(messageListData)
             }
         }

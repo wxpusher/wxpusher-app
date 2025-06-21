@@ -8,6 +8,7 @@ import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
@@ -81,7 +82,7 @@ object WxpApiService {
     suspend fun fetchMessageList(req: WxpMessageListReq): List<WxpMessageListMessage>? {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
-                .get(WxpNetworkService.getUrl("/api/need-login/device/message-list-v2")) {
+                .get(WxpNetworkService.getUrl("/api/need-login/device/message/list-v2")) {
                     parameter("lastUserReceiveRecordId", req.lastUserReceiveRecordId)
                     parameter("key", req.key)
                 }.body()
@@ -98,14 +99,32 @@ object WxpApiService {
         read: Boolean,
         successBlock: (() -> Unit)
     ): Unit? {
-        println("id=${id}")
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
-                .put(WxpNetworkService.getUrl("/api/need-login/device/message-read-mark")) {
+                .put(WxpNetworkService.getUrl("/api/need-login/device/message/read-mark")) {
                     id?.let {
                         parameter("id", id)
                     }
                     parameter("read", read)
+                }.body()
+        }, successBlock = {
+            successBlock.invoke()
+        }
+        )
+    }
+
+    /**
+     * 删除消息记录
+     * @param id 消息的消息id
+     */
+    suspend fun deleteMessageById(
+        id: Long,
+        successBlock: (() -> Unit)
+    ): Unit? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .delete(WxpNetworkService.getUrl("/api/need-login/device/message/delete")) {
+                    parameter("id", id)
                 }.body()
         }, successBlock = {
             successBlock.invoke()
