@@ -98,6 +98,7 @@ object WxpApiService {
         read: Boolean,
         successBlock: (() -> Unit)
     ): Unit? {
+        println("id=${id}")
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .put(WxpNetworkService.getUrl("/api/need-login/device/message-read-mark")) {

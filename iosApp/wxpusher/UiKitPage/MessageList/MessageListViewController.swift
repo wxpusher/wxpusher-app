@@ -10,7 +10,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     private class FooterLoadingView: UIView {
         private let activityIndicator = UIActivityIndicatorView(style: .medium)
         private let messageLabel = UILabel()
-        
+
         override init(frame: CGRect) {
             super.init(frame: frame)
             setupUI()
@@ -191,35 +191,35 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     @objc private func optionsTapped() {
         let actionSheet = UIAlertController(title: nil,
-                                              message: nil,
-                                              preferredStyle: .actionSheet)
+                                            message: nil,
+                                            preferredStyle: .actionSheet)
         
+        
+        // 添加选项按钮
+        let option1 = UIAlertAction(title: "已读全部消息", style: .default) { [weak self]_ in
+            self?.presenter.markMessageReadStatus(id: nil, read: true)
+        }
+        
+        
+        let cancel = UIAlertAction(title: "取消", style: .cancel) { _ in
             
-            // 添加选项按钮
-            let option1 = UIAlertAction(title: "已读全部消息", style: .default) { [weak self]_ in
-                self?.presenter.markMessageReadStatus(id: nil, read: true)
-            }
-            
-            
-            let cancel = UIAlertAction(title: "取消", style: .cancel) { _ in
-           
-            }
-            
-            actionSheet.addAction(option1)
-            actionSheet.addAction(cancel)
-            
-            // 在 iPad 上需要设置弹出位置
-            if let popoverController = actionSheet.popoverPresentationController {
-                popoverController.sourceView = self.view
-                popoverController.sourceRect = CGRect(x: self.view.bounds.midX,
-                                                   y: self.view.bounds.midY,
-                                                   width: 0,
-                                                   height: 0)
-                popoverController.permittedArrowDirections = []
-            }
-            
-            // 显示 Action Sheet
-            present(actionSheet, animated: true, completion: nil)
+        }
+        
+        actionSheet.addAction(option1)
+        actionSheet.addAction(cancel)
+        
+        // 在 iPad 上需要设置弹出位置
+        if let popoverController = actionSheet.popoverPresentationController {
+            popoverController.sourceView = self.view
+            popoverController.sourceRect = CGRect(x: self.view.bounds.midX,
+                                                  y: self.view.bounds.midY,
+                                                  width: 0,
+                                                  height: 0)
+            popoverController.permittedArrowDirections = []
+        }
+        
+        // 显示 Action Sheet
+        present(actionSheet, animated: true, completion: nil)
     }
     
     
@@ -283,6 +283,58 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         
         tableView.backgroundView = emptyView
         tableView.backgroundView?.isHidden = true
+        //添加列表长按事件
+        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
+        longPressRecognizer.minimumPressDuration = 0.5 // 设置长按时间阈值 (秒)
+        tableView.addGestureRecognizer(longPressRecognizer)
+    }
+    
+    @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
+        // 确保手势已经开始
+        guard gestureRecognizer.state == .began else { return }
+        
+        // 获取长按位置对应的 indexPath
+        let point = gestureRecognizer.location(in: tableView)
+        guard let indexPath = tableView.indexPathForRow(at: point) else { return }
+        
+        // 获取对应的数据项
+        let item = messageList[indexPath.row]
+        
+        let actionSheet = UIAlertController(title: nil,
+                                            message: nil,
+                                            preferredStyle: .actionSheet)
+        
+        let readText = item.read ? "标记未读" : "标记已读"
+        let option1 = UIAlertAction(title: readText, style: .default) { [weak self]_ in
+            self?.presenter.markMessageReadStatus(id: KotlinLong.init(longLong: item.id), read: !item.read)
+        }
+        let option2 = UIAlertAction(title: "删除", style: .destructive) { [weak self]_ in
+           
+        }
+        
+        
+        let cancel = UIAlertAction(title: "取消", style: .cancel) { _ in
+            
+        }
+        
+        actionSheet.addAction(option1)
+        actionSheet.addAction(option2)
+        
+        actionSheet.addAction(cancel)
+        
+        // 在 iPad 上需要设置弹出位置
+        if let popoverController = actionSheet.popoverPresentationController {
+            popoverController.sourceView = self.view
+            popoverController.sourceRect = CGRect(x: self.view.bounds.midX,
+                                                  y: self.view.bounds.midY,
+                                                  width: 0,
+                                                  height: 0)
+            popoverController.permittedArrowDirections = []
+        }
+        
+        // 显示 Action Sheet
+        present(actionSheet, animated: true, completion: nil)
+        
     }
     
     private func setupRefreshControl() {
@@ -296,7 +348,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         tableView.mj_header = tableViewRefreshHeader
     }
     
-   
+    
     private func gotoLogin(){
         self.navigationController?.setViewControllers([WxpLoginViewController()], animated: false)
         //  self.navigationController?.setViewControllers([WxpBindPhoneViewController(phone: "1", code: "111112", phoneVerifyCode: "3")], animated: false)
@@ -470,7 +522,7 @@ class MessageCell: UITableViewCell {
             messageLabel.trailingAnchor.constraint(lessThanOrEqualTo: linkImageView.leadingAnchor, constant: -8),
             
             // Link image view constraints (与标题第一行对齐)
-//            linkImageView.centerYAnchor.constraint(equalTo: messageLabel.centerYAnchor),
+            //            linkImageView.centerYAnchor.constraint(equalTo: messageLabel.centerYAnchor),
             linkImageView.lastBaselineAnchor.constraint(equalTo: messageLabel.firstBaselineAnchor),
             linkImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
             linkImageView.widthAnchor.constraint(equalToConstant: 20),

@@ -131,9 +131,14 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     override fun markMessageReadStatus(id: Long?, read: Boolean) {
         runAtMainSuspend {
             WxpApiService.markMessageReadStatus(id, read) {
-                messageListData.forEach {
-                    it.read = true
+                if(id==null){
+                    messageListData.forEach {
+                        it.read = read
+                    }
+                }else{
+                    messageListData.find { it.id == id }?.read = read
                 }
+
                 view?.onMessageList(messageListData)
             }
         }
