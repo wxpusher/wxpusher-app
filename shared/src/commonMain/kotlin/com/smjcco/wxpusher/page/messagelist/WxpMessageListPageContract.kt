@@ -13,7 +13,7 @@ interface IWxpMessageListView : IWxpBaseMvpView<IWxpMessageListPresenter> {
     /**
      * 列表页面是否在加载中
      */
-    fun showMessageMoreLoading(loading: Boolean,hasMore: Boolean)
+    fun showMessageMoreLoading(loading: Boolean, hasMore: Boolean)
 
     /**
      * 列表页面的数据
@@ -36,6 +36,7 @@ interface IWxpMessageListPresenter :
      * 获取上次刷新时间
      */
     fun getTipsOfLastRefreshTime(): String
+
     /**
      * 当收到新的消息，把数据插入到了列表里面
      */
@@ -55,4 +56,14 @@ interface IWxpMessageListPresenter :
      * 加载更多数据
      */
     fun loadMore()
+
+    /**
+     * 标记消息已读状态
+     * @param id 消息的消息id，不传表示标记用户的所有消息
+     * @param read 是否标记为已读状态
+     */
+    fun markMessageReadStatus(
+        id: Long? = null,
+        read: Boolean
+    )
 }

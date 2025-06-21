@@ -11,6 +11,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
+import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -23,6 +24,7 @@ object WxpApiService {
     suspend fun <T> commonRespDeal(
         block: suspend () -> BaseResp<T>,
         toastError: Boolean = true,
+        successBlock: ((data: T) -> Unit)? = null,
         errorBlock: ((e: Throwable) -> Unit)? = null
     ): T? {
         try {
@@ -30,6 +32,7 @@ object WxpApiService {
                 block()
             }
             if (resp.code == 1000) {
+                successBlock?.invoke(resp.data)
                 return resp.data
             }
             if (toastError) {
@@ -83,5 +86,29 @@ object WxpApiService {
                     parameter("key", req.key)
                 }.body()
         })
+    }
+
+    /**
+     * 标记消息已读状态
+     * @param id 消息的消息id，不传表示标记用户的所有消息
+     * @param read 是否标记为已读状态
+     */
+    suspend fun markMessageReadStatus(
+        id: Long? = null,
+        read: Boolean,
+        successBlock: (() -> Unit)
+    ): Unit? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .put(WxpNetworkService.getUrl("/api/need-login/device/message-read-mark")) {
+                    id?.let {
+                        parameter("id", id)
+                    }
+                    parameter("read", read)
+                }.body()
+        }, successBlock = {
+            successBlock.invoke()
+        }
+        )
     }
 }

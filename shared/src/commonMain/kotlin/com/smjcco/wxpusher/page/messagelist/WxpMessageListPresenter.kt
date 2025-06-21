@@ -4,6 +4,7 @@ import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.WxpBaseMvpPresenter
 import com.smjcco.wxpusher.base.WxpDateTimeUtils
 import com.smjcco.wxpusher.base.WxpSaveService
+import com.smjcco.wxpusher.base.WxpToastUtils
 import com.smjcco.wxpusher.base.letOnNotEmpty
 import com.smjcco.wxpusher.base.runAtMainSuspend
 import kotlinx.serialization.json.Json
@@ -124,6 +125,17 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             }
             view?.showMessageMoreLoading(false, hasMore)
             loading = false
+        }
+    }
+
+    override fun markMessageReadStatus(id: Long?, read: Boolean) {
+        runAtMainSuspend {
+            WxpApiService.markMessageReadStatus(id, read) {
+                messageListData.forEach {
+                    it.read = true
+                }
+                view?.onMessageList(messageListData)
+            }
         }
     }
 }

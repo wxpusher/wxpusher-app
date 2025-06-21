@@ -190,7 +190,36 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     
     @objc private func optionsTapped() {
-        print("选项按钮被点击")
+        let actionSheet = UIAlertController(title: nil,
+                                              message: nil,
+                                              preferredStyle: .actionSheet)
+        
+            
+            // 添加选项按钮
+            let option1 = UIAlertAction(title: "已读全部消息", style: .default) { [weak self]_ in
+                self?.presenter.markMessageReadStatus(id: nil, read: true)
+            }
+            
+            
+            let cancel = UIAlertAction(title: "取消", style: .cancel) { _ in
+           
+            }
+            
+            actionSheet.addAction(option1)
+            actionSheet.addAction(cancel)
+            
+            // 在 iPad 上需要设置弹出位置
+            if let popoverController = actionSheet.popoverPresentationController {
+                popoverController.sourceView = self.view
+                popoverController.sourceRect = CGRect(x: self.view.bounds.midX,
+                                                   y: self.view.bounds.midY,
+                                                   width: 0,
+                                                   height: 0)
+                popoverController.permittedArrowDirections = []
+            }
+            
+            // 显示 Action Sheet
+            present(actionSheet, animated: true, completion: nil)
     }
     
     
@@ -350,6 +379,7 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
             tableView.reloadData()
         }
     }
+    
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         //滚动有一段距离，说明一页没有显示完，最后显示最后一条的时候 ，加载更多
         if tableView.contentOffset.y > 50 && indexPath.row == messageList.count - 1 {
