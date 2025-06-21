@@ -73,6 +73,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
                 messageListData = fetchResultList.toMutableList()
                 lastUserReceiveRecordId = messageListData.lastOrNull()?.id ?: Long.MAX_VALUE
                 hasMore = true
+                view?.showMessageMoreLoading(false, hasMore)
                 view?.onMessageList(messageListData.toList())
                 saveRefreshListData()
             }

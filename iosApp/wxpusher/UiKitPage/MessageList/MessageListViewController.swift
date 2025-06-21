@@ -182,7 +182,11 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         tableView.estimatedRowHeight = 100
         tableView.separatorStyle = .none
         
-        footerLoadingView.setMessage("上滑加载更多")
+        footerLoadingView.setMessage("点击加载更多")
+        // 添加点击手势
+        footerLoadingView.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(clickLoadMore(_:)))
+        footerLoadingView.addGestureRecognizer(tapGesture)
         tableView.tableFooterView = footerLoadingView
         
         // 添加空状态视图
@@ -235,6 +239,11 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
     
     // MARK: - Page Action
+    // 点击事件处理
+    @objc func clickLoadMore(_ sender: UITapGestureRecognizer) {
+        presenter.loadMore()
+    }
+    
     @objc private func showSearchBar() {
         self.mainTabVC.navigationItem.titleView = searchBar
         UIView.animate(withDuration: 0.3) {
@@ -372,7 +381,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     private func gotoLogin(){
         self.navigationController?.setViewControllers([WxpLoginViewController()], animated: false)
-        //  self.navigationController?.setViewControllers([WxpBindPhoneViewController(phone: "1", code: "111112", phoneVerifyCode: "3")], animated: false)
     }
     
     // MARK: - MVP-VIEW
@@ -388,7 +396,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
             footerLoadingView.startLoading()
         }else{
             if(hasMore){
-                footerLoadingView.setMessage("上滑加载更多")
+                footerLoadingView.setMessage("点击加载更多")
             }else{
                 footerLoadingView.setMessage("只保留最近7天消息，没有更多数据了")
             }
@@ -454,8 +462,8 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        //滚动有一段距离，说明一页没有显示完，最后显示最后一条的时候 ，加载更多
-        if tableView.contentOffset.y > 50 && indexPath.row == messageList.count - 1 {
+        //展示最后一个item的时候，加载更多
+        if  indexPath.item == messageList.count - 1{
             presenter.loadMore()
         }
     }
