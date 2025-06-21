@@ -62,6 +62,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         if (loading) {
             return
         }
+        println("刷新refresh")
         runAtMainSuspend {
             loading = true
             view?.showMessageRefreshing(true)
@@ -72,7 +73,6 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             if (fetchResultList != null) {
                 messageListData = fetchResultList.toMutableList()
                 lastUserReceiveRecordId = messageListData.lastOrNull()?.id ?: Long.MAX_VALUE
-                hasMore = true
                 view?.showMessageMoreLoading(false, hasMore)
                 view?.onMessageList(messageListData.toList())
                 saveRefreshListData()
@@ -107,6 +107,13 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     override fun loadMore() {
         if (!hasMore) {
             println("没有更多数据了")
+            return
+        }
+        //至少>20条才需要加载更多，后端目前下发的是一页30条 ，避免每次加载首页，都多请求一次
+        if(messageListData.size < 20){
+            println("数据不够1页，不加载更多")
+            hasMore = false
+            view?.showMessageMoreLoading(false, hasMore)
             return
         }
         runAtMainSuspend {
