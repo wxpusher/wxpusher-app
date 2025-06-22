@@ -10,7 +10,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     private class FooterLoadingView: UIView {
         private let activityIndicator = UIActivityIndicatorView(style: .medium)
         private let messageLabel = UILabel()
-
+        
         override init(frame: CGRect) {
             super.init(frame: frame)
             setupUI()
@@ -452,13 +452,11 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         tableView.deselectRow(at: indexPath, animated: true)
         let message = messageList[indexPath.row]
         let urlString = message.url.trimmingCharacters(in: .whitespaces)
-        if let url = URL(string: urlString) {
-            let webVC = WebViewController(url: url)
-            navigationController?.pushViewController(webVC, animated: true)
-            //点击的时候，标记为已读
-            message.read = true
-            tableView.reloadData()
-        }
+        WxpJumpPageUtils.jumpToWebUrl(url: urlString)
+        
+        //        点击的时候，标记为已读
+        message.read = true
+        tableView.reloadData()
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -472,6 +470,8 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
 
 
 class MessageCell: UITableViewCell {
+    
+    private var message:WxpMessageListMessage?
     
     // MARK: - UI Elements
     private let unreadDot: UIView = {
@@ -517,8 +517,14 @@ class MessageCell: UITableViewCell {
         imageView.image = UIImage(systemName: "link")?.withTintColor(UIColor.defAccentPrimaryColor)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.isHidden = true
+        //添加点击事件
+        let longPressRecognizer = UILongPressGestureRecognizer(target: MessageCell.self, action: #selector(jumpToSourceUrl))
+        imageView.addGestureRecognizer(longPressRecognizer)
         return imageView
     }()
+    
+    // 新增：保存宽度约束
+    private var linkImageViewWidthConstraint: NSLayoutConstraint?
     
     // MARK: - Initialization
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -538,6 +544,10 @@ class MessageCell: UITableViewCell {
         contentView.addSubview(dateLabel)
         contentView.addSubview(linkImageView)
         
+        // 先创建宽度约束
+        let widthConstraint = linkImageView.widthAnchor.constraint(equalToConstant: 20)
+        self.linkImageViewWidthConstraint = widthConstraint
+        
         NSLayoutConstraint.activate([
             // Unread dot constraints
             unreadDot.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 6),
@@ -551,10 +561,9 @@ class MessageCell: UITableViewCell {
             messageLabel.trailingAnchor.constraint(lessThanOrEqualTo: linkImageView.leadingAnchor, constant: -8),
             
             // Link image view constraints (与标题第一行对齐)
-            //            linkImageView.centerYAnchor.constraint(equalTo: messageLabel.centerYAnchor),
             linkImageView.lastBaselineAnchor.constraint(equalTo: messageLabel.firstBaselineAnchor),
             linkImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            linkImageView.widthAnchor.constraint(equalToConstant: 20),
+            widthConstraint, // 用变量保存
             linkImageView.heightAnchor.constraint(equalToConstant: 20),
             
             // Source label constraints
@@ -571,11 +580,27 @@ class MessageCell: UITableViewCell {
     
     // MARK: - Configuration
     func configure(message:WxpMessageListMessage) {
-        messageLabel.text = message.summary
+        self.message = message
+        messageLabel.text = message.summary+message.summary+message.summary+message.summary
         sourceLabel.text = "来源: \(message.name ?? "")"
         dateLabel.text = WxpDateTimeUtils.shared.formatDateTime(timeStamp: message.createTime)
-        linkImageView.isHidden = false
         unreadDot.isHidden = message.read
         
+        let sourceUrl = message.sourceUrl?.trimmingCharacters(in: .whitespaces) ?? ""
+        let showLink = !sourceUrl.isEmpty
+        linkImageView.isHidden = !showLink
+        // 动态调整宽度
+        linkImageViewWidthConstraint?.constant = showLink ? 20 : 0
+    }
+    
+    @objc private func jumpToSourceUrl(){
+        guard let urlString = self.message?.url.trimmingCharacters(in: .whitespaces),
+              !urlString.isEmpty else {
+            // 处理 URL 为空的情况
+            print("URL is empty or nil")
+            return
+        }
+        
+        WxpJumpPageUtils.jumpToWebUrl(url: urlString)
     }
 }
