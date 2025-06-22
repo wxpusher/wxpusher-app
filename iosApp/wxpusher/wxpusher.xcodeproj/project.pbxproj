@@ -289,7 +289,6 @@
 			children = (
 				1A962E662E08610200C966A3 /* KtSwiftJumpPageUtils.m */,
 				1A962E682E08611300C966A3 /* KtSwiftJumpPageUtils.h */,
-				1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */,
 			);
 			path = KtSwiftBridge;
 			sourceTree = "<group>";
@@ -333,6 +332,7 @@
 		1A9C3E9A2E01CEF300A25249 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";

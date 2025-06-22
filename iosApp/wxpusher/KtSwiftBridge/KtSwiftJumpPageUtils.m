@@ -7,11 +7,12 @@
 
 #import <Foundation/Foundation.h>
 #import "KtSwiftJumpPageUtils.h"
+#import "WxPusher_iOS-Swift.h"
 
 @implementation KtSwiftJumpPageUtils
 
 + (void)jumpToLogin{
-    NSLog(@"OC-jumpToLogin");
+    [WxpJumpPageUtils jumpToLogin];
 }
 
 @end
