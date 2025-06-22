@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -17,9 +18,26 @@ kotlin {
             }
         }
     }
-    iosX64()
-    iosArm64()
-    iosSimulatorArm64()
+    // 定义一个配置函数
+    fun KotlinNativeTarget.iosTargetConfig() {
+        compilations.getByName("main") {
+            val iosShellBridge by cinterops.creating {
+                defFile(project.file("src/iosMain/cinterop/KtSwiftBridge.def"))
+                includeDirs(project.rootProject.file("iosApp/wxpusher/KtSwiftBridge"))
+            }
+        }
+    }
+
+    // 应用配置到各个目标
+    iosX64() {
+        iosTargetConfig()
+    }
+    iosArm64() {
+        iosTargetConfig()
+    }
+    iosSimulatorArm64() {
+        iosTargetConfig()
+    }
 
     cocoapods {
         summary = "Some description for the Shared Module"

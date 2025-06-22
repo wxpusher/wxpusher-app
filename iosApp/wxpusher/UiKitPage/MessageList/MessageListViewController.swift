@@ -452,7 +452,7 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         tableView.deselectRow(at: indexPath, animated: true)
         let message = messageList[indexPath.row]
         let urlString = message.url.trimmingCharacters(in: .whitespaces)
-        WxpJumpPageUtils.jumpToWebUrl(url: urlString)
+//        WxpJumpPageUtils.jumpToWebUrl(url: urlString)
         
         //        点击的时候，标记为已读
         message.read = true
@@ -601,6 +601,6 @@ class MessageCell: UITableViewCell {
             return
         }
         
-        WxpJumpPageUtils.jumpToWebUrl(url: urlString)
+//        WxpJumpPageUtils.jumpToWebUrl(url: urlString)
     }
 }

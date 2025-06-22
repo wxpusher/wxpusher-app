@@ -42,6 +42,8 @@
 		1A7D79CC2B086F7400C5F4F1 /* MessageListViewVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7D79CA2B086F7400C5F4F1 /* MessageListViewVM.swift */; };
 		1A7D79CE2B08B55B00C5F4F1 /* MessageListBean.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7D79CD2B08B55B00C5F4F1 /* MessageListBean.swift */; };
 		1A7D79CF2B08B55B00C5F4F1 /* MessageListBean.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7D79CD2B08B55B00C5F4F1 /* MessageListBean.swift */; };
+		1A962E672E08610200C966A3 /* KtSwiftJumpPageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E662E08610200C966A3 /* KtSwiftJumpPageUtils.m */; };
+		1A962E6A2E08625700C966A3 /* WxpJumpPageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */; };
 		1A9C3E702DF5963400A25249 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1A9C3E6F2DF5963400A25249 /* Launch Screen.storyboard */; };
 		1A9C3E732DF5984900A25249 /* WxpAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E712DF5984900A25249 /* WxpAppDelegate.swift */; };
 		1A9C3E742DF5984900A25249 /* WxpSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E722DF5984900A25249 /* WxpSceneDelegate.swift */; };
@@ -56,7 +58,6 @@
 		1A9C3E922DF7352500A25249 /* UIButton+Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */; };
 		1A9C3E942DF9D66600A25249 /* WxpMessageListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E932DF9D66600A25249 /* WxpMessageListService.swift */; };
 		1A9C3E972DFE80E600A25249 /* WxpBaseMvpUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */; };
-		1A9C3E9D2E01CF2200A25249 /* WxpJumpPageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E9C2E01CF2200A25249 /* WxpJumpPageUtils.swift */; };
 		1AAD926C2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AAD926B2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift */; };
 		1AAD926D2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AAD926B2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift */; };
 		1AC210D82ACC57F1008D86EA /* CommonExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC210D72ACC57F1008D86EA /* CommonExt.swift */; };
@@ -113,6 +114,9 @@
 		1A7D79C72B086E9300C5F4F1 /* MessageListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageListView.swift; sourceTree = "<group>"; };
 		1A7D79CA2B086F7400C5F4F1 /* MessageListViewVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageListViewVM.swift; sourceTree = "<group>"; };
 		1A7D79CD2B08B55B00C5F4F1 /* MessageListBean.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageListBean.swift; sourceTree = "<group>"; };
+		1A962E662E08610200C966A3 /* KtSwiftJumpPageUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KtSwiftJumpPageUtils.m; sourceTree = "<group>"; };
+		1A962E682E08611300C966A3 /* KtSwiftJumpPageUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KtSwiftJumpPageUtils.h; sourceTree = "<group>"; };
+		1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpJumpPageUtils.swift; sourceTree = "<group>"; };
 		1A9C3E6F2DF5963400A25249 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		1A9C3E712DF5984900A25249 /* WxpAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpAppDelegate.swift; sourceTree = "<group>"; };
 		1A9C3E722DF5984900A25249 /* WxpSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpSceneDelegate.swift; sourceTree = "<group>"; };
@@ -126,7 +130,6 @@
 		1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Loading.swift"; sourceTree = "<group>"; };
 		1A9C3E932DF9D66600A25249 /* WxpMessageListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpMessageListService.swift; sourceTree = "<group>"; };
 		1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBaseMvpUIViewController.swift; sourceTree = "<group>"; };
-		1A9C3E9C2E01CF2200A25249 /* WxpJumpPageUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpJumpPageUtils.swift; sourceTree = "<group>"; };
 		1AAD926B2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckBoxToggleStyle.swift; sourceTree = "<group>"; };
 		1AC210D72ACC57F1008D86EA /* CommonExt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommonExt.swift; sourceTree = "<group>"; };
 		1AC210DA2ACC581C008D86EA /* HomeTabView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeTabView.swift; sourceTree = "<group>"; };
@@ -258,6 +261,7 @@
 		1A5681882A598A89003547E6 = {
 			isa = PBXGroup;
 			children = (
+				1A962E5D2E085C4800C966A3 /* KtSwiftBridge */,
 				1AD0B1122AE7F9D500DABE06 /* WxPusher-iOS */,
 				1ADEF6AE2ACDC6D6002FEB57 /* WxPusher-Mac */,
 				1ADEF6A42ACDBD97002FEB57 /* Api */,
@@ -278,6 +282,16 @@
 				1A7D79CA2B086F7400C5F4F1 /* MessageListViewVM.swift */,
 			);
 			path = MessageList;
+			sourceTree = "<group>";
+		};
+		1A962E5D2E085C4800C966A3 /* KtSwiftBridge */ = {
+			isa = PBXGroup;
+			children = (
+				1A962E662E08610200C966A3 /* KtSwiftJumpPageUtils.m */,
+				1A962E682E08611300C966A3 /* KtSwiftJumpPageUtils.h */,
+				1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */,
+			);
+			path = KtSwiftBridge;
 			sourceTree = "<group>";
 		};
 		1A9C3E772DF5A02E00A25249 /* MessageList */ = {
@@ -319,7 +333,6 @@
 		1A9C3E9A2E01CEF300A25249 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
-				1A9C3E9C2E01CF2200A25249 /* WxpJumpPageUtils.swift */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -499,7 +512,7 @@
 				TargetAttributes = {
 					1A5681902A598A89003547E6 = {
 						CreatedOnToolsVersion = 14.2;
-						LastSwiftMigration = 1420;
+						LastSwiftMigration = 1620;
 					};
 					1ADEF6AC2ACDC6D6002FEB57 = {
 						CreatedOnToolsVersion = 14.2;
@@ -628,7 +641,7 @@
 				1A9C3E782DF5A02E00A25249 /* MessageListViewController.swift in Sources */,
 				1A9C3E7A2DF5A07D00A25249 /* WxpMessageItemBeam.swift in Sources */,
 				1A5164632B09D6D40000BA90 /* WebView.swift in Sources */,
-				1A9C3E9D2E01CF2200A25249 /* WxpJumpPageUtils.swift in Sources */,
+				1A962E672E08610200C966A3 /* KtSwiftJumpPageUtils.m in Sources */,
 				1A9C3E802DF5ABFC00A25249 /* WxpLoginViewController.swift in Sources */,
 				1AC210D82ACC57F1008D86EA /* CommonExt.swift in Sources */,
 				1AC210DF2ACC581C008D86EA /* HomeView.swift in Sources */,
@@ -642,6 +655,7 @@
 				1ACCD55B2AF9342200841714 /* SaveKey.swift in Sources */,
 				1A9C3E732DF5984900A25249 /* WxpAppDelegate.swift in Sources */,
 				1A9C3E742DF5984900A25249 /* WxpSceneDelegate.swift in Sources */,
+				1A962E6A2E08625700C966A3 /* WxpJumpPageUtils.swift in Sources */,
 				1A9C3E8D2DF5DA8600A25249 /* WxpBindPhoneViewController.swift in Sources */,
 				1A9C3E922DF7352500A25249 /* UIButton+Loading.swift in Sources */,
 				1A9C3E892DF5CB9800A25249 /* UIColor+Color.swift in Sources */,

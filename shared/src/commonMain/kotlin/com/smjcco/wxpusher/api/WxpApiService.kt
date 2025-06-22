@@ -3,6 +3,7 @@ package com.smjcco.wxpusher.api
 import com.smjcco.wxpusher.base.BaseResp
 import com.smjcco.wxpusher.base.WxpNetworkService
 import com.smjcco.wxpusher.base.WxpToastUtils
+import com.smjcco.wxpusher.biz.common.WxpAppPageService
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
@@ -35,6 +36,11 @@ object WxpApiService {
             if (resp.code == 1000) {
                 successBlock?.invoke(resp.data)
                 return resp.data
+            }
+
+            if (resp.code == 1002){
+                WxpAppPageService.jumpToLogin()
+                return null
             }
             if (toastError) {
                 WxpToastUtils.showToast(resp.msg)

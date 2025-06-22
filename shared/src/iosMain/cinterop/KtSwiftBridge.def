@@ -1,0 +1,3 @@
+package = platform.swift.com.smjcco.wxpusher
+headers = KtSwiftJumpPageUtils.h
+language = Objective-C
