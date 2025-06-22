@@ -517,9 +517,7 @@ class MessageCell: UITableViewCell {
         imageView.image = UIImage(systemName: "link")?.withTintColor(UIColor.defAccentPrimaryColor)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.isHidden = true
-        //添加点击事件
-        let longPressRecognizer = UILongPressGestureRecognizer(target: MessageCell.self, action: #selector(jumpToSourceUrl))
-        imageView.addGestureRecognizer(longPressRecognizer)
+        imageView.isUserInteractionEnabled = true
         return imageView
     }()
     
@@ -576,6 +574,10 @@ class MessageCell: UITableViewCell {
             dateLabel.centerYAnchor.constraint(equalTo: sourceLabel.centerYAnchor),
             dateLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
         ])
+        
+        //添加链接点击事件
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(jumpToSourceUrl))
+        linkImageView.addGestureRecognizer(tapGesture)
     }
     
     // MARK: - Configuration
@@ -586,18 +588,19 @@ class MessageCell: UITableViewCell {
         dateLabel.text = WxpDateTimeUtils.shared.formatDateTime(timeStamp: message.createTime)
         unreadDot.isHidden = message.read
         
+        //链接按钮
         let sourceUrl = message.sourceUrl?.trimmingCharacters(in: .whitespaces) ?? ""
         let showLink = !sourceUrl.isEmpty
         linkImageView.isHidden = !showLink
-        // 动态调整宽度
         linkImageViewWidthConstraint?.constant = showLink ? 20 : 0
+        
     }
     
-    @objc private func jumpToSourceUrl(){
-        guard let urlString = self.message?.url.trimmingCharacters(in: .whitespaces),
+    @objc func jumpToSourceUrl(){
+        guard let urlString = self.message?.sourceUrl?.trimmingCharacters(in: .whitespaces),
               !urlString.isEmpty else {
             // 处理 URL 为空的情况
-            print("URL is empty or nil")
+            print("sourceUrl is empty or nil")
             return
         }
         
