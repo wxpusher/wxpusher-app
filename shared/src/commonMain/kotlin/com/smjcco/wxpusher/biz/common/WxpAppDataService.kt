@@ -1,9 +1,12 @@
 package com.smjcco.wxpusher.biz.common
 
+import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.WxpBaseInfoService
 import com.smjcco.wxpusher.base.WxpSaveService
+import com.smjcco.wxpusher.base.runAtMainSuspend
 import com.smjcco.wxpusher.biz.bean.WxpLoginInfo
 import com.smjcco.wxpusher.biz.bean.WxpPlatformEnum
+import com.smjcco.wxpusher.biz.bean.WxpUpdateInfoReq
 import kotlinx.serialization.json.Json
 
 object WxpAppDataService {
@@ -33,6 +36,20 @@ object WxpAppDataService {
         saveLoginInfo(WxpLoginInfo(deviceToken, deviceId, uid))
         savePushToken(pushToken)
         WxpSaveService.set(mergeIOSDataHasRun, true)
+    }
+
+    /**
+     * 上传设备信息到服务器
+     * 重点是pushToken和设备的绑定关系
+     */
+    fun updateDeviceInfo() {
+        runAtMainSuspend {
+            val loginInfo = getLoginInfo()
+            val updateInfoReq = WxpUpdateInfoReq(loginInfo?.deviceId, loginInfo?.deviceToken)
+            WxpApiService.updateDeviceInfo(updateInfoReq) {
+                println("更新pushToken成功,updateInfoReq=${updateInfoReq}")
+            }
+        }
     }
 
     /**

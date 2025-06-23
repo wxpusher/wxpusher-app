@@ -8,7 +8,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         let tempWin = UIWindow(windowScene: windowScene)
 
-        let mainTabBarController = MainTabBarController()
+//        let mainTabBarController = MainTabBarController()
+        let mainTabBarController = UserAgreementViewController()
         let navigationController = UINavigationController(rootViewController: mainTabBarController)
         tempWin.backgroundColor = .white
         tempWin.rootViewController = navigationController

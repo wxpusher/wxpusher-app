@@ -3,6 +3,7 @@ package com.smjcco.wxpusher.api
 import com.smjcco.wxpusher.base.BaseResp
 import com.smjcco.wxpusher.base.WxpNetworkService
 import com.smjcco.wxpusher.base.WxpToastUtils
+import com.smjcco.wxpusher.biz.bean.WxpUpdateInfoReq
 import com.smjcco.wxpusher.biz.common.WxpAppPageService
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
@@ -38,7 +39,7 @@ object WxpApiService {
                 return resp.data
             }
 
-            if (resp.code == 1002){
+            if (resp.code == 1002) {
                 WxpAppPageService.jumpToLogin()
                 return null
             }
@@ -80,6 +81,21 @@ object WxpApiService {
                     setBody(req)
                 }.body()
         })
+    }
+
+    /**
+     * 更新设备的pushToken信息
+     */
+    suspend fun updateDeviceInfo(req: WxpUpdateInfoReq, successBlock: (() -> Unit)? = null): Unit? {
+        if (req.deviceUuid?.isEmpty() == true || req.pushToken?.isEmpty() == true) {
+            return Unit
+        }
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .put(WxpNetworkService.getUrl("/api/device/update-device-info")) {
+                    setBody(req)
+                }.body()
+        }, successBlock = { successBlock?.invoke() })
     }
 
     /**

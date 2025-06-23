@@ -21,6 +21,22 @@ import Foundation
             rootVC.setViewControllers([loginVC], animated: false)
         }
     }
+    
+    /**
+     * 跳转到用户隐私协议
+     */
+     public static func jumpToUserAgreement() {
+        DispatchQueue.main.async {
+            // 获取keyWindow
+            guard let window = UIApplication.shared.keyWindow ?? UIApplication.shared.windows.first else {
+                return
+            }
+
+            let vc = UserAgreementViewController()
+            let rootVC: UINavigationController = window.rootViewController as! UINavigationController
+            rootVC.setViewControllers([vc], animated: false)
+        }
+    }
 
     /**
     * 跳转到web页面
@@ -49,14 +65,6 @@ import Foundation
             let webVC = WebViewController(url: url)
             let rootVC = window.rootViewController as! UINavigationController
             rootVC.pushViewController(webVC, animated: true)
-//
-//
-//            navigationController?.pushViewController(webVC, animated: true)
-//
-//            // 创建登录ViewController
-//            let loginVC = WxpLoginViewController() // 替换为你的登录VC
-//            let rootVC:UINavigationController = window.rootViewController as! UINavigationController
-//            rootVC.setViewControllers([loginVC], animated: false)
         }
     }
 }
