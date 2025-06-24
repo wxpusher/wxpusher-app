@@ -205,7 +205,7 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
     }
     
     func onGoMain() {
-        navigationController?.setViewControllers([MainTabBarController()], animated: true)
+        WxpJumpPageUtils.jumpToMain()
     }
     
     func onSendButtonText(msg: String, loading: Bool) {

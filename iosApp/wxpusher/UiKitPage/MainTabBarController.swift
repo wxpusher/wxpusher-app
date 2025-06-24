@@ -5,6 +5,18 @@ class MainTabBarController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        //没有同意隐私协议
+        if(!WxpSaveService.shared.get(key: WxpSaveKey.UserHasAgreement, value: false)){
+            WxpJumpPageUtils.jumpToUserAgreement()
+            return
+        }
+        //没有登录
+        let deviceToken = WxpAppDataService.shared.getLoginInfo()?.deviceToken ?? ""
+        if(deviceToken.isEmpty){
+            WxpJumpPageUtils.jumpToLogin()
+            return
+        }
+        
         setupViewControllers()
         setupAppearance()
           
