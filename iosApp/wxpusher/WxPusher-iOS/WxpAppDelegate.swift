@@ -69,6 +69,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
         print("[push]-apple push token: \(token)")
         WxpAppDataService.shared.savePushToken(pushToken: token)
-        updateDeviceInfo()
+        WxpAppDataService.shared.updateDeviceInfo()
     }
 } 

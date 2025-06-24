@@ -41,6 +41,7 @@ class WxpBindPresenter(view: IWxpBindView) :
                         uid = it.uid
                     )
                     WxpAppDataService.saveLoginInfo(loginInfo)
+                    WxpAppDataService.updateDeviceInfo()
                     view?.onGoMain()
                 } else {
                     WxpToastUtils.showToast("绑定未完成，请先按步骤绑定 ")

@@ -195,6 +195,8 @@ class UserAgreementViewController: WxpBaseUIViewController, UITextViewDelegate {
         return false
     }
     
+    // MARK: - APP返回前台处理
+    
     deinit {
         NotificationCenter.default.removeObserver(self)
     }

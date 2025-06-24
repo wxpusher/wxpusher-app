@@ -93,6 +93,7 @@ class WxpLoginPresenter(view: IWxpLoginView) :
                         uid = it.uid
                     )
                     WxpAppDataService.saveLoginInfo(loginInfo)
+                    WxpAppDataService.updateDeviceInfo()
                     view?.onGoMain()
                 } else {
                     view?.onGoBind(phone = phone, code = verifyCode, data = it)

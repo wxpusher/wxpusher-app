@@ -19,8 +19,26 @@ class MainTabBarController: UITabBarController {
         
         setupViewControllers()
         setupAppearance()
+        notificationPermissionRemind()
           
         self.delegate = self
+    }
+    
+    //没有权限的异常提醒
+    private func notificationPermissionRemind(){
+        WxpPermissionUtils.requestNotificationPermission { success in
+            if(!success){
+                var params = WxpDialogParameter()
+                params.title = "异常提醒"
+                params.message = "WxPusher必须要推送权限才能正常工作，请在【设置-WxPusher消息推送平台-通知】打开相关开关"
+                params.leftText = "取消"
+                params.rightText = "去设置"
+                params.rightBlock = {
+                    WxpJumpPageUtils.openAppSettings()
+                }
+                WxpDialogUtils.showConfirmDialog(params: params)
+            }
+        }
     }
     
     private func setupViewControllers() {
