@@ -1,6 +1,9 @@
 package com.smjcco.wxpusher.biz.bean
 
+import kotlinx.serialization.Serializable
 
+
+@Serializable
 data class WxpUpdateInfoReq(
     val deviceUuid: String? = null,
     val pushToken: String? = null,
