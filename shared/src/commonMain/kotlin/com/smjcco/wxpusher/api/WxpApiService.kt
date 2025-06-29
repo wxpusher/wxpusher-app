@@ -86,13 +86,13 @@ object WxpApiService {
     /**
      * 更新设备的pushToken信息
      */
-    suspend fun updateDeviceInfo(req: WxpUpdateInfoReq, successBlock: (() -> Unit)? = null): Unit? {
+    suspend fun updateDeviceInfo(req: WxpUpdateInfoReq, successBlock: (() -> Unit)? = null): Boolean? {
         if (req.deviceUuid?.isEmpty() == true || req.pushToken?.isEmpty() == true) {
-            return Unit
+            return false
         }
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
-                .put(WxpNetworkService.getUrl("/api/device/update-device-info")) {
+                .put(WxpNetworkService.getUrl("/api/need-login/device/update-device-info")) {
                     setBody(req)
                 }.body()
         }, successBlock = { successBlock?.invoke() })
