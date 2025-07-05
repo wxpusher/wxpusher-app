@@ -20,7 +20,6 @@ class ProfileViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.setNavigationBarHidden(false, animated: false)
-        mainTabVC.navigationItem.setRightBarButtonItems(nil, animated: false)
     }
     
     override func viewDidLoad() {

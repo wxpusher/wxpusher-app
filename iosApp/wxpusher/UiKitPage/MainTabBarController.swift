@@ -17,11 +17,13 @@ class MainTabBarController: UITabBarController {
             return
         }
         
+        
         setupViewControllers()
         setupAppearance()
         notificationPermissionRemind()
           
         self.delegate = self
+        
     }
     
     //没有权限的异常提醒
