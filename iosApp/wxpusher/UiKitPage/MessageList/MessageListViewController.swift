@@ -131,11 +131,11 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
 
 //        searchController.searchResultsUpdater = self
         searchController.searchBar.delegate = self
-        searchController.obscuresBackgroundDuringPresentation = true
+        searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "搜索"
         // 设置搜索栏不隐藏导航栏，但会覆盖内容
         searchController.hidesNavigationBarDuringPresentation = true
-        mainTabVC.navigationItem.hidesSearchBarWhenScrolling = true
+        mainTabVC.navigationItem.hidesSearchBarWhenScrolling = false
         mainTabVC.navigationItem.searchController = searchController
         // 确保搜索控制器能够覆盖整个界面，包括 TabBar
         mainTabVC.definesPresentationContext = true
@@ -381,7 +381,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
             if(hasMore){
                 footerLoadingView.setMessage("点击加载更多")
             }else{
-                footerLoadingView.setMessage("只保留最近7天消息，没有更多数据了")
+                footerLoadingView.setMessage("只保留最近7天消息，没有数据了")
             }
             footerLoadingView.stopLoading()
         }

@@ -85,8 +85,24 @@ class MainTabBarController: UITabBarController {
     }
 }
 
-//将当前tab容器VC的标题，设置为当前选中的tab 子VC的标题
+
 extension MainTabBarController: UITabBarControllerDelegate {
+    func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+        // 如果搜索栏正在激活，阻止切换 Tab，需要先关闭搜索栏，再进行tab切换
+        if let searchController = navigationItem.searchController,
+           searchController.isActive {
+            searchController.dismiss(animated: true) {
+                if let index = tabBarController.viewControllers?.firstIndex(of: viewController) {
+                    tabBarController.selectedIndex = index
+                    tabBarController.title = viewController.title
+                }
+            }
+            return false
+        }
+        return true
+    }
+    
+    //将当前tab容器VC的标题，设置为当前选中的tab 子VC的标题
     func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
         tabBarController.title = viewController.title
     }
