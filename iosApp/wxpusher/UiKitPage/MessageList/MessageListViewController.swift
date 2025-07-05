@@ -129,12 +129,17 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         
         mainTabVC.navigationItem.rightBarButtonItems = [optionsButton]
 
-        searchController.searchResultsUpdater = self
+//        searchController.searchResultsUpdater = self
+        searchController.searchBar.delegate = self
         searchController.obscuresBackgroundDuringPresentation = true
         searchController.searchBar.placeholder = "搜索"
+        // 设置搜索栏不隐藏导航栏，但会覆盖内容
+        searchController.hidesNavigationBarDuringPresentation = true
         mainTabVC.navigationItem.hidesSearchBarWhenScrolling = true
         mainTabVC.navigationItem.searchController = searchController
-        definesPresentationContext = true
+        // 确保搜索控制器能够覆盖整个界面，包括 TabBar
+        mainTabVC.definesPresentationContext = true
+        mainTabVC.extendedLayoutIncludesOpaqueBars = true
         hideSearchBar()
     }
     
@@ -238,9 +243,10 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     
      func hideSearchBar() {
-        searchController.dismiss(animated: false)
-//        self.searchController.searchBar.resignFirstResponder()
-//        self.searchController.isActive = false
+        if searchController.isActive {
+            searchController.dismiss(animated: false)
+            searchController.searchBar.resignFirstResponder()
+        }
     }
     
     @objc private func optionsTapped() {
@@ -400,17 +406,17 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
 }
 
 // MARK: -  extension
-extension MessageListViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        let searchText = searchController.searchBar.text
-        presenter.searchIfChanged(key: searchText)
-    }
-   
-}
+//extension MessageListViewController: UISearchResultsUpdating {
+//    func updateSearchResults(for searchController: UISearchController) {
+//        let searchText = searchController.searchBar.text
+//        presenter.searchIfChanged(key: searchText)
+//    }
+//   
+//}
 
 extension MessageListViewController: UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        hideSearchBar()
+        searchController.dismiss(animated: true)
         presenter.searchIfChanged(key: "")
     }
     
@@ -418,12 +424,13 @@ extension MessageListViewController: UISearchBarDelegate {
         // 处理搜索
         let key = searchBar.text ?? ""
         presenter.searchIfChanged(key:key)
+        searchBar.resignFirstResponder()
     }
-    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        print("用户取消了输入框的选中状态")
-        hideSearchBar()
-        presenter.searchIfChanged(key: "")
-    }
+    
+//    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+//        print("用户取消了输入框的选中状态")
+//        presenter.searchIfChanged(key: "")
+//    }
 }
 
 extension MessageListViewController: UITableViewDelegate, UITableViewDataSource {
