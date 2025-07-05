@@ -45,7 +45,7 @@ class MainTabBarController: UITabBarController {
     
     private func setupViewControllers() {
         let messageListVC = MessageListViewController(mainTabVC: self)
-        let profileVC = ProfileViewController(mainTabVC: self)
+        let profileVC = WxpProfileViewController(mainTabVC: self)
         // 创建导航控制器
         messageListVC.tabBarItem = UITabBarItem(
             title: "消息列表",

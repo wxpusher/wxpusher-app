@@ -24,6 +24,9 @@
 		1A4715512AED57110089D7A7 /* SendVerifyBean.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47154F2AED57110089D7A7 /* SendVerifyBean.swift */; };
 		1A4715572AF782710089D7A7 /* NetError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4715562AF782710089D7A7 /* NetError.swift */; };
 		1A4715582AF782710089D7A7 /* NetError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4715562AF782710089D7A7 /* NetError.swift */; };
+		1A4934632E196C7900EA1C71 /* WxpProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934622E196C7900EA1C71 /* WxpProfileViewController.swift */; };
+		1A4934662E19714B00EA1C71 /* KtSwiftCommonParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934652E19703400EA1C71 /* KtSwiftCommonParams.m */; };
+		1A4934682E1971EA00EA1C71 /* WxpCommonParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934672E1971E400EA1C71 /* WxpCommonParams.swift */; };
 		1A5164632B09D6D40000BA90 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164622B09D6D40000BA90 /* WebView.swift */; };
 		1A5164642B09D6D40000BA90 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164622B09D6D40000BA90 /* WebView.swift */; };
 		1A5164672B0A3A650000BA90 /* HomeViewVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164662B0A3A650000BA90 /* HomeViewVM.swift */; };
@@ -111,6 +114,10 @@
 		1A47154C2AED47810089D7A7 /* WxPusherTargetType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxPusherTargetType.swift; sourceTree = "<group>"; };
 		1A47154F2AED57110089D7A7 /* SendVerifyBean.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendVerifyBean.swift; sourceTree = "<group>"; };
 		1A4715562AF782710089D7A7 /* NetError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetError.swift; sourceTree = "<group>"; };
+		1A4934622E196C7900EA1C71 /* WxpProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpProfileViewController.swift; sourceTree = "<group>"; };
+		1A4934642E19702300EA1C71 /* KtSwiftCommonParams.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KtSwiftCommonParams.h; sourceTree = "<group>"; };
+		1A4934652E19703400EA1C71 /* KtSwiftCommonParams.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KtSwiftCommonParams.m; sourceTree = "<group>"; };
+		1A4934672E1971E400EA1C71 /* WxpCommonParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpCommonParams.swift; sourceTree = "<group>"; };
 		1A5164622B09D6D40000BA90 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		1A5164662B0A3A650000BA90 /* HomeViewVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewVM.swift; sourceTree = "<group>"; };
 		1A51646A2B0A3AB20000BA90 /* BaseVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseVM.swift; sourceTree = "<group>"; };
@@ -194,6 +201,7 @@
 		1A447DF42DF53ECD005C402F /* UiKitPage */ = {
 			isa = PBXGroup;
 			children = (
+				1A4934612E196A4000EA1C71 /* Profile */,
 				1A9C3E872DF5CB8800A25249 /* Common */,
 				1A962E6B2E09B1F300C966A3 /* UserAgreement */,
 				1A9C3E8C2DF5DA8600A25249 /* BindPhone */,
@@ -228,6 +236,14 @@
 				1A68CC9C2B3AD45000F6E742 /* UpdateDeviceInfoBean.swift */,
 			);
 			path = Bean;
+			sourceTree = "<group>";
+		};
+		1A4934612E196A4000EA1C71 /* Profile */ = {
+			isa = PBXGroup;
+			children = (
+				1A4934622E196C7900EA1C71 /* WxpProfileViewController.swift */,
+			);
+			path = Profile;
 			sourceTree = "<group>";
 		};
 		1A5164612B09D6C20000BA90 /* WebView */ = {
@@ -301,6 +317,8 @@
 		1A962E5D2E085C4800C966A3 /* KtSwiftBridge */ = {
 			isa = PBXGroup;
 			children = (
+				1A4934642E19702300EA1C71 /* KtSwiftCommonParams.h */,
+				1A4934652E19703400EA1C71 /* KtSwiftCommonParams.m */,
 				1A962E662E08610200C966A3 /* KtSwiftJumpPageUtils.m */,
 				1A962E682E08611300C966A3 /* KtSwiftJumpPageUtils.h */,
 			);
@@ -356,6 +374,7 @@
 		1A9C3E9A2E01CEF300A25249 /* Utils */ = {
 			isa = PBXGroup;
 			children = (
+				1A4934672E1971E400EA1C71 /* WxpCommonParams.swift */,
 				1A962E762E0B09AD00C966A3 /* WxpDialogUtils.swift */,
 				1A962E702E0AFF8E00C966A3 /* WxpPermissionUtils.swift */,
 				1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */,
@@ -651,6 +670,7 @@
 			files = (
 				1A7D79CB2B086F7400C5F4F1 /* MessageListViewVM.swift in Sources */,
 				1ACCD55F2AFFB2D100841714 /* BindPhoneView.swift in Sources */,
+				1A4934632E196C7900EA1C71 /* WxpProfileViewController.swift in Sources */,
 				1A4715502AED57110089D7A7 /* SendVerifyBean.swift in Sources */,
 				1AC210EA2ACC5C8D008D86EA /* UidMethodView.swift in Sources */,
 				1A51646B2B0A3AB20000BA90 /* BaseVM.swift in Sources */,
@@ -661,12 +681,14 @@
 				1AC210DE2ACC581C008D86EA /* LoginView.swift in Sources */,
 				1A5164722B14DD6F0000BA90 /* ProfileViewVM.swift in Sources */,
 				1A4715572AF782710089D7A7 /* NetError.swift in Sources */,
+				1A4934662E19714B00EA1C71 /* KtSwiftCommonParams.m in Sources */,
 				1A962E772E0B09AD00C966A3 /* WxpDialogUtils.swift in Sources */,
 				1ACCD5582AF9267B00841714 /* VerifyCodeLoginBean.swift in Sources */,
 				1A9C3E7C2DF5A5B300A25249 /* WxpNetworkConstants.swift in Sources */,
 				1A51646F2B137E650000BA90 /* ProfileView.swift in Sources */,
 				1A9C3E782DF5A02E00A25249 /* MessageListViewController.swift in Sources */,
 				1A9C3E7A2DF5A07D00A25249 /* WxpMessageItemBeam.swift in Sources */,
+				1A4934682E1971EA00EA1C71 /* WxpCommonParams.swift in Sources */,
 				1A5164632B09D6D40000BA90 /* WebView.swift in Sources */,
 				1A962E672E08610200C966A3 /* KtSwiftJumpPageUtils.m in Sources */,
 				1A9C3E802DF5ABFC00A25249 /* WxpLoginViewController.swift in Sources */,
