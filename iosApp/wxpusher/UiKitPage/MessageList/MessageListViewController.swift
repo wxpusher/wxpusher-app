@@ -140,7 +140,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         // 确保搜索控制器能够覆盖整个界面，包括 TabBar
         mainTabVC.definesPresentationContext = true
         mainTabVC.extendedLayoutIncludesOpaqueBars = true
-        hideSearchBar()
     }
     
     override func viewDidLoad() {
@@ -155,8 +154,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-        hideSearchBar()
-        self.mainTabVC.navigationItem.searchController = nil
+        mainTabVC.navigationItem.searchController = nil
         self.mainTabVC.navigationItem.rightBarButtonItems = []
     }
     
@@ -242,12 +240,12 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
     
     
-     func hideSearchBar() {
-        if searchController.isActive {
-            searchController.dismiss(animated: false)
-            searchController.searchBar.resignFirstResponder()
-        }
-    }
+//     func hideSearchBar() {
+//        if searchController.isActive {
+//            searchController.dismiss(animated: false)
+//            searchController.searchBar.resignFirstResponder()
+//        }
+//    }
     
     @objc private func optionsTapped() {
         let actionSheet = UIAlertController(title: nil,
