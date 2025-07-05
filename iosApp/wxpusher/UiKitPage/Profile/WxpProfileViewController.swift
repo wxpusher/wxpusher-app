@@ -83,7 +83,7 @@ class WxpProfileViewController: UIViewController {
                 },
                 ProfileItem(title: "设备ID", subtitle: deviceId,
                             accessoryType: .disclosureIndicator) {
-                    WxpToastUtils.shared.showToast(msg: "UID复制成功")
+                    WxpToastUtils.shared.showToast(msg: "设备ID复制成功")
                 }
             ]),
             
