@@ -81,16 +81,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     private func setupUI() {
         title = "消息列表"
-        
-        emptyView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(emptyView)
-        NSLayoutConstraint.activate([
-            emptyView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            emptyView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
-        emptyView.isHidden = true
+      
         
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -104,7 +95,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         ])
        
         tableView.backgroundColor = .systemBackground
-        
         
         tableView.delegate = self
         tableView.dataSource = self
@@ -127,6 +117,20 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
         longPressRecognizer.minimumPressDuration = 0.5 // 设置长按时间阈值 (秒)
         tableView.addGestureRecognizer(longPressRecognizer)
+        
+        
+        //添加空态页面
+        emptyView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(emptyView)
+        NSLayoutConstraint.activate([
+            emptyView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            emptyView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+
+        emptyView.backgroundColor = .systemBackground
+        emptyView.isHidden = true
     }
     
     func setupSearchAndNavication(){
