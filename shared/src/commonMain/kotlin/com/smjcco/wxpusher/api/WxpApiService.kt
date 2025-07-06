@@ -86,7 +86,26 @@ object WxpApiService {
     /**
      * 更新设备的pushToken信息
      */
-    suspend fun updateDeviceInfo(req: WxpUpdateInfoReq, successBlock: (() -> Unit)? = null): Boolean? {
+    suspend fun logout(
+        successBlock: (() -> Unit)? = null
+    ): Boolean? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .post(WxpNetworkService.getUrl("/api/need-login/device/logout")) {
+
+                }.body()
+        }, errorBlock = {
+            WxpToastUtils.showToast("失败," + it.message)
+        }, successBlock = { successBlock?.invoke() })
+    }
+
+    /**
+     * 更新设备的pushToken信息
+     */
+    suspend fun updateDeviceInfo(
+        req: WxpUpdateInfoReq,
+        successBlock: (() -> Unit)? = null
+    ): Boolean? {
         if (req.deviceUuid?.isEmpty() == true || req.pushToken?.isEmpty() == true) {
             return false
         }

@@ -53,6 +53,22 @@ object WxpAppDataService {
     }
 
     /**
+     * 退出登录
+     */
+    fun logout() {
+        runAtMainSuspend {
+            WxpApiService.logout {
+                //删除本地的deviceToken
+                getLoginInfo()?.let {
+                    it.deviceToken = null
+                    saveLoginInfo(it)
+                }
+                WxpAppPageService.jumpToLogin()
+            }
+        }
+    }
+
+    /**
      * 获取登陆信息
      */
     fun getLoginInfo(): WxpLoginInfo? {

@@ -5,7 +5,7 @@ class WxpProfileViewController: UIViewController {
     
     
     private let tableView = UITableView(frame: .zero, style: .grouped)
-  
+    
     
     // 数据源
     private var sectionData: [(title: String, items: [ProfileItem])] = []
@@ -74,13 +74,13 @@ class WxpProfileViewController: UIViewController {
             ("设备和账号", [
                 ProfileItem(title: "UID", subtitle: uid.isEmpty ? "未登录" : uid,
                             accessoryType: .disclosureIndicator) {
-                    UIPasteboard.general.string = uid
-                    WxpToastUtils.shared.showToast(msg: "UID复制成功")
-                },
+                                UIPasteboard.general.string = uid
+                                WxpToastUtils.shared.showToast(msg: "UID复制成功")
+                            },
                 ProfileItem(title: "设备ID", subtitle: deviceId,
                             accessoryType: .disclosureIndicator) {
-                    WxpToastUtils.shared.showToast(msg: "设备ID复制成功")
-                }
+                                WxpToastUtils.shared.showToast(msg: "设备ID复制成功")
+                            }
             ]),
             
             // 通用设置
@@ -114,32 +114,41 @@ class WxpProfileViewController: UIViewController {
                 ProfileItem(title: "用户协议", subtitle: "查看用户和隐私协议", accessoryType: .disclosureIndicator) {
                     WxpJumpPageUtils.jumpToWebUrl(url: "https://wxpusher.zjiecode.com/admin/agreement/index-argeement.html")
                 },
-                ProfileItem(title: "软件更新", subtitle: WxpCommonParams.appVersionName(), accessoryType: .disclosureIndicator) { [weak self] in
-                  
+                ProfileItem(title: "软件更新", subtitle: WxpCommonParams.appVersionName(), accessoryType: .disclosureIndicator) {
+                    
+                    
                     
                 }
             ]),
             
             ("账号管理", [
-               
+                
                 ProfileItem(title: "用户账号", subtitle: "退出登录",
                             accessoryType: .disclosureIndicator) {
+                                var params = WxpDialogParameter()
+                                params.title = "退出当前账号吗？"
+                                params.leftText = "取消"
+                                params.rightText = "退出账号"
+                                params.rightBlock = {
+                                    WxpAppDataService.shared.logout()
+                                }
+                                WxpDialogUtils.showConfirmDialog(params: params)
                                 
-                },
+                            },
                 ProfileItem(title: "用户数据", subtitle: "注销账号",
                             accessoryType: .disclosureIndicator) {
                                 
-                }
+                            }
             ]),
             ("异常和建议", [
                 ProfileItem(title: "推送检查", subtitle: "收不到消息的异常排查",
                             accessoryType: .disclosureIndicator) {
                                 
-                },
+                            },
                 ProfileItem(title: "反馈建议", subtitle: "欢迎你指导我们进步",
                             accessoryType: .disclosureIndicator) {
                                 
-                }
+                            }
             ])
         ]
     }
@@ -169,7 +178,7 @@ extension WxpProfileViewController: UITableViewDataSource, UITableViewDelegate {
         return sectionData[section].title
     }
     
-   
+    
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return UITableView.automaticDimension
@@ -293,4 +302,4 @@ class WxpProfileHeaderView: UITableViewHeaderFooterView {
     }
 }
 
- 
+
