@@ -18,6 +18,7 @@ class WebViewController: UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         navigationController?.setNavigationBarHidden(false, animated: true)
+        navigationController?.navigationBar.prefersLargeTitles = false
     }
     
     override func viewDidLoad() {

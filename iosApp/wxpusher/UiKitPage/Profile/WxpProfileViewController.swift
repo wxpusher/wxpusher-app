@@ -31,9 +31,13 @@ class WxpProfileViewController: UIViewController {
         setupUI()
         setupData()
     }
+
+    override func viewDidAppear(_ animated: Bool) {
+        navigationController?.navigationBar.prefersLargeTitles = true
+    }
     
     private func setupUI() {
-        title = "设置"
+        title = "我的"
         navigationController?.navigationBar.prefersLargeTitles = true
         
         tableView.delegate = self
@@ -135,11 +139,11 @@ class WxpProfileViewController: UIViewController {
             ("异常和建议", [
                 ProfileItem(title: "推送检查", subtitle: "收不到消息的异常排查",
                             accessoryType: .disclosureIndicator) {
-                                
+                                WxpJumpPageUtils.jumpToWebUrl(url: "https://wxpusher.zjiecode.com/docs/open-app-note/index.html?brand=iOS")
                             },
                 ProfileItem(title: "反馈建议", subtitle: "欢迎你指导我们进步",
                             accessoryType: .disclosureIndicator) {
-                                
+                                WxpJumpPageUtils.jumpToWebUrl(url: "https://wj.qq.com/s2/22198188/cc95/")
                             }
             ])
         ]

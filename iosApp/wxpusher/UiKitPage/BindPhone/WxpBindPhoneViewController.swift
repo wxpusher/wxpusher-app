@@ -254,8 +254,9 @@ class WxpBindPhoneViewController: WxpBaseMvpUIViewController<IWxpBindPresenter>,
         
         return container
     }
+    
     func onGoMain() {
-        navigationController?.setViewControllers([MainTabBarController()], animated: false)
+        WxpJumpPageUtils.jumpToMain()
     }
     
     override func createPresenter() -> Any? {

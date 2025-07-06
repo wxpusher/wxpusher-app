@@ -81,6 +81,18 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     private func setupUI() {
         title = "消息列表"
+        
+        emptyView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(emptyView)
+        NSLayoutConstraint.activate([
+            emptyView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            emptyView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+        emptyView.isHidden = true
+        
+        
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
         
@@ -111,9 +123,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         footerLoadingView.addGestureRecognizer(tapGesture)
         tableView.tableFooterView = footerLoadingView
         
-        
-        tableView.backgroundView = emptyView
-        tableView.backgroundView?.isHidden = true
         //添加列表长按事件
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress))
         longPressRecognizer.minimumPressDuration = 0.5 // 设置长按时间阈值 (秒)
@@ -259,7 +268,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     // MARK: - MVP-VIEW
     func onMessageList(data: [WxpMessageListMessage]) {
         self.messageList = data
-        tableView.backgroundView?.isHidden = !data.isEmpty
+        tableView.isHidden = data.isEmpty
+        emptyView.isHidden = !data.isEmpty
         self.tableView.reloadData()
     }
     
@@ -328,15 +338,6 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         let message = messageList[indexPath.row]
         let urlString = message.url.trimmingCharacters(in: .whitespaces)
         WxpJumpPageUtils.jumpToWebUrl(url: urlString)
-//        guard let url = URL(string: urlString) else {
-//            // 处理 URL 无效的情况
-//            print("Invalid URL: \(urlString)")
-//            return
-//        }
-//        let webVC = WebViewController(url: url)
-//        webVC.hidesBottomBarWhenPushed = true
-//        navigationController?.pushViewController(webVC, animated: true)
-        // 点击的时候，标记为已读
         message.read = true
         tableView.reloadData()
     }

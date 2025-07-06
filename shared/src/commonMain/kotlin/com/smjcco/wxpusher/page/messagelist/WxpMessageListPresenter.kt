@@ -76,9 +76,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             if (fetchResultList != null) {
                 messageListData = fetchResultList.toMutableList()
                 lastUserReceiveRecordId = messageListData.lastOrNull()?.id ?: Long.MAX_VALUE
-                if (messageListData.size < pageMinCount) {
-                    hasMore = false
-                }
+                hasMore = messageListData.size >= pageMinCount
                 view?.showMessageMoreLoading(false, hasMore)
                 view?.onMessageList(messageListData.toList())
                 //搜索的时候，不保存缓存
