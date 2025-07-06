@@ -7,6 +7,7 @@ import com.smjcco.wxpusher.base.WxpSaveService
 import com.smjcco.wxpusher.base.WxpToastUtils
 import com.smjcco.wxpusher.base.letOnNotEmpty
 import com.smjcco.wxpusher.base.runAtMainSuspend
+import com.smjcco.wxpusher.biz.common.WxpAppDataService
 import kotlinx.serialization.json.Json
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -17,7 +18,6 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     //当前页面的列表的数据
     private var messageListData: MutableList<WxpMessageListMessage> = mutableListOf()
 
-    private val SaveCacheKey = "WxpMessageList_MessageSaveCacheKey"
     private val MessageRefreshTimeKey = "WxpMessageList_MessageRefreshTimeKey"
 
 
@@ -39,10 +39,10 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     }
 
     override fun init() {
-        val messageDataStr = WxpSaveService.get(SaveCacheKey, "")
-        messageDataStr.letOnNotEmpty {
-            messageListData = Json.decodeFromString(it)
-            view?.onMessageList(messageListData.toList())
+        WxpAppDataService.getCacheMessageList()?.let {
+            messageListData = it.toMutableList()
+            view?.onMessageList(it)
+
         }
     }
 
@@ -102,12 +102,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
      */
     @OptIn(ExperimentalTime::class)
     private fun saveRefreshListData() {
-        val dataStr = Json.encodeToString(messageListData)
-        WxpSaveService.set(SaveCacheKey, dataStr)
-        WxpSaveService.set(
-            MessageRefreshTimeKey,
-            Clock.System.now().toEpochMilliseconds().toString()
-        )
+        WxpAppDataService.setCacheMessageList(messageListData)
     }
 
 

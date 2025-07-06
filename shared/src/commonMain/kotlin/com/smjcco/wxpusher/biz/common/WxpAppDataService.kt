@@ -3,13 +3,16 @@ package com.smjcco.wxpusher.biz.common
 import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.WxpBaseInfoService
 import com.smjcco.wxpusher.base.WxpSaveService
+import com.smjcco.wxpusher.base.letOnNotEmpty
 import com.smjcco.wxpusher.base.runAtMainSuspend
 import com.smjcco.wxpusher.biz.bean.WxpLoginInfo
 import com.smjcco.wxpusher.biz.bean.WxpPlatformEnum
 import com.smjcco.wxpusher.biz.bean.WxpUpdateInfoReq
+import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
 import kotlinx.serialization.json.Json
 
 object WxpAppDataService {
+    private const val MessageListCacheKey = "WxpMessageList_MessageSaveCacheKey"
     private const val SaveLoginInfoKey = "SaveLoginInfoKey"
     private const val PushTokenKey = "PushTokenKey"
     private const val ApiUrl = "ApiUrl"
@@ -45,7 +48,7 @@ object WxpAppDataService {
     fun updateDeviceInfo() {
         runAtMainSuspend {
             val loginInfo = getLoginInfo()
-            val updateInfoReq = WxpUpdateInfoReq(loginInfo?.deviceId, loginInfo?.deviceToken)
+            val updateInfoReq = WxpUpdateInfoReq(loginInfo?.deviceId, getPushToken())
             WxpApiService.updateDeviceInfo(updateInfoReq) {
                 println("更新pushToken成功,updateInfoReq=${updateInfoReq}")
             }
@@ -96,11 +99,36 @@ object WxpAppDataService {
     }
 
     /**
+     * 获取缓存的消息列表数据
+     */
+    fun getCacheMessageList(): List<WxpMessageListMessage>? {
+        val messageDataStr = WxpSaveService.get(MessageListCacheKey, "")
+        if (messageDataStr.isEmpty()) {
+            return null
+        }
+        return Json.decodeFromString(messageDataStr)
+    }
+
+    /**
+     * 保存消息列表缓存
+     */
+    fun setCacheMessageList(messageList: List<WxpMessageListMessage>?) {
+        if (messageList.isNullOrEmpty()) {
+            WxpSaveService.set(MessageListCacheKey, "")
+            return
+        }
+        val dataStr = Json.encodeToString(messageList)
+        WxpSaveService.set(MessageListCacheKey, dataStr)
+    }
+
+
+    /**
      * 返回string类型，方便给到容器
      */
     private fun getLoginInfoStr(): String? {
         return WxpSaveService.get(SaveLoginInfoKey, "")
     }
+
 
 //    /**
 //     * 保存登陆信息

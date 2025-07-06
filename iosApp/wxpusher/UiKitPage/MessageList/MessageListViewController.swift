@@ -77,12 +77,56 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         presenter.doInit()
         //开始刷新，mj_header的回调回调用p层刷新
         tableView.mj_header?.beginRefreshing();
+        
+        //存活的时候，监听消息，刷新页面
+        NotificationCenter.default.addObserver(forName: notiKey, object: nil, queue: nil) {[weak self] notification in
+            let userInfo = notification.userInfo
+            guard let userInfo =  userInfo else {
+                return
+            }
+            let messagae = self?.getMessage(userInfo: userInfo)
+            guard let messagae =  messagae else {
+                return
+            }
+            self?.presenter.onReceiveNewMessage(message: messagae)
+        }
+    }
+    
+    
+    /**
+     * 从推送信息中，获取一条消息数据
+     */
+    private func getMessage(userInfo: [AnyHashable : Any])->WxpMessageListMessage?{
+        if(userInfo.isEmpty){
+            return nil;
+        }
+        let id = userInfo["id"] as! Int64?
+        let url = userInfo["url"] as!  String?
+        let summary = userInfo["summary"] as! String?
+        let read = userInfo["read"] as!  Bool?
+        let createTime = userInfo["createTime"]  as! Int64?
+    
+        
+        guard let id = id,
+              let url = url,
+              let summary = summary,
+              let read = read,
+              let createTime = createTime else {
+            print("数据不正确，忽略消息")
+            return nil
+        }
+        
+        
+        let sourceUrl = userInfo["sourceUrl"]  as!  String?
+        let name = userInfo["name"]  as!  String?
+        
+        
+        let message = WxpMessageListMessage(id: id, url: url, sourceUrl: sourceUrl, summary: summary, name: name, read: read, createTime: createTime)
+        return message
     }
     
     private func setupUI() {
         title = "消息列表"
-      
-        
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
