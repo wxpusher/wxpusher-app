@@ -5,14 +5,6 @@ import RxSwift
 import shared
 import MJRefresh
 
-class LargeTitleRefreshHeader: MJRefreshNormalHeader {
-//    override func placeSubviews() {
-//        super.placeSubviews()
-////        let top = (scrollView?.adjustedContentInset.top ?? 0) + 44
-//        self.mj_y = 150
-//
-//    }
-}
 
 class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPresenter>,IWxpMessageListView  {
     
@@ -36,10 +28,9 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        setupUI()
-        setupRefreshControl()
         setupSearchAndNavication()
+        setupRefreshControl()
+        setupUI()
         
         
         //        页面加载的时候初始化,先显示缓存数据
@@ -71,6 +62,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         tableView.estimatedRowHeight = 100
         tableView.separatorStyle = .none
         
+        tableView.contentInset = UIEdgeInsets(top: 55, left: 0, bottom: 0, right: 0)
 //        tableView.contentInsetAdjustmentBehavior = .never
         
         footerLoadingView.setMessage("点击加载更多")
@@ -131,9 +123,15 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     func setupSearchAndNavication(){
         title = "消息列表"
-        navigationController?.navigationBar.prefersLargeTitles = true
         
-        view.backgroundColor = .systemGroupedBackground
+        view.backgroundColor = .systemBackground
+        
+        searchController.searchBar.delegate = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "搜索"
+        searchController.searchBar.backgroundColor = .systemBackground
+        searchController.hidesNavigationBarDuringPresentation = true
+        navigationItem.searchController = searchController
         
         let optionsButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"),
                                             style: .plain,
@@ -141,17 +139,9 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
                                             action: #selector(optionsTapped))
         
         navigationItem.rightBarButtonItems = [optionsButton]
+       
+        navigationItem.hidesSearchBarWhenScrolling = true
         
-        
-        searchController.searchBar.delegate = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "搜索"
-        searchController.searchBar.backgroundColor = .systemBackground
-        // 设置搜索栏不隐藏导航栏，但会覆盖内容
-        searchController.hidesNavigationBarDuringPresentation = true
-        navigationItem.hidesSearchBarWhenScrolling = false
-        navigationItem.searchController = searchController
-        navigationItem.largeTitleDisplayMode = .always
         
             
     }
@@ -264,7 +254,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
     
     private func setupRefreshControl() {
-        tableViewRefreshHeader = LargeTitleRefreshHeader(refreshingBlock: {
+        tableViewRefreshHeader = MJRefreshNormalHeader(refreshingBlock: {
                 self.presenter.refresh()
         })
         
