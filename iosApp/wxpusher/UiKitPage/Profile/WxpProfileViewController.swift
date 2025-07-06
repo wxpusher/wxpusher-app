@@ -34,16 +34,6 @@ class WxpProfileViewController: UIViewController {
     
     private func setupUI() {
         title = "设置"
-        
-        view.backgroundColor = .systemGroupedBackground
-        
-        
-        let optionsButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"),
-                                            style: .plain,
-                                            target: self,
-                                            action: nil)
-        
-        navigationItem.rightBarButtonItems = [optionsButton]
         navigationController?.navigationBar.prefersLargeTitles = true
         
         tableView.delegate = self
@@ -82,8 +72,25 @@ class WxpProfileViewController: UIViewController {
                                 WxpToastUtils.shared.showToast(msg: "设备ID复制成功")
                             }
             ]),
-            
-            // 通用设置
+            ("账号管理", [
+                ProfileItem(title: "用户账号", subtitle: "退出登录",
+                            accessoryType: .disclosureIndicator) {
+                                var params = WxpDialogParameter()
+                                params.title = "退出当前账号吗？"
+                                params.message = "退出后需要重新登录才可以接收消息"
+                                params.leftText = "取消"
+                                params.rightText = "退出账号"
+                                params.rightBlock = {
+                                    WxpAppDataService.shared.logout()
+                                }
+                                WxpDialogUtils.showConfirmDialog(params: params)
+                                
+                            },
+                ProfileItem(title: "用户数据", subtitle: "注销账号",
+                            accessoryType: .disclosureIndicator) {
+                                
+                            }
+            ]),
             ("通用", [
                 ProfileItem(title: "通知设置", subtitle: "检查通知权限", accessoryType: .disclosureIndicator) {
                     WxpPermissionUtils.requestNotificationPermission { success in
@@ -121,25 +128,7 @@ class WxpProfileViewController: UIViewController {
                 }
             ]),
             
-            ("账号管理", [
-                
-                ProfileItem(title: "用户账号", subtitle: "退出登录",
-                            accessoryType: .disclosureIndicator) {
-                                var params = WxpDialogParameter()
-                                params.title = "退出当前账号吗？"
-                                params.leftText = "取消"
-                                params.rightText = "退出账号"
-                                params.rightBlock = {
-                                    WxpAppDataService.shared.logout()
-                                }
-                                WxpDialogUtils.showConfirmDialog(params: params)
-                                
-                            },
-                ProfileItem(title: "用户数据", subtitle: "注销账号",
-                            accessoryType: .disclosureIndicator) {
-                                
-                            }
-            ]),
+           
             ("异常和建议", [
                 ProfileItem(title: "推送检查", subtitle: "收不到消息的异常排查",
                             accessoryType: .disclosureIndicator) {
