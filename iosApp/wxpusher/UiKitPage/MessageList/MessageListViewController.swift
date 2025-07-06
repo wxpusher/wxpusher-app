@@ -5,6 +5,15 @@ import RxSwift
 import shared
 import MJRefresh
 
+class LargeTitleRefreshHeader: MJRefreshNormalHeader {
+//    override func placeSubviews() {
+//        super.placeSubviews()
+////        let top = (scrollView?.adjustedContentInset.top ?? 0) + 44
+//        self.mj_y = 150
+//
+//    }
+}
+
 class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPresenter>,IWxpMessageListView  {
     
     private let tableView = UITableView()
@@ -22,21 +31,22 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     //搜索
     private let searchController = UISearchController(searchResultsController: nil)
-    
+
   
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupSearchAndNavication()
+        
         setupUI()
         setupRefreshControl()
+        setupSearchAndNavication()
         
         
-        //页面加载的时候初始化,先显示缓存数据
+        //        页面加载的时候初始化,先显示缓存数据
         presenter.doInit()
         //开始刷新，mj_header的回调回调用p层刷新
         tableView.mj_header?.beginRefreshing();
     }
-    
     
     private func setupUI() {
         title = "消息列表"
@@ -50,6 +60,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
+       
+        tableView.backgroundColor = .systemBackground
         
         
         tableView.delegate = self
@@ -58,6 +70,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 100
         tableView.separatorStyle = .none
+        
+//        tableView.contentInsetAdjustmentBehavior = .never
         
         footerLoadingView.setMessage("点击加载更多")
         // 添加点击手势
@@ -116,28 +130,31 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
     
     func setupSearchAndNavication(){
-        navigationController?.setNavigationBarHidden(false, animated: false)
+        title = "消息列表"
+        navigationController?.navigationBar.prefersLargeTitles = true
+        
+        view.backgroundColor = .systemGroupedBackground
+        
         let optionsButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"),
                                             style: .plain,
                                             target: self,
                                             action: #selector(optionsTapped))
         
         navigationItem.rightBarButtonItems = [optionsButton]
-        navigationController?.navigationBar.prefersLargeTitles = true
-
-//        searchController.searchResultsUpdater = self
+        
+        
         searchController.searchBar.delegate = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "搜索"
+        searchController.searchBar.backgroundColor = .systemBackground
         // 设置搜索栏不隐藏导航栏，但会覆盖内容
-//        searchController.hidesNavigationBarDuringPresentation = true
-        navigationItem.hidesSearchBarWhenScrolling = true
+        searchController.hidesNavigationBarDuringPresentation = true
+        navigationItem.hidesSearchBarWhenScrolling = false
         navigationItem.searchController = searchController
-        // 确保搜索控制器能够覆盖整个界面，包括 TabBar
-//        definesPresentationContext = true
-//        extendedLayoutIncludesOpaqueBars = true
+        navigationItem.largeTitleDisplayMode = .always
+        
+            
     }
-    
     // MARK: - Page Action
     @objc func clickLoadMore(_ sender: UITapGestureRecognizer) {
         presenter.loadMore()
@@ -247,14 +264,16 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
     
     private func setupRefreshControl() {
-        tableViewRefreshHeader = MJRefreshNormalHeader(refreshingBlock: {
+        tableViewRefreshHeader = LargeTitleRefreshHeader(refreshingBlock: {
                 self.presenter.refresh()
         })
         
         tableViewRefreshHeader?.lastUpdatedTimeText = {[weak self] _ in
             return self?.presenter.getTipsOfLastRefreshTime() ?? "更新于 无"
         }
+//        tableViewRefreshHeader?.ignoredScrollViewContentInsetTop = -50
         tableView.mj_header = tableViewRefreshHeader
+        
     }
     
     
@@ -345,8 +364,15 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         tableView.deselectRow(at: indexPath, animated: true)
         let message = messageList[indexPath.row]
         let urlString = message.url.trimmingCharacters(in: .whitespaces)
-        WxpJumpPageUtils.jumpToWebUrl(url: urlString)
-        
+//        WxpJumpPageUtils.jumpToWebUrl(url: urlString)
+        guard let url = URL(string: urlString) else {
+            // 处理 URL 无效的情况
+            print("Invalid URL: \(urlString)")
+            return
+        }
+        let webVC = WebViewController(url: url)
+        webVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(webVC, animated: true)
         // 点击的时候，标记为已读
         message.read = true
         tableView.reloadData()
@@ -357,7 +383,20 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         if  indexPath.item == messageList.count - 1{
             presenter.loadMore()
         }
+        
     }
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+//        let threshold: CGFloat = 50 // 设定一个阈值
+//            let offsetY = scrollView.contentOffset.y
+//            
+//            if offsetY > threshold {
+//                navigationItem.largeTitleDisplayMode = .never
+//            } else {
+//                navigationItem.largeTitleDisplayMode = .always
+//            }
+    }
+    
     
 }
 

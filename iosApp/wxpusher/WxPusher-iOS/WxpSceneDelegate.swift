@@ -9,10 +9,10 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let tempWin = UIWindow(windowScene: windowScene)
 
         let mainTabBarController = MainTabBarController()
-//        let mainTabBarController = UserAgreementViewController()
-        let navigationController = UINavigationController(rootViewController: mainTabBarController)
-        tempWin.backgroundColor = .white
-        tempWin.rootViewController = navigationController
+//        let mainTabBarController = WxpProfileViewController()
+//        let navigationController = UINavigationController(rootViewController: mainTabBarController)
+        tempWin.backgroundColor = .systemBackground
+        tempWin.rootViewController = mainTabBarController
         tempWin.makeKeyAndVisible()
         self.window = tempWin
                 

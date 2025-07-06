@@ -3,13 +3,9 @@ import Toaster
 import shared
 class MainTabBarController: UITabBarController {
     
-    override func viewWillAppear(_ animated: Bool) {
-        //不显示根nav的标题，用每个tab自己的nav显示标题
-        navigationController?.setNavigationBarHidden(true, animated: false)
-    }
-    
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         //没有同意隐私协议
         if(!WxpSaveService.shared.get(key: WxpSaveKey.UserHasAgreement, value: false)){
             WxpJumpPageUtils.jumpToUserAgreement()
@@ -21,13 +17,38 @@ class MainTabBarController: UITabBarController {
             WxpJumpPageUtils.jumpToLogin()
             return
         }
-        
+        navigationItem.largeTitleDisplayMode = .automatic
 
         setupViewControllers()
 //        setupAppearance()
         notificationPermissionRemind()
           
 //        self.delegate = self
+        
+    }
+    
+    
+    private func setupViewControllers() {
+        let messageListVC = MessageListViewController()
+        let profileVC = WxpProfileViewController()
+        // 创建导航控制器
+        messageListVC.tabBarItem = UITabBarItem(
+            title: "消息列表",
+            image: UIImage(systemName: "paperplane"),
+            selectedImage: UIImage(systemName: "paperplane.fill")
+        )
+        profileVC.tabBarItem = UITabBarItem(
+            title: "我的",
+            image: UIImage(systemName: "person"),
+            selectedImage: UIImage(systemName: "person.fill")
+        )
+        
+        // 设置视图控制器数组
+        let controllers = [UINavigationController(rootViewController: messageListVC),
+                           UINavigationController(rootViewController: profileVC)]
+        
+        self.viewControllers = controllers
+        self.title = controllers[self.selectedIndex].title
         
     }
     
@@ -46,30 +67,6 @@ class MainTabBarController: UITabBarController {
                 WxpDialogUtils.showConfirmDialog(params: params)
             }
         }
-    }
-    
-    private func setupViewControllers() {
-        let messageListVC = MessageListViewController()
-        let profileVC = WxpProfileViewController(mainTabVC: self)
-        // 创建导航控制器
-        messageListVC.tabBarItem = UITabBarItem(
-            title: "消息列表",
-            image: UIImage(systemName: "paperplane"),
-            selectedImage: UIImage(systemName: "paperplane.fill")
-        )
-        profileVC.tabBarItem = UITabBarItem(
-            title: "我的",
-            image: UIImage(systemName: "person"),
-            selectedImage: UIImage(systemName: "person.fill")
-        )
-        
-        // 设置视图控制器数组
-        let controllers = [UINavigationController(rootViewController: messageListVC), UINavigationController(rootViewController: profileVC)]
-        
-        self.viewControllers = controllers
-        self.selectedIndex = 0
-        self.title = controllers[self.selectedIndex].title
-        
     }
     
 //    private func setupAppearance() {

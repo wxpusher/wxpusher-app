@@ -43,8 +43,9 @@ class WxpDialogUtils: NSObject{
         }
         
         WxpJumpPageUtils.runWithWindows(){ window in
-            let rootVC: UINavigationController = window.rootViewController as! UINavigationController
-            rootVC.present(alert, animated: true)
+            window.rootViewController?.present(alert, animated: true)
+//            let rootVC: UINavigationController = window.rootViewController as! UINavigationController
+//            rootVC.present(alert, animated: true)
         }
     }
     
