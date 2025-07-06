@@ -38,6 +38,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         UNUserNotificationCenter.current().delegate = self
         
+        if let remoteNotification = launchOptions?[.remoteNotification] as? [String: Any] {
+            print("通过远程通知冷启动，notification=\(remoteNotification)")
+            WxpToastUtils.shared.showToast(msg: remoteNotification.description)
+        }
+        
         return true
     }
     
@@ -74,6 +79,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         NotificationCenter.default.post(name: notiKey, object: nil, userInfo: userInfo)
         //应用在前台的时候，如何提醒处理收到的消息
         completionHandler([.banner, .sound, .badge])
+    }
+    
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        var userInfo = response.notification.request.content.userInfo
+        print("[push]-应用存活-点击通知，userInfo=\(userInfo)")
+        let url = userInfo["url"] as!  String?
+        guard let url = url else { return }
+        WxpJumpPageUtils.jumpToWebUrl(url: url)
+        //打开的消息 ，标记为已读状态
+        userInfo["read"] = true
+        NotificationCenter.default.post(name: notiKey, object: nil, userInfo: userInfo)
+        completionHandler()
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {

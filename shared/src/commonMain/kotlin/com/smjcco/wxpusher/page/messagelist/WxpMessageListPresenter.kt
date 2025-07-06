@@ -47,6 +47,14 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     }
 
     override fun onReceiveNewMessage(message: WxpMessageListMessage) {
+        //如果更新的消息已经存在，就更新阅读状态
+        messageListData.find { it.id == message.id }?.let {
+            it.read = message.read;
+            // 通知视图更新
+            view?.onMessageList(messageListData.toList())
+            saveRefreshListData()
+            return
+        }
         // 找到第一个 id 小于新消息 id 的位置
         val insertIndex = messageListData.indexOfFirst { it.id < message.id }
         if (insertIndex == -1) {
