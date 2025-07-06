@@ -48,6 +48,7 @@ class WxpProfileViewController: UIViewController {
     
     private func setupUI() {
         title = "设置"
+        navigationController?.navigationBar.prefersLargeTitles = true
         view.backgroundColor = .systemGroupedBackground
         
         tableView.delegate = self

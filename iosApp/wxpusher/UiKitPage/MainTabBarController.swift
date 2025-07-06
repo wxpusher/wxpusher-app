@@ -3,6 +3,11 @@ import Toaster
 import shared
 class MainTabBarController: UITabBarController {
     
+    override func viewWillAppear(_ animated: Bool) {
+        //不显示tab的导航栏
+        navigationController?.setNavigationBarHidden(true, animated: false)
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         //没有同意隐私协议
@@ -17,12 +22,12 @@ class MainTabBarController: UITabBarController {
             return
         }
         
-        
+
         setupViewControllers()
-        setupAppearance()
+//        setupAppearance()
         notificationPermissionRemind()
           
-        self.delegate = self
+//        self.delegate = self
         
     }
     
@@ -44,7 +49,7 @@ class MainTabBarController: UITabBarController {
     }
     
     private func setupViewControllers() {
-        let messageListVC = MessageListViewController(mainTabVC: self)
+        let messageListVC = MessageListViewController()
         let profileVC = WxpProfileViewController(mainTabVC: self)
         // 创建导航控制器
         messageListVC.tabBarItem = UITabBarItem(
@@ -59,51 +64,52 @@ class MainTabBarController: UITabBarController {
         )
         
         // 设置视图控制器数组
-        let controllers = [messageListVC, profileVC]
+        let controllers = [UINavigationController(rootViewController: messageListVC), UINavigationController(rootViewController: profileVC)]
+        
         self.viewControllers = controllers
         self.selectedIndex = 0
         self.title = controllers[self.selectedIndex].title
         
     }
     
-    private func setupAppearance() {
-        // 设置 TabBar 外观
-        if #available(iOS 15.0, *) {
-            let appearance = UITabBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            tabBar.standardAppearance = appearance
-            tabBar.scrollEdgeAppearance = appearance
-        }
-        
-        // 设置导航栏外观
-        if #available(iOS 15.0, *) {
-            let appearance = UINavigationBarAppearance()
-            appearance.configureWithOpaqueBackground()
-            UINavigationBar.appearance().standardAppearance = appearance
-            UINavigationBar.appearance().scrollEdgeAppearance = appearance
-        }
-    }
+//    private func setupAppearance() {
+//        // 设置 TabBar 外观
+//        if #available(iOS 15.0, *) {
+//            let appearance = UITabBarAppearance()
+//            appearance.configureWithOpaqueBackground()
+//            tabBar.standardAppearance = appearance
+//            tabBar.scrollEdgeAppearance = appearance
+//        }
+//        
+//        // 设置导航栏外观
+//        if #available(iOS 15.0, *) {
+//            let appearance = UINavigationBarAppearance()
+//            appearance.configureWithOpaqueBackground()
+//            UINavigationBar.appearance().standardAppearance = appearance
+//            UINavigationBar.appearance().scrollEdgeAppearance = appearance
+//        }
+//    }
 }
 
 
-extension MainTabBarController: UITabBarControllerDelegate {
-    func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
-        // 如果搜索栏正在激活，阻止切换 Tab，需要先关闭搜索栏，再进行tab切换
-        if let searchController = navigationItem.searchController,
-           searchController.isActive {
-            searchController.dismiss(animated: true) {
-                if let index = tabBarController.viewControllers?.firstIndex(of: viewController) {
-                    tabBarController.selectedIndex = index
-                    tabBarController.title = viewController.title
-                }
-            }
-            return false
-        }
-        return true
-    }
-    
-    //将当前tab容器VC的标题，设置为当前选中的tab 子VC的标题
-    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        tabBarController.title = viewController.title
-    }
-} 
+//extension MainTabBarController: UITabBarControllerDelegate {
+//    func tabBarController(_ tabBarController: UITabBarController, shouldSelect viewController: UIViewController) -> Bool {
+//        // 如果搜索栏正在激活，阻止切换 Tab，需要先关闭搜索栏，再进行tab切换
+//        if let searchController = navigationItem.searchController,
+//           searchController.isActive {
+//            searchController.dismiss(animated: true) {
+//                if let index = tabBarController.viewControllers?.firstIndex(of: viewController) {
+//                    tabBarController.selectedIndex = index
+//                    tabBarController.title = viewController.title
+//                }
+//            }
+//            return false
+//        }
+//        return true
+//    }
+//    
+//    //将当前tab容器VC的标题，设置为当前选中的tab 子VC的标题
+//    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
+//        tabBarController.title = viewController.title
+//    }
+//} 

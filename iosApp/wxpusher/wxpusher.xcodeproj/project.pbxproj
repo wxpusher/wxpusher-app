@@ -27,6 +27,7 @@
 		1A4934632E196C7900EA1C71 /* WxpProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934622E196C7900EA1C71 /* WxpProfileViewController.swift */; };
 		1A4934662E19714B00EA1C71 /* KtSwiftCommonParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934652E19703400EA1C71 /* KtSwiftCommonParams.m */; };
 		1A4934682E1971EA00EA1C71 /* WxpCommonParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934672E1971E400EA1C71 /* WxpCommonParams.swift */; };
+		1A49346A2E19FB8000EA1C71 /* WxpFooterLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934692E19FB7D00EA1C71 /* WxpFooterLoadingView.swift */; };
 		1A5164632B09D6D40000BA90 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164622B09D6D40000BA90 /* WebView.swift */; };
 		1A5164642B09D6D40000BA90 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164622B09D6D40000BA90 /* WebView.swift */; };
 		1A5164672B0A3A650000BA90 /* HomeViewVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164662B0A3A650000BA90 /* HomeViewVM.swift */; };
@@ -118,6 +119,7 @@
 		1A4934642E19702300EA1C71 /* KtSwiftCommonParams.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KtSwiftCommonParams.h; sourceTree = "<group>"; };
 		1A4934652E19703400EA1C71 /* KtSwiftCommonParams.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KtSwiftCommonParams.m; sourceTree = "<group>"; };
 		1A4934672E1971E400EA1C71 /* WxpCommonParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpCommonParams.swift; sourceTree = "<group>"; };
+		1A4934692E19FB7D00EA1C71 /* WxpFooterLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpFooterLoadingView.swift; sourceTree = "<group>"; };
 		1A5164622B09D6D40000BA90 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		1A5164662B0A3A650000BA90 /* HomeViewVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewVM.swift; sourceTree = "<group>"; };
 		1A51646A2B0A3AB20000BA90 /* BaseVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseVM.swift; sourceTree = "<group>"; };
@@ -336,6 +338,7 @@
 		1A9C3E772DF5A02E00A25249 /* MessageList */ = {
 			isa = PBXGroup;
 			children = (
+				1A4934692E19FB7D00EA1C71 /* WxpFooterLoadingView.swift */,
 				1A9C3E932DF9D66600A25249 /* WxpMessageListService.swift */,
 				1A9C3E792DF5A07200A25249 /* WxpMessageItemBeam.swift */,
 				1A9C3E762DF5A02E00A25249 /* MessageListViewController.swift */,
@@ -678,6 +681,7 @@
 				1ACCD5622AFFCD9400841714 /* BindPhoneViewVM.swift in Sources */,
 				1A68CC9D2B3AD45000F6E742 /* UpdateDeviceInfoBean.swift in Sources */,
 				1AAD926C2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift in Sources */,
+				1A49346A2E19FB8000EA1C71 /* WxpFooterLoadingView.swift in Sources */,
 				1AC210DE2ACC581C008D86EA /* LoginView.swift in Sources */,
 				1A5164722B14DD6F0000BA90 /* ProfileViewVM.swift in Sources */,
 				1A4715572AF782710089D7A7 /* NetError.swift in Sources */,

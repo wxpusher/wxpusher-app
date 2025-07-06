@@ -7,95 +7,10 @@ import MJRefresh
 
 class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPresenter>,IWxpMessageListView  {
     
-    private class FooterLoadingView: UIView {
-        private let activityIndicator = UIActivityIndicatorView(style: .medium)
-        private let messageLabel = UILabel()
-        
-        override init(frame: CGRect) {
-            super.init(frame: frame)
-            setupUI()
-        }
-        
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-        
-        private func setupUI() {
-            addSubview(activityIndicator)
-            addSubview(messageLabel)
-            
-            activityIndicator.translatesAutoresizingMaskIntoConstraints = false
-            messageLabel.translatesAutoresizingMaskIntoConstraints = false
-            
-            // 创建一个容器视图来包含 activityIndicator 和 messageLabel
-            let containerView = UIView()
-            containerView.translatesAutoresizingMaskIntoConstraints = false
-            addSubview(containerView)
-            
-            containerView.addSubview(activityIndicator)
-            containerView.addSubview(messageLabel)
-            
-            NSLayoutConstraint.activate([
-                // 容器视图约束
-                containerView.centerXAnchor.constraint(equalTo: centerXAnchor),
-                containerView.centerYAnchor.constraint(equalTo: centerYAnchor),
-                
-                // activityIndicator 约束
-                activityIndicator.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-                activityIndicator.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-                activityIndicator.widthAnchor.constraint(equalToConstant: 20),
-                
-                // messageLabel 约束
-                messageLabel.leadingAnchor.constraint(equalTo: activityIndicator.trailingAnchor, constant: 8),
-                messageLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-                messageLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
-            ])
-            
-            messageLabel.textColor = UIColor.defFontSecondColor
-            messageLabel.font = .systemFont(ofSize: 12)
-            messageLabel.textAlignment = .left
-            
-            // 初始状态隐藏 loading
-            activityIndicator.isHidden = true
-            // 当 activityIndicator 隐藏时，移除其宽度约束
-            activityIndicator.widthAnchor.constraint(equalToConstant: 0).isActive = true
-        }
-        
-        func setMessage(_ message: String) {
-            messageLabel.text = message
-        }
-        
-        func startLoading() {
-            // 移除宽度为0的约束
-            activityIndicator.constraints.forEach { constraint in
-                if constraint.firstAttribute == .width && constraint.constant == 0 {
-                    constraint.isActive = false
-                }
-            }
-            // 添加正常宽度约束
-            activityIndicator.widthAnchor.constraint(equalToConstant: 20).isActive = true
-            activityIndicator.isHidden = false
-            activityIndicator.startAnimating()
-        }
-        
-        func stopLoading() {
-            activityIndicator.stopAnimating()
-            activityIndicator.isHidden = true
-            // 移除正常宽度约束
-            activityIndicator.constraints.forEach { constraint in
-                if constraint.firstAttribute == .width && constraint.constant == 20 {
-                    constraint.isActive = false
-                }
-            }
-            // 添加宽度为0的约束
-            activityIndicator.widthAnchor.constraint(equalToConstant: 0).isActive = true
-        }
-    }
-    
     private let tableView = UITableView()
     private var tableViewRefreshHeader:MJRefreshNormalHeader? = nil
     
-    private let footerLoadingView = FooterLoadingView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 60))
+    private let footerLoadingView = WxpFooterLoadingView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 60))
     
     private let disposeBag = DisposeBag()
     private var messageList: [WxpMessageListMessage] = []
@@ -103,49 +18,18 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     private var hasMore = true
     private var currentPage = 1
     private var lastMessageId: Int64 = Int64.max
-    private var mainTabVC:MainTabBarController
     
     
     //搜索
-    private var searchShow = false //是否正在显示搜索输入框
     private let searchController = UISearchController(searchResultsController: nil)
     
-    
-    init(mainTabVC: MainTabBarController) {
-        self.mainTabVC = mainTabVC
-        super.init(nibName: nil, bundle: nil)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        self.navigationController?.setNavigationBarHidden(false, animated: false)
-        let optionsButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"),
-                                            style: .plain,
-                                            target: self,
-                                            action: #selector(optionsTapped))
-        
-        mainTabVC.navigationItem.rightBarButtonItems = [optionsButton]
-
-//        searchController.searchResultsUpdater = self
-        searchController.searchBar.delegate = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "搜索"
-        // 设置搜索栏不隐藏导航栏，但会覆盖内容
-        searchController.hidesNavigationBarDuringPresentation = true
-        mainTabVC.navigationItem.hidesSearchBarWhenScrolling = false
-        mainTabVC.navigationItem.searchController = searchController
-        // 确保搜索控制器能够覆盖整个界面，包括 TabBar
-        mainTabVC.definesPresentationContext = true
-        mainTabVC.extendedLayoutIncludesOpaqueBars = true
-    }
-    
+  
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupSearchAndNavication()
         setupUI()
         setupRefreshControl()
+        
         
         //页面加载的时候初始化,先显示缓存数据
         presenter.doInit()
@@ -153,10 +37,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         tableView.mj_header?.beginRefreshing();
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        mainTabVC.navigationItem.searchController = nil
-        self.mainTabVC.navigationItem.rightBarButtonItems = []
-    }
     
     private func setupUI() {
         title = "消息列表"
@@ -233,8 +113,30 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         tableView.addGestureRecognizer(longPressRecognizer)
     }
     
+    func setupSearchAndNavication(){
+        navigationController?.setNavigationBarHidden(false, animated: false)
+        let optionsButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"),
+                                            style: .plain,
+                                            target: self,
+                                            action: #selector(optionsTapped))
+        
+        navigationItem.rightBarButtonItems = [optionsButton]
+        navigationController?.navigationBar.prefersLargeTitles = true
+
+//        searchController.searchResultsUpdater = self
+        searchController.searchBar.delegate = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "搜索"
+        // 设置搜索栏不隐藏导航栏，但会覆盖内容
+//        searchController.hidesNavigationBarDuringPresentation = true
+        navigationItem.hidesSearchBarWhenScrolling = true
+        navigationItem.searchController = searchController
+        // 确保搜索控制器能够覆盖整个界面，包括 TabBar
+//        definesPresentationContext = true
+//        extendedLayoutIncludesOpaqueBars = true
+    }
+    
     // MARK: - Page Action
-    // 点击事件处理
     @objc func clickLoadMore(_ sender: UITapGestureRecognizer) {
         presenter.loadMore()
     }
@@ -365,7 +267,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
     
     // MARK: - MVP-VIEW
-    
     func onMessageList(data: [WxpMessageListMessage]) {
         self.messageList = data
         self.tableView.reloadData()
