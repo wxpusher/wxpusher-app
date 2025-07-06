@@ -233,6 +233,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         actionSheet.addAction(option2)
         actionSheet.addAction(cancel)
         
+        //震动反馈
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
         // 显示 Action Sheet
         present(actionSheet, animated: true, completion: nil)
         
@@ -259,7 +261,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     private func setupRefreshControl() {
         let tableViewRefreshHeader:MJRefreshNormalHeader = MJRefreshNormalHeader(refreshingBlock: {
-                self.presenter.refresh()
+            self.presenter.refresh()
         })
         
         tableViewRefreshHeader.lastUpdatedTimeText = {[weak self] _ in
@@ -356,6 +358,7 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         //展示最后一个item的时候，加载更多
         if  indexPath.item == messageList.count - 1{
+            UIImpactFeedbackGenerator(style: .light).impactOccurred()
             presenter.loadMore()
         }
         
