@@ -28,6 +28,7 @@
 		1A4934662E19714B00EA1C71 /* KtSwiftCommonParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934652E19703400EA1C71 /* KtSwiftCommonParams.m */; };
 		1A4934682E1971EA00EA1C71 /* WxpCommonParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934672E1971E400EA1C71 /* WxpCommonParams.swift */; };
 		1A49346A2E19FB8000EA1C71 /* WxpFooterLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934692E19FB7D00EA1C71 /* WxpFooterLoadingView.swift */; };
+		1A49346C2E1A6B6800EA1C71 /* WxpUnbindPhoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A49346B2E1A6B6800EA1C71 /* WxpUnbindPhoneViewController.swift */; };
 		1A5164632B09D6D40000BA90 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164622B09D6D40000BA90 /* WebView.swift */; };
 		1A5164642B09D6D40000BA90 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164622B09D6D40000BA90 /* WebView.swift */; };
 		1A5164672B0A3A650000BA90 /* HomeViewVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164662B0A3A650000BA90 /* HomeViewVM.swift */; };
@@ -120,6 +121,7 @@
 		1A4934652E19703400EA1C71 /* KtSwiftCommonParams.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KtSwiftCommonParams.m; sourceTree = "<group>"; };
 		1A4934672E1971E400EA1C71 /* WxpCommonParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpCommonParams.swift; sourceTree = "<group>"; };
 		1A4934692E19FB7D00EA1C71 /* WxpFooterLoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpFooterLoadingView.swift; sourceTree = "<group>"; };
+		1A49346B2E1A6B6800EA1C71 /* WxpUnbindPhoneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpUnbindPhoneViewController.swift; sourceTree = "<group>"; };
 		1A5164622B09D6D40000BA90 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		1A5164662B0A3A650000BA90 /* HomeViewVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewVM.swift; sourceTree = "<group>"; };
 		1A51646A2B0A3AB20000BA90 /* BaseVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseVM.swift; sourceTree = "<group>"; };
@@ -244,6 +246,7 @@
 			isa = PBXGroup;
 			children = (
 				1A4934622E196C7900EA1C71 /* WxpProfileViewController.swift */,
+				1A49346B2E1A6B6800EA1C71 /* WxpUnbindPhoneViewController.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -698,6 +701,7 @@
 				1A9C3E802DF5ABFC00A25249 /* WxpLoginViewController.swift in Sources */,
 				1A962E732E0B075600C966A3 /* UserAgreementViewController.swift in Sources */,
 				1A962E792E0B0B2100C966A3 /* WxpCommonBlockDef.swift in Sources */,
+				1A49346C2E1A6B6800EA1C71 /* WxpUnbindPhoneViewController.swift in Sources */,
 				1AC210D82ACC57F1008D86EA /* CommonExt.swift in Sources */,
 				1AC210DF2ACC581C008D86EA /* HomeView.swift in Sources */,
 				1A447DF62DF53ECD005C402F /* StringConstants.swift in Sources */,

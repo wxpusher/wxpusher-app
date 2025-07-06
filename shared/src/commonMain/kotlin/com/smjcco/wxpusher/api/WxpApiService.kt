@@ -100,6 +100,22 @@ object WxpApiService {
     }
 
     /**
+     * 解绑手机号
+     */
+    suspend fun unbindPhone(
+        successBlock: (() -> Unit)? = null
+    ): Boolean? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .post(WxpNetworkService.getUrl("/api/need-login/device/unbind")) {
+
+                }.body()
+        }, errorBlock = {
+            WxpToastUtils.showToast("失败," + it.message)
+        }, successBlock = { successBlock?.invoke() })
+    }
+
+    /**
      * 更新设备的pushToken信息
      */
     suspend fun updateDeviceInfo(

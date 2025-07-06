@@ -86,9 +86,12 @@ class WxpProfileViewController: UIViewController {
                                 WxpDialogUtils.showConfirmDialog(params: params)
                                 
                             },
-                ProfileItem(title: "用户数据", subtitle: "注销账号",
+                ProfileItem(title: "用户数据", subtitle: "注销手机号",
                             accessoryType: .disclosureIndicator) {
-                                
+                                let unbindVC = WxpUnbindPhoneViewController()
+                                let navController = UINavigationController(rootViewController: unbindVC)
+                                navController.modalPresentationStyle = .pageSheet
+                                self.present(navController, animated: true)
                             }
             ]),
             ("通用", [
