@@ -28,7 +28,6 @@ class WxpProfileViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-//        navigationController?.setNavigationBarHidden(false, animated: false)
         setupUI()
         setupData()
     }
@@ -45,25 +44,23 @@ class WxpProfileViewController: UIViewController {
                                             action: nil)
         
         navigationItem.rightBarButtonItems = [optionsButton]
-//        navigationController?.setNavigationBarHidden(false, animated: false)
         navigationController?.navigationBar.prefersLargeTitles = true
         
-//        
-//        tableView.delegate = self
-//        tableView.dataSource = self
-//        tableView.register(ProfileTableViewCell.self, forCellReuseIdentifier: "ProfileCell")
-//        tableView.register(WxpProfileHeaderView.self, forHeaderFooterViewReuseIdentifier: "ProfileHeader")
-//        tableView.separatorStyle = .singleLine
-//        tableView.backgroundColor = .systemGroupedBackground
-//        
-//        view.addSubview(tableView)
-//        tableView.translatesAutoresizingMaskIntoConstraints = false
-//        NSLayoutConstraint.activate([
-//            tableView.topAnchor.constraint(equalTo: view.topAnchor),
-//            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-//            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-//            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-//        ])
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(ProfileTableViewCell.self, forCellReuseIdentifier: "ProfileCell")
+        tableView.register(WxpProfileHeaderView.self, forHeaderFooterViewReuseIdentifier: "ProfileHeader")
+        tableView.separatorStyle = .singleLine
+        tableView.backgroundColor = .systemGroupedBackground
+        
+        view.addSubview(tableView)
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
     
     private func setupData() {

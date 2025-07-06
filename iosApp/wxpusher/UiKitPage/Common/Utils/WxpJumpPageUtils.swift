@@ -24,10 +24,7 @@ import Foundation
     */
     @objc public static func jumpToLogin() {
         runWithWindows(){ window in
-            let rootVC: UINavigationController = window.rootViewController as! UINavigationController
-            // 替换为你的登录VC
-            let loginVC = WxpLoginViewController()
-            rootVC.setViewControllers([loginVC], animated: false)
+            window.rootViewController = UINavigationController(rootViewController:  WxpLoginViewController())
         }
     }
     
@@ -36,9 +33,11 @@ import Foundation
      */
      public static func jumpToUserAgreement() {
          runWithWindows(){ window in
-             let rootVC: UINavigationController = window.rootViewController as! UINavigationController
-             let vc = UserAgreementViewController()
-             rootVC.setViewControllers([vc], animated: false)
+//             let rootVC: UINavigationController = window.rootViewController as! UINavigationController
+//             let vc = UserAgreementViewController()
+//             rootVC.setViewControllers([vc], animated: false)
+             
+             window.rootViewController = UINavigationController(rootViewController:  UserAgreementViewController())
          }
     }
     /**
@@ -46,9 +45,11 @@ import Foundation
      */
     public static func jumpToMain() {
         runWithWindows(){ window in
-            let rootVC: UINavigationController = window.rootViewController as! UINavigationController
-            let vc = MainTabBarController()
-            rootVC.setViewControllers([vc], animated: false)
+//            let rootVC: UINavigationController = window.rootViewController as! UINavigationController
+//            let vc = MainTabBarController()
+//            rootVC.setViewControllers([vc], animated: false)
+            
+            window.rootViewController = MainTabBarController()
         }
    }
 
@@ -70,11 +71,20 @@ import Foundation
                 print("Invalid URL: \(urlString)")
                 return
             }
-
-
+            let rootView = window.rootViewController
             let webVC = WebViewController(url: url)
-            let rootVC = window.rootViewController as! UINavigationController
-            rootVC.pushViewController(webVC, animated: true)
+            //如果根是navVC，那就压栈
+            if(rootView is UINavigationController){
+                let rootVC = rootView as! UINavigationController
+                rootVC.pushViewController(webVC, animated: true)
+            } else if(rootView is UITabBarController){
+                let tabVC = rootView as! UITabBarController
+                if(tabVC.selectedViewController  is UINavigationController){
+                    let rootVC = tabVC.selectedViewController as! UINavigationController
+                    webVC.hidesBottomBarWhenPushed = true
+                    rootVC.pushViewController(webVC, animated: true)
+                }
+            }
         }
        
     }

@@ -8,70 +8,21 @@ import MJRefresh
 
 class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPresenter>,IWxpMessageListView  {
     
-    private let tableView = UITableView()
+   
     private var tableViewRefreshHeader:MJRefreshNormalHeader? = nil
     
     private let footerLoadingView = WxpFooterLoadingView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 60))
     
-    private let disposeBag = DisposeBag()
     private var messageList: [WxpMessageListMessage] = []
-    
-    private var hasMore = true
-    private var currentPage = 1
-    private var lastMessageId: Int64 = Int64.max
-    
+
     
     //搜索
     private let searchController = UISearchController(searchResultsController: nil)
-
-  
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        setupSearchAndNavication()
-        setupRefreshControl()
-        setupUI()
-        
-        
-        //        页面加载的时候初始化,先显示缓存数据
-        presenter.doInit()
-        //开始刷新，mj_header的回调回调用p层刷新
-        tableView.mj_header?.beginRefreshing();
-    }
+    private let tableView = UITableView()
     
-    private func setupUI() {
-        title = "消息列表"
-        tableView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(tableView)
-    
-        
-        NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
-            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
-        ])
-       
-        tableView.backgroundColor = .systemBackground
-        
-        
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.register(MessageCell.self, forCellReuseIdentifier: "MessageCell")
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 100
-        tableView.separatorStyle = .none
-        
-        tableView.contentInset = UIEdgeInsets(top: 55, left: 0, bottom: 0, right: 0)
-//        tableView.contentInsetAdjustmentBehavior = .never
-        
-        footerLoadingView.setMessage("点击加载更多")
-        // 添加点击手势
-        footerLoadingView.isUserInteractionEnabled = true
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(clickLoadMore(_:)))
-        footerLoadingView.addGestureRecognizer(tapGesture)
-        tableView.tableFooterView = footerLoadingView
-        
+    //空态页
+    private let emptyView: UIView = {
         // 添加空状态视图
         let emptyView = UIView()
         let emptyImageView = UIImageView(image: UIImage(systemName: "tray"))
@@ -112,6 +63,54 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
             tryButton.widthAnchor.constraint(equalToConstant: 200),
             tryButton.heightAnchor.constraint(equalToConstant: 44)
         ])
+        return emptyView
+    }()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        setupSearchAndNavication()
+        setupRefreshControl()
+        setupUI()
+        
+        
+        //页面加载的时候初始化,先显示缓存数据
+        presenter.doInit()
+        //开始刷新，mj_header的回调回调用p层刷新
+        tableView.mj_header?.beginRefreshing();
+    }
+    
+    private func setupUI() {
+        title = "消息列表"
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tableView)
+        
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+       
+        tableView.backgroundColor = .systemBackground
+        
+        
+        tableView.delegate = self
+        tableView.dataSource = self
+        tableView.register(MessageCell.self, forCellReuseIdentifier: "MessageCell")
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 100
+        tableView.separatorStyle = .none
+        
+        // 让系统自动处理安全区域的内容偏移，包括导航栏和搜索栏
+        tableView.contentInsetAdjustmentBehavior = .automatic
+        
+        footerLoadingView.setMessage("点击加载更多")
+        // 添加点击手势
+        footerLoadingView.isUserInteractionEnabled = true
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(clickLoadMore(_:)))
+        footerLoadingView.addGestureRecognizer(tapGesture)
+        tableView.tableFooterView = footerLoadingView
+        
         
         tableView.backgroundView = emptyView
         tableView.backgroundView?.isHidden = true
@@ -129,8 +128,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         searchController.searchBar.delegate = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "搜索"
-        searchController.searchBar.backgroundColor = .systemBackground
-        searchController.hidesNavigationBarDuringPresentation = true
+        searchController.hidesNavigationBarDuringPresentation = false
         navigationItem.searchController = searchController
         
         let optionsButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"),
@@ -139,10 +137,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
                                             action: #selector(optionsTapped))
         
         navigationItem.rightBarButtonItems = [optionsButton]
-       
-        navigationItem.hidesSearchBarWhenScrolling = true
-        
-        
+        navigationItem.hidesSearchBarWhenScrolling = false
             
     }
     // MARK: - Page Action
@@ -156,7 +151,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         let actionSheet = UIAlertController(title: nil,
                                             message: nil,
                                             preferredStyle: .actionSheet)
-        
         
         // 添加选项按钮
         let option1 = UIAlertAction(title: "已读全部消息", style: .default) { [weak self]_ in
@@ -219,16 +213,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         actionSheet.addAction(option2)
         actionSheet.addAction(cancel)
         
-        // 在 iPad 上需要设置弹出位置
-        if let popoverController = actionSheet.popoverPresentationController {
-            popoverController.sourceView = self.view
-            popoverController.sourceRect = CGRect(x: self.view.bounds.midX,
-                                                  y: self.view.bounds.midY,
-                                                  width: 0,
-                                                  height: 0)
-            popoverController.permittedArrowDirections = []
-        }
-        
         // 显示 Action Sheet
         present(actionSheet, animated: true, completion: nil)
         
@@ -254,14 +238,15 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
     
     private func setupRefreshControl() {
-        tableViewRefreshHeader = MJRefreshNormalHeader(refreshingBlock: {
+        let tableViewRefreshHeader:MJRefreshNormalHeader = MJRefreshNormalHeader(refreshingBlock: {
                 self.presenter.refresh()
         })
         
-        tableViewRefreshHeader?.lastUpdatedTimeText = {[weak self] _ in
+        tableViewRefreshHeader.lastUpdatedTimeText = {[weak self] _ in
             return self?.presenter.getTipsOfLastRefreshTime() ?? "更新于 无"
         }
-//        tableViewRefreshHeader?.ignoredScrollViewContentInsetTop = -50
+        // 设置忽略顶部内容偏移，让MJRefresh正确计算位置
+        tableViewRefreshHeader.ignoredScrollViewContentInsetTop = 0
         tableView.mj_header = tableViewRefreshHeader
         
     }
@@ -310,14 +295,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
 }
 
-// MARK: -  extension
-//extension MessageListViewController: UISearchResultsUpdating {
-//    func updateSearchResults(for searchController: UISearchController) {
-//        let searchText = searchController.searchBar.text
-//        presenter.searchIfChanged(key: searchText)
-//    }
-//   
-//}
 
 extension MessageListViewController: UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
@@ -332,10 +309,6 @@ extension MessageListViewController: UISearchBarDelegate {
         searchBar.resignFirstResponder()
     }
     
-//    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-//        print("用户取消了输入框的选中状态")
-//        presenter.searchIfChanged(key: "")
-//    }
 }
 
 extension MessageListViewController: UITableViewDelegate, UITableViewDataSource {
@@ -354,15 +327,15 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         tableView.deselectRow(at: indexPath, animated: true)
         let message = messageList[indexPath.row]
         let urlString = message.url.trimmingCharacters(in: .whitespaces)
-//        WxpJumpPageUtils.jumpToWebUrl(url: urlString)
-        guard let url = URL(string: urlString) else {
-            // 处理 URL 无效的情况
-            print("Invalid URL: \(urlString)")
-            return
-        }
-        let webVC = WebViewController(url: url)
-        webVC.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(webVC, animated: true)
+        WxpJumpPageUtils.jumpToWebUrl(url: urlString)
+//        guard let url = URL(string: urlString) else {
+//            // 处理 URL 无效的情况
+//            print("Invalid URL: \(urlString)")
+//            return
+//        }
+//        let webVC = WebViewController(url: url)
+//        webVC.hidesBottomBarWhenPushed = true
+//        navigationController?.pushViewController(webVC, animated: true)
         // 点击的时候，标记为已读
         message.read = true
         tableView.reloadData()
@@ -375,18 +348,6 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         }
         
     }
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        
-//        let threshold: CGFloat = 50 // 设定一个阈值
-//            let offsetY = scrollView.contentOffset.y
-//            
-//            if offsetY > threshold {
-//                navigationItem.largeTitleDisplayMode = .never
-//            } else {
-//                navigationItem.largeTitleDisplayMode = .always
-//            }
-    }
-    
     
 }
 
