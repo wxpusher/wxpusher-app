@@ -43,12 +43,14 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
     
+        
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
+        
         
         tableView.delegate = self
         tableView.dataSource = self
@@ -142,12 +144,6 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
     
     
-//     func hideSearchBar() {
-//        if searchController.isActive {
-//            searchController.dismiss(animated: false)
-//            searchController.searchBar.resignFirstResponder()
-//        }
-//    }
     
     @objc private func optionsTapped() {
         let actionSheet = UIAlertController(title: nil,
@@ -252,7 +248,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     private func setupRefreshControl() {
         tableViewRefreshHeader = MJRefreshNormalHeader(refreshingBlock: {
-            self.presenter.refresh()
+                self.presenter.refresh()
         })
         
         tableViewRefreshHeader?.lastUpdatedTimeText = {[weak self] _ in
@@ -269,6 +265,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     // MARK: - MVP-VIEW
     func onMessageList(data: [WxpMessageListMessage]) {
         self.messageList = data
+        tableView.backgroundView?.isHidden = !data.isEmpty
         self.tableView.reloadData()
     }
     

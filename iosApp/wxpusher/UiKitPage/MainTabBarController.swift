@@ -4,7 +4,7 @@ import shared
 class MainTabBarController: UITabBarController {
     
     override func viewWillAppear(_ animated: Bool) {
-        //不显示tab的导航栏
+        //不显示根nav的标题，用每个tab自己的nav显示标题
         navigationController?.setNavigationBarHidden(true, animated: false)
     }
     
@@ -37,7 +37,7 @@ class MainTabBarController: UITabBarController {
             if(!success){
                 var params = WxpDialogParameter()
                 params.title = "异常提醒"
-                params.message = "WxPusher必须要推送权限才能正常工作，请在【设置-WxPusher消息推送平台-通知】打开相关开关"
+                params.message = "WxPusher必须要推送权限才能正常工作，请在【设置-WxPusher消息推送平台-通知】打开通知开关"
                 params.leftText = "取消"
                 params.rightText = "去设置"
                 params.rightBlock = {
