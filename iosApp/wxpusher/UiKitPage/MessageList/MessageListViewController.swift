@@ -101,7 +101,14 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         tableView.register(MessageCell.self, forCellReuseIdentifier: "MessageCell")
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 100
-        tableView.separatorStyle = .none
+        tableView.separatorStyle = .singleLine
+        
+        // 设置分割线样式，避免第一个cell之前显示分割线
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 16, bottom: 0, right: 0)
+        tableView.separatorColor = .systemGray5
+        
+        // 设置一个很小的tableHeaderView来避免第一个cell之前的分割线
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: CGFloat.leastNormalMagnitude))
         
         // 让系统自动处理安全区域的内容偏移，包括导航栏和搜索栏
         tableView.contentInsetAdjustmentBehavior = .automatic

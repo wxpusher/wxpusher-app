@@ -8,6 +8,8 @@ object WxpToastUtils {
         if (msg.isNullOrEmpty()) {
             return
         }
-        ExpWxpToastUtils_showToast(msg)
+        runAtMainSuspend {
+            ExpWxpToastUtils_showToast(msg)
+        }
     }
 }
