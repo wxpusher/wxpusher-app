@@ -42,13 +42,12 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         WxpAppDataService.getCacheMessageList()?.let {
             messageListData = it.toMutableList()
             view?.onMessageList(it)
-
         }
     }
 
     override fun onReceiveNewMessage(message: WxpMessageListMessage) {
         //如果更新的消息已经存在，就更新阅读状态
-        messageListData.find { it.id == message.id }?.let {
+        messageListData.find { it.messageId == message.messageId }?.let {
             it.read = message.read;
             // 通知视图更新
             view?.onMessageList(messageListData.toList())
@@ -56,7 +55,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             return
         }
         // 找到第一个 id 小于新消息 id 的位置
-        val insertIndex = messageListData.indexOfFirst { it.id < message.id }
+        val insertIndex = messageListData.indexOfFirst { it.messageId < message.messageId }
         if (insertIndex == -1) {
             // 如果没有找到更小的 id，说明新消息的 id 是最小的，添加到列表末尾
             messageListData.add(message)
@@ -80,10 +79,11 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             val req = WxpMessageListReq(Long.MAX_VALUE, key)
             val fetchResultList = WxpApiService.fetchMessageList(req)
             view?.showMessageRefreshing(false)
+            WxpSaveService.set(MessageRefreshTimeKey, WxpDateTimeUtils.getTimestamp().toDouble())
             //如果刷新的数据不为null，说明是刷新成功了,然后才更新数据
             if (fetchResultList != null) {
                 messageListData = fetchResultList.toMutableList()
-                lastUserReceiveRecordId = messageListData.lastOrNull()?.id ?: Long.MAX_VALUE
+                lastUserReceiveRecordId = messageListData.lastOrNull()?.messageId ?: Long.MAX_VALUE
                 hasMore = messageListData.size >= pageMinCount
                 view?.showMessageMoreLoading(false, hasMore)
                 view?.onMessageList(messageListData.toList())
@@ -96,9 +96,9 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         }
     }
 
-    @OptIn(ExperimentalTime::class)
     override fun getTipsOfLastRefreshTime(): String {
         val time = WxpSaveService.get(MessageRefreshTimeKey, 0.0)
+        println("time=${time}")
         if (time <= 0.0) {
             return "更新于 无"
         }
@@ -108,7 +108,6 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     /**
      * 保存一下第一页的数据，方便下次启动的时候用缓存渲染
      */
-    @OptIn(ExperimentalTime::class)
     private fun saveRefreshListData() {
         WxpAppDataService.setCacheMessageList(messageListData)
     }
@@ -137,7 +136,8 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
                     hasMore = false
                 } else {
                     messageListData.addAll(fetchResultList)
-                    lastUserReceiveRecordId = messageListData.lastOrNull()?.id ?: Long.MAX_VALUE
+                    lastUserReceiveRecordId =
+                        messageListData.lastOrNull()?.messageId ?: Long.MAX_VALUE
                     view?.onMessageList(messageListData.toList())
                 }
             }
@@ -146,15 +146,15 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         }
     }
 
-    override fun markMessageReadStatus(id: Long?, read: Boolean) {
+    override fun markMessageReadStatus(messageId: Long?, read: Boolean) {
         runAtMainSuspend {
-            WxpApiService.markMessageReadStatus(id, read) {
-                if (id == null) {
+            WxpApiService.markMessageReadStatus(messageId, read) {
+                if (messageId == null) {
                     messageListData.forEach {
                         it.read = read
                     }
                 } else {
-                    messageListData.find { it.id == id }?.read = read
+                    messageListData.find { it.messageId == messageId }?.read = read
                 }
 
                 view?.onMessageList(messageListData)
@@ -162,10 +162,10 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         }
     }
 
-    override fun deleteById(id: Long) {
+    override fun deleteById(messageId: Long) {
         runAtMainSuspend {
-            WxpApiService.deleteMessageById(id) {
-                messageListData.removeAll { it.id == id }
+            WxpApiService.deleteMessageById(messageId) {
+                messageListData.removeAll { it.messageId == messageId }
                 view?.onMessageList(messageListData)
             }
         }

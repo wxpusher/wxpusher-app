@@ -31,4 +31,7 @@ object WxpDateTimeUtils {
         return timeStamp.toDateTimeString()
     }
 
+    @OptIn(ExperimentalTime::class)
+    fun getTimestamp(): Long = Clock.System.now().toEpochMilliseconds()
+
 }

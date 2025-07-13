@@ -11,7 +11,7 @@ data class WxpMessageListReq(
 
 @Serializable
 data class WxpMessageListMessage(
-    val id: Long,
+    val messageId: Long,
     val url: String,
     val sourceUrl: String?,
     val summary: String,

@@ -116,12 +116,9 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
             return nil
         }
         
-        
         let sourceUrl = userInfo["sourceUrl"] as? String
         
-        
-        
-        let message = WxpMessageListMessage(id: messageId, url: url, sourceUrl: sourceUrl, summary: summary, name: name, read: false, createTime: createTime)
+        let message = WxpMessageListMessage(messageId: messageId, url: url, sourceUrl: sourceUrl, summary: summary, name: name, read: false, createTime: createTime)
         return message
     }
     
@@ -261,7 +258,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         
         let readText = item.read ? "标记未读" : "标记已读"
         let option1 = UIAlertAction(title: readText, style: .default) { [weak self]_ in
-            self?.presenter.markMessageReadStatus(id: KotlinLong.init(longLong: item.id), read: !item.read)
+            self?.presenter.markMessageReadStatus(id: KotlinLong.init(longLong: item.messageId), read: !item.read)
         }
         
         let option2 = UIAlertAction(title: "删除", style: .destructive) { [weak self]_ in
@@ -295,7 +292,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         
         // 添加删除按钮（使用.destructive样式）
         alert.addAction(UIAlertAction(title: "删除", style: .destructive, handler: {[weak self] _ in
-            self?.presenter.deleteById(id: message.id)
+            self?.presenter.deleteById(id: message.messageId)
         }))
         
         alert.addAction(UIAlertAction(title: "取消", style: .cancel))

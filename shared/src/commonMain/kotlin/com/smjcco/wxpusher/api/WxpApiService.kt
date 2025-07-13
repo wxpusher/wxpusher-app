@@ -152,15 +152,15 @@ object WxpApiService {
      * @param read 是否标记为已读状态
      */
     suspend fun markMessageReadStatus(
-        id: Long? = null,
+        messageId: Long? = null,
         read: Boolean,
         successBlock: (() -> Unit)
     ): Unit? {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .put(WxpNetworkService.getUrl("/api/need-login/device/message/read-mark")) {
-                    id?.let {
-                        parameter("id", id)
+                    messageId?.let {
+                        parameter("messageId", messageId)
                     }
                     parameter("read", read)
                 }.body()
@@ -175,13 +175,13 @@ object WxpApiService {
      * @param id 消息的消息id
      */
     suspend fun deleteMessageById(
-        id: Long,
+        messageId: Long,
         successBlock: (() -> Unit)
     ): Unit? {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .delete(WxpNetworkService.getUrl("/api/need-login/device/message/delete")) {
-                    parameter("id", id)
+                    parameter("messageId", messageId)
                 }.body()
         }, successBlock = {
             successBlock.invoke()
