@@ -100,28 +100,28 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         if(userInfo.isEmpty){
             return nil;
         }
-        let id = userInfo["id"] as! Int64?
+        let messageId = userInfo["messageId"] as! Int64?
         let url = userInfo["url"] as!  String?
         let summary = userInfo["summary"] as! String?
-        let read = userInfo["read"] as!  Bool?
         let createTime = userInfo["createTime"]  as! Int64?
+        let name = userInfo["name"] as! String?
     
         
-        guard let id = id,
+        guard let messageId = messageId,
               let url = url,
               let summary = summary,
-              let read = read,
+              let name = name,
               let createTime = createTime else {
             print("数据不正确，忽略消息")
             return nil
         }
         
         
-        let sourceUrl = userInfo["sourceUrl"]  as!  String?
-        let name = userInfo["name"]  as!  String?
+        let sourceUrl = userInfo["sourceUrl"] as? String
         
         
-        let message = WxpMessageListMessage(id: id, url: url, sourceUrl: sourceUrl, summary: summary, name: name, read: read, createTime: createTime)
+        
+        let message = WxpMessageListMessage(id: messageId, url: url, sourceUrl: sourceUrl, summary: summary, name: name, read: false, createTime: createTime)
         return message
     }
     
