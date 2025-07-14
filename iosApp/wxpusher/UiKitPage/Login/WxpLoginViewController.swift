@@ -174,7 +174,8 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
     
     // MARK: - Actions
     @objc private func jumpPrivacy(){
-        self.navigationController?.pushViewController(WebViewController(url: URL(string:StringConstants.privateUrl)!), animated: true)
+        WxpJumpPageUtils.jumpToWebUrl(url: StringConstants.privateUrl)
+//        self.navigationController?.pushViewController(WxpWebViewController(url: URL(string:StringConstants.privateUrl)!), animated: true)
     }
     
     @objc private func getCodeButtonTapped() {

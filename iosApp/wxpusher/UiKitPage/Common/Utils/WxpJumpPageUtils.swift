@@ -3,7 +3,6 @@ import UIKit
 
 import Foundation
 
-
 @objc class WxpJumpPageUtils: NSObject {
     
     /**
@@ -72,7 +71,9 @@ import Foundation
                 return
             }
             let rootView = window.rootViewController
-            let webVC = WebViewController(url: url)
+            let webVC = WxpWebViewController(url: url)
+//            let webVC =  WxpFSafariViewController(url: url)
+//            webVC.dismissButtonStyle = .close 
             //如果根是navVC，那就压栈
             if(rootView is UINavigationController){
                 let rootVC = rootView as! UINavigationController

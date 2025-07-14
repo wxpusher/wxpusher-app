@@ -129,9 +129,7 @@ class WxpProfileViewController: UIViewController {
                     WxpJumpPageUtils.jumpToWebUrl(url: "https://wxpusher.zjiecode.com/admin/agreement/index-argeement.html")
                 },
                 ProfileItem(title: "软件更新", subtitle: WxpCommonParams.appVersionName(), accessoryType: .disclosureIndicator) {
-                    
-                    
-                    
+                    WxpVersionUpdateChecker().checkForUpdate()
                 }
             ]),
             

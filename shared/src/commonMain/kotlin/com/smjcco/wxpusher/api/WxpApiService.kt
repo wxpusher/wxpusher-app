@@ -140,7 +140,7 @@ object WxpApiService {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .get(WxpNetworkService.getUrl("/api/need-login/device/message/list-v2")) {
-                    parameter("lastUserReceiveRecordId", req.lastUserReceiveRecordId)
+                    parameter("messageId", req.messageId)
                     parameter("key", req.key)
                 }.body()
         })

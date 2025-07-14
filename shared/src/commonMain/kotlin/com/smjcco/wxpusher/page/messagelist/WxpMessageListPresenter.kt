@@ -4,13 +4,8 @@ import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.WxpBaseMvpPresenter
 import com.smjcco.wxpusher.base.WxpDateTimeUtils
 import com.smjcco.wxpusher.base.WxpSaveService
-import com.smjcco.wxpusher.base.WxpToastUtils
-import com.smjcco.wxpusher.base.letOnNotEmpty
 import com.smjcco.wxpusher.base.runAtMainSuspend
 import com.smjcco.wxpusher.biz.common.WxpAppDataService
-import kotlinx.serialization.json.Json
-import kotlin.time.Clock
-import kotlin.time.ExperimentalTime
 
 class WxpMessageListPresenter(view: IWxpMessageListView) :
     WxpBaseMvpPresenter<IWxpMessageListView, IWxpMessageListPresenter>(view),
@@ -22,7 +17,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
 
 
     //前页面的最后一条消息id
-    private var lastUserReceiveRecordId = Long.MAX_VALUE
+    private var lastMessageId = Long.MAX_VALUE
 
     //至少>20条才需要加载更多，后端目前下发的是一页30条 ，避免每次加载首页，都多请求一次
     private var pageMinCount = 20
@@ -83,7 +78,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             //如果刷新的数据不为null，说明是刷新成功了,然后才更新数据
             if (fetchResultList != null) {
                 messageListData = fetchResultList.toMutableList()
-                lastUserReceiveRecordId = messageListData.lastOrNull()?.messageId ?: Long.MAX_VALUE
+                lastMessageId = messageListData.lastOrNull()?.messageId ?: Long.MAX_VALUE
                 hasMore = messageListData.size >= pageMinCount
                 view?.showMessageMoreLoading(false, hasMore)
                 view?.onMessageList(messageListData.toList())
@@ -128,7 +123,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         runAtMainSuspend {
             loading = true
             view?.showMessageMoreLoading(true, hasMore)
-            val req = WxpMessageListReq(lastUserReceiveRecordId, key)
+            val req = WxpMessageListReq(lastMessageId, key)
             val fetchResultList = WxpApiService.fetchMessageList(req)
             if (fetchResultList !== null) {
                 if (fetchResultList.isEmpty()) {
@@ -136,7 +131,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
                     hasMore = false
                 } else {
                     messageListData.addAll(fetchResultList)
-                    lastUserReceiveRecordId =
+                    lastMessageId =
                         messageListData.lastOrNull()?.messageId ?: Long.MAX_VALUE
                     view?.onMessageList(messageListData.toList())
                 }
