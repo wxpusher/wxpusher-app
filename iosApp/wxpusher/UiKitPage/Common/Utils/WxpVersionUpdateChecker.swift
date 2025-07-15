@@ -12,11 +12,19 @@ import shared
 class WxpVersionUpdateChecker {
     
     private let bundleId:String
-    init() {
+    private let updateDateSaveKey = "WxpVersionUpdateChecker_updateDateSaveKey"
+    //强制提醒，用于手动检查更新
+    private let force:Bool
+    init(force:Bool) {
         bundleId = Bundle.main.bundleIdentifier ?? ""
+        self.force = force
     }
     func checkForUpdate() {
         guard let url = URL(string: "https://itunes.apple.com/lookup?bundleId=\(bundleId)") else {
+            return
+        }
+        //当天已经检查过了，并且不是强制检查，就直接返回
+        if(WxpSaveService.shared.get(key: updateDateSaveKey, value___: "") == WxpDateTimeUtils.shared.getDate() && !force){
             return
         }
         
@@ -38,7 +46,8 @@ class WxpVersionUpdateChecker {
                 DispatchQueue.main.async {
                     if self.compareVersions(current: currentVersion, appStore: appStoreVersion) {
                         self.showUpdateAlert(appStoreURL: trackViewUrl,releaseNote: releaseNotes)
-                    }else{
+                    }else if(self.force){
+                        //force才进行提醒，否则不提醒
                         WxpToastUtils.shared.showToast(msg: "当前已是最新版本")
                     }
                 }
@@ -74,17 +83,12 @@ class WxpVersionUpdateChecker {
             self.openAppStore(appStoreURL: appStoreURL)
         }
         WxpDialogUtils.showConfirmDialog(params: parmas)
+        //保存弹窗，一天只提示一次更新
+        WxpSaveService.shared.set(key: updateDateSaveKey, value___: WxpDateTimeUtils.shared.getDate())
     }
     
     private func openAppStore(appStoreURL: String) {
         guard let url = URL(string: appStoreURL) else { return }
         UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        //        guard let appStoreURL = URL(string: "itms-apps://itunes.apple.com/app/\(bundleId)") else {
-        //            return
-        //        }
-        //
-        //        if UIApplication.shared.canOpenURL(appStoreURL) {
-        //            UIApplication.shared.open(appStoreURL, options: [:], completionHandler: nil)
-        //        }
     }
 }
