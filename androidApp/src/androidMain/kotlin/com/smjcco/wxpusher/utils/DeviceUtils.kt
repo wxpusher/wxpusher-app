@@ -80,6 +80,8 @@ object DeviceUtils {
             return DevicePlatform.Android_XIAOMI
         } else if (isVivo()) {
             return DevicePlatform.Android_VIVO
+        } else if (isOppo()) {
+            return DevicePlatform.Android_OPPO
         } else if (isHonorPush()) {
             //临时逻辑，判断是支持荣耀push，但是没有打开开关，就走自建，避免进入华为的逻辑
             if (ConfigManager.getCurrentConfig().honorPush) {
@@ -88,9 +90,8 @@ object DeviceUtils {
                 return DevicePlatform.Android
             }
         } else if (isHuaweiMobileServicesAvailable()) {
+            //华为需要放在最后面，因为安装了HCM就会识别成华为，后面需要处理一下
             return DevicePlatform.Android_HUAWEI
-        } else if (isOppo()) {
-            return DevicePlatform.Android_OPPO
         }
         return DevicePlatform.Android
     }
