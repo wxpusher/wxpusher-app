@@ -90,6 +90,7 @@ object DeviceUtils {
                 return DevicePlatform.Android
             }
         } else if (isHuaweiMobileServicesAvailable()) {
+            //华为需要放在最后面，因为安装了HCM就会识别成华为，后面需要处理一下
             return DevicePlatform.Android_HUAWEI
         }
         return DevicePlatform.Android
