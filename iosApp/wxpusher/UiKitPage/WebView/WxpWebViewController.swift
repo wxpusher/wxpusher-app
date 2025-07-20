@@ -14,6 +14,8 @@ class WxpWebViewController: UIViewController {
     private let webView: WKWebView
     private let url: URL
     private let progressView: UIProgressView
+    private var loadingStartTime: Date?
+    private var progressTimer: Timer?
     
     
     init(url: URL) {
@@ -130,6 +132,7 @@ class WxpWebViewController: UIViewController {
     
     deinit {
         webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
+        progressTimer?.invalidate()
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -229,20 +232,35 @@ extension WxpWebViewController: WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        // 显示进度条
-        progressView.isHidden = false
+        // 记录开始加载时间
+        loadingStartTime = Date()
         progressView.progress = 0.0
+        
+        // 设置1秒后显示进度条的定时器，避免网页加载太快，进度条闪一下
+        progressTimer?.invalidate()
+        progressTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { [weak self] _ in
+            // 如果1秒后还在加载，则显示进度条
+            if self?.webView.isLoading == true {
+                self?.progressView.isHidden = false
+            }
+        }
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        // 隐藏进度条
+        // 取消定时器并隐藏进度条
+        progressTimer?.invalidate()
+        progressTimer = nil
         progressView.isHidden = true
+        loadingStartTime = nil
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         // 处理加载错误
+        progressTimer?.invalidate()
+        progressTimer = nil
         progressView.isHidden = true
         progressView.progress = 0.0
+        loadingStartTime = nil
         WxpToastUtils.shared.showToast(msg: "加载失败")
     }
 } 
