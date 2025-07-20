@@ -96,7 +96,7 @@ class WxpWebViewController: UIViewController {
     }
     
     private func setupUI() {
-        title = "网页内容"
+        title = "内容加载中"
         view.backgroundColor = .systemBackground
         webView.navigationDelegate = self
         
@@ -247,6 +247,13 @@ extension WxpWebViewController: WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        // 设置网页标题
+        if let webTitle = webView.title, !webTitle.isEmpty {
+            title = webTitle
+        } else {
+            title = "网页内容"
+        }
+        
         // 取消定时器并隐藏进度条
         progressTimer?.invalidate()
         progressTimer = nil
@@ -255,6 +262,9 @@ extension WxpWebViewController: WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        // 设置错误时的标题
+        title = "加载失败"
+        
         // 处理加载错误
         progressTimer?.invalidate()
         progressTimer = nil
