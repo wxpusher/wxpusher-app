@@ -31,6 +31,7 @@
 		1A49346C2E1A6B6800EA1C71 /* WxpUnbindPhoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A49346B2E1A6B6800EA1C71 /* WxpUnbindPhoneViewController.swift */; };
 		1A49346F2E255ECC00EA1C71 /* WxpFSafariViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A49346E2E255ECC00EA1C71 /* WxpFSafariViewController.swift */; };
 		1A4934712E25667D00EA1C71 /* WxpVersionUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934702E25667100EA1C71 /* WxpVersionUpdateChecker.swift */; };
+		1A4934732E2D0F0C00EA1C71 /* WxpCommonNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934722E2D0F0100EA1C71 /* WxpCommonNotification.swift */; };
 		1A5164632B09D6D40000BA90 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164622B09D6D40000BA90 /* WebView.swift */; };
 		1A5164642B09D6D40000BA90 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164622B09D6D40000BA90 /* WebView.swift */; };
 		1A5164672B0A3A650000BA90 /* HomeViewVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164662B0A3A650000BA90 /* HomeViewVM.swift */; };
@@ -126,6 +127,7 @@
 		1A49346B2E1A6B6800EA1C71 /* WxpUnbindPhoneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpUnbindPhoneViewController.swift; sourceTree = "<group>"; };
 		1A49346E2E255ECC00EA1C71 /* WxpFSafariViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpFSafariViewController.swift; sourceTree = "<group>"; };
 		1A4934702E25667100EA1C71 /* WxpVersionUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpVersionUpdateChecker.swift; sourceTree = "<group>"; };
+		1A4934722E2D0F0100EA1C71 /* WxpCommonNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpCommonNotification.swift; sourceTree = "<group>"; };
 		1A5164622B09D6D40000BA90 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		1A5164662B0A3A650000BA90 /* HomeViewVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewVM.swift; sourceTree = "<group>"; };
 		1A51646A2B0A3AB20000BA90 /* BaseVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseVM.swift; sourceTree = "<group>"; };
@@ -376,6 +378,7 @@
 				1A9C3E9A2E01CEF300A25249 /* Utils */,
 				1A962E782E0B0B1D00C966A3 /* WxpCommonBlockDef.swift */,
 				1A962E742E0B080A00C966A3 /* WxpSaveKey.swift */,
+				1A4934722E2D0F0100EA1C71 /* WxpCommonNotification.swift */,
 				1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */,
 				1A9C3E882DF5CB8F00A25249 /* UIColor+Color.swift */,
 			);
@@ -712,6 +715,7 @@
 				1A9C3E782DF5A02E00A25249 /* MessageListViewController.swift in Sources */,
 				1A9C3E7A2DF5A07D00A25249 /* WxpMessageItemBeam.swift in Sources */,
 				1A4934682E1971EA00EA1C71 /* WxpCommonParams.swift in Sources */,
+				1A4934732E2D0F0C00EA1C71 /* WxpCommonNotification.swift in Sources */,
 				1A5164632B09D6D40000BA90 /* WebView.swift in Sources */,
 				1A962E672E08610200C966A3 /* KtSwiftJumpPageUtils.m in Sources */,
 				1A9C3E802DF5ABFC00A25249 /* WxpLoginViewController.swift in Sources */,

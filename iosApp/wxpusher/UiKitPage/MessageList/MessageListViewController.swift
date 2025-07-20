@@ -82,8 +82,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         //开始刷新，mj_header的回调回调用p层刷新
         tableView.mj_header?.beginRefreshing();
         
-        //存活的时候，监听消息，刷新页面
-        NotificationCenter.default.addObserver(forName: notiKey, object: nil, queue: nil) {[weak self] notification in
+        //存活的时候，监听点击消息的事件
+        NotificationCenter.default.addObserver(forName: WxpCommonNotification.ClickMessageNotification, object: nil, queue: nil) {[weak self] notification in
             let userInfo = notification.userInfo
             guard let userInfo =  userInfo else {
                 return
@@ -109,12 +109,14 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         let summary = userInfo["summary"] as! String?
         let createTime = userInfo["createTime"]  as! Int64?
         let name = userInfo["name"] as! String?
+        let read = userInfo["read"] as! Bool?
     
         
         guard let messageId = messageId,
               let url = url,
               let summary = summary,
               let name = name,
+              let read = read,
               let createTime = createTime else {
             print("数据不正确，忽略消息")
             return nil
@@ -122,7 +124,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         
         let sourceUrl = userInfo["sourceUrl"] as? String
         
-        let message = WxpMessageListMessage(messageId: messageId, url: url, sourceUrl: sourceUrl, summary: summary, name: name, read: false, createTime: createTime)
+        let message = WxpMessageListMessage(messageId: messageId, url: url, sourceUrl: sourceUrl, summary: summary, name: name, read: read, createTime: createTime)
         return message
     }
     

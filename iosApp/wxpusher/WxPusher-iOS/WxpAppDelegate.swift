@@ -75,9 +75,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
 //  通过这个方法，可以让应用在前台的时候也提醒消息，但是有这个方法，上面的方法就不会调用了
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        let userInfo = notification.request.content.userInfo
+        var userInfo = notification.request.content.userInfo
         print("[push]-应用存活-前台，收到用户消息的时候，userInfo=\(userInfo)")
-        NotificationCenter.default.post(name: notiKey, object: nil, userInfo: userInfo)
+        //在前台收到消息，消息不是已读状态
+        userInfo["read"] = false
+        NotificationCenter.default.post(name: WxpCommonNotification.ClickMessageNotification, object: nil, userInfo: userInfo)
         //应用在前台的时候，如何提醒处理收到的消息
         completionHandler([.banner, .sound, .badge])
     }
@@ -90,7 +92,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         WxpJumpPageUtils.jumpToWebUrl(url: url)
         //打开的消息 ，标记为已读状态
         userInfo["read"] = true
-        NotificationCenter.default.post(name: notiKey, object: nil, userInfo: userInfo)
+        NotificationCenter.default.post(name: WxpCommonNotification.ClickMessageNotification, object: nil, userInfo: userInfo)
         completionHandler()
     }
     
