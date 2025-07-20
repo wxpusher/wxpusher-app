@@ -3,8 +3,17 @@ import WebKit
 import shared
 
 class WxpWebViewController: UIViewController {
+    
+    // 白名单域名列表
+    private let WhitelistHosts: Set<String> = [
+        "wxpusher.zjiecode.com",
+        "10.0.0.11",
+    ]
+    private let DeviceTokenKey = "deviceToken"
+    
     private let webView: WKWebView
     private let url: URL
+    
     
     init(url: URL) {
         self.url = url
@@ -96,8 +105,28 @@ class WxpWebViewController: UIViewController {
     }
     
     private func loadWebContent() {
-        let request = URLRequest(url: url)
+        let request = createRequestWithTokenIfNeeded(for: url)
         webView.load(request)
+    }
+    
+    // MARK: - Helper Methods
+    
+    /// 检查主机是否在白名单内
+    private func isHostInWhitelist(_ host: String?) -> Bool {
+        guard let host = host else { return false }
+        return WhitelistHosts.contains(host)
+    }
+    
+    /// 创建带 token header 的请求
+    private func createRequestWithTokenIfNeeded(for url: URL) -> URLRequest {
+        var request = URLRequest(url: url)
+        
+        if isHostInWhitelist(url.host) {
+            let token = WxpAppDataService.shared.getLoginInfo()?.deviceToken ?? ""
+            request.setValue(token, forHTTPHeaderField: DeviceTokenKey)
+        }
+        
+        return request
     }
     
     // MARK: - Action Methods
@@ -144,6 +173,27 @@ class WxpWebViewController: UIViewController {
 }
 
 extension WxpWebViewController: WKNavigationDelegate {
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        guard let url = navigationAction.request.url else {
+            decisionHandler(.allow)
+            return
+        }
+        
+        // 如果是白名单内的域名，需要添加 token header
+        if isHostInWhitelist(url.host) {
+            let newRequest = createRequestWithTokenIfNeeded(for: url)
+            
+            // 如果当前请求没有 token header，重新加载带 token 的请求
+            if navigationAction.request.value(forHTTPHeaderField: DeviceTokenKey) == nil {
+                webView.load(newRequest)
+                decisionHandler(.cancel)
+                return
+            }
+        }
+        
+        decisionHandler(.allow)
+    }
+    
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         // 显示加载指示器
     }
@@ -154,6 +204,6 @@ extension WxpWebViewController: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         // 处理加载错误
-        showToast(message: "加载失败")
+        WxpToastUtils.shared.showToast(msg: "加载失败")
     }
 } 
