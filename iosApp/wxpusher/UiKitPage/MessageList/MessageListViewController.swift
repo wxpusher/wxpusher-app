@@ -40,6 +40,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         tryButton.backgroundColor = .systemBlue
         tryButton.setTitleColor(.white, for: .normal)
         tryButton.layer.cornerRadius = 4
+        //暂时先不实现体验，后面来补充这个功能
+        tryButton.isHidden = true
         
         emptyView.addSubview(emptyImageView)
         emptyView.addSubview(emptyLabel)
