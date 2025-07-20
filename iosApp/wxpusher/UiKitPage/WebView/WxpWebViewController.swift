@@ -1,5 +1,6 @@
 import UIKit
 import WebKit
+import shared
 
 class WxpWebViewController: UIViewController {
     private let webView: WKWebView
@@ -45,14 +46,14 @@ class WxpWebViewController: UIViewController {
                                             preferredStyle: .actionSheet)
         
         // 添加选项按钮
-        let option1 = UIAlertAction(title: "复制链接", style: .default) { [weak self]_ in
-           
+        let option1 = UIAlertAction(title: "复制链接", style: .default) { [weak self] _ in
+            self?.copyLinkToClipboard()
         }
-        let option2 = UIAlertAction(title: "分享", style: .default) { [weak self]_ in
-           
+        let option2 = UIAlertAction(title: "分享", style: .default) { [weak self] _ in
+            self?.shareURL()
         }
-        let option3 = UIAlertAction(title: "在浏览器中打开", style: .default) { [weak self]_ in
-           
+        let option3 = UIAlertAction(title: "在浏览器中打开", style: .default) { [weak self] _ in
+            self?.openInBrowser()
         }
         
         
@@ -97,6 +98,48 @@ class WxpWebViewController: UIViewController {
     private func loadWebContent() {
         let request = URLRequest(url: url)
         webView.load(request)
+    }
+    
+    // MARK: - Action Methods
+    
+    /// 复制链接到剪贴板
+    private func copyLinkToClipboard() {
+        let urlString = webView.url?.absoluteString ?? url.absoluteString
+        UIPasteboard.general.string = urlString
+        WxpToastUtils.shared.showToast(msg: "复制成功")
+    }
+    
+    /// 分享当前URL
+    private func shareURL() {
+        let urlString = webView.url?.absoluteString ?? url.absoluteString
+        let activityViewController = UIActivityViewController(activityItems: [urlString], 
+                                                            applicationActivities: nil)
+        
+        // 在 iPad 上需要设置弹出位置
+        if let popoverController = activityViewController.popoverPresentationController {
+            popoverController.sourceView = self.view
+            popoverController.sourceRect = CGRect(x: self.view.bounds.midX,
+                                                  y: self.view.bounds.midY,
+                                                  width: 0,
+                                                  height: 0)
+            popoverController.permittedArrowDirections = []
+        }
+        
+        present(activityViewController, animated: true, completion: nil)
+    }
+    
+    /// 在系统浏览器中打开链接
+    private func openInBrowser() {
+        let urlToOpen = webView.url ?? url
+        if UIApplication.shared.canOpenURL(urlToOpen) {
+            UIApplication.shared.open(urlToOpen, options: [:]) { success in
+                if !success {
+                    WxpToastUtils.shared.showToast(msg: "无法打开浏览器")
+                }
+            }
+        } else {
+            WxpToastUtils.shared.showToast(msg: "无效的链接")
+        }
     }
 }
 
