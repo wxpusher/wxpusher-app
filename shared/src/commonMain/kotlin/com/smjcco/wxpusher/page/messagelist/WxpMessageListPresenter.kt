@@ -29,7 +29,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     override fun searchIfChanged(key: String?) {
         if (this.key != key) {
             this.key = key
-            refresh()
+            refresh(false)
         }
     }
 
@@ -63,11 +63,14 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         saveRefreshListData()
     }
 
-    override fun refresh() {
+    override fun refresh(manual: Boolean) {
         if (loading) {
             return
         }
-        println("刷新refresh")
+        //手动触发的，就给予震动反馈
+        if (manual) {
+            view?.onFeedback()
+        }
         runAtMainSuspend {
             loading = true
             view?.showMessageRefreshing(true)
@@ -93,7 +96,6 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
 
     override fun getTipsOfLastRefreshTime(): String {
         val time = WxpSaveService.get(MessageRefreshTimeKey, 0.0)
-        println("time=${time}")
         if (time <= 0.0) {
             return "更新于 无"
         }

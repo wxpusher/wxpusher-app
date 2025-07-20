@@ -21,6 +21,12 @@ interface IWxpMessageListView : IWxpBaseMvpView<IWxpMessageListPresenter> {
     fun onMessageList(data: List<WxpMessageListMessage>)
 
 
+    /**
+     * 在刷新，加载更多的时候，给予用户反馈
+     * iOS上是震动一下
+     */
+    fun onFeedback();
+
 }
 
 interface IWxpMessageListPresenter :
@@ -49,8 +55,9 @@ interface IWxpMessageListPresenter :
 
     /**
      * 刷新数据
+     * @param manual是否手动触发的
      */
-    fun refresh()
+    fun refresh(manual: Boolean)
 
     /**
      * 加载更多数据

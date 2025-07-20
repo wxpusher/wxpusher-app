@@ -21,6 +21,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     private let tableView = UITableView()
     
+    private var openAppFristRefresh = true
+    
     //空态页
     private let emptyView: UIView = {
         // 添加空状态视图
@@ -275,9 +277,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         actionSheet.addAction(option1)
         actionSheet.addAction(option2)
         actionSheet.addAction(cancel)
-        
-        //震动反馈
-        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        //长按给予一个震动反馈
+        onFeedback()
         // 显示 Action Sheet
         present(actionSheet, animated: true, completion: nil)
         
@@ -304,7 +305,9 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     private func setupRefreshControl() {
         let tableViewRefreshHeader:MJRefreshNormalHeader = MJRefreshNormalHeader(refreshingBlock: {
-            self.presenter.refresh()
+            self.presenter.refresh(manual: !self.openAppFristRefresh)
+            //刷新一次以后，就不再是打开app第一次刷新了
+            self.openAppFristRefresh = false
         })
         
         tableViewRefreshHeader.lastUpdatedTimeText = {[weak self] _ in
@@ -322,6 +325,11 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
     
     // MARK: - MVP-VIEW
+    func onFeedback() {
+        //震动反馈
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+    }
+    
     func onMessageList(data: [WxpMessageListMessage]) {
         self.messageList = data
         tableView.isHidden = data.isEmpty
@@ -401,7 +409,6 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         //展示最后一个item的时候，加载更多
         if  indexPath.item == messageList.count - 1{
-            UIImpactFeedbackGenerator(style: .light).impactOccurred()
             presenter.loadMore()
         }
         
