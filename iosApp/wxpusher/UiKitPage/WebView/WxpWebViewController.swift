@@ -13,12 +13,14 @@ class WxpWebViewController: UIViewController {
     
     private let webView: WKWebView
     private let url: URL
+    private let progressView: UIProgressView
     
     
     init(url: URL) {
         self.url = url
         let configuration = WKWebViewConfiguration()
         self.webView = WKWebView(frame: .zero, configuration: configuration)
+        self.progressView = UIProgressView(progressViewStyle: .bar)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -35,8 +37,10 @@ class WxpWebViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupOption()
+        setupProgressView()
         loadWebContent()
     }
+    
     private func setupOption(){
         view.backgroundColor = .systemBackground
         
@@ -97,11 +101,41 @@ class WxpWebViewController: UIViewController {
         view.addSubview(webView)
         webView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 1.0), // 为进度条留出空间
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+    }
+    
+    private func setupProgressView() {
+        // 设置进度条样式
+        progressView.trackTintColor = UIColor.clear
+        progressView.progressTintColor = UIColor.systemBlue
+        progressView.isHidden = true
+        
+        // 添加进度条到视图
+        view.addSubview(progressView)
+        progressView.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            progressView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            progressView.heightAnchor.constraint(equalToConstant: 1.0)
+        ])
+        
+        // 添加KVO观察WebView的估计进度
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
+    }
+    
+    deinit {
+        webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == #keyPath(WKWebView.estimatedProgress) {
+            progressView.progress = Float(webView.estimatedProgress)
+        }
     }
     
     private func loadWebContent() {
@@ -195,15 +229,20 @@ extension WxpWebViewController: WKNavigationDelegate {
     }
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
-        // 显示加载指示器
+        // 显示进度条
+        progressView.isHidden = false
+        progressView.progress = 0.0
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        // 隐藏加载指示器
+        // 隐藏进度条
+        progressView.isHidden = true
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         // 处理加载错误
+        progressView.isHidden = true
+        progressView.progress = 0.0
         WxpToastUtils.shared.showToast(msg: "加载失败")
     }
 } 
