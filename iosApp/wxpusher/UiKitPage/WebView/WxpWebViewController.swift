@@ -112,7 +112,7 @@ class WxpWebViewController: UIViewController {
         
         
         // 先创建约束引用，稍后在setupThirdPartyBanner中设置
-        webViewTopConstraint = webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0)
+        webViewTopConstraint = webView.topAnchor.constraint(equalTo: thirdPartyBannerView.bottomAnchor, constant: 0)
         bannerHeightConstraint = thirdPartyBannerView.heightAnchor.constraint(equalToConstant: 0)
         
         
@@ -223,7 +223,6 @@ class WxpWebViewController: UIViewController {
         
         thirdPartyBannerView.isHidden = false
         bannerHeightConstraint.constant = 30
-        webViewTopConstraint.constant = 30.0
         
         UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
@@ -232,7 +231,6 @@ class WxpWebViewController: UIViewController {
     
     private func hideBanner() {
         bannerHeightConstraint.constant = 0
-        webViewTopConstraint.constant = 0
         
         UIView.animate(withDuration: 0.3, animations: {
             self.view.layoutIfNeeded()
