@@ -8,13 +8,13 @@ import MJRefresh
 
 class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPresenter>,IWxpMessageListView  {
     
-   
+    
     private var tableViewRefreshHeader:MJRefreshNormalHeader? = nil
     
     private let footerLoadingView = WxpFooterLoadingView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 60))
     
     private var messageList: [WxpMessageListMessage] = []
-
+    
     
     //搜索
     private let searchController = UISearchController(searchResultsController: nil)
@@ -94,9 +94,26 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
             }
             self?.presenter.onReceiveNewMessage(message: messagae)
         }
+        //监听app返回前台，尝试刷新消息
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(willEnterForegroundNotification),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil
+        )
     }
     
+    deinit {
+        // 移除监听（避免内存泄漏）
+        NotificationCenter.default.removeObserver(self)
+    }
     
+    @objc private func willEnterForegroundNotification(){
+        //不是第一次打开app，就尝试后台刷新消息
+        if(!openAppFristRefresh){
+            presenter.fetchMessageResume()
+        }
+    }
     /**
      * 从推送信息中，获取一条消息数据
      */
@@ -110,7 +127,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         let createTime = userInfo["createTime"]  as! Int64?
         let name = userInfo["name"] as! String?
         let read = userInfo["read"] as! Bool?
-    
+        
         
         guard let messageId = messageId,
               let url = url,
@@ -140,7 +157,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
-       
+        
         tableView.backgroundColor = .systemBackground
         
         tableView.delegate = self
@@ -182,7 +199,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
             emptyView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
-
+        
         emptyView.backgroundColor = .systemBackground
         emptyView.isHidden = true
     }
@@ -205,7 +222,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         
         navigationItem.rightBarButtonItems = [optionsButton]
         navigationItem.hidesSearchBarWhenScrolling = false
-            
+        
     }
     // MARK: - Page Action
     @objc func clickLoadMore(_ sender: UITapGestureRecognizer) {

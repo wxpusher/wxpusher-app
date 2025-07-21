@@ -65,6 +65,13 @@ interface IWxpMessageListPresenter :
     fun loadMore()
 
     /**
+     * 返回app的时候，可以静默获取一次消息
+     * 主要用于iOS，应用未杀死，收到消息的时候app没有运行，返回前台，收到的消息不显示
+     * 这个时候调用此接口，获取一次最新的消息，静默插入列表
+     */
+    fun fetchMessageResume()
+
+    /**
      * 标记消息已读状态
      * @param id 消息的消息id，不传表示标记用户的所有消息
      * @param read 是否标记为已读状态

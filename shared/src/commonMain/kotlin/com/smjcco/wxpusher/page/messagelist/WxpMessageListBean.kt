@@ -7,6 +7,7 @@ import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 data class WxpMessageListReq(
     val messageId: Long,
     val key: String?,
+    val fetchResume: Boolean? = false,
 )
 
 

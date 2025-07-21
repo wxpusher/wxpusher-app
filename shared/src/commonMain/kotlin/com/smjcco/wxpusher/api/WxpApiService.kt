@@ -142,6 +142,7 @@ object WxpApiService {
                 .get(WxpNetworkService.getUrl("/api/need-login/device/message/list-v2")) {
                     parameter("messageId", req.messageId)
                     parameter("key", req.key)
+                    parameter("fetchResume", req.fetchResume)
                 }.body()
         })
     }

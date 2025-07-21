@@ -94,6 +94,45 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         }
     }
 
+    override fun fetchMessageResume() {
+        if (loading) {
+            return
+        }
+        runAtMainSuspend {
+            loading = true
+            val req = WxpMessageListReq(Long.MAX_VALUE, key, true)
+            val fetchResultList = WxpApiService.fetchMessageList(req)
+            WxpSaveService.set(MessageRefreshTimeKey, WxpDateTimeUtils.getTimestamp().toDouble())
+            if (fetchResultList != null) {
+                for (message in fetchResultList) {
+                    var has = false
+                    for (listMessage in messageListData) {
+                        if (listMessage.messageId == message.messageId) {
+                            has = true
+                            break
+                        }
+                    }
+                    if (has) {
+                        continue
+                    }
+                    // 找到第一个 id 小于新消息 id 的位置
+                    val insertIndex =
+                        messageListData.indexOfFirst { it.messageId < message.messageId }
+                    if (insertIndex == -1) {
+                        // 如果没有找到更小的 id，说明新消息的 id 是最小的，添加到列表末尾
+                        messageListData.add(message)
+                    } else {
+                        // 在找到的位置插入新消息
+                        messageListData.add(insertIndex, message)
+                    }
+                }
+                view?.onMessageList(messageListData.toList())
+                saveRefreshListData()
+            }
+            loading = false
+        }
+    }
+
     override fun getTipsOfLastRefreshTime(): String {
         val time = WxpSaveService.get(MessageRefreshTimeKey, 0.0)
         if (time <= 0.0) {
