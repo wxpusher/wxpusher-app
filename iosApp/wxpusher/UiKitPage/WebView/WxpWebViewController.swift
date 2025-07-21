@@ -7,22 +7,72 @@ class WxpWebViewController: UIViewController {
     // 白名单域名列表
     private let WhitelistHosts: Set<String> = [
         "wxpusher.zjiecode.com",
+        "wxpusher.test.zjiecode.com",
         "10.0.0.11",
     ]
     private let DeviceTokenKey = "deviceToken"
     
-    private let webView: WKWebView
     private let url: URL
-    private let progressView: UIProgressView
     private var loadingStartTime: Date?
     private var progressTimer: Timer?
+    private var showThirdPartyBanner = true
+    
+    
+    // MARK: - View
+    private let progressView: UIProgressView = {
+        // 设置进度条样式
+        let progressView = UIProgressView(progressViewStyle: .bar)
+        progressView.trackTintColor = UIColor.clear
+        progressView.progressTintColor = UIColor.systemBlue
+        progressView.isHidden = true
+        
+        progressView.translatesAutoresizingMaskIntoConstraints = false
+        return progressView
+    }()
+    
+    // Banner相关
+    private var thirdPartyBannerView: UIView = {
+        let containerView = UIView()
+        containerView.backgroundColor = UIColor.defAccentSecoundColor
+        containerView.isHidden = true
+        
+        // 创建标签
+        let label = UILabel()
+        label.text = "⚠️ 当前内容由第三方提供，与WxPusher无关"
+        label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
+        label.textColor = UIColor.white
+        label.numberOfLines = 1
+        
+        // 添加子视图
+        containerView.addSubview(label)
+        
+        // 设置自动布局
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            // 标签约束
+            label.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            label.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+            label.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+        ])
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        
+        return containerView
+    }()
+    
+    private let webView: WKWebView = {
+        let configuration = WKWebViewConfiguration()
+        let webView = WKWebView(frame: .zero, configuration: configuration)
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        return webView
+    }()
+    
+    private var bannerHeightConstraint: NSLayoutConstraint!
+    private var webViewTopConstraint: NSLayoutConstraint!
     
     
     init(url: URL) {
         self.url = url
-        let configuration = WKWebViewConfiguration()
-        self.webView = WKWebView(frame: .zero, configuration: configuration)
-        self.progressView = UIProgressView(progressViewStyle: .bar)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -39,9 +89,52 @@ class WxpWebViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupOption()
-        setupProgressView()
         loadWebContent()
     }
+    
+    private func setupUI() {
+        title = "内容加载中"
+        view.backgroundColor = .systemBackground
+        webView.navigationDelegate = self
+        
+        //进度条更新观察
+        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
+        
+        //点击三方内容提示
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(bannerTapped))
+        thirdPartyBannerView.addGestureRecognizer(tapGesture)
+        
+        
+        //设置布局约束
+        view.addSubview(thirdPartyBannerView)
+        view.addSubview(webView)
+        view.addSubview(progressView)
+        
+        
+        // 先创建约束引用，稍后在setupThirdPartyBanner中设置
+        webViewTopConstraint = webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 0)
+        bannerHeightConstraint = thirdPartyBannerView.heightAnchor.constraint(equalToConstant: 0)
+        
+        
+        NSLayoutConstraint.activate([
+            thirdPartyBannerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            thirdPartyBannerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            thirdPartyBannerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            bannerHeightConstraint,
+            
+            webViewTopConstraint,
+            webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            webView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            progressView.topAnchor.constraint(equalTo: webView.topAnchor),
+            progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            progressView.heightAnchor.constraint(equalToConstant: 1.0)
+            
+        ])
+    }
+    
     
     private func setupOption(){
         view.backgroundColor = .systemBackground
@@ -54,6 +147,7 @@ class WxpWebViewController: UIViewController {
         
         navigationItem.rightBarButtonItems = [optionsButton]
     }
+    
     
     @objc private func optionsTapped() {
         let actionSheet = UIAlertController(title: nil,
@@ -95,40 +189,69 @@ class WxpWebViewController: UIViewController {
         present(actionSheet, animated: true, completion: nil)
     }
     
-    private func setupUI() {
-        title = "内容加载中"
-        view.backgroundColor = .systemBackground
-        webView.navigationDelegate = self
-        
-        view.addSubview(webView)
-        webView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 1.0), // 为进度条留出空间
-            webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        ])
+    @objc private func bannerTapped() {
+        showThirdPartyContentAlert()
     }
     
-    private func setupProgressView() {
-        // 设置进度条样式
-        progressView.trackTintColor = UIColor.clear
-        progressView.progressTintColor = UIColor.systemBlue
-        progressView.isHidden = true
+    private func showThirdPartyContentAlert() {
+        let alert = UIAlertController(
+            title: "第三方内容提示",
+            message: "当前页面包含第三方提供的内容。这些内容由第三方独立提供和维护，与WxPusher无关。请谨慎对待页面中的信息，WxPusher不对第三方内容的准确性、安全性或合法性承担责任。\n\n如果您对内容有疑问或遇到问题，请直接联系内容提供方。",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "不再提示", style: .destructive) { [weak self] _ in
+            self?.hideBannerPermanently()
+        })
+        alert.addAction(UIAlertAction(title: "我知道了", style: .default, handler: nil))
         
-        // 添加进度条到视图
-        view.addSubview(progressView)
-        progressView.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            progressView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            progressView.heightAnchor.constraint(equalToConstant: 1.0)
-        ])
-        
-        // 添加KVO观察WebView的估计进度
-        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
+        present(alert, animated: true, completion: nil)
     }
+    
+    private func hideBannerPermanently() {
+        // 保存用户选择到UserDefaults
+        showThirdPartyBanner = false
+        // 隐藏banner
+        hideBanner()
+    }
+    
+    private func shouldShowBanner() -> Bool {
+        return showThirdPartyBanner
+    }
+    
+    private func showBanner() {
+        guard shouldShowBanner() else { return }
+        
+        thirdPartyBannerView.isHidden = false
+        bannerHeightConstraint.constant = 30
+        webViewTopConstraint.constant = 30.0
+        
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    private func hideBanner() {
+        bannerHeightConstraint.constant = 0
+        webViewTopConstraint.constant = 0
+        
+        UIView.animate(withDuration: 0.3, animations: {
+            self.view.layoutIfNeeded()
+        }) { _ in
+            self.thirdPartyBannerView.isHidden = true
+        }
+    }
+     
+     private func checkAndShowThirdPartyBanner(for url: URL?) {
+         guard let url = url else { return }
+         
+         if isHostInWhitelist(url.host) {
+             // 白名单内的域名，隐藏banner
+             hideBanner()
+         } else {
+             // 第三方域名，显示banner
+             showBanner()
+         }
+     }
     
     deinit {
         webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
@@ -236,6 +359,9 @@ extension WxpWebViewController: WKNavigationDelegate {
         loadingStartTime = Date()
         progressView.progress = 0.0
         
+        // 检查是否需要显示第三方内容banner
+        checkAndShowThirdPartyBanner(for: webView.url)
+        
         // 设置1秒后显示进度条的定时器，避免网页加载太快，进度条闪一下
         progressTimer?.invalidate()
         progressTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { [weak self] _ in
@@ -253,6 +379,9 @@ extension WxpWebViewController: WKNavigationDelegate {
         } else {
             title = "网页内容"
         }
+        
+        // 检查是否需要显示第三方内容banner
+        checkAndShowThirdPartyBanner(for: webView.url)
         
         // 取消定时器并隐藏进度条
         progressTimer?.invalidate()
