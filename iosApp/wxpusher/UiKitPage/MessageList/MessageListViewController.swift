@@ -214,55 +214,54 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         searchController.searchBar.placeholder = "搜索"
         searchController.hidesNavigationBarDuringPresentation = false
         navigationItem.searchController = searchController
-        
-        let optionsButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"),
-                                            style: .plain,
-                                            target: self,
-                                            action: #selector(optionsTapped))
-        
-        navigationItem.rightBarButtonItems = [optionsButton]
         navigationItem.hidesSearchBarWhenScrolling = false
         
+        
+        let mainMenu = UIMenu(title: "", children: [
+            // 第一组：订阅相关
+            UIMenu(title: "订阅管理", options: .displayInline, children: [
+                UIAction(
+                    title: "添加订阅",
+                    image: UIImage(systemName: "plus.bubble"),
+                    handler:{ [weak self]_ in
+                        self?.presenter.markMessageReadStatus(id: nil, read: true)
+                    }
+                ),
+                UIAction(
+                    title: "订阅管理",
+                    image: UIImage(systemName: "folder.badge.gearshape"),
+                    handler:{ [weak self]_ in
+                        self?.presenter.markMessageReadStatus(id: nil, read: true)
+                    }
+                )
+            ]),
+            
+            // 第二组：消息操作
+            UIMenu(title: "消息操作", options: .displayInline, children: [
+                UIAction(
+                    title: "已读全部消息",
+                    image: UIImage(systemName: "checkmark.square"),
+                    handler:{ [weak self]_ in
+                        self?.presenter.markMessageReadStatus(id: nil, read: true)
+                    }
+                )
+            ])
+        ])
+        
+        let menuButton = UIBarButtonItem(
+            title: "操作选项",
+            image: UIImage(systemName: "ellipsis.circle"),
+            primaryAction: nil,
+            menu: mainMenu
+        )
+        navigationItem.rightBarButtonItem = menuButton
+        
     }
+    
     // MARK: - Page Action
     @objc func clickLoadMore(_ sender: UITapGestureRecognizer) {
         presenter.loadMore()
     }
-    
-    
-    
-    @objc private func optionsTapped() {
-        let actionSheet = UIAlertController(title: nil,
-                                            message: nil,
-                                            preferredStyle: .actionSheet)
-        
-        // 添加选项按钮
-        let option1 = UIAlertAction(title: "已读全部消息", style: .default) { [weak self]_ in
-            self?.presenter.markMessageReadStatus(id: nil, read: true)
-        }
-        
-        
-        let cancel = UIAlertAction(title: "取消", style: .cancel) { _ in
-            
-        }
-        
-        actionSheet.addAction(option1)
-        actionSheet.addAction(cancel)
-        
-        // 在 iPad 上需要设置弹出位置
-        if let popoverController = actionSheet.popoverPresentationController {
-            popoverController.sourceView = self.view
-            popoverController.sourceRect = CGRect(x: self.view.bounds.midX,
-                                                  y: self.view.bounds.midY,
-                                                  width: 0,
-                                                  height: 0)
-            popoverController.permittedArrowDirections = []
-        }
-        
-        // 显示 Action Sheet
-        present(actionSheet, animated: true, completion: nil)
-    }
-    
     
     @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
         // 确保手势已经开始
