@@ -68,7 +68,6 @@ class WxpWebViewController: UIViewController {
     }()
     
     private var bannerHeightConstraint: NSLayoutConstraint!
-    private var webViewTopConstraint: NSLayoutConstraint!
     
     
     init(url: URL) {
@@ -111,8 +110,7 @@ class WxpWebViewController: UIViewController {
         view.addSubview(progressView)
         
         
-        // 先创建约束引用，稍后在setupThirdPartyBanner中设置
-        webViewTopConstraint = webView.topAnchor.constraint(equalTo: thirdPartyBannerView.bottomAnchor, constant: 0)
+        // 先创建约束引用
         bannerHeightConstraint = thirdPartyBannerView.heightAnchor.constraint(equalToConstant: 0)
         
         
@@ -122,7 +120,7 @@ class WxpWebViewController: UIViewController {
             thirdPartyBannerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             bannerHeightConstraint,
             
-            webViewTopConstraint,
+            webView.topAnchor.constraint(equalTo: thirdPartyBannerView.bottomAnchor, constant: 0),
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             webView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
