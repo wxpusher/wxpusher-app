@@ -139,54 +139,38 @@ class WxpWebViewController: UIViewController {
     private func setupOption(){
         view.backgroundColor = .systemBackground
         
+        let mainMenu = UIMenu(title: "", children: [
+            UIAction(
+                title: "复制链接",
+                image: UIImage(systemName: "doc.on.doc"),
+                handler:{ [weak self]_ in
+                    self?.copyLinkToClipboard()
+                }
+            ),
+            UIAction(
+                title: "分享",
+                image: UIImage(systemName: "square.and.arrow.up"),
+                handler:{ [weak self]_ in
+                    self?.shareURL()
+                }
+            ),
+            UIAction(
+                title: "在浏览器中打开",
+                image: UIImage(systemName: "safari"),
+                handler:{ [weak self]_ in
+                    self?.openInBrowser()
+                }
+            )
+        ])
         
-        let optionsButton = UIBarButtonItem(image: UIImage(systemName: "ellipsis"),
-                                            style: .plain,
-                                            target: self,
-                                            action: #selector(optionsTapped))
+        let menuButton = UIBarButtonItem(
+            title: "操作选项",
+            image: UIImage(systemName: "ellipsis.circle"),
+            primaryAction: nil,
+            menu: mainMenu
+        )
+        navigationItem.rightBarButtonItem = menuButton
         
-        navigationItem.rightBarButtonItems = [optionsButton]
-    }
-    
-    
-    @objc private func optionsTapped() {
-        let actionSheet = UIAlertController(title: nil,
-                                            message: nil,
-                                            preferredStyle: .actionSheet)
-        
-        // 添加选项按钮
-        let option1 = UIAlertAction(title: "复制链接", style: .default) { [weak self] _ in
-            self?.copyLinkToClipboard()
-        }
-        let option2 = UIAlertAction(title: "分享", style: .default) { [weak self] _ in
-            self?.shareURL()
-        }
-        let option3 = UIAlertAction(title: "在浏览器中打开", style: .default) { [weak self] _ in
-            self?.openInBrowser()
-        }
-        
-        
-        let cancel = UIAlertAction(title: "取消", style: .cancel) { _ in
-            
-        }
-        
-        actionSheet.addAction(option1)
-        actionSheet.addAction(option2)
-        actionSheet.addAction(option3)
-        actionSheet.addAction(cancel)
-        
-        // 在 iPad 上需要设置弹出位置
-        if let popoverController = actionSheet.popoverPresentationController {
-            popoverController.sourceView = self.view
-            popoverController.sourceRect = CGRect(x: self.view.bounds.midX,
-                                                  y: self.view.bounds.midY,
-                                                  width: 0,
-                                                  height: 0)
-            popoverController.permittedArrowDirections = []
-        }
-        
-        // 显示 Action Sheet
-        present(actionSheet, animated: true, completion: nil)
     }
     
     @objc private func bannerTapped() {

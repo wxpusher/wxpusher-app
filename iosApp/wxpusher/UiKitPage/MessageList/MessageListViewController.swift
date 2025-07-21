@@ -224,14 +224,14 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
                     title: "添加订阅",
                     image: UIImage(systemName: "plus.bubble"),
                     handler:{ [weak self]_ in
-                        self?.presenter.markMessageReadStatus(id: nil, read: true)
+//                        self?.presenter.markMessageReadStatus(id: nil, read: true)
                     }
                 ),
                 UIAction(
                     title: "订阅管理",
                     image: UIImage(systemName: "folder.badge.gearshape"),
                     handler:{ [weak self]_ in
-                        self?.presenter.markMessageReadStatus(id: nil, read: true)
+//                        self?.presenter.markMessageReadStatus(id: nil, read: true)
                     }
                 )
             ]),
