@@ -11,6 +11,8 @@ class WxpWebViewController: UIViewController {
         "10.0.0.11",
     ]
     private let DeviceTokenKey = "deviceToken"
+    private let DevicePlatformKey = "platform"
+    private let DeviceVersionNameKey = "versionName"
     
     private let url: URL
     private var loadingStartTime: Date?
@@ -278,8 +280,13 @@ class WxpWebViewController: UIViewController {
         var request = URLRequest(url: url)
         
         if isHostInWhitelist(url.host) {
-            let token = WxpAppDataService.shared.getLoginInfo()?.deviceToken ?? ""
-            request.setValue(token, forHTTPHeaderField: DeviceTokenKey)
+            let deviceToken = WxpAppDataService.shared.getLoginInfo()?.deviceToken ?? ""
+            let versionName = WxpBaseInfoService.shared.getAppVersionName()
+            let platform = WxpBaseInfoService.shared.getPlatform()
+            
+            request.setValue(deviceToken, forHTTPHeaderField: DeviceTokenKey)
+            request.setValue(versionName, forHTTPHeaderField: DeviceVersionNameKey)
+            request.setValue(platform, forHTTPHeaderField: DevicePlatformKey)
         }
         
         return request
