@@ -94,7 +94,8 @@ class WxpWebViewController: UIViewController {
     }
     
     private func setupUI() {
-        title = "内容加载中"
+        //先不显示标题，避免加载的时候闪一下
+        title = ""
         view.backgroundColor = .systemBackground
         webView.navigationDelegate = self
         
