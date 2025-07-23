@@ -14,26 +14,13 @@ extension Color {
     //次要主题色
     public static let defAccentSecoundColor: Color = Color("AccentSecoundColor")
     
+    //主要文字颜色
     public static let defFontPrimaryColor: Color = Color("FontPrimaryColor")
-    
+    //主要文字反色
     public static let defFontReversalPrimaryColor: Color = Color("FontReversalPrimaryColor")
-    
+    //2级文字颜色
     public static let defFontSecondColor: Color = Color("FontSecondColor")
-    
+    //3级文字颜色
     public static let defFontThirdColor: Color = Color("FontThirdColor")
     
-    
-//    init(hex: String,opacity: Double) {
-//        let scanner = Scanner(string: hex)
-//        _ = scanner.scanString("#")
-//        
-//        var rgb: UInt64 = 0
-//        
-//        scanner.scanHexInt64(&rgb)
-//        
-//        let red = Double((rgb & 0xFF0000) >> 16) / 255.0
-//        let green = Double((rgb & 0x00FF00) >> 8) / 255.0
-//        let blue = Double(rgb & 0x0000FF) / 255.0
-//        self.init(red: red, green: green, blue: blue,opacity: opacity)
-//    }
 }

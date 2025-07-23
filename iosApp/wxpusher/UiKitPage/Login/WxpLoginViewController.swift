@@ -46,7 +46,7 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
     private lazy var getCodeButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("获取验证码", for: .normal)
-        button.backgroundColor = .systemBlue
+        button.backgroundColor = UIColor.defAccentPrimaryColor
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 4
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -56,7 +56,7 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
     private lazy var loginButton: UIButton = {
         let button = UIButton(type: .system)
         button.setTitle("登录", for: .normal)
-        button.backgroundColor = .systemBlue
+        button.backgroundColor = UIColor.defAccentPrimaryColor
         button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 4
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -76,7 +76,7 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         let attrText = NSMutableAttributedString()
         attrText.append(NSAttributedString(string: "同意《"))
         let titleText = "隐私协议和用户协议"
-        attrText.append(NSAttributedString(string: titleText, attributes: [.foregroundColor:UIColor.defAccentPrimaryColor,.link:true]))
+        attrText.append(NSAttributedString(string: titleText, attributes: [.foregroundColor:UIColor.defAccentPrimaryColor]))
         attrText.append(NSAttributedString(string: "》"))
         
         label.attributedText = attrText
