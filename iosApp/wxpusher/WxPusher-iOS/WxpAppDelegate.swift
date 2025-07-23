@@ -44,6 +44,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
             WxpToastUtils.shared.showToast(msg: remoteNotification.description)
         }
         
+        //设置全局主要颜色
+        UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = UIColor.defAccentPrimaryColor
         return true
     }
     
