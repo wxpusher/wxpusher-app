@@ -38,24 +38,35 @@ class WxpWebViewController: UIViewController {
         containerView.backgroundColor = UIColor.defAccentSecoundColor
         containerView.isHidden = true
         
+        //前面的警告标签
+        let config = UIImage.SymbolConfiguration(pointSize: 14, weight: .bold, scale: .large)
+        let image = UIImage(systemName: "exclamationmark.triangle", withConfiguration: config)
+        let imageView = UIImageView(image: image)
+        imageView.tintColor = UIColor.white
+        
         // 创建标签
         let label = UILabel()
-        label.text = "⚠️ 当前内容由第三方提供，与WxPusher无关"
+        label.text = "当前内容由第三方提供，与WxPusher无关"
         label.font = UIFont.systemFont(ofSize: 14, weight: .medium)
         label.textColor = UIColor.white
         label.numberOfLines = 1
         
         // 添加子视图
+        containerView.addSubview(imageView)
         containerView.addSubview(label)
         
         // 设置自动布局
         label.translatesAutoresizingMaskIntoConstraints = false
+        imageView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
+            //图片
+            imageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
+            imageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             // 标签约束
             label.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            label.leadingAnchor.constraint(equalTo: containerView.leadingAnchor, constant: 16),
-            label.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+            label.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 8),
+            label.trailingAnchor.constraint(lessThanOrEqualTo: containerView.trailingAnchor, constant: -16),
         ])
         containerView.translatesAutoresizingMaskIntoConstraints = false
         
