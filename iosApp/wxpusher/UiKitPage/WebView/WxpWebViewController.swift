@@ -39,7 +39,7 @@ class WxpWebViewController: UIViewController {
         containerView.isHidden = true
         
         //前面的警告标签
-        let config = UIImage.SymbolConfiguration(pointSize: 14, weight: .bold, scale: .large)
+        let config = UIImage.SymbolConfiguration(pointSize: 14, weight: .medium, scale: .large)
         let image = UIImage(systemName: "exclamationmark.triangle", withConfiguration: config)
         let imageView = UIImageView(image: image)
         imageView.tintColor = UIColor.white
@@ -51,13 +51,21 @@ class WxpWebViewController: UIViewController {
         label.textColor = UIColor.white
         label.numberOfLines = 1
         
+        //右边箭头
+        let rightConfig = UIImage.SymbolConfiguration(pointSize: 14, weight: .medium, scale: .large)
+        let rightImage = UIImage(systemName: "chevron.right", withConfiguration: rightConfig)
+        let rightImageView = UIImageView(image: rightImage)
+        rightImageView.tintColor = UIColor.white
+        
         // 添加子视图
         containerView.addSubview(imageView)
         containerView.addSubview(label)
+        containerView.addSubview(rightImageView)
         
         // 设置自动布局
-        label.translatesAutoresizingMaskIntoConstraints = false
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        label.translatesAutoresizingMaskIntoConstraints = false
+        rightImageView.translatesAutoresizingMaskIntoConstraints = false
         
         NSLayoutConstraint.activate([
             //图片
@@ -66,7 +74,10 @@ class WxpWebViewController: UIViewController {
             // 标签约束
             label.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             label.leadingAnchor.constraint(equalTo: imageView.trailingAnchor, constant: 8),
-            label.trailingAnchor.constraint(lessThanOrEqualTo: containerView.trailingAnchor, constant: -16),
+            label.trailingAnchor.constraint(lessThanOrEqualTo: rightImageView.trailingAnchor, constant: -8),
+            //监听
+            rightImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -16),
+            rightImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
         ])
         containerView.translatesAutoresizingMaskIntoConstraints = false
         
