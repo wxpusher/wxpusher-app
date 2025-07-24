@@ -104,6 +104,10 @@ class WxpQRCodeScanViewController: WxpBaseUIViewController {
         // 隐藏导航栏
         navigationController?.setNavigationBarHidden(true, animated: animated)
         
+        // 启用手势返回
+        navigationController?.interactivePopGestureRecognizer?.isEnabled = true
+        navigationController?.interactivePopGestureRecognizer?.delegate = self
+        
         if (captureSession?.isRunning == false) {
             DispatchQueue.global(qos: .background).async {
                 self.captureSession?.startRunning()
@@ -113,6 +117,9 @@ class WxpQRCodeScanViewController: WxpBaseUIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        
+        // 恢复导航栏
+        navigationController?.setNavigationBarHidden(false, animated: animated)
         
         if (captureSession?.isRunning == true) {
             DispatchQueue.global(qos: .background).async {
@@ -439,5 +446,12 @@ extension WxpQRCodeScanViewController: UIImagePickerControllerDelegate, UINaviga
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true)
+    }
+}
+
+// MARK: - UIGestureRecognizerDelegate
+extension WxpQRCodeScanViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldBeRequiredToFailBy otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
 } 
