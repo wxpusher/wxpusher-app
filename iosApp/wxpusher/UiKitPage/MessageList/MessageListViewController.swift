@@ -224,7 +224,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
                     title: "添加订阅",
                     image: UIImage(systemName: "plus.bubble"),
                     handler:{ [weak self]_ in
-//                        self?.presenter.markMessageReadStatus(id: nil, read: true)
+                        self?.jumpToQRCodeScan()
                     }
                 ),
                 UIAction(
@@ -340,6 +340,22 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     private func gotoLogin(){
         self.navigationController?.setViewControllers([WxpLoginViewController()], animated: false)
+    }
+    
+    private func jumpToQRCodeScan() {
+//         TODO: 临时注释，等待添加到Xcode项目后启用
+         let qrScanVC = WxpQRCodeScanViewController()
+         qrScanVC.hidesBottomBarWhenPushed = true
+         navigationController?.pushViewController(qrScanVC, animated: true)
+        
+//        // 临时显示提示
+//        let alert = UIAlertController(
+//            title: "功能开发中",
+//            message: "扫码功能正在开发中，敬请期待",
+//            preferredStyle: .alert
+//        )
+//        alert.addAction(UIAlertAction(title: "确定", style: .default))
+//        present(alert, animated: true)
     }
     
     // MARK: - MVP-VIEW

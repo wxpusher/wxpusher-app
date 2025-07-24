@@ -32,6 +32,7 @@
 		1A49346F2E255ECC00EA1C71 /* WxpFSafariViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A49346E2E255ECC00EA1C71 /* WxpFSafariViewController.swift */; };
 		1A4934712E25667D00EA1C71 /* WxpVersionUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934702E25667100EA1C71 /* WxpVersionUpdateChecker.swift */; };
 		1A4934732E2D0F0C00EA1C71 /* WxpCommonNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934722E2D0F0100EA1C71 /* WxpCommonNotification.swift */; };
+		1A4934782E32393A00EA1C71 /* WxpQRCodeScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934762E32393A00EA1C71 /* WxpQRCodeScanViewController.swift */; };
 		1A5164632B09D6D40000BA90 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164622B09D6D40000BA90 /* WebView.swift */; };
 		1A5164642B09D6D40000BA90 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164622B09D6D40000BA90 /* WebView.swift */; };
 		1A5164672B0A3A650000BA90 /* HomeViewVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A5164662B0A3A650000BA90 /* HomeViewVM.swift */; };
@@ -128,6 +129,7 @@
 		1A49346E2E255ECC00EA1C71 /* WxpFSafariViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpFSafariViewController.swift; sourceTree = "<group>"; };
 		1A4934702E25667100EA1C71 /* WxpVersionUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpVersionUpdateChecker.swift; sourceTree = "<group>"; };
 		1A4934722E2D0F0100EA1C71 /* WxpCommonNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpCommonNotification.swift; sourceTree = "<group>"; };
+		1A4934762E32393A00EA1C71 /* WxpQRCodeScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpQRCodeScanViewController.swift; sourceTree = "<group>"; };
 		1A5164622B09D6D40000BA90 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		1A5164662B0A3A650000BA90 /* HomeViewVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewVM.swift; sourceTree = "<group>"; };
 		1A51646A2B0A3AB20000BA90 /* BaseVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseVM.swift; sourceTree = "<group>"; };
@@ -211,12 +213,12 @@
 		1A447DF42DF53ECD005C402F /* UiKitPage */ = {
 			isa = PBXGroup;
 			children = (
-				1A49346D2E255EC500EA1C71 /* WebView */,
 				1A4934612E196A4000EA1C71 /* Profile */,
 				1A9C3E872DF5CB8800A25249 /* Common */,
 				1A962E6B2E09B1F300C966A3 /* UserAgreement */,
 				1A9C3E8C2DF5DA8600A25249 /* BindPhone */,
 				1A9C3E7F2DF5ABFC00A25249 /* Login */,
+				1A4934772E32393A00EA1C71 /* QRCodeScan */,
 				1A9C3E772DF5A02E00A25249 /* MessageList */,
 				1A447DEE2DF53ECD005C402F /* StringConstants.swift */,
 				1A9C3E852DF5BB4A00A25249 /* ProfileViewController.swift */,
@@ -264,6 +266,14 @@
 				1A447DF32DF53ECD005C402F /* WxpWebViewController.swift */,
 			);
 			path = WebView;
+			sourceTree = "<group>";
+		};
+		1A4934772E32393A00EA1C71 /* QRCodeScan */ = {
+			isa = PBXGroup;
+			children = (
+				1A4934762E32393A00EA1C71 /* WxpQRCodeScanViewController.swift */,
+			);
+			path = QRCodeScan;
 			sourceTree = "<group>";
 		};
 		1A5164612B09D6C20000BA90 /* WebView */ = {
@@ -416,6 +426,7 @@
 		1AC210D62ACC562D008D86EA /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				1A49346D2E255EC500EA1C71 /* WebView */,
 				1AAD926A2AE7AB410074F97D /* Style */,
 				1AC210D72ACC57F1008D86EA /* CommonExt.swift */,
 				1AC210EB2ACD6DB6008D86EA /* ColorExt.swift */,
@@ -752,6 +763,7 @@
 				1A47153A2AE80A300089D7A7 /* LoginViewVM.swift in Sources */,
 				1A962E712E0AFF9300C966A3 /* WxpPermissionUtils.swift in Sources */,
 				1A7D79CE2B08B55B00C5F4F1 /* MessageListBean.swift in Sources */,
+				1A4934782E32393A00EA1C71 /* WxpQRCodeScanViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
