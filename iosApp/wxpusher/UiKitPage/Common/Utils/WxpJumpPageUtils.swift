@@ -106,4 +106,27 @@ import Foundation
             print("Settings Can Not open")
         }
     }
+    /**
+    * 跳转到扫码页面
+    */
+    public static func jumpToScan(callback:@escaping WxpQRCodeScanViewController.Callback) {
+        runWithWindows(){ window in
+            let rootView = window.rootViewController
+            let vc = WxpQRCodeScanViewController()
+            vc.callback = callback
+            //如果根是navVC，那就压栈
+            if(rootView is UINavigationController){
+                let rootVC = rootView as! UINavigationController
+                rootVC.pushViewController(vc, animated: true)
+            } else if(rootView is UITabBarController){
+                let tabVC = rootView as! UITabBarController
+                if(tabVC.selectedViewController  is UINavigationController){
+                    let rootVC = tabVC.selectedViewController as! UINavigationController
+                    vc.hidesBottomBarWhenPushed = true
+                    rootVC.pushViewController(vc, animated: true)
+                }
+            }
+        }
+       
+    }
 }

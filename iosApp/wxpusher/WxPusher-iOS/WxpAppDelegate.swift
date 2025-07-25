@@ -22,7 +22,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         //初始化
 //        WxpConfig.shared.baseUrl = "https://wxpusher.zjiecode.com"
-        WxpConfig.shared.baseUrl = "http://wxpusher.test.zjiecode.com"
+//        WxpConfig.shared.baseUrl = "http://wxpusher.test.zjiecode.com"
         WxpConfig.shared.baseUrl = "http://10.0.0.11:6100"
         
         //        WxpConfig.shared.baseUrl = "http://127.0.0.1:6100"
@@ -39,10 +39,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         UNUserNotificationCenter.current().delegate = self
         
-        if let remoteNotification = launchOptions?[.remoteNotification] as? [String: Any] {
-            print("通过远程通知冷启动，notification=\(remoteNotification)")
-            WxpToastUtils.shared.showToast(msg: remoteNotification.description)
-        }
+//        if let remoteNotification = launchOptions?[.remoteNotification] as? [String: Any] {
+//            print("通过远程通知冷启动，notification=\(remoteNotification)")
+//            WxpToastUtils.shared.showToast(msg: remoteNotification.description)
+//        }
         
         //设置全局主要颜色
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = UIColor.defAccentPrimaryColor

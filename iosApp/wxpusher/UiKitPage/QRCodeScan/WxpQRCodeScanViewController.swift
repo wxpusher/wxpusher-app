@@ -6,6 +6,10 @@ import shared
 
 class WxpQRCodeScanViewController: WxpBaseUIViewController {
     
+    typealias Callback = (String) -> Void
+    
+    public var callback:Callback? = nil
+    
     // MARK: - Properties
     private var captureSession: AVCaptureSession?
     private var videoPreviewLayer: AVCaptureVideoPreviewLayer?
@@ -365,27 +369,7 @@ class WxpQRCodeScanViewController: WxpBaseUIViewController {
         let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
         impactFeedback.impactOccurred()
         
-        // 打印二维码内容
-        print("扫描到二维码内容: \(code)")
-        
-        // 显示结果
-        let alert = UIAlertController(
-            title: "扫码成功",
-            message: "二维码内容:\n\(code)",
-            preferredStyle: .alert
-        )
-        
-        alert.addAction(UIAlertAction(title: "确定", style: .default) { [weak self] _ in
-            self?.navigationController?.popViewController(animated: true)
-        })
-        
-        alert.addAction(UIAlertAction(title: "继续扫码", style: .cancel) { [weak self] _ in
-            DispatchQueue.global(qos: .background).async {
-                self?.captureSession?.startRunning()
-            }
-        })
-        
-        present(alert, animated: true)
+        callback?(code)
     }
     
     // MARK: - Helper Methods

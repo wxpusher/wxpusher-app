@@ -10,6 +10,10 @@ import com.smjcco.wxpusher.biz.common.WxpAppDataService
 class WxpMessageListPresenter(view: IWxpMessageListView) :
     WxpBaseMvpPresenter<IWxpMessageListView, IWxpMessageListPresenter>(view),
     IWxpMessageListPresenter {
+
+    //冷启动的时候被点击的消息
+    private var clickMessage: WxpMessageListMessage? = null
+
     //当前页面的列表的数据
     private var messageListData: MutableList<WxpMessageListMessage> = mutableListOf()
 
@@ -41,6 +45,11 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     }
 
     override fun onReceiveNewMessage(message: WxpMessageListMessage) {
+        //点击消息冷启动的时候，可能消息还没有拉回来，缓存一下被点击的消息，拉回来的时候，检查是同一条消息，就标记为已读。
+        if (messageListData.isEmpty()) {
+            clickMessage = message;
+            return
+        }
         //如果更新的消息已经存在，就更新阅读状态
         messageListData.find { it.messageId == message.messageId }?.let {
             it.read = message.read;
@@ -64,6 +73,9 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     }
 
     override fun refresh(manual: Boolean) {
+        println("refresh=${manual}")
+        println("clickMessage=${clickMessage}")
+        
         if (loading) {
             return
         }
@@ -80,6 +92,13 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             WxpSaveService.set(MessageRefreshTimeKey, WxpDateTimeUtils.getTimestamp().toDouble())
             //如果刷新的数据不为null，说明是刷新成功了,然后才更新数据
             if (fetchResultList != null) {
+                //如果有被点击消息，就更新一下被点击消息的状态
+                if (clickMessage != null) {
+                    fetchResultList.find { it.messageId == clickMessage?.messageId }?.read =
+                        (clickMessage?.read == true)
+//                    clickMessage = null
+                    println("clickMessage=${clickMessage}")
+                }
                 messageListData = fetchResultList.toMutableList()
                 lastMessageId = messageListData.lastOrNull()?.messageId ?: Long.MAX_VALUE
                 hasMore = messageListData.size >= pageMinCount

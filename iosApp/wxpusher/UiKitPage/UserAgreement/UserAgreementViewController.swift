@@ -53,6 +53,7 @@ class UserAgreementViewController: WxpBaseUIViewController, UITextViewDelegate {
         attr.addAttribute(.link, value: "wxpusher://privacypolicy", range: privacyRange)
         attr.addAttribute(.font, value: UIFont.systemFont(ofSize: 16), range: NSRange(location: 0, length: attr.length))
         textView.attributedText = attr
+        textView.textColor = UIColor.defFontPrimaryColor
         textView.linkTextAttributes = [
             .foregroundColor: UIColor.defAccentPrimaryColor,
             .underlineStyle: NSUnderlineStyle.single.rawValue
@@ -185,10 +186,10 @@ class UserAgreementViewController: WxpBaseUIViewController, UITextViewDelegate {
     // MARK: - UITextViewDelegate
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
         if URL.absoluteString == "wxpusher://useragreement" {
-            WxpJumpPageUtils.jumpToWebUrl(url: "https://wxpusher.zjiecode.com/admin/agreement/index-argeement.html")
+            WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.baseUrl)/admin/agreement/index-argeement.html")
         } else if URL.absoluteString == "wxpusher://privacypolicy" {
             // 跳转到隐私政策页面
-            WxpJumpPageUtils.jumpToWebUrl(url: "https://wxpusher.zjiecode.com/admin/agreement/privacy-agreement.html")
+            WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.baseUrl)/admin/agreement/privacy-agreement.html")
             
         }
         // 不让系统处理

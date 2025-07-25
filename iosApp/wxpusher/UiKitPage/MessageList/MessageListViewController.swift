@@ -224,7 +224,9 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
                     title: "添加订阅",
                     image: UIImage(systemName: "plus.bubble"),
                     handler:{ [weak self]_ in
-                        self?.jumpToQRCodeScan()
+                        WxpJumpPageUtils.jumpToScan {[weak self] code in
+                            self?.navigationController?.popViewController(animated: false)
+                        }
                     }
                 ),
                 UIAction(
@@ -565,7 +567,7 @@ class MessageCell: UITableViewCell {
     // MARK: - Configuration
     func configure(message:WxpMessageListMessage) {
         self.message = message
-        messageLabel.text = message.summary+message.summary+message.summary+message.summary
+        messageLabel.text = message.summary
         sourceLabel.text = "来源: \(message.name ?? "")"
         dateLabel.text = WxpDateTimeUtils.shared.formatDateTime(timeStamp: message.createTime)
         unreadDot.isHidden = message.read
