@@ -219,24 +219,25 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         
         let mainMenu = UIMenu(title: "", children: [
             // 第一组：订阅相关
-            UIMenu(title: "订阅管理", options: .displayInline, children: [
-                UIAction(
-                    title: "添加订阅",
-                    image: UIImage(systemName: "plus.bubble"),
-                    handler:{ [weak self]_ in
-                        WxpJumpPageUtils.jumpToScan {[weak self] code in
-                            self?.navigationController?.popViewController(animated: false)
-                        }
-                    }
-                ),
-                UIAction(
-                    title: "订阅管理",
-                    image: UIImage(systemName: "folder.badge.gearshape"),
-                    handler:{ [weak self]_ in
-//                        self?.presenter.markMessageReadStatus(id: nil, read: true)
-                    }
-                )
-            ]),
+            // 订阅入口暂时不做
+//            UIMenu(title: "订阅管理", options: .displayInline, children: [
+//                UIAction(
+//                    title: "添加订阅",
+//                    image: UIImage(systemName: "plus.bubble"),
+//                    handler:{ [weak self]_ in
+//                        WxpJumpPageUtils.jumpToScan {[weak self] code in
+//                            self?.navigationController?.popViewController(animated: false)
+//                        }
+//                    }
+//                ),
+//                UIAction(
+//                    title: "订阅管理",
+//                    image: UIImage(systemName: "folder.badge.gearshape"),
+//                    handler:{ [weak self]_ in
+////                        self?.presenter.markMessageReadStatus(id: nil, read: true)
+//                    }
+//                )
+//            ]),
             
             // 第二组：消息操作
             UIMenu(title: "消息操作", options: .displayInline, children: [
