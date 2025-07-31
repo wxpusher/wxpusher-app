@@ -507,6 +507,8 @@ class MessageCell: UITableViewCell {
     
     // 新增：保存宽度约束
     private var linkImageViewWidthConstraint: NSLayoutConstraint?
+    private var titleViewAlignLinkImageView: NSLayoutConstraint?
+    private var titleViewAlignParentImageView: NSLayoutConstraint?
     
     // MARK: - Initialization
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -527,8 +529,12 @@ class MessageCell: UITableViewCell {
         contentView.addSubview(linkImageView)
         
         // 先创建宽度约束
-        let widthConstraint = linkImageView.widthAnchor.constraint(equalToConstant: 20)
-        self.linkImageViewWidthConstraint = widthConstraint
+        self.linkImageViewWidthConstraint = linkImageView.widthAnchor.constraint(equalToConstant: 20)
+        //靠着点击按钮的约束
+        self.titleViewAlignLinkImageView = messageLabel.trailingAnchor.constraint(equalTo: linkImageView.leadingAnchor, constant: -8)
+        self.titleViewAlignLinkImageView?.isActive = false
+        //靠着父容器的约束（无链接的时候）
+        self.titleViewAlignParentImageView = messageLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16)
         
         NSLayoutConstraint.activate([
             // Unread dot constraints
@@ -540,12 +546,13 @@ class MessageCell: UITableViewCell {
             // Message label constraints
             messageLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
             messageLabel.leadingAnchor.constraint(equalTo: unreadDot.trailingAnchor, constant: 4),
-            messageLabel.trailingAnchor.constraint(lessThanOrEqualTo: linkImageView.leadingAnchor, constant: -8),
+            self.titleViewAlignLinkImageView!,
+            self.titleViewAlignParentImageView!,
             
             // Link image view constraints (与标题第一行对齐)
             linkImageView.lastBaselineAnchor.constraint(equalTo: messageLabel.firstBaselineAnchor),
             linkImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
-            widthConstraint, // 用变量保存
+            self.linkImageViewWidthConstraint!, // 用变量保存
             linkImageView.heightAnchor.constraint(equalToConstant: 20),
             
             // Source label constraints
@@ -576,7 +583,16 @@ class MessageCell: UITableViewCell {
         let sourceUrl = message.sourceUrl?.trimmingCharacters(in: .whitespaces) ?? ""
         let showLink = !sourceUrl.isEmpty
         linkImageView.isHidden = !showLink
-        linkImageViewWidthConstraint?.constant = showLink ? 20 : 0
+        if(showLink){
+            self.titleViewAlignLinkImageView?.isActive = true
+            self.titleViewAlignParentImageView?.isActive = false
+            linkImageViewWidthConstraint?.constant = 20
+        }else{
+            self.titleViewAlignLinkImageView?.isActive = false
+            self.titleViewAlignParentImageView?.isActive = true
+            linkImageViewWidthConstraint?.constant = 0
+        }
+        
         
     }
     
