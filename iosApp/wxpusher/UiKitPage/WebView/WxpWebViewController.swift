@@ -9,6 +9,7 @@ class WxpWebViewController: UIViewController {
         "wxpusher.zjiecode.com",
         "wxpusher.test.zjiecode.com",
         "10.0.0.11",
+        "127.0.0.1",
     ]
     private let DeviceTokenKey = "deviceToken"
     private let DevicePlatformKey = "platform"
@@ -88,6 +89,10 @@ class WxpWebViewController: UIViewController {
         let configuration = WKWebViewConfiguration()
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.translatesAutoresizingMaskIntoConstraints = false
+        
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        webView.scrollView.backgroundColor = .clear
         return webView
     }()
     
@@ -206,9 +211,9 @@ class WxpWebViewController: UIViewController {
             message: "当前页面包含第三方提供的内容。这些内容由第三方独立提供和维护，与WxPusher无关。请谨慎对待页面中的信息，WxPusher不对第三方内容的准确性、安全性或合法性承担责任。\n\n如果您对内容有疑问或遇到问题，请直接联系内容提供方。",
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: "不再提示", style: .destructive) { [weak self] _ in
-            self?.hideBannerPermanently()
-        })
+//        alert.addAction(UIAlertAction(title: "不再提示", style: .destructive) { [weak self] _ in
+//            self?.hideBannerPermanently()
+//        })
         alert.addAction(UIAlertAction(title: "我知道了", style: .default, handler: nil))
         
         present(alert, animated: true, completion: nil)
