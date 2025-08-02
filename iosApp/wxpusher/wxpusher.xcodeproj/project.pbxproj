@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		1A447DF62DF53ECD005C402F /* StringConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A447DEE2DF53ECD005C402F /* StringConstants.swift */; };
-		1A447DF72DF53ECD005C402F /* MessageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A447DF12DF53ECD005C402F /* MessageService.swift */; };
 		1A447DF92DF53ECD005C402F /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A447DEF2DF53ECD005C402F /* MainTabBarController.swift */; };
 		1A447DFA2DF53ECD005C402F /* WxpWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A447DF32DF53ECD005C402F /* WxpWebViewController.swift */; };
 		1A4715372AE8017A0089D7A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1AC210E12ACC584B008D86EA /* Assets.xcassets */; };
@@ -35,18 +34,11 @@
 		1A9C3E782DF5A02E00A25249 /* MessageListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E762DF5A02E00A25249 /* MessageListViewController.swift */; };
 		1A9C3E7A2DF5A07D00A25249 /* WxpMessageItemBeam.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E792DF5A07200A25249 /* WxpMessageItemBeam.swift */; };
 		1A9C3E802DF5ABFC00A25249 /* WxpLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E7E2DF5ABFC00A25249 /* WxpLoginViewController.swift */; };
-		1A9C3E862DF5BB4A00A25249 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E852DF5BB4A00A25249 /* ProfileViewController.swift */; };
 		1A9C3E892DF5CB9800A25249 /* UIColor+Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E882DF5CB8F00A25249 /* UIColor+Color.swift */; };
 		1A9C3E8D2DF5DA8600A25249 /* WxpBindPhoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E8A2DF5DA8600A25249 /* WxpBindPhoneViewController.swift */; };
 		1A9C3E922DF7352500A25249 /* UIButton+Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */; };
 		1A9C3E972DFE80E600A25249 /* WxpBaseMvpUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */; };
-		1AAD926C2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AAD926B2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift */; };
-		1AAD926D2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AAD926B2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift */; };
-		1AC210EC2ACD6DB6008D86EA /* ColorExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC210EB2ACD6DB6008D86EA /* ColorExt.swift */; };
-		1ACCD55B2AF9342200841714 /* SaveKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACCD55A2AF9342200841714 /* SaveKey.swift */; };
-		1ACCD55C2AF9342200841714 /* SaveKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACCD55A2AF9342200841714 /* SaveKey.swift */; };
 		1ADEF6B02ACDC6D6002FEB57 /* WxPusher_MacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADEF6AF2ACDC6D6002FEB57 /* WxPusher_MacApp.swift */; };
-		1ADEF6BD2ACDC75A002FEB57 /* ColorExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC210EB2ACD6DB6008D86EA /* ColorExt.swift */; };
 		986EF3A412E72E2E14454E8B /* libPods-WxPusher-Mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C69846B4E017B608DEE27FE0 /* libPods-WxPusher-Mac.a */; };
 		E8F4FFB984C6ECD1DE28A901 /* libPods-WxPusher-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C6789F00DFBD4BD46990F9 /* libPods-WxPusher-iOS.a */; };
 /* End PBXBuildFile section */
@@ -56,7 +48,6 @@
 		1A3C056A2ACDCDA1006F7007 /* WxPusher-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WxPusher-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A447DEE2DF53ECD005C402F /* StringConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringConstants.swift; sourceTree = "<group>"; };
 		1A447DEF2DF53ECD005C402F /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
-		1A447DF12DF53ECD005C402F /* MessageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageService.swift; sourceTree = "<group>"; };
 		1A447DF32DF53ECD005C402F /* WxpWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpWebViewController.swift; sourceTree = "<group>"; };
 		1A4715482AED3F500089D7A7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1A4934622E196C7900EA1C71 /* WxpProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpProfileViewController.swift; sourceTree = "<group>"; };
@@ -84,16 +75,12 @@
 		1A9C3E762DF5A02E00A25249 /* MessageListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageListViewController.swift; sourceTree = "<group>"; };
 		1A9C3E792DF5A07200A25249 /* WxpMessageItemBeam.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpMessageItemBeam.swift; sourceTree = "<group>"; };
 		1A9C3E7E2DF5ABFC00A25249 /* WxpLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpLoginViewController.swift; sourceTree = "<group>"; };
-		1A9C3E852DF5BB4A00A25249 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		1A9C3E882DF5CB8F00A25249 /* UIColor+Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Color.swift"; sourceTree = "<group>"; };
 		1A9C3E8A2DF5DA8600A25249 /* WxpBindPhoneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBindPhoneViewController.swift; sourceTree = "<group>"; };
 		1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Loading.swift"; sourceTree = "<group>"; };
 		1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBaseMvpUIViewController.swift; sourceTree = "<group>"; };
-		1AAD926B2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckBoxToggleStyle.swift; sourceTree = "<group>"; };
 		1AC210E12ACC584B008D86EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1AC210E32ACC5883008D86EA /* wxpusher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = wxpusher.entitlements; sourceTree = "<group>"; };
-		1AC210EB2ACD6DB6008D86EA /* ColorExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExt.swift; sourceTree = "<group>"; };
-		1ACCD55A2AF9342200841714 /* SaveKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveKey.swift; sourceTree = "<group>"; };
 		1ADEF6AF2ACDC6D6002FEB57 /* WxPusher_MacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxPusher_MacApp.swift; sourceTree = "<group>"; };
 		1ADEF6B32ACDC6D9002FEB57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1ADEF6B62ACDC6D9002FEB57 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -128,25 +115,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		1A447DF42DF53ECD005C402F /* UiKitPage */ = {
+		1A447DF42DF53ECD005C402F /* Page */ = {
 			isa = PBXGroup;
 			children = (
+				1A49347A2E3DC6CD00EA1C71 /* Main */,
+				1A4934792E3DC6AC00EA1C71 /* Base */,
 				1A4934612E196A4000EA1C71 /* Profile */,
-				1A9C3E872DF5CB8800A25249 /* Common */,
 				1A962E6B2E09B1F300C966A3 /* UserAgreement */,
 				1A9C3E8C2DF5DA8600A25249 /* BindPhone */,
 				1A9C3E7F2DF5ABFC00A25249 /* Login */,
 				1A49346D2E255EC500EA1C71 /* WebView */,
 				1A4934772E32393A00EA1C71 /* QRCodeScan */,
 				1A9C3E772DF5A02E00A25249 /* MessageList */,
-				1A447DEE2DF53ECD005C402F /* StringConstants.swift */,
-				1A9C3E852DF5BB4A00A25249 /* ProfileViewController.swift */,
-				1A447DEF2DF53ECD005C402F /* MainTabBarController.swift */,
-				1A447DF12DF53ECD005C402F /* MessageService.swift */,
-				1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */,
-				1A962E6E2E09B3D200C966A3 /* WxpBaseUIViewController.swift */,
 			);
-			path = UiKitPage;
+			path = Page;
 			sourceTree = "<group>";
 		};
 		1A4934612E196A4000EA1C71 /* Profile */ = {
@@ -175,14 +157,31 @@
 			path = QRCodeScan;
 			sourceTree = "<group>";
 		};
+		1A4934792E3DC6AC00EA1C71 /* Base */ = {
+			isa = PBXGroup;
+			children = (
+				1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */,
+				1A962E6E2E09B3D200C966A3 /* WxpBaseUIViewController.swift */,
+			);
+			path = Base;
+			sourceTree = "<group>";
+		};
+		1A49347A2E3DC6CD00EA1C71 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				1A447DEF2DF53ECD005C402F /* MainTabBarController.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
 		1A5681882A598A89003547E6 = {
 			isa = PBXGroup;
 			children = (
 				1A962E5D2E085C4800C966A3 /* KtSwiftBridge */,
 				1AD0B1122AE7F9D500DABE06 /* WxPusher-iOS */,
 				1ADEF6AE2ACDC6D6002FEB57 /* WxPusher-Mac */,
-				1A447DF42DF53ECD005C402F /* UiKitPage */,
-				1AC210D62ACC562D008D86EA /* Common */,
+				1A447DF42DF53ECD005C402F /* Page */,
+				1A9C3E872DF5CB8800A25249 /* Common */,
 				1ADEF6C72ACDCA13002FEB57 /* WxPusher-Mac.app */,
 				1A3C056A2ACDCDA1006F7007 /* WxPusher-iOS.app */,
 				C8D717C45952B498CBA9B9D7 /* Pods */,
@@ -232,6 +231,7 @@
 			children = (
 				1A9C3E9A2E01CEF300A25249 /* Utils */,
 				1A962E782E0B0B1D00C966A3 /* WxpCommonBlockDef.swift */,
+				1A447DEE2DF53ECD005C402F /* StringConstants.swift */,
 				1A962E742E0B080A00C966A3 /* WxpSaveKey.swift */,
 				1A4934722E2D0F0100EA1C71 /* WxpCommonNotification.swift */,
 				1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */,
@@ -258,24 +258,6 @@
 				1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */,
 			);
 			path = Utils;
-			sourceTree = "<group>";
-		};
-		1AAD926A2AE7AB410074F97D /* Style */ = {
-			isa = PBXGroup;
-			children = (
-				1AAD926B2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift */,
-			);
-			path = Style;
-			sourceTree = "<group>";
-		};
-		1AC210D62ACC562D008D86EA /* Common */ = {
-			isa = PBXGroup;
-			children = (
-				1AAD926A2AE7AB410074F97D /* Style */,
-				1AC210EB2ACD6DB6008D86EA /* ColorExt.swift */,
-				1ACCD55A2AF9342200841714 /* SaveKey.swift */,
-			);
-			path = Common;
 			sourceTree = "<group>";
 		};
 		1AD0B1122AE7F9D500DABE06 /* WxPusher-iOS */ = {
@@ -496,7 +478,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				1A4934632E196C7900EA1C71 /* WxpProfileViewController.swift in Sources */,
-				1AAD926C2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift in Sources */,
 				1A49346A2E19FB8000EA1C71 /* WxpFooterLoadingView.swift in Sources */,
 				1A4934662E19714B00EA1C71 /* KtSwiftCommonParams.m in Sources */,
 				1A962E772E0B09AD00C966A3 /* WxpDialogUtils.swift in Sources */,
@@ -513,11 +494,9 @@
 				1A49346C2E1A6B6800EA1C71 /* WxpUnbindPhoneViewController.swift in Sources */,
 				1A447DF62DF53ECD005C402F /* StringConstants.swift in Sources */,
 				1A962E6F2E09B3D200C966A3 /* WxpBaseUIViewController.swift in Sources */,
-				1A447DF72DF53ECD005C402F /* MessageService.swift in Sources */,
 				1A447DF92DF53ECD005C402F /* MainTabBarController.swift in Sources */,
 				1A447DFA2DF53ECD005C402F /* WxpWebViewController.swift in Sources */,
 				1A962E752E0B081300C966A3 /* WxpSaveKey.swift in Sources */,
-				1ACCD55B2AF9342200841714 /* SaveKey.swift in Sources */,
 				1A9C3E732DF5984900A25249 /* WxpAppDelegate.swift in Sources */,
 				1A9C3E742DF5984900A25249 /* WxpSceneDelegate.swift in Sources */,
 				1A962E6A2E08625700C966A3 /* WxpJumpPageUtils.swift in Sources */,
@@ -525,8 +504,6 @@
 				1A9C3E922DF7352500A25249 /* UIButton+Loading.swift in Sources */,
 				1A9C3E892DF5CB9800A25249 /* UIColor+Color.swift in Sources */,
 				1A9C3E972DFE80E600A25249 /* WxpBaseMvpUIViewController.swift in Sources */,
-				1AC210EC2ACD6DB6008D86EA /* ColorExt.swift in Sources */,
-				1A9C3E862DF5BB4A00A25249 /* ProfileViewController.swift in Sources */,
 				1A962E712E0AFF9300C966A3 /* WxpPermissionUtils.swift in Sources */,
 				1A4934782E32393A00EA1C71 /* WxpQRCodeScanViewController.swift in Sources */,
 			);
@@ -536,9 +513,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1AAD926D2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift in Sources */,
-				1ADEF6BD2ACDC75A002FEB57 /* ColorExt.swift in Sources */,
-				1ACCD55C2AF9342200841714 /* SaveKey.swift in Sources */,
 				1ADEF6B02ACDC6D6002FEB57 /* WxPusher_MacApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
