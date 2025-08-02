@@ -11,16 +11,7 @@
 		1A447DF72DF53ECD005C402F /* MessageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A447DF12DF53ECD005C402F /* MessageService.swift */; };
 		1A447DF92DF53ECD005C402F /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A447DEF2DF53ECD005C402F /* MainTabBarController.swift */; };
 		1A447DFA2DF53ECD005C402F /* WxpWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A447DF32DF53ECD005C402F /* WxpWebViewController.swift */; };
-		1A47152D2AE7FC250089D7A7 /* WxpusherApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47152C2AE7FC250089D7A7 /* WxpusherApp.swift */; };
 		1A4715372AE8017A0089D7A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1AC210E12ACC584B008D86EA /* Assets.xcassets */; };
-		1A47154A2AED41550089D7A7 /* BaseResp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4715492AED41550089D7A7 /* BaseResp.swift */; };
-		1A47154B2AED41550089D7A7 /* BaseResp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4715492AED41550089D7A7 /* BaseResp.swift */; };
-		1A47154D2AED47810089D7A7 /* WxPusherTargetType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47154C2AED47810089D7A7 /* WxPusherTargetType.swift */; };
-		1A47154E2AED47810089D7A7 /* WxPusherTargetType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47154C2AED47810089D7A7 /* WxPusherTargetType.swift */; };
-		1A4715502AED57110089D7A7 /* SendVerifyBean.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47154F2AED57110089D7A7 /* SendVerifyBean.swift */; };
-		1A4715512AED57110089D7A7 /* SendVerifyBean.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A47154F2AED57110089D7A7 /* SendVerifyBean.swift */; };
-		1A4715572AF782710089D7A7 /* NetError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4715562AF782710089D7A7 /* NetError.swift */; };
-		1A4715582AF782710089D7A7 /* NetError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4715562AF782710089D7A7 /* NetError.swift */; };
 		1A4934632E196C7900EA1C71 /* WxpProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934622E196C7900EA1C71 /* WxpProfileViewController.swift */; };
 		1A4934662E19714B00EA1C71 /* KtSwiftCommonParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934652E19703400EA1C71 /* KtSwiftCommonParams.m */; };
 		1A4934682E1971EA00EA1C71 /* WxpCommonParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934672E1971E400EA1C71 /* WxpCommonParams.swift */; };
@@ -30,10 +21,6 @@
 		1A4934712E25667D00EA1C71 /* WxpVersionUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934702E25667100EA1C71 /* WxpVersionUpdateChecker.swift */; };
 		1A4934732E2D0F0C00EA1C71 /* WxpCommonNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934722E2D0F0100EA1C71 /* WxpCommonNotification.swift */; };
 		1A4934782E32393A00EA1C71 /* WxpQRCodeScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934762E32393A00EA1C71 /* WxpQRCodeScanViewController.swift */; };
-		1A68CC9D2B3AD45000F6E742 /* UpdateDeviceInfoBean.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A68CC9C2B3AD45000F6E742 /* UpdateDeviceInfoBean.swift */; };
-		1A68CC9E2B3AD45000F6E742 /* UpdateDeviceInfoBean.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A68CC9C2B3AD45000F6E742 /* UpdateDeviceInfoBean.swift */; };
-		1A7D79CE2B08B55B00C5F4F1 /* MessageListBean.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7D79CD2B08B55B00C5F4F1 /* MessageListBean.swift */; };
-		1A7D79CF2B08B55B00C5F4F1 /* MessageListBean.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A7D79CD2B08B55B00C5F4F1 /* MessageListBean.swift */; };
 		1A962E672E08610200C966A3 /* KtSwiftJumpPageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E662E08610200C966A3 /* KtSwiftJumpPageUtils.m */; };
 		1A962E6A2E08625700C966A3 /* WxpJumpPageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */; };
 		1A962E6F2E09B3D200C966A3 /* WxpBaseUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E6E2E09B3D200C966A3 /* WxpBaseUIViewController.swift */; };
@@ -47,28 +34,19 @@
 		1A9C3E742DF5984900A25249 /* WxpSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E722DF5984900A25249 /* WxpSceneDelegate.swift */; };
 		1A9C3E782DF5A02E00A25249 /* MessageListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E762DF5A02E00A25249 /* MessageListViewController.swift */; };
 		1A9C3E7A2DF5A07D00A25249 /* WxpMessageItemBeam.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E792DF5A07200A25249 /* WxpMessageItemBeam.swift */; };
-		1A9C3E7C2DF5A5B300A25249 /* WxpNetworkConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E7B2DF5A5A800A25249 /* WxpNetworkConstants.swift */; };
-		1A9C3E7D2DF5A5B300A25249 /* WxpNetworkConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E7B2DF5A5A800A25249 /* WxpNetworkConstants.swift */; };
 		1A9C3E802DF5ABFC00A25249 /* WxpLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E7E2DF5ABFC00A25249 /* WxpLoginViewController.swift */; };
 		1A9C3E862DF5BB4A00A25249 /* ProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E852DF5BB4A00A25249 /* ProfileViewController.swift */; };
 		1A9C3E892DF5CB9800A25249 /* UIColor+Color.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E882DF5CB8F00A25249 /* UIColor+Color.swift */; };
 		1A9C3E8D2DF5DA8600A25249 /* WxpBindPhoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E8A2DF5DA8600A25249 /* WxpBindPhoneViewController.swift */; };
 		1A9C3E922DF7352500A25249 /* UIButton+Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */; };
-		1A9C3E942DF9D66600A25249 /* WxpMessageListService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E932DF9D66600A25249 /* WxpMessageListService.swift */; };
 		1A9C3E972DFE80E600A25249 /* WxpBaseMvpUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */; };
 		1AAD926C2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AAD926B2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift */; };
 		1AAD926D2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AAD926B2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift */; };
-		1AC210D82ACC57F1008D86EA /* CommonExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC210D72ACC57F1008D86EA /* CommonExt.swift */; };
 		1AC210EC2ACD6DB6008D86EA /* ColorExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC210EB2ACD6DB6008D86EA /* ColorExt.swift */; };
-		1ACCD5582AF9267B00841714 /* VerifyCodeLoginBean.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACCD5572AF9267B00841714 /* VerifyCodeLoginBean.swift */; };
-		1ACCD5592AF9267C00841714 /* VerifyCodeLoginBean.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACCD5572AF9267B00841714 /* VerifyCodeLoginBean.swift */; };
 		1ACCD55B2AF9342200841714 /* SaveKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACCD55A2AF9342200841714 /* SaveKey.swift */; };
 		1ACCD55C2AF9342200841714 /* SaveKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACCD55A2AF9342200841714 /* SaveKey.swift */; };
-		1ADEF6A62ACDBE57002FEB57 /* WxPusherApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADEF6A52ACDBE57002FEB57 /* WxPusherApi.swift */; };
 		1ADEF6B02ACDC6D6002FEB57 /* WxPusher_MacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADEF6AF2ACDC6D6002FEB57 /* WxPusher_MacApp.swift */; };
-		1ADEF6BC2ACDC75A002FEB57 /* CommonExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC210D72ACC57F1008D86EA /* CommonExt.swift */; };
 		1ADEF6BD2ACDC75A002FEB57 /* ColorExt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AC210EB2ACD6DB6008D86EA /* ColorExt.swift */; };
-		1ADEF6C32ACDC764002FEB57 /* WxPusherApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADEF6A52ACDBE57002FEB57 /* WxPusherApi.swift */; };
 		986EF3A412E72E2E14454E8B /* libPods-WxPusher-Mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C69846B4E017B608DEE27FE0 /* libPods-WxPusher-Mac.a */; };
 		E8F4FFB984C6ECD1DE28A901 /* libPods-WxPusher-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C6789F00DFBD4BD46990F9 /* libPods-WxPusher-iOS.a */; };
 /* End PBXBuildFile section */
@@ -80,13 +58,7 @@
 		1A447DEF2DF53ECD005C402F /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
 		1A447DF12DF53ECD005C402F /* MessageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageService.swift; sourceTree = "<group>"; };
 		1A447DF32DF53ECD005C402F /* WxpWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpWebViewController.swift; sourceTree = "<group>"; };
-		1A47152C2AE7FC250089D7A7 /* WxpusherApp.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WxpusherApp.swift; sourceTree = "<group>"; };
-		1A47152E2AE7FC8B0089D7A7 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		1A4715482AED3F500089D7A7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		1A4715492AED41550089D7A7 /* BaseResp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseResp.swift; sourceTree = "<group>"; };
-		1A47154C2AED47810089D7A7 /* WxPusherTargetType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxPusherTargetType.swift; sourceTree = "<group>"; };
-		1A47154F2AED57110089D7A7 /* SendVerifyBean.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SendVerifyBean.swift; sourceTree = "<group>"; };
-		1A4715562AF782710089D7A7 /* NetError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetError.swift; sourceTree = "<group>"; };
 		1A4934622E196C7900EA1C71 /* WxpProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpProfileViewController.swift; sourceTree = "<group>"; };
 		1A4934642E19702300EA1C71 /* KtSwiftCommonParams.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KtSwiftCommonParams.h; sourceTree = "<group>"; };
 		1A4934652E19703400EA1C71 /* KtSwiftCommonParams.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KtSwiftCommonParams.m; sourceTree = "<group>"; };
@@ -97,8 +69,6 @@
 		1A4934702E25667100EA1C71 /* WxpVersionUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpVersionUpdateChecker.swift; sourceTree = "<group>"; };
 		1A4934722E2D0F0100EA1C71 /* WxpCommonNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpCommonNotification.swift; sourceTree = "<group>"; };
 		1A4934762E32393A00EA1C71 /* WxpQRCodeScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpQRCodeScanViewController.swift; sourceTree = "<group>"; };
-		1A68CC9C2B3AD45000F6E742 /* UpdateDeviceInfoBean.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpdateDeviceInfoBean.swift; sourceTree = "<group>"; };
-		1A7D79CD2B08B55B00C5F4F1 /* MessageListBean.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageListBean.swift; sourceTree = "<group>"; };
 		1A962E662E08610200C966A3 /* KtSwiftJumpPageUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KtSwiftJumpPageUtils.m; sourceTree = "<group>"; };
 		1A962E682E08611300C966A3 /* KtSwiftJumpPageUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KtSwiftJumpPageUtils.h; sourceTree = "<group>"; };
 		1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpJumpPageUtils.swift; sourceTree = "<group>"; };
@@ -113,22 +83,17 @@
 		1A9C3E722DF5984900A25249 /* WxpSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpSceneDelegate.swift; sourceTree = "<group>"; };
 		1A9C3E762DF5A02E00A25249 /* MessageListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessageListViewController.swift; sourceTree = "<group>"; };
 		1A9C3E792DF5A07200A25249 /* WxpMessageItemBeam.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpMessageItemBeam.swift; sourceTree = "<group>"; };
-		1A9C3E7B2DF5A5A800A25249 /* WxpNetworkConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpNetworkConstants.swift; sourceTree = "<group>"; };
 		1A9C3E7E2DF5ABFC00A25249 /* WxpLoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpLoginViewController.swift; sourceTree = "<group>"; };
 		1A9C3E852DF5BB4A00A25249 /* ProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewController.swift; sourceTree = "<group>"; };
 		1A9C3E882DF5CB8F00A25249 /* UIColor+Color.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Color.swift"; sourceTree = "<group>"; };
 		1A9C3E8A2DF5DA8600A25249 /* WxpBindPhoneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBindPhoneViewController.swift; sourceTree = "<group>"; };
 		1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIButton+Loading.swift"; sourceTree = "<group>"; };
-		1A9C3E932DF9D66600A25249 /* WxpMessageListService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpMessageListService.swift; sourceTree = "<group>"; };
 		1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBaseMvpUIViewController.swift; sourceTree = "<group>"; };
 		1AAD926B2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CheckBoxToggleStyle.swift; sourceTree = "<group>"; };
-		1AC210D72ACC57F1008D86EA /* CommonExt.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CommonExt.swift; sourceTree = "<group>"; };
 		1AC210E12ACC584B008D86EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1AC210E32ACC5883008D86EA /* wxpusher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = wxpusher.entitlements; sourceTree = "<group>"; };
 		1AC210EB2ACD6DB6008D86EA /* ColorExt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorExt.swift; sourceTree = "<group>"; };
-		1ACCD5572AF9267B00841714 /* VerifyCodeLoginBean.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifyCodeLoginBean.swift; sourceTree = "<group>"; };
 		1ACCD55A2AF9342200841714 /* SaveKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveKey.swift; sourceTree = "<group>"; };
-		1ADEF6A52ACDBE57002FEB57 /* WxPusherApi.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxPusherApi.swift; sourceTree = "<group>"; };
 		1ADEF6AF2ACDC6D6002FEB57 /* WxPusher_MacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxPusher_MacApp.swift; sourceTree = "<group>"; };
 		1ADEF6B32ACDC6D9002FEB57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1ADEF6B62ACDC6D9002FEB57 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -184,17 +149,6 @@
 			path = UiKitPage;
 			sourceTree = "<group>";
 		};
-		1A4715552AED575A0089D7A7 /* Bean */ = {
-			isa = PBXGroup;
-			children = (
-				1A47154F2AED57110089D7A7 /* SendVerifyBean.swift */,
-				1ACCD5572AF9267B00841714 /* VerifyCodeLoginBean.swift */,
-				1A7D79CD2B08B55B00C5F4F1 /* MessageListBean.swift */,
-				1A68CC9C2B3AD45000F6E742 /* UpdateDeviceInfoBean.swift */,
-			);
-			path = Bean;
-			sourceTree = "<group>";
-		};
 		1A4934612E196A4000EA1C71 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
@@ -227,7 +181,6 @@
 				1A962E5D2E085C4800C966A3 /* KtSwiftBridge */,
 				1AD0B1122AE7F9D500DABE06 /* WxPusher-iOS */,
 				1ADEF6AE2ACDC6D6002FEB57 /* WxPusher-Mac */,
-				1ADEF6A42ACDBD97002FEB57 /* Api */,
 				1A447DF42DF53ECD005C402F /* UiKitPage */,
 				1AC210D62ACC562D008D86EA /* Common */,
 				1ADEF6C72ACDCA13002FEB57 /* WxPusher-Mac.app */,
@@ -260,7 +213,6 @@
 			isa = PBXGroup;
 			children = (
 				1A4934692E19FB7D00EA1C71 /* WxpFooterLoadingView.swift */,
-				1A9C3E932DF9D66600A25249 /* WxpMessageListService.swift */,
 				1A9C3E792DF5A07200A25249 /* WxpMessageItemBeam.swift */,
 				1A9C3E762DF5A02E00A25249 /* MessageListViewController.swift */,
 			);
@@ -320,47 +272,23 @@
 			isa = PBXGroup;
 			children = (
 				1AAD926A2AE7AB410074F97D /* Style */,
-				1AC210D72ACC57F1008D86EA /* CommonExt.swift */,
 				1AC210EB2ACD6DB6008D86EA /* ColorExt.swift */,
 				1ACCD55A2AF9342200841714 /* SaveKey.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
 		};
-		1AC210E52ACC595A008D86EA /* Preview Content */ = {
-			isa = PBXGroup;
-			children = (
-				1A47152E2AE7FC8B0089D7A7 /* Preview Assets.xcassets */,
-			);
-			path = "Preview Content";
-			sourceTree = "<group>";
-		};
 		1AD0B1122AE7F9D500DABE06 /* WxPusher-iOS */ = {
 			isa = PBXGroup;
 			children = (
 				1A4715482AED3F500089D7A7 /* Info.plist */,
-				1A47152C2AE7FC250089D7A7 /* WxpusherApp.swift */,
 				1A9C3E712DF5984900A25249 /* WxpAppDelegate.swift */,
 				1A9C3E722DF5984900A25249 /* WxpSceneDelegate.swift */,
 				1A9C3E6F2DF5963400A25249 /* Launch Screen.storyboard */,
 				1AC210E32ACC5883008D86EA /* wxpusher.entitlements */,
 				1AC210E12ACC584B008D86EA /* Assets.xcassets */,
-				1AC210E52ACC595A008D86EA /* Preview Content */,
 			);
 			path = "WxPusher-iOS";
-			sourceTree = "<group>";
-		};
-		1ADEF6A42ACDBD97002FEB57 /* Api */ = {
-			isa = PBXGroup;
-			children = (
-				1A4715552AED575A0089D7A7 /* Bean */,
-				1ADEF6A52ACDBE57002FEB57 /* WxPusherApi.swift */,
-				1A9C3E7B2DF5A5A800A25249 /* WxpNetworkConstants.swift */,
-				1A4715492AED41550089D7A7 /* BaseResp.swift */,
-				1A47154C2AED47810089D7A7 /* WxPusherTargetType.swift */,
-				1A4715562AF782710089D7A7 /* NetError.swift */,
-			);
-			path = Api;
 			sourceTree = "<group>";
 		};
 		1ADEF6AE2ACDC6D6002FEB57 /* WxPusher-Mac */ = {
@@ -568,16 +496,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				1A4934632E196C7900EA1C71 /* WxpProfileViewController.swift in Sources */,
-				1A4715502AED57110089D7A7 /* SendVerifyBean.swift in Sources */,
-				1A47154D2AED47810089D7A7 /* WxPusherTargetType.swift in Sources */,
-				1A68CC9D2B3AD45000F6E742 /* UpdateDeviceInfoBean.swift in Sources */,
 				1AAD926C2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift in Sources */,
 				1A49346A2E19FB8000EA1C71 /* WxpFooterLoadingView.swift in Sources */,
-				1A4715572AF782710089D7A7 /* NetError.swift in Sources */,
 				1A4934662E19714B00EA1C71 /* KtSwiftCommonParams.m in Sources */,
 				1A962E772E0B09AD00C966A3 /* WxpDialogUtils.swift in Sources */,
-				1ACCD5582AF9267B00841714 /* VerifyCodeLoginBean.swift in Sources */,
-				1A9C3E7C2DF5A5B300A25249 /* WxpNetworkConstants.swift in Sources */,
 				1A4934712E25667D00EA1C71 /* WxpVersionUpdateChecker.swift in Sources */,
 				1A49346F2E255ECC00EA1C71 /* WxpFSafariViewController.swift in Sources */,
 				1A9C3E782DF5A02E00A25249 /* MessageListViewController.swift in Sources */,
@@ -589,14 +511,11 @@
 				1A962E732E0B075600C966A3 /* UserAgreementViewController.swift in Sources */,
 				1A962E792E0B0B2100C966A3 /* WxpCommonBlockDef.swift in Sources */,
 				1A49346C2E1A6B6800EA1C71 /* WxpUnbindPhoneViewController.swift in Sources */,
-				1AC210D82ACC57F1008D86EA /* CommonExt.swift in Sources */,
 				1A447DF62DF53ECD005C402F /* StringConstants.swift in Sources */,
-				1A9C3E942DF9D66600A25249 /* WxpMessageListService.swift in Sources */,
 				1A962E6F2E09B3D200C966A3 /* WxpBaseUIViewController.swift in Sources */,
 				1A447DF72DF53ECD005C402F /* MessageService.swift in Sources */,
 				1A447DF92DF53ECD005C402F /* MainTabBarController.swift in Sources */,
 				1A447DFA2DF53ECD005C402F /* WxpWebViewController.swift in Sources */,
-				1ADEF6A62ACDBE57002FEB57 /* WxPusherApi.swift in Sources */,
 				1A962E752E0B081300C966A3 /* WxpSaveKey.swift in Sources */,
 				1ACCD55B2AF9342200841714 /* SaveKey.swift in Sources */,
 				1A9C3E732DF5984900A25249 /* WxpAppDelegate.swift in Sources */,
@@ -605,13 +524,10 @@
 				1A9C3E8D2DF5DA8600A25249 /* WxpBindPhoneViewController.swift in Sources */,
 				1A9C3E922DF7352500A25249 /* UIButton+Loading.swift in Sources */,
 				1A9C3E892DF5CB9800A25249 /* UIColor+Color.swift in Sources */,
-				1A47152D2AE7FC250089D7A7 /* WxpusherApp.swift in Sources */,
-				1A47154A2AED41550089D7A7 /* BaseResp.swift in Sources */,
 				1A9C3E972DFE80E600A25249 /* WxpBaseMvpUIViewController.swift in Sources */,
 				1AC210EC2ACD6DB6008D86EA /* ColorExt.swift in Sources */,
 				1A9C3E862DF5BB4A00A25249 /* ProfileViewController.swift in Sources */,
 				1A962E712E0AFF9300C966A3 /* WxpPermissionUtils.swift in Sources */,
-				1A7D79CE2B08B55B00C5F4F1 /* MessageListBean.swift in Sources */,
 				1A4934782E32393A00EA1C71 /* WxpQRCodeScanViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -620,19 +536,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1A4715512AED57110089D7A7 /* SendVerifyBean.swift in Sources */,
-				1A9C3E7D2DF5A5B300A25249 /* WxpNetworkConstants.swift in Sources */,
 				1AAD926D2AE7AB5D0074F97D /* CheckBoxToggleStyle.swift in Sources */,
-				1A47154E2AED47810089D7A7 /* WxPusherTargetType.swift in Sources */,
-				1A47154B2AED41550089D7A7 /* BaseResp.swift in Sources */,
-				1ADEF6BC2ACDC75A002FEB57 /* CommonExt.swift in Sources */,
-				1A4715582AF782710089D7A7 /* NetError.swift in Sources */,
 				1ADEF6BD2ACDC75A002FEB57 /* ColorExt.swift in Sources */,
-				1ACCD5592AF9267C00841714 /* VerifyCodeLoginBean.swift in Sources */,
 				1ACCD55C2AF9342200841714 /* SaveKey.swift in Sources */,
-				1A7D79CF2B08B55B00C5F4F1 /* MessageListBean.swift in Sources */,
-				1ADEF6C32ACDC764002FEB57 /* WxPusherApi.swift in Sources */,
-				1A68CC9E2B3AD45000F6E742 /* UpdateDeviceInfoBean.swift in Sources */,
 				1ADEF6B02ACDC6D6002FEB57 /* WxPusher_MacApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -763,7 +669,6 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 101;
-				DEVELOPMENT_ASSET_PATHS = "\"WxPusher-iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = 8UU533BM7N;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -811,7 +716,6 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 101;
-				DEVELOPMENT_ASSET_PATHS = "\"WxPusher-iOS/Preview Content\"";
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 8UU533BM7N;
 				ENABLE_HARDENED_RUNTIME = YES;
