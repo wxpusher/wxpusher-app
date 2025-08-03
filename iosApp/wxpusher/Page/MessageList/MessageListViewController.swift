@@ -108,6 +108,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         )
         
         //页面创建的时候，就已经有被点击的消息了
+        WxpLogUtils.shared.d(tag: "WxPusher", message: "消息列表页面-dealUserInfoMessage=\(MessageListViewController.clickMessageUserInfo)", throwable: nil)
         if let messageUserInfo = MessageListViewController.clickMessageUserInfo {
             self.dealUserInfoMessage(userInfo: messageUserInfo)
         }
@@ -121,6 +122,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         guard let messagae =  messagae else {
             return
         }
+        WxpLogUtils.shared.d(tag: "WxPusher", message: "消息列表页面-onReceiveNewMessage=\(messagae)", throwable: nil)
         self.presenter.onReceiveNewMessage(message: messagae)
     }
     

@@ -47,10 +47,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
 
     override fun onReceiveNewMessage(message: WxpMessageListMessage) {
         //点击消息冷启动的时候，可能消息还没有拉回来，缓存一下被点击的消息，拉回来的时候，检查是同一条消息，就标记为已读。
-        if (messageListData.isEmpty()) {
-            clickMessage = message;
-            return
-        }
+        clickMessage = message;
         //如果更新的消息已经存在，就更新阅读状态
         messageListData.find { it.messageId == message.messageId }?.let {
             it.read = message.read;
