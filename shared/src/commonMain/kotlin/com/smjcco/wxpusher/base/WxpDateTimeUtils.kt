@@ -39,6 +39,13 @@ object WxpDateTimeUtils {
     }
 
     @OptIn(ExperimentalTime::class)
+    fun getDateTime(): String {
+        val nowInSeconds = Clock.System.now().toEpochMilliseconds()
+        return nowInSeconds.toDateTimeString()
+    }
+
+
+    @OptIn(ExperimentalTime::class)
     fun getTimestamp(): Long = Clock.System.now().toEpochMilliseconds()
 
 }

@@ -23,8 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         //初始化
 //        WxpConfig.shared.baseUrl = "https://wxpusher.zjiecode.com"
 //        WxpConfig.shared.baseUrl = "http://wxpusher.test.zjiecode.com"
-//        WxpConfig.shared.baseUrl = "http://10.0.0.11:6100"
-        WxpConfig.shared.baseUrl = "http://127.0.0.1:6100"
+        WxpConfig.shared.baseUrl = "http://10.0.0.11:6100"
+//        WxpConfig.shared.baseUrl = "http://127.0.0.1:6100"
         
         //        WxpConfig.shared.baseUrl = "http://127.0.0.1:6100"
         
@@ -95,6 +95,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         WxpJumpPageUtils.jumpToWebUrl(url: url)
         //打开的消息 ，标记为已读状态
         userInfo["read"] = true
+        WxpLogUtils.shared.d(tag: "WxPusher", message: "发送消息点击事件", throwable: nil)
+        MessageListViewController.setClickMessage(message: userInfo)
         NotificationCenter.default.post(name: WxpCommonNotification.ClickMessageNotification, object: nil, userInfo: userInfo)
         completionHandler()
     }

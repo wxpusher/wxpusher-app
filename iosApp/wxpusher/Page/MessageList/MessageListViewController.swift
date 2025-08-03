@@ -23,6 +23,17 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     private var openAppFristRefresh = true
     
+    private static var clickMessageUserInfo:[AnyHashable : Any]? = nil
+    
+    ///
+    ///在收到消息，app没有在后台的时候，点击通知栏消息，发送广播，先于消息列表列表创建
+    ///所以收不到消息，导致拉到消息后，列表页面的阅读状态不对
+    ///用一个静态变量，保存一下，在页面创建的时候 ，判断一下有没有被点击的消息，如果有，就更新一下这个消息
+    ///避免阅读状态不对
+    public static func  setClickMessage(message:[AnyHashable : Any]?){
+        clickMessageUserInfo = message;
+    }
+    
     //空态页
     private let emptyView: UIView = {
         // 添加空状态视图
@@ -76,7 +87,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         setupRefreshControl()
         setupUI()
         
-        
+        WxpLogUtils.shared.d(tag: "WxPusher", message: "消息列表页面-viewDidLoad", throwable: nil)
         //页面加载的时候初始化,先显示缓存数据
         presenter.doInit()
         //开始刷新，mj_header的回调回调用p层刷新
@@ -85,14 +96,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         //存活的时候，监听点击消息的事件
         NotificationCenter.default.addObserver(forName: WxpCommonNotification.ClickMessageNotification, object: nil, queue: nil) {[weak self] notification in
             let userInfo = notification.userInfo
-            guard let userInfo =  userInfo else {
-                return
-            }
-            let messagae = self?.getMessage(userInfo: userInfo)
-            guard let messagae =  messagae else {
-                return
-            }
-            self?.presenter.onReceiveNewMessage(message: messagae)
+            self?.dealUserInfoMessage(userInfo: userInfo)
+           
         }
         //监听app返回前台，尝试刷新消息
         NotificationCenter.default.addObserver(
@@ -101,6 +106,22 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
             name: UIApplication.willEnterForegroundNotification,
             object: nil
         )
+        
+        //页面创建的时候，就已经有被点击的消息了
+        if let messageUserInfo = MessageListViewController.clickMessageUserInfo {
+            self.dealUserInfoMessage(userInfo: messageUserInfo)
+        }
+    }
+    
+    private func dealUserInfoMessage(userInfo:[AnyHashable : Any]?){
+        guard let userInfo =  userInfo else {
+            return
+        }
+        let messagae = self.getMessage(userInfo: userInfo)
+        guard let messagae =  messagae else {
+            return
+        }
+        self.presenter.onReceiveNewMessage(message: messagae)
     }
     
     deinit {
@@ -368,6 +389,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     }
     
     func onMessageList(data: [WxpMessageListMessage]) {
+        WxpLogUtils.shared.d(tag: "WxPusher", message: "消息列表页面-onMessageList", throwable: nil)
         self.messageList = data
         tableView.isHidden = data.isEmpty
         emptyView.isHidden = !data.isEmpty

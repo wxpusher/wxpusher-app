@@ -3,6 +3,7 @@ package com.smjcco.wxpusher.page.messagelist
 import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.WxpBaseMvpPresenter
 import com.smjcco.wxpusher.base.WxpDateTimeUtils
+import com.smjcco.wxpusher.base.WxpLogUtils
 import com.smjcco.wxpusher.base.WxpSaveService
 import com.smjcco.wxpusher.base.runAtMainSuspend
 import com.smjcco.wxpusher.biz.common.WxpAppDataService
@@ -73,9 +74,9 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     }
 
     override fun refresh(manual: Boolean) {
-        println("refresh=${manual}")
-        println("clickMessage=${clickMessage}")
-        
+        WxpLogUtils.d(message = "开始刷新-refresh")
+        WxpLogUtils.d(message = "clickMessage=${clickMessage}")
+
         if (loading) {
             return
         }
@@ -96,8 +97,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
                 if (clickMessage != null) {
                     fetchResultList.find { it.messageId == clickMessage?.messageId }?.read =
                         (clickMessage?.read == true)
-//                    clickMessage = null
-                    println("clickMessage=${clickMessage}")
+                    WxpLogUtils.d(message = "标记消息已读=${clickMessage}")
                 }
                 messageListData = fetchResultList.toMutableList()
                 lastMessageId = messageListData.lastOrNull()?.messageId ?: Long.MAX_VALUE
@@ -114,6 +114,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     }
 
     override fun fetchMessageResume() {
+        WxpLogUtils.d(message = "开始刷新-fetchMessageResume")
         if (loading) {
             return
         }
@@ -170,12 +171,12 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
 
     override fun loadMore() {
         if (!hasMore) {
-            println("没有更多数据，不进行加载")
+            WxpLogUtils.d(message = "loadMore-没有更多数据，不进行加载")
             return
         }
 
         if (messageListData.size < pageMinCount) {
-            println("数据不够1页，不加载更多")
+            WxpLogUtils.d(message = "loadMore-数据不够1页，不加载更多")
             hasMore = false
             view?.showMessageMoreLoading(false, hasMore)
             return

@@ -2,6 +2,7 @@ import UIKit
 
 
 import Foundation
+import shared
 
 @objc class WxpJumpPageUtils: NSObject {
     
@@ -84,6 +85,7 @@ import Foundation
                     let rootVC = tabVC.selectedViewController as! UINavigationController
                     webVC.hidesBottomBarWhenPushed = true
                     rootVC.pushViewController(webVC, animated: true)
+                    WxpLogUtils.shared.d(tag: "WxPusher", message: "通过消息详情页面tab跳转", throwable: nil)
                 }
             }
         }
