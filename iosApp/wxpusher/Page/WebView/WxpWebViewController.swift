@@ -354,19 +354,29 @@ extension WxpWebViewController: WKNavigationDelegate {
             return
         }
         
-        // 如果是白名单内的域名，需要添加 token header
-        if isHostInWhitelist(url.host) {
-            let newRequest = createRequestWithTokenIfNeeded(for: url)
-            
-            // 如果当前请求没有 token header，重新加载带 token 的请求
-            if navigationAction.request.value(forHTTPHeaderField: DeviceTokenKey) == nil {
-                webView.load(newRequest)
-                decisionHandler(.cancel)
-                return
-            }
+        guard let scheme = url.scheme?.lowercased() else {
+            decisionHandler(.allow)
+            return
         }
-        
-        decisionHandler(.allow)
+        //如果是标准协议，就直接打开，如果不是标准协议，就调用系统打开
+        let webSchemes = ["http", "https", "about", "file"]
+        if webSchemes.contains(scheme){
+            // 如果是白名单内的域名，需要添加 token header
+            if isHostInWhitelist(url.host) {
+                let newRequest = createRequestWithTokenIfNeeded(for: url)
+                // 如果当前请求没有 token header，重新加载带 token 的请求
+                if navigationAction.request.value(forHTTPHeaderField: DeviceTokenKey) == nil {
+                    webView.load(newRequest)
+                    decisionHandler(.cancel)
+                    return
+                }
+            }
+            decisionHandler(.allow)
+            return
+        }
+        //调用系统打开，才能打开第三方的app
+        UIApplication.shared.open(url)
+        decisionHandler(.cancel)
     }
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
