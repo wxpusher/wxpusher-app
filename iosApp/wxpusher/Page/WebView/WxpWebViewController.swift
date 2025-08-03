@@ -125,6 +125,7 @@ class WxpWebViewController: UIViewController {
         title = ""
         view.backgroundColor = .systemBackground
         webView.navigationDelegate = self
+        webView.uiDelegate = self
         
         //进度条更新观察
         webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
@@ -427,4 +428,13 @@ extension WxpWebViewController: WKNavigationDelegate {
         loadingStartTime = nil
         WxpToastUtils.shared.showToast(msg: "加载失败")
     }
-} 
+    
+}
+
+extension WxpWebViewController: WKUIDelegate {
+    func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping @MainActor () -> Void) {
+        let p = WxpDialogParameter(title: message,rightText: "我知道了")
+        WxpDialogUtils.showConfirmDialog(params: p)
+        completionHandler()
+    }
+}
