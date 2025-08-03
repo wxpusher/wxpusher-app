@@ -26,7 +26,6 @@ class WxpWebViewController: UIViewController {
         // 设置进度条样式
         let progressView = UIProgressView(progressViewStyle: .bar)
         progressView.trackTintColor = UIColor.clear
-        progressView.progressTintColor = UIColor.systemBlue
         progressView.isHidden = true
         
         progressView.translatesAutoresizingMaskIntoConstraints = false
