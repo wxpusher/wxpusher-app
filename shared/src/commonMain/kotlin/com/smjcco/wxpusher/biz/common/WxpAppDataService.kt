@@ -2,6 +2,7 @@ package com.smjcco.wxpusher.biz.common
 
 import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.WxpBaseInfoService
+import com.smjcco.wxpusher.base.WxpLogUtils
 import com.smjcco.wxpusher.base.WxpSaveService
 import com.smjcco.wxpusher.base.letOnNotEmpty
 import com.smjcco.wxpusher.base.runAtMainSuspend
@@ -25,17 +26,22 @@ object WxpAppDataService {
      * 针对iOS，第一次启动的时候，进行一次数据迁移，避免用户重新登录
      */
     fun mergeIOSData() {
+        WxpLogUtils.d(message = "开始迁移iOS数据")
         if (WxpBaseInfoService.getPlatform() != WxpPlatformEnum.iOS.platform) {
+            WxpLogUtils.d(message = "开始迁移iOS数据，非iOS")
             return
         }
         if (WxpSaveService.get(mergeIOSDataHasRun, false)) {
+            WxpLogUtils.d(message = "开始迁移iOS数据，已经迁移过")
             return
         }
+
         //把iOS的数据，读取出来，存档到新的方式里面，避免用户重新登录
         val uid = WxpSaveService.get("sp_uid", "")
         val deviceId = WxpSaveService.get("deviceId", "")
         val deviceToken = WxpSaveService.get("deviceToken", "")
         val pushToken = WxpSaveService.get("pushToken", "")
+        WxpLogUtils.d(message = "开始迁移iOS数据，读取数据 deviceToken=" + deviceToken)
         saveLoginInfo(WxpLoginInfo(deviceToken, deviceId, uid))
         savePushToken(pushToken)
         WxpSaveService.set(mergeIOSDataHasRun, true)
