@@ -57,7 +57,7 @@ interface IWxpMessageListPresenter :
      * 刷新数据
      * @param manual是否手动触发的
      */
-    fun refresh(manual: Boolean)
+    fun refresh(scene: Int)
 
     /**
      * 加载更多数据

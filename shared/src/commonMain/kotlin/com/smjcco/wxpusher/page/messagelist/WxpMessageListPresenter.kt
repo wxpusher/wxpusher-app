@@ -34,7 +34,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     override fun searchIfChanged(key: String?) {
         if (this.key != key) {
             this.key = key
-            refresh(false)
+            refresh(WxpMessageListReq.SceneSearch)
         }
     }
 
@@ -73,7 +73,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         saveRefreshListData()
     }
 
-    override fun refresh(manual: Boolean) {
+    override fun refresh(scene: Int) {
         WxpLogUtils.d(message = "开始刷新-refresh")
         WxpLogUtils.d(message = "clickMessage=${clickMessage}")
 
@@ -81,13 +81,13 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             return
         }
         //手动触发的，就给予震动反馈
-        if (manual) {
+        if (WxpMessageListReq.SceneManual == scene) {
             view?.onFeedback()
         }
         runAtMainSuspend {
             loading = true
             view?.showMessageRefreshing(true)
-            val req = WxpMessageListReq(Long.MAX_VALUE, key)
+            val req = WxpMessageListReq(Long.MAX_VALUE, key, scene)
             val fetchResultList = WxpApiService.fetchMessageList(req)
             view?.showMessageRefreshing(false)
             WxpSaveService.set(MessageRefreshTimeKey, WxpDateTimeUtils.getTimestamp().toDouble())
@@ -120,7 +120,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         }
         runAtMainSuspend {
             loading = true
-            val req = WxpMessageListReq(Long.MAX_VALUE, key, true)
+            val req = WxpMessageListReq(Long.MAX_VALUE, key, WxpMessageListReq.SceneFetchResume)
             val fetchResultList = WxpApiService.fetchMessageList(req)
             WxpSaveService.set(MessageRefreshTimeKey, WxpDateTimeUtils.getTimestamp().toDouble())
             if (fetchResultList != null) {
@@ -174,7 +174,6 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             WxpLogUtils.d(message = "loadMore-没有更多数据，不进行加载")
             return
         }
-
         if (messageListData.size < pageMinCount) {
             WxpLogUtils.d(message = "loadMore-数据不够1页，不加载更多")
             hasMore = false
@@ -184,7 +183,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         runAtMainSuspend {
             loading = true
             view?.showMessageMoreLoading(true, hasMore)
-            val req = WxpMessageListReq(lastMessageId, key)
+            val req = WxpMessageListReq(lastMessageId, key, WxpMessageListReq.SceneLoadMore)
             val fetchResultList = WxpApiService.fetchMessageList(req)
             if (fetchResultList !== null) {
                 if (fetchResultList.isEmpty()) {

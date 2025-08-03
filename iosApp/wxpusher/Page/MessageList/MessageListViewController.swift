@@ -347,7 +347,12 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     private func setupRefreshControl() {
         let tableViewRefreshHeader:MJRefreshNormalHeader = MJRefreshNormalHeader(refreshingBlock: {
-            self.presenter.refresh(manual: !self.openAppFristRefresh)
+            let scene = if(self.openAppFristRefresh){
+                WxpMessageListReq.Companion.shared.SceneAutoRefresh
+            } else {
+                WxpMessageListReq.Companion.shared.SceneManual
+            }
+            self.presenter.refresh(scene: scene)
             //刷新一次以后，就不再是打开app第一次刷新了
             self.openAppFristRefresh = false
         })
