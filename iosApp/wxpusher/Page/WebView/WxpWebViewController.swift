@@ -20,6 +20,10 @@ class WxpWebViewController: UIViewController {
     private var progressTimer: Timer?
     private var showThirdPartyBanner = true
     
+    ///针对内部域名，需要添加token的header，但是添加以后，偶尔遇到再次反复加载的情况
+    ///因此用一个变量记录下来，上次加载的同一个req不重复加载
+    private var wxpLoadRequest:URLRequest?
+    
     
     // MARK: - View
     private let progressView: UIProgressView = {
@@ -358,6 +362,7 @@ extension WxpWebViewController: WKNavigationDelegate {
         return nil
     }
     
+    
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         guard let url = navigationAction.request.url else {
             decisionHandler(.allow)
@@ -375,8 +380,9 @@ extension WxpWebViewController: WKNavigationDelegate {
             if isHostInWhitelist(url.host) {
                 let newRequest = createRequestWithTokenIfNeeded(for: url)
                 // 如果当前请求没有 token header，重新加载带 token 的请求
-                if navigationAction.request.value(forHTTPHeaderField: DeviceTokenKey) == nil {
+                if newRequest != wxpLoadRequest && navigationAction.request.value(forHTTPHeaderField: DeviceTokenKey) == nil {
                     webView.load(newRequest)
+                    wxpLoadRequest = newRequest
                     decisionHandler(.cancel)
                     return
                 }
