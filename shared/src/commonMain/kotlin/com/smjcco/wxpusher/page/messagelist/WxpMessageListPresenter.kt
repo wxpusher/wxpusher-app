@@ -177,6 +177,8 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             view?.showMessageMoreLoading(false, hasMore)
             return
         }
+        //加载更多，给予一个震动反馈
+        view?.onFeedback()
         runAtMainSuspend {
             loading = true
             view?.showMessageMoreLoading(true, hasMore)
