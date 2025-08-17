@@ -43,7 +43,6 @@ class WxpProfileViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(ProfileTableViewCell.self, forCellReuseIdentifier: "ProfileCell")
-        tableView.register(WxpProfileHeaderView.self, forHeaderFooterViewReuseIdentifier: "ProfileHeader")
         tableView.separatorStyle = .singleLine
         tableView.backgroundColor = .systemGroupedBackground
         
@@ -74,9 +73,7 @@ class WxpProfileViewController: UIViewController {
                 ProfileItem(title: "设备ID", subtitle: deviceId,
                             accessoryType: .disclosureIndicator) {
                                 WxpToastUtils.shared.showToast(msg: "设备ID复制成功")
-                            }
-            ]),
-            ("账号管理", [
+                            },
                 ProfileItem(title: "用户账号", subtitle: "退出登录",
                             accessoryType: .disclosureIndicator) {
                                 var params = WxpDialogParameter()
@@ -98,7 +95,7 @@ class WxpProfileViewController: UIViewController {
                                 self.present(navController, animated: true)
                             }
             ]),
-            ("通用", [
+            ("通知提醒", [
                 ProfileItem(title: "通知设置", subtitle: "检查通知权限", accessoryType: .disclosureIndicator) {
                     WxpPermissionUtils.requestNotificationPermission { success in
                         if(success){
@@ -125,24 +122,28 @@ class WxpProfileViewController: UIViewController {
                         }
                     }
                 },
-                ProfileItem(title: "用户协议", subtitle: "查看用户和隐私协议", accessoryType: .disclosureIndicator) {
-                    WxpJumpPageUtils.jumpToWebUrl(url: "https://wxpusher.zjiecode.com/admin/agreement/index-argeement.html")
-                },
-                ProfileItem(title: "软件更新", subtitle: WxpCommonParams.appVersionName(), accessoryType: .disclosureIndicator) {
-                    WxpVersionUpdateChecker(force: true).checkForUpdate()
-                }
-            ]),
-            
-           
-            ("异常和建议", [
                 ProfileItem(title: "推送检查", subtitle: "收不到消息的异常排查",
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToWebUrl(url: "https://wxpusher.zjiecode.com/docs/open-app-note/index.html?brand=iOS")
-                            },
+                            }
+                
+            ]),
+            
+            ("通用", [
                 ProfileItem(title: "反馈建议", subtitle: "欢迎你指导我们进步",
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToWebUrl(url: "https://wj.qq.com/s2/22198188/cc95/")
-                            }
+                            },
+                ProfileItem(title: "软件更新", subtitle: WxpCommonParams.appVersionName(), accessoryType: .disclosureIndicator) {
+                    WxpVersionUpdateChecker(force: true).checkForUpdate()
+                },
+                ProfileItem(title: "用户协议", subtitle: "查看用户和隐私协议", accessoryType: .disclosureIndicator) {
+                    WxpJumpPageUtils.jumpToWebUrl(url: "https://wxpusher.zjiecode.com/admin/agreement/index-argeement.html")
+                }
+                ,
+                ProfileItem(title: "备案号", subtitle: "蜀ICP备14025423号-2A", accessoryType: .disclosureIndicator) {
+                    WxpJumpPageUtils.jumpToWebUrl(url: "https://beian.miit.gov.cn/")
+                }
             ])
         ]
     }
@@ -152,7 +153,7 @@ class WxpProfileViewController: UIViewController {
 extension WxpProfileViewController: UITableViewDataSource, UITableViewDelegate {
     
     func numberOfSections(in tableView: UITableView) -> Int {
-        return sectionData.count // +1 for header section
+        return sectionData.count
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -164,7 +165,6 @@ extension WxpProfileViewController: UITableViewDataSource, UITableViewDelegate {
         
         let item = sectionData[indexPath.section].items[indexPath.row]
         cell.configure(with: item)
-        
         return cell
     }
     
@@ -228,72 +228,3 @@ class ProfileTableViewCell: UITableViewCell {
         }
     }
 }
-
-// MARK: - Profile Header View
-class WxpProfileHeaderView: UITableViewHeaderFooterView {
-    private let logoImageView = UIImageView()
-    private let titleLabel = UILabel()
-    private let versionLabel = UILabel()
-    
-    override init(reuseIdentifier: String?) {
-        super.init(reuseIdentifier: reuseIdentifier)
-        setupUI()
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-    
-    private func setupUI() {
-        // 设置背景色
-        backgroundView = UIView()
-        backgroundView?.backgroundColor = .systemGroupedBackground
-        
-        // 设置 Logo
-        if let logoImage = UIImage(named: "Logo") {
-            logoImageView.image = logoImage
-        } else {
-            logoImageView.image = UIImage(systemName: "app.fill")
-            logoImageView.tintColor = .defAccentPrimaryColor
-        }
-        logoImageView.contentMode = .scaleAspectFit
-        logoImageView.layer.cornerRadius = 60
-        logoImageView.clipsToBounds = true
-        logoImageView.layer.borderWidth = 1
-        logoImageView.layer.borderColor = UIColor.systemGray4.cgColor
-        
-        titleLabel.text = "WxPusher"
-        titleLabel.textAlignment = .center
-        titleLabel.font = .systemFont(ofSize: 20, weight: .medium)
-        titleLabel.textColor = .defFontPrimaryColor
-        
-        versionLabel.text = "版本 " + WxpCommonParams.appVersionName()
-        versionLabel.textAlignment = .center
-        versionLabel.textColor = .defFontSecondColor
-        versionLabel.font = .systemFont(ofSize: 14)
-        
-        contentView.addSubview(logoImageView)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(versionLabel)
-        
-        logoImageView.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        versionLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        NSLayoutConstraint.activate([
-            logoImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            logoImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
-            logoImageView.widthAnchor.constraint(equalToConstant: 120),
-            logoImageView.heightAnchor.constraint(equalToConstant: 120),
-            
-            titleLabel.topAnchor.constraint(equalTo: logoImageView.bottomAnchor, constant: 12),
-            titleLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            
-            versionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
-            versionLabel.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            versionLabel.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor, constant: -10)
-        ])
-    }
-}
-
-
