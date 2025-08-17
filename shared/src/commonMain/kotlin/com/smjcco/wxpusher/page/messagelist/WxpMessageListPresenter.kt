@@ -115,6 +115,10 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         if (loading) {
             return
         }
+        if (WxpAppDataService.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
+            WxpLogUtils.d(message = "开始刷新-fetchMessageResume-没有登录，放弃刷新")
+            return
+        }
         runAtMainSuspend {
             loading = true
             val req = WxpMessageListReq(Long.MAX_VALUE, key, WxpMessageListReq.SceneFetchResume)
