@@ -118,8 +118,9 @@ class WxpWebViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .systemBackground
         setupUI()
-        setupOption()
+        showOption()
         loadWebContent()
     }
     
@@ -168,9 +169,7 @@ class WxpWebViewController: UIViewController {
     }
     
     
-    private func setupOption(){
-        view.backgroundColor = .systemBackground
-        
+    private func showOption(){
         let mainMenu = UIMenu(title: "", children: [
             UIAction(
                 title: "复制链接",
@@ -203,6 +202,10 @@ class WxpWebViewController: UIViewController {
         )
         navigationItem.rightBarButtonItem = menuButton
         
+    }
+    
+    private func hideOption(){
+        navigationItem.rightBarButtonItem = nil
     }
     
     @objc private func bannerTapped() {
@@ -410,6 +413,13 @@ extension WxpWebViewController: WKNavigationDelegate {
             if self?.webView.isLoading == true {
                 self?.progressView.isHidden = false
             }
+        }
+        
+        //如果打开的是订阅管理的页面，就隐藏右上角的按钮
+        if let url = webView.url, isHostInWhitelist(url.host) && url.path.contains("wxuser") {
+            hideOption()
+        } else {
+            showOption()
         }
     }
     
