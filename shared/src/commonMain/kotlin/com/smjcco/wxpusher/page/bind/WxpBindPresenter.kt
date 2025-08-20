@@ -38,7 +38,8 @@ class WxpBindPresenter(view: IWxpBindView) :
                     val loginInfo = WxpLoginInfo(
                         deviceId = it.deviceId,
                         deviceToken = it.deviceToken,
-                        uid = it.uid
+                        uid = it.uid,
+                        openId = it.openId
                     )
                     WxpAppDataService.saveLoginInfo(loginInfo)
                     WxpAppDataService.updateDeviceInfo()

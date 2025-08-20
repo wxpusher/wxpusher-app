@@ -19,4 +19,5 @@ data class WxpLoginSendVerifyCodeResp(
     val deviceToken: String?,
     val deviceId: String?,
     val uid: String?,
+    val openId: String?,
 )
