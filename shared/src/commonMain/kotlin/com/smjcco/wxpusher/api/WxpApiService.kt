@@ -9,6 +9,7 @@ import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
+import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
@@ -52,6 +53,8 @@ object WxpApiService {
             if (toastError) {
                 if (e is IOException) {
                     WxpToastUtils.showToast("请检查网络")
+                } else if (e is NoTransformationFoundException) {
+                    WxpToastUtils.showToast("数据反序列化异常，可能是服务器出现问题，请稍后再试")
                 } else {
                     WxpToastUtils.showToast(e.message)
                 }
@@ -188,5 +191,21 @@ object WxpApiService {
             successBlock.invoke()
         }
         )
+    }
+
+    /**
+     * 在用户没有openid的时候，查询一下用户的openid
+     */
+    suspend fun getOpenId(): String? {
+        val data: Map<String, String>? = commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .get(WxpNetworkService.getUrl("/api/need-login/device/openid"))
+                .body()
+        }
+        )
+        if (data?.isNotEmpty() == true) {
+            return data.get("openId")
+        }
+        return null
     }
 }

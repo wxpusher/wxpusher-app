@@ -1,5 +1,6 @@
 package com.smjcco.wxpusher.page.messagelist
 
+import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.WxpBaseMvpPresenter
 import com.smjcco.wxpusher.base.WxpDateTimeUtils
@@ -226,6 +227,25 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
                 messageListData.removeAll { it.messageId == messageId }
                 view?.onMessageList(messageListData)
             }
+        }
+    }
+
+    override fun openSubscribeManagerPage() {
+        runAtMainSuspend {
+            var openId = WxpAppDataService.getLoginInfo()?.openId
+            if (openId.isNullOrEmpty()) {
+                //如果为空，从网络请求一次openid
+                openId = WxpApiService.getOpenId()
+                if (openId == null || openId.isEmpty()) {
+                    return@runAtMainSuspend
+                }
+                val loginInfo = WxpAppDataService.getLoginInfo()
+                loginInfo?.openId = openId
+                if (loginInfo != null) {
+                    WxpAppDataService.saveLoginInfo(loginInfo)
+                }
+            }
+            view?.onOpenSubscribeManagerPage("${WxpConfig.baseUrl}/wxuser/?openId=${openId}#/")
         }
     }
 }

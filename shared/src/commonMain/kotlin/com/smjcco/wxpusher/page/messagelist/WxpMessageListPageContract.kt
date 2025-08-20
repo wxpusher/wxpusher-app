@@ -27,6 +27,11 @@ interface IWxpMessageListView : IWxpBaseMvpView<IWxpMessageListPresenter> {
      */
     fun onFeedback();
 
+    /**
+     * 打开订阅管理页面
+     */
+    fun onOpenSubscribeManagerPage(url: String);
+
 }
 
 interface IWxpMessageListPresenter :
@@ -86,4 +91,11 @@ interface IWxpMessageListPresenter :
      * @param id 消息的消息id
      */
     fun deleteById(id: Long)
+
+
+    /**
+     * 打开订阅管理页面
+     * 如果本地有openid，直接打开 ，如果没有，就请求一次云端，获取openid
+     */
+    fun openSubscribeManagerPage();
 }

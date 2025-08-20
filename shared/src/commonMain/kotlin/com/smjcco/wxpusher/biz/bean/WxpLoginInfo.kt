@@ -8,8 +8,8 @@ import kotlinx.serialization.Serializable
  */
 @Serializable
 data class WxpLoginInfo(
-    var deviceToken: String?, //设备身份信息
-    val deviceId: String?, //设备id
-    val uid: String?, //用户uid
-    val openId: String? //用户的openid
+    var deviceToken: String? = null , //设备身份信息
+    val deviceId: String? = null , //设备id
+    val uid: String? = null , //用户uid
+    var openId: String? = null //用户的openid，可能不存在
 )
