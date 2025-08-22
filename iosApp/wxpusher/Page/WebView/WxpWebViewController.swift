@@ -163,7 +163,7 @@ class WxpWebViewController: UIViewController {
     // 创建选项按钮的辅助方法
     private func createOptionButton(imageName: String, action: Selector) -> UIButton {
         let button = UIButton(type: .system)
-        let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .medium, scale: .large)
+        let config = UIImage.SymbolConfiguration(pointSize: 16, weight: .medium, scale: .large)
         let image = UIImage(systemName: imageName, withConfiguration: config)
         button.setImage(image, for: .normal)
         button.tintColor = UIColor.label // 支持黑暗模式
