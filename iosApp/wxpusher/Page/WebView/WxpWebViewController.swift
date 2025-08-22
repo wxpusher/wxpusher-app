@@ -88,6 +88,72 @@ class WxpWebViewController: UIViewController {
         return containerView
     }()
     
+    //webview的前进，后退和刷新操作
+    private var webOptionView: UIView = {
+        let containerView = UIView()
+        containerView.backgroundColor = UIColor.systemBackground
+        
+        // 创建4个按钮
+        let backButton = createOptionButton(imageName: "chevron.left", action: #selector(backButtonTapped))
+        let forwardButton = createOptionButton(imageName: "chevron.right", action: #selector(forwardButtonTapped))
+        let refreshButton = createOptionButton(imageName: "arrow.clockwise", action: #selector(refreshButtonTapped))
+        let closeButton = createOptionButton(imageName: "xmark", action: #selector(closeButtonTapped))
+        
+        // 添加按钮到容器
+        containerView.addSubview(backButton)
+        containerView.addSubview(forwardButton)
+        containerView.addSubview(refreshButton)
+        containerView.addSubview(closeButton)
+        
+        // 设置自动布局
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        forwardButton.translatesAutoresizingMaskIntoConstraints = false
+        refreshButton.translatesAutoresizingMaskIntoConstraints = false
+        closeButton.translatesAutoresizingMaskIntoConstraints = false
+        
+        NSLayoutConstraint.activate([
+            // 按钮高度
+            backButton.heightAnchor.constraint(equalToConstant: 44),
+            forwardButton.heightAnchor.constraint(equalToConstant: 44),
+            refreshButton.heightAnchor.constraint(equalToConstant: 44),
+            closeButton.heightAnchor.constraint(equalToConstant: 44),
+            
+            // 按钮垂直居中
+            backButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            forwardButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            refreshButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            closeButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            
+            // 按钮水平分布（4等分）
+            backButton.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            backButton.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.25),
+            
+            forwardButton.leadingAnchor.constraint(equalTo: backButton.trailingAnchor),
+            forwardButton.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.25),
+            
+            refreshButton.leadingAnchor.constraint(equalTo: forwardButton.trailingAnchor),
+            refreshButton.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.25),
+            
+            closeButton.leadingAnchor.constraint(equalTo: refreshButton.trailingAnchor),
+            closeButton.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.25),
+            closeButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
+        ])
+        
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        return containerView
+    }()
+    
+    // 创建选项按钮的辅助方法
+    private static func createOptionButton(imageName: String, action: Selector) -> UIButton {
+        let button = UIButton(type: .system)
+        let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .medium, scale: .large)
+        let image = UIImage(systemName: imageName, withConfiguration: config)
+        button.setImage(image, for: .normal)
+        button.tintColor = UIColor.label // 支持黑暗模式
+        button.addTarget(self, action: action, for: .touchUpInside)
+        return button
+    }
+    
     private let webView: WKWebView = {
         let configuration = WKWebViewConfiguration()
         let webView = WKWebView(frame: .zero, configuration: configuration)
@@ -143,7 +209,7 @@ class WxpWebViewController: UIViewController {
         view.addSubview(thirdPartyBannerView)
         view.addSubview(webView)
         view.addSubview(progressView)
-        
+        view.addSubview(webOptionView)
         
         // 先创建约束引用
         bannerHeightConstraint = thirdPartyBannerView.heightAnchor.constraint(equalToConstant: 0)
@@ -158,12 +224,17 @@ class WxpWebViewController: UIViewController {
             webView.topAnchor.constraint(equalTo: thirdPartyBannerView.bottomAnchor, constant: 0),
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            webView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            webView.bottomAnchor.constraint(equalTo: webOptionView.topAnchor),
             
             progressView.topAnchor.constraint(equalTo: webView.topAnchor),
             progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            progressView.heightAnchor.constraint(equalToConstant: 1.0)
+            progressView.heightAnchor.constraint(equalToConstant: 1.0),
+            
+            webOptionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            webOptionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            webOptionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            webOptionView.heightAnchor.constraint(equalToConstant: 44)
             
         ])
     }
@@ -210,6 +281,28 @@ class WxpWebViewController: UIViewController {
     
     @objc private func bannerTapped() {
         showThirdPartyContentAlert()
+    }
+    
+    // MARK: - Web Option Button Actions
+    
+    @objc private func backButtonTapped() {
+        if webView.canGoBack {
+            webView.goBack()
+        }
+    }
+    
+    @objc private func forwardButtonTapped() {
+        if webView.canGoForward {
+            webView.goForward()
+        }
+    }
+    
+    @objc private func refreshButtonTapped() {
+        webView.reload()
+    }
+    
+    @objc private func closeButtonTapped() {
+        navigationController?.popViewController(animated: true)
     }
     
     private func showThirdPartyContentAlert() {
