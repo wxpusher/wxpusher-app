@@ -89,7 +89,7 @@ class WxpWebViewController: UIViewController {
     }()
     
     //webview的前进，后退和刷新操作
-    private var webOptionView: UIView = {
+    private lazy var webOptionView: UIView = {
         let containerView = UIView()
         containerView.backgroundColor = UIColor.systemBackground
         
@@ -99,11 +99,15 @@ class WxpWebViewController: UIViewController {
         let refreshButton = createOptionButton(imageName: "arrow.clockwise", action: #selector(refreshButtonTapped))
         let closeButton = createOptionButton(imageName: "xmark", action: #selector(closeButtonTapped))
         
+        let dividerLine = UIView()
+        dividerLine.backgroundColor = UIColor.defDividerSecoundColor
+        dividerLine.translatesAutoresizingMaskIntoConstraints = false
         // 添加按钮到容器
         containerView.addSubview(backButton)
         containerView.addSubview(forwardButton)
         containerView.addSubview(refreshButton)
         containerView.addSubview(closeButton)
+        containerView.addSubview(dividerLine)
         
         // 设置自动布局
         backButton.translatesAutoresizingMaskIntoConstraints = false
@@ -136,7 +140,12 @@ class WxpWebViewController: UIViewController {
             
             closeButton.leadingAnchor.constraint(equalTo: refreshButton.trailingAnchor),
             closeButton.widthAnchor.constraint(equalTo: containerView.widthAnchor, multiplier: 0.25),
-            closeButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
+            closeButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            
+            dividerLine.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            dividerLine.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
+            dividerLine.topAnchor.constraint(equalTo: containerView.topAnchor),
+            dividerLine.heightAnchor.constraint(equalToConstant: 1),
         ])
         
         containerView.translatesAutoresizingMaskIntoConstraints = false
@@ -144,7 +153,7 @@ class WxpWebViewController: UIViewController {
     }()
     
     // 创建选项按钮的辅助方法
-    private static func createOptionButton(imageName: String, action: Selector) -> UIButton {
+    private func createOptionButton(imageName: String, action: Selector) -> UIButton {
         let button = UIButton(type: .system)
         let config = UIImage.SymbolConfiguration(pointSize: 20, weight: .medium, scale: .large)
         let image = UIImage(systemName: imageName, withConfiguration: config)
@@ -284,7 +293,6 @@ class WxpWebViewController: UIViewController {
     }
     
     // MARK: - Web Option Button Actions
-    
     @objc private func backButtonTapped() {
         if webView.canGoBack {
             webView.goBack()
