@@ -88,14 +88,22 @@ class WxpWebViewController: UIViewController {
         return containerView
     }()
     
+    private lazy var webBackButton: UIButton = {
+        return createOptionButton(imageName: "chevron.left", action: #selector(backButtonTapped))
+    }()
+    
+    private lazy var webForwardButton: UIButton = {
+        return createOptionButton(imageName: "chevron.right", action: #selector(forwardButtonTapped))
+    }()
+    
     //webview的前进，后退和刷新操作
     private lazy var webOptionView: UIView = {
         let containerView = UIView()
         containerView.backgroundColor = UIColor.systemBackground
         
         // 创建4个按钮
-        let backButton = createOptionButton(imageName: "chevron.left", action: #selector(backButtonTapped))
-        let forwardButton = createOptionButton(imageName: "chevron.right", action: #selector(forwardButtonTapped))
+        let backButton = webBackButton
+        let forwardButton = webForwardButton
         let refreshButton = createOptionButton(imageName: "arrow.clockwise", action: #selector(refreshButtonTapped))
         let closeButton = createOptionButton(imageName: "xmark", action: #selector(closeButtonTapped))
         
@@ -286,6 +294,11 @@ class WxpWebViewController: UIViewController {
     
     private func hideOption(){
         navigationItem.rightBarButtonItem = nil
+    }
+    
+    private func updateWebOptionBtnStatus(){
+        webBackButton.isEnabled = webView.canGoBack
+        webForwardButton.isEnabled = webView.canGoForward
     }
     
     @objc private func bannerTapped() {
@@ -540,6 +553,8 @@ extension WxpWebViewController: WKNavigationDelegate {
         progressTimer = nil
         progressView.isHidden = true
         loadingStartTime = nil
+        
+        updateWebOptionBtnStatus()
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -553,6 +568,11 @@ extension WxpWebViewController: WKNavigationDelegate {
         progressView.progress = 0.0
         loadingStartTime = nil
         WxpToastUtils.shared.showToast(msg: "加载失败")
+        updateWebOptionBtnStatus()
+    }
+    
+    func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        updateWebOptionBtnStatus()
     }
     
 }
