@@ -16,6 +16,12 @@ data class WxpScanQrcodeResp(
 
         //扫码定位
         const val TypeSubscribe = 1
+
+        //打开一个url
+        const val TypeOpenUrl = 2
+
+        //打开一个url，打开前先弹窗确认
+        const val TypeOpenUrlWithConfirm: Int = 3
     }
 }
 

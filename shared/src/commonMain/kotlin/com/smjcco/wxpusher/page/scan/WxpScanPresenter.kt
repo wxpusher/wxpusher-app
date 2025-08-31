@@ -22,6 +22,7 @@ class WxpScanPresenter(view: IWxpScanView) :
         }
         params.rightText = "查看详情"
         params.rightBlock = {
+            view?.onClosePage()
             runAtMainSuspend {
                 var openId = WxpAppDataService.getLoginInfo()?.openId
                 if (openId.isNullOrEmpty()) {
@@ -55,22 +56,48 @@ class WxpScanPresenter(view: IWxpScanView) :
             if (scanResult.type == WxpScanQrcodeResp.TypeSubscribe) {
                 if (scanResult.followResult != null) {
                     dealFollowResult(scanResult.followResult)
-                    view?.onClosePage()
                 } else {
                     WxpToastUtils.showToast("数据异常，请重试")
                     view?.onClosePage()
                 }
+            } else if (scanResult.type == WxpScanQrcodeResp.TypeOpenUrlWithConfirm) {
+                if (scanResult.data.isNullOrEmpty()) {
+                    view?.onClosePage()
+                    WxpToastUtils.showToast("返回数据错误，无法打开")
+                } else {
+                    val params = WxpDialogParams()
+                    params.title = "扫描成功"
+                    params.message = scanResult.data
+                    params.leftText = "关闭"
+                    params.leftBlock = {
+                        view?.onClosePage()
+                    }
+                    params.rightText = "打开"
+                    params.rightBlock = {
+                        view?.onClosePage()
+                        view?.onOpenWebPage(scanResult.data)
+                    }
+                    WxpDialogUtils.showDialog(params)
+                }
+            } else if (scanResult.type == WxpScanQrcodeResp.TypeOpenUrl) {
+                if (scanResult.data.isNullOrEmpty()) {
+                    view?.onClosePage()
+                    WxpToastUtils.showToast("返回数据错误，无法打开")
+                } else {
+                    view?.onClosePage()
+                    view?.onOpenWebPage(scanResult.data)
+                }
             } else {
                 val params = WxpDialogParams()
-                params.title = "扫描内容"
-                params.message = data
+                params.title = "扫描成功"
+                params.message = scanResult.data
                 params.leftText = "关闭"
                 params.leftBlock = {
                     view?.onClosePage()
                 }
                 params.rightText = "复制"
                 params.rightBlock = {
-                    view?.onCopy(data)
+                    view?.onCopy(scanResult.data ?: "")
                     view?.onClosePage()
                 }
                 WxpDialogUtils.showDialog(params)
