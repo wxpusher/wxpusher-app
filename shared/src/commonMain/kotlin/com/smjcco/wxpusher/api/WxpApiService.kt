@@ -9,6 +9,7 @@ import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
+import com.smjcco.wxpusher.page.scan.WxpScanQrcodeResp
 import io.ktor.client.call.NoTransformationFoundException
 import io.ktor.client.call.body
 import io.ktor.client.request.delete
@@ -207,5 +208,20 @@ object WxpApiService {
             return data.get("openId")
         }
         return null
+    }
+
+    /**
+     * 查询扫码结果
+     */
+    suspend fun getScanResult(data: String): WxpScanQrcodeResp? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .post(WxpNetworkService.getUrl("/api/need-login/device/scan")) {
+                    val body = mapOf("data" to data)
+                    setBody(body)
+                }
+                .body()
+        }
+        )
     }
 }

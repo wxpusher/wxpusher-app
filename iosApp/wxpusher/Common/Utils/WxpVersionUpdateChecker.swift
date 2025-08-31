@@ -76,13 +76,15 @@ class WxpVersionUpdateChecker {
     }
     
     private func showUpdateAlert(appStoreURL: String,releaseNote:String?) {
-        let parmas = WxpDialogParameter(title: "有新版本可用",
-                                        message: releaseNote ?? "请升级版本以获得最佳体验。",
-                                        leftText: "取消",
-                                        rightText: "更新") {
+        let dialogParams=WxpDialogParams()
+        dialogParams.title = "有新版本可用"
+        dialogParams.message = releaseNote ?? "请升级版本以获得最佳体验。"
+        dialogParams.leftText = "取消"
+        dialogParams.rightText = "更新"
+        dialogParams.rightBlock =  {
             self.openAppStore(appStoreURL: appStoreURL)
         }
-        WxpDialogUtils.showConfirmDialog(params: parmas)
+        WxpDialogUtils.showDialog(params: dialogParams)
         //保存弹窗，一天只提示一次更新
         WxpSaveService.shared.set(key: updateDateSaveKey, value___: WxpDateTimeUtils.shared.getDate())
     }

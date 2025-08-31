@@ -76,7 +76,7 @@ class WxpProfileViewController: UIViewController {
                             },
                 ProfileItem(title: "用户账号", subtitle: "退出登录",
                             accessoryType: .disclosureIndicator) {
-                                var params = WxpDialogParameter()
+                                var params = WxpDialogParams()
                                 params.title = "退出当前账号吗？"
                                 params.message = "退出后需要重新登录才可以接收消息"
                                 params.leftText = "取消"
@@ -84,7 +84,7 @@ class WxpProfileViewController: UIViewController {
                                 params.rightBlock = {
                                     WxpAppDataService.shared.logout()
                                 }
-                                WxpDialogUtils.showConfirmDialog(params: params)
+                                WxpDialogUtils.showDialog(params: params)
                                 
                             },
                 ProfileItem(title: "用户数据", subtitle: "注销手机号",
@@ -100,7 +100,7 @@ class WxpProfileViewController: UIViewController {
                     WxpPermissionUtils.requestNotificationPermission { success in
                         if(success){
                             WxpToastUtils.shared.showToast(msg: "你已经打开通知权限")
-                            var params = WxpDialogParameter()
+                            var params = WxpDialogParams()
                             params.title = "提醒方式设置"
                             params.message = "当前已经打开通知权限，你还可以设置锁屏显示、通知中心显示、横幅显示等，还可以设置通知的铃声。是否前往设置？"
                             params.leftText = "取消"
@@ -108,9 +108,9 @@ class WxpProfileViewController: UIViewController {
                             params.rightBlock = {
                                 WxpJumpPageUtils.openAppSettings()
                             }
-                            WxpDialogUtils.showConfirmDialog(params: params)
+                            WxpDialogUtils.showDialog(params: params)
                         }else{
-                            var params = WxpDialogParameter()
+                            var params = WxpDialogParams()
                             params.title = "异常提醒"
                             params.message = "WxPusher必须要推送权限才能正常工作，请在【设置-WxPusher消息推送平台-通知】打开相关开关"
                             params.leftText = "取消"
@@ -118,7 +118,7 @@ class WxpProfileViewController: UIViewController {
                             params.rightBlock = {
                                 WxpJumpPageUtils.openAppSettings()
                             }
-                            WxpDialogUtils.showConfirmDialog(params: params)
+                            WxpDialogUtils.showDialog(params: params)
                         }
                     }
                 },

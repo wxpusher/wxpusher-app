@@ -9,22 +9,13 @@ import UserNotifications
 import UIKit
 
 
-
-struct WxpDialogParameter{
-    var title: String?
-    var message: String?
-    var leftText: String?
-    var leftBlock: WxpBlockNoParamNoReturn?
-    var rightText: String?
-    var rightBlock: WxpBlockNoParamNoReturn?
-}
-
+/**
+ * 弹窗一个dialog，在swift中可以直接调用，也会在OC中调用，还可能在kt中通过OC的接口进行调用
+ */
 class WxpDialogUtils: NSObject{
     
-    /**
-     * 弹出confirm弹窗
-     */
-    public static func showConfirmDialog(params: WxpDialogParameter){
+    @objc
+    public static func showDialog(params: WxpDialogParams){
         let alert = UIAlertController(
             title: params.title,
             message: params.message,

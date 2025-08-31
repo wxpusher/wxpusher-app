@@ -61,11 +61,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
         print("[push]-didFailToRegisterForRemoteNotificationsWithError，error=%@", error)
-        var dialogParams=WxpDialogParameter()
+        var dialogParams=WxpDialogParams()
         dialogParams.title = "异常提醒"
         dialogParams.message = "设备注册苹果APNs服务失败，你收不到消息推送 ，原因如下\n\(error.localizedDescription)"
         dialogParams.rightText = "我知道了"
-        WxpDialogUtils.showConfirmDialog(params: dialogParams)
+        WxpDialogUtils.showDialog(params: dialogParams)
     }
    
 //    应用前台的时候，会收到消息， 但是不会弹窗提醒

@@ -5,6 +5,7 @@ import com.smjcco.wxpusher.base.WxpBaseInfoService
 import com.smjcco.wxpusher.base.WxpLogUtils
 import com.smjcco.wxpusher.base.WxpSaveService
 import com.smjcco.wxpusher.base.letOnNotEmpty
+import com.smjcco.wxpusher.base.runAtIOSuspend
 import com.smjcco.wxpusher.base.runAtMainSuspend
 import com.smjcco.wxpusher.biz.bean.WxpLoginInfo
 import com.smjcco.wxpusher.biz.bean.WxpPlatformEnum
@@ -101,6 +102,19 @@ object WxpAppDataService {
                 return@let null
             }
             return@let Json.decodeFromString(it)
+        }
+    }
+
+    fun saveOpenId(openId: String?) {
+        if (openId.isNullOrEmpty()) {
+            return
+        }
+        runAtIOSuspend {
+            val loginInfo = getLoginInfo()
+            loginInfo?.openId = openId
+            if (loginInfo != null) {
+                saveLoginInfo(loginInfo)
+            }
         }
     }
 

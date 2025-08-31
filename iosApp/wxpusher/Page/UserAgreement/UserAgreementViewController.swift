@@ -153,7 +153,7 @@ class UserAgreementViewController: WxpBaseUIViewController, UITextViewDelegate {
                 WxpSaveService.shared.set(key: WxpSaveKey.UserHasAgreement, value: true)
                 WxpJumpPageUtils.jumpToMain()
             }else{
-                var params = WxpDialogParameter()
+                var params = WxpDialogParams()
                 params.title = "异常提醒"
                 params.message = "WxPusher必须要推送权限才能正常工作，请在【设置-WxPusher消息推送平台-通知】打开相关开关"
                 params.leftText = "取消"
@@ -161,7 +161,7 @@ class UserAgreementViewController: WxpBaseUIViewController, UITextViewDelegate {
                 params.rightBlock = {
                     WxpJumpPageUtils.openAppSettings()
                 }
-                WxpDialogUtils.showConfirmDialog(params: params)
+                WxpDialogUtils.showDialog(params: params)
             }
         }
     }

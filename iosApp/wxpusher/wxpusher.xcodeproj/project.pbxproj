@@ -38,6 +38,7 @@
 		1A9C3E8D2DF5DA8600A25249 /* WxpBindPhoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E8A2DF5DA8600A25249 /* WxpBindPhoneViewController.swift */; };
 		1A9C3E922DF7352500A25249 /* UIButton+Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */; };
 		1A9C3E972DFE80E600A25249 /* WxpBaseMvpUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */; };
+		1ACFF6112E63190500608219 /* KtSwiftDialogUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 1ACFF6102E63190500608219 /* KtSwiftDialogUtils.m */; };
 		1ADEF6B02ACDC6D6002FEB57 /* WxPusher_MacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADEF6AF2ACDC6D6002FEB57 /* WxPusher_MacApp.swift */; };
 		986EF3A412E72E2E14454E8B /* libPods-WxPusher-Mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C69846B4E017B608DEE27FE0 /* libPods-WxPusher-Mac.a */; };
 		E8F4FFB984C6ECD1DE28A901 /* libPods-WxPusher-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C6789F00DFBD4BD46990F9 /* libPods-WxPusher-iOS.a */; };
@@ -81,6 +82,9 @@
 		1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBaseMvpUIViewController.swift; sourceTree = "<group>"; };
 		1AC210E12ACC584B008D86EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1AC210E32ACC5883008D86EA /* wxpusher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = wxpusher.entitlements; sourceTree = "<group>"; };
+		1ACFF60F2E63190500608219 /* KtSwiftDialogUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KtSwiftDialogUtils.h; sourceTree = "<group>"; };
+		1ACFF6102E63190500608219 /* KtSwiftDialogUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KtSwiftDialogUtils.m; sourceTree = "<group>"; };
+		1ACFF6142E64393B00608219 /* WxPusherBridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WxPusherBridgingHeader.h; sourceTree = "<group>"; };
 		1ADEF6AF2ACDC6D6002FEB57 /* WxPusher_MacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxPusher_MacApp.swift; sourceTree = "<group>"; };
 		1ADEF6B32ACDC6D9002FEB57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1ADEF6B62ACDC6D9002FEB57 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -196,6 +200,8 @@
 				1A4934652E19703400EA1C71 /* KtSwiftCommonParams.m */,
 				1A962E682E08611300C966A3 /* KtSwiftJumpPageUtils.h */,
 				1A962E662E08610200C966A3 /* KtSwiftJumpPageUtils.m */,
+				1ACFF60F2E63190500608219 /* KtSwiftDialogUtils.h */,
+				1ACFF6102E63190500608219 /* KtSwiftDialogUtils.m */,
 			);
 			path = KtSwiftBridge;
 			sourceTree = "<group>";
@@ -263,6 +269,7 @@
 		1AD0B1122AE7F9D500DABE06 /* WxPusher-iOS */ = {
 			isa = PBXGroup;
 			children = (
+				1ACFF6142E64393B00608219 /* WxPusherBridgingHeader.h */,
 				1A4715482AED3F500089D7A7 /* Info.plist */,
 				1A9C3E712DF5984900A25249 /* WxpAppDelegate.swift */,
 				1A9C3E722DF5984900A25249 /* WxpSceneDelegate.swift */,
@@ -477,6 +484,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1ACFF6112E63190500608219 /* KtSwiftDialogUtils.m in Sources */,
 				1A4934632E196C7900EA1C71 /* WxpProfileViewController.swift in Sources */,
 				1A49346A2E19FB8000EA1C71 /* WxpFooterLoadingView.swift in Sources */,
 				1A4934662E19714B00EA1C71 /* KtSwiftCommonParams.m in Sources */,
@@ -669,6 +677,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "WxPusher-iOS/WxPusherBridgingHeader.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
@@ -718,6 +727,7 @@
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OBJC_BRIDGING_HEADER = "WxPusher-iOS/WxPusherBridgingHeader.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};

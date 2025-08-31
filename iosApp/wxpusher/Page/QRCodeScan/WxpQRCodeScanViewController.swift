@@ -4,7 +4,7 @@ import Photos
 import Vision
 import shared
 
-class WxpQRCodeScanViewController: WxpBaseUIViewController {
+class WxpQRCodeScanViewController: WxpBaseMvpUIViewController<IWxpScanPresenter>,IWxpScanView {
     
     typealias Callback = (String) -> Void
     
@@ -94,6 +94,10 @@ class WxpQRCodeScanViewController: WxpBaseUIViewController {
         view.translatesAutoresizingMaskIntoConstraints = false
         return view
     }()
+    
+    override func createPresenter() -> Any? {
+        return WxpScanPresenter(view: self)
+    }
     
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -369,7 +373,7 @@ class WxpQRCodeScanViewController: WxpBaseUIViewController {
         let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
         impactFeedback.impactOccurred()
         
-        callback?(code)
+        presenter.scan(data: code)
     }
     
     // MARK: - Helper Methods
@@ -392,6 +396,20 @@ class WxpQRCodeScanViewController: WxpBaseUIViewController {
     
     private func showToast(_ message: String) {
         WxpToastUtils.shared.showToast(msg: message)
+    }
+    
+    // MARK: - MVP-VIEW
+    func onClosePage() {
+        self.navigationController?.popViewController(animated: false)
+    }
+    
+    func onCopy(data: String) {
+        UIPasteboard.general.string = data
+        WxpToastUtils.shared.showToast(msg: "复制成功")
+    }
+    
+    func onOpenWebPage(url: String) {
+        WxpJumpPageUtils.jumpToWebUrl(url: url)
     }
 }
 

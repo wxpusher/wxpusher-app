@@ -244,15 +244,15 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
             // 第一组：订阅相关
             // 订阅入口暂时不做
             UIMenu(title: "订阅管理", options: .displayInline, children: [
-//                UIAction(
-//                    title: "添加订阅",
-//                    image: UIImage(systemName: "plus.bubble"),
-//                    handler:{ [weak self]_ in
-//                        WxpJumpPageUtils.jumpToScan {[weak self] code in
-//                            self?.navigationController?.popViewController(animated: false)
-//                        }
-//                    }
-//                ),
+                UIAction(
+                    title: "扫码添加订阅",
+                    image: UIImage(systemName: "qrcode.viewfinder"),
+                    handler:{ [weak self]_ in
+                        WxpJumpPageUtils.jumpToScan {[weak self] code in
+                            self?.navigationController?.popViewController(animated: false)
+                        }
+                    }
+                ),
                 UIAction(
                     title: "订阅管理",
                     image: UIImage(systemName: "folder.badge.gearshape"),

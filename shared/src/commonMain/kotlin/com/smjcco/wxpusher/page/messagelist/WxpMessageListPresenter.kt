@@ -239,11 +239,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
                 if (openId == null || openId.isEmpty()) {
                     return@runAtMainSuspend
                 }
-                val loginInfo = WxpAppDataService.getLoginInfo()
-                loginInfo?.openId = openId
-                if (loginInfo != null) {
-                    WxpAppDataService.saveLoginInfo(loginInfo)
-                }
+                WxpAppDataService.saveOpenId(openId)
             }
             view?.onOpenSubscribeManagerPage("${WxpConfig.baseUrl}/wxuser/?openId=${openId}#/")
         }

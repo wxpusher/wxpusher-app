@@ -1,3 +1,3 @@
 package = platform.swift.com.smjcco.wxpusher
-headers = KtSwiftJumpPageUtils.h
+headers = KtSwiftJumpPageUtils.h KtSwiftDialogUtils.h
 language = Objective-C

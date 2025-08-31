@@ -579,8 +579,8 @@ extension WxpWebViewController: WKNavigationDelegate {
 
 extension WxpWebViewController: WKUIDelegate {
     func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping @MainActor () -> Void) {
-        let p = WxpDialogParameter(title: message,rightText: "我知道了")
-        WxpDialogUtils.showConfirmDialog(params: p)
+        let p = WxpDialogParams(title: message, rightText: "我知道了")
+        WxpDialogUtils.showDialog(params: p)
         completionHandler()
     }
 }

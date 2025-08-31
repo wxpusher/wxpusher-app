@@ -11,6 +11,13 @@ fun runAtMainSuspend(block: suspend () -> Unit) {
     }
 }
 
+fun runAtIOSuspend(block: suspend () -> Unit) {
+    WxpScopeUtils.getIoScopeScope().launch {
+        block()
+    }
+}
+
+
 object WxpScopeUtils {
     private val mainScope = CoroutineScope(Dispatchers.Main)
     private val ioScope = CoroutineScope(Dispatchers.IO)
