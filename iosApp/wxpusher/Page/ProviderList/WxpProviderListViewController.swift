@@ -22,11 +22,23 @@ class WxpProviderListViewController: WxpBaseMvpUIViewController<IWxpProviderList
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        title = "消息市场"
+        showOption()
         setupUI()
         presenter.loadPage()
     }
     
-    func setupUI(){
+    private func showOption(){
+        let button = UIBarButtonItem(
+            image: UIImage(systemName: "arrow.clockwise"),
+            style: .plain,
+            target: self,
+            action: #selector(loadPage)
+        )
+        navigationItem.rightBarButtonItem = button
+    }
+    
+    private func setupUI(){
         view.addSubview(webView)
         
         NSLayoutConstraint.activate([
@@ -44,6 +56,11 @@ class WxpProviderListViewController: WxpBaseMvpUIViewController<IWxpProviderList
     func onLoadPage(url: String) {
         let request = URLRequest(url: URL(string: url)!)
         webView.load(request)
+    }
+    
+    // MARK: - Page Action
+    @objc func loadPage() {
+        presenter.loadPage()
     }
     
     
