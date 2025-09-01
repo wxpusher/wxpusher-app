@@ -32,10 +32,16 @@ class MainTabBarController: UITabBarController {
     
     private func setupViewControllers() {
         let messageListVC = MessageListViewController()
+        let providerListVC = WxpProviderListViewController()
         let profileVC = WxpProfileViewController()
         // 创建导航控制器
         messageListVC.tabBarItem = UITabBarItem(
             title: "消息列表",
+            image: UIImage(systemName: "paperplane"),
+            selectedImage: UIImage(systemName: "paperplane.fill")
+        )
+        providerListVC.tabBarItem = UITabBarItem(
+            title: "消息市场",
             image: UIImage(systemName: "paperplane"),
             selectedImage: UIImage(systemName: "paperplane.fill")
         )
@@ -47,6 +53,7 @@ class MainTabBarController: UITabBarController {
         
         // 设置视图控制器数组
         let controllers = [UINavigationController(rootViewController: messageListVC),
+                           UINavigationController(rootViewController: providerListVC),
                            UINavigationController(rootViewController: profileVC)]
         
         self.viewControllers = controllers

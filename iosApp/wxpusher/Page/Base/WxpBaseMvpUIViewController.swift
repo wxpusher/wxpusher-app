@@ -32,6 +32,8 @@ class WxpBaseMvpUIViewController<P: IWxpBaseMvpPresenter>: UIViewController {
     }
     
     deinit {
-        presenter.onDestroy()
+        if(presenter != nil){
+            presenter.onDestroy()
+        }
     }
 }

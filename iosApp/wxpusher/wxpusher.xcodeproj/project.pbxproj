@@ -39,6 +39,7 @@
 		1A9C3E922DF7352500A25249 /* UIButton+Loading.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E912DF7351F00A25249 /* UIButton+Loading.swift */; };
 		1A9C3E972DFE80E600A25249 /* WxpBaseMvpUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */; };
 		1ACFF6112E63190500608219 /* KtSwiftDialogUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 1ACFF6102E63190500608219 /* KtSwiftDialogUtils.m */; };
+		1ACFF6172E65E74600608219 /* WxpProviderListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACFF6162E65E74600608219 /* WxpProviderListViewController.swift */; };
 		1ADEF6B02ACDC6D6002FEB57 /* WxPusher_MacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADEF6AF2ACDC6D6002FEB57 /* WxPusher_MacApp.swift */; };
 		986EF3A412E72E2E14454E8B /* libPods-WxPusher-Mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C69846B4E017B608DEE27FE0 /* libPods-WxPusher-Mac.a */; };
 		E8F4FFB984C6ECD1DE28A901 /* libPods-WxPusher-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C6789F00DFBD4BD46990F9 /* libPods-WxPusher-iOS.a */; };
@@ -85,6 +86,7 @@
 		1ACFF60F2E63190500608219 /* KtSwiftDialogUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KtSwiftDialogUtils.h; sourceTree = "<group>"; };
 		1ACFF6102E63190500608219 /* KtSwiftDialogUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KtSwiftDialogUtils.m; sourceTree = "<group>"; };
 		1ACFF6142E64393B00608219 /* WxPusherBridgingHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WxPusherBridgingHeader.h; sourceTree = "<group>"; };
+		1ACFF6162E65E74600608219 /* WxpProviderListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpProviderListViewController.swift; sourceTree = "<group>"; };
 		1ADEF6AF2ACDC6D6002FEB57 /* WxPusher_MacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxPusher_MacApp.swift; sourceTree = "<group>"; };
 		1ADEF6B32ACDC6D9002FEB57 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1ADEF6B62ACDC6D9002FEB57 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -122,6 +124,7 @@
 		1A447DF42DF53ECD005C402F /* Page */ = {
 			isa = PBXGroup;
 			children = (
+				1ACFF6152E65E72000608219 /* ProviderList */,
 				1A49347A2E3DC6CD00EA1C71 /* Main */,
 				1A4934792E3DC6AC00EA1C71 /* Base */,
 				1A4934612E196A4000EA1C71 /* Profile */,
@@ -264,6 +267,14 @@
 				1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */,
 			);
 			path = Utils;
+			sourceTree = "<group>";
+		};
+		1ACFF6152E65E72000608219 /* ProviderList */ = {
+			isa = PBXGroup;
+			children = (
+				1ACFF6162E65E74600608219 /* WxpProviderListViewController.swift */,
+			);
+			path = ProviderList;
 			sourceTree = "<group>";
 		};
 		1AD0B1122AE7F9D500DABE06 /* WxPusher-iOS */ = {
@@ -514,6 +525,7 @@
 				1A9C3E972DFE80E600A25249 /* WxpBaseMvpUIViewController.swift in Sources */,
 				1A962E712E0AFF9300C966A3 /* WxpPermissionUtils.swift in Sources */,
 				1A4934782E32393A00EA1C71 /* WxpQRCodeScanViewController.swift in Sources */,
+				1ACFF6172E65E74600608219 /* WxpProviderListViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
