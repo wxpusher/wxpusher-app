@@ -65,7 +65,7 @@ class MainTabBarController: UITabBarController {
     private func notificationPermissionRemind(){
         WxpPermissionUtils.requestNotificationPermission { success in
             if(!success){
-                var params = WxpDialogParams()
+                let params = WxpDialogParams()
                 params.title = "异常提醒"
                 params.message = "WxPusher必须要推送权限才能正常工作，请在【设置-WxPusher消息推送平台-通知】打开通知开关"
                 params.leftText = "取消"
