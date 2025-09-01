@@ -30,7 +30,7 @@ class WxpProviderListViewController: WxpBaseMvpUIViewController<IWxpProviderList
     
     private func showOption(){
         let button = UIBarButtonItem(
-            image: UIImage(systemName: "arrow.clockwise"),
+            image: UIImage(systemName: "arrow.triangle.2.circlepath"),
             style: .plain,
             target: self,
             action: #selector(loadPage)
