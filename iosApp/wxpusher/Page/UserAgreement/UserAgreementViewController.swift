@@ -144,19 +144,25 @@ class UserAgreementViewController: WxpBaseUIViewController, UITextViewDelegate {
         ])
         
     }
+    private func jumpToMain(){
+        WxpSaveService.shared.set(key: WxpSaveKey.UserHasAgreement, value: true)
+        WxpJumpPageUtils.jumpToMain()
+    }
     
     
     // MARK: - Actions
     @objc private func agreeTapped() {
-        WxpPermissionUtils.requestNotificationPermission { success in
+        WxpPermissionUtils.requestNotificationPermission {[weak self] success in
             if(success){
-                WxpSaveService.shared.set(key: WxpSaveKey.UserHasAgreement, value: true)
-                WxpJumpPageUtils.jumpToMain()
+                self?.jumpToMain()
             }else{
-                var params = WxpDialogParams()
+                let params = WxpDialogParams()
                 params.title = "异常提醒"
-                params.message = "WxPusher必须要推送权限才能正常工作，请在【设置-WxPusher消息推送平台-通知】打开相关开关"
+                params.message = "WxPusher必须要推送权限才能正常工作，你可以稍后在【设置-WxPusher消息推送平台-通知】中打开"
                 params.leftText = "取消"
+                params.leftBlock = {
+                    self?.jumpToMain()
+                }
                 params.rightText = "去设置"
                 params.rightBlock = {
                     WxpJumpPageUtils.openAppSettings()

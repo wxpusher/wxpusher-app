@@ -22,6 +22,7 @@ class MainTabBarController: UITabBarController {
         setupViewControllers()
 //        setupAppearance()
         notificationPermissionRemind()
+        setupListenBackToRegisterAPNs()
           
 //        self.delegate = self
         
@@ -76,6 +77,39 @@ class MainTabBarController: UITabBarController {
                 WxpDialogUtils.showDialog(params: params)
             }
         }
+    }
+    
+    private func setupListenBackToRegisterAPNs(){
+        //用户感知用户返回前台，检查是否打开了通知权限，如果已经打开，需要进行一次注册，才能获取到APNs token
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleAppActive),
+            name: UIApplication.didBecomeActiveNotification,
+            object: nil
+        )
+    }
+    
+    //感知app返回到前台了
+    @objc func handleAppActive() {
+        //没有pushToken，说明用户最开始可能没有给通知栏权限，每次打开app都会进行提醒，用户可能会打开通知权限，因此检查一次，进行注册
+        let pushToken = WxpAppDataService.shared.getPushToken()
+        if(pushToken == nil || pushToken!.isEmpty){
+            //当页面显示的时候，检查权限，进行一次APNs注册，避免去设置页面打开，回来以后，没有触发注册
+            UNUserNotificationCenter.current().getNotificationSettings { settings in
+                if settings.authorizationStatus == .authorized {
+                    DispatchQueue.main.async {
+                        UIApplication.shared.registerForRemoteNotifications()
+                    }
+                    return
+                }
+            }
+            print("在首页注册APNs")
+            return
+        }
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self)
     }
     
 //    private func setupAppearance() {
