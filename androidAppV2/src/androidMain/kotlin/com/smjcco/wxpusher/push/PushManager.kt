@@ -1,0 +1,109 @@
+package com.smjcco.wxpusher.push
+
+import android.app.Activity
+import android.app.Application
+import com.smjcco.wxpusher.api.DeviceApi
+import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.log.WxPusherLog
+import com.smjcco.wxpusher.push.honor.HonorPushUtils
+import com.smjcco.wxpusher.push.huawei.HuaweiPushUtils
+import com.smjcco.wxpusher.push.oppo.OppoPushUtils
+import com.smjcco.wxpusher.push.vivo.VIVOPushUtils
+import com.smjcco.wxpusher.push.ws.WsManager
+import com.smjcco.wxpusher.push.ws.WsUtils
+import com.smjcco.wxpusher.push.xiaomi.XiaomiUtils
+import com.smjcco.wxpusher.utils.AppDataUtils
+import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.utils.DeviceUtils
+
+/**
+ * 管理push的一堆事儿，对厂商和通道做抽象
+ */
+object PushManager {
+    private val TAG = "PushManager"
+
+    /**
+     * 初始化推送
+     */
+    fun init(application: Application) {
+        if (!ApplicationUtils.isMainProcess()) {
+            WxPusherLog.i(TAG, "非主进程，不初始化")
+            return
+        }
+
+        val platform = DeviceUtils.getPlatform()
+        if (platform == DevicePlatform.Android_XIAOMI) {
+            WxPusherLog.i(TAG, "初始化小米推送")
+            XiaomiUtils.init(application)
+        } else if (platform == DevicePlatform.Android_VIVO) {
+            WxPusherLog.i(TAG, "初始化VIVO推送")
+            VIVOPushUtils.init(ApplicationUtils.application)
+        } else if (platform == DevicePlatform.Android_HONOR) {
+            WxPusherLog.i(TAG, "初始化荣耀推送")
+            HonorPushUtils.init(application)
+        } else if (platform == DevicePlatform.Android_HUAWEI) {
+            WxPusherLog.i(TAG, "初始化华为推送")
+            HuaweiPushUtils.init(application)
+        } else if (platform == DevicePlatform.Android_OPPO) {
+            WxPusherLog.i(TAG, "初始化OPPO推送")
+            OppoPushUtils.init(application)
+        } else {
+            WxPusherLog.i(TAG, "初始化自建长链接")
+            WsManager.init()
+        }
+
+    }
+
+    /**
+     * 当获取pushtoken失败的时候回调
+     */
+    fun onGetPushTokenFail(platform: DevicePlatform) {
+        if (platform != DevicePlatform.Android) {
+            WxPusherLog.i(TAG, "获取厂商pushToken失败，初始化自建长链接")
+            WsManager.init()
+        }
+    }
+
+    /**
+     * 当获取到推动token的时候，管理token的上报，更新
+     */
+    fun onGetPushToken(token: String, platform: DevicePlatform) {
+        WxPusherLog.i(TAG, "收到设备token，platform=${platform}, token=${token}")
+        AppDataUtils.savePushToken(token)
+        DeviceApi.updateDeviceInfoAsync(platform)
+    }
+
+    /**
+     * 显示打开通知提醒的弹窗
+     */
+    fun showOpenNoteRemindSettingDialog(activity: Activity) {
+        if (AppDataUtils.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
+            return
+        }
+        if (AppDataUtils.getPushToken().isNullOrEmpty()) {
+            return
+        }
+        val platform = DeviceUtils.getPlatform()
+        if (platform == DevicePlatform.Android_XIAOMI) {
+            XiaomiUtils.showSettingGuide(activity)
+        } else if (platform == DevicePlatform.Android_VIVO) {
+            CommonUtils.showSettingGuide(activity)
+        } else if (platform == DevicePlatform.Android_HONOR) {
+            CommonUtils.showSettingGuide(activity)
+        } else if (platform == DevicePlatform.Android_HUAWEI) {
+            CommonUtils.showSettingGuide(activity)
+        } else if (platform == DevicePlatform.Android_OPPO) {
+            CommonUtils.showSettingGuide(activity)
+        } else {
+            WsUtils.showSettingGuide(activity)
+        }
+    }
+
+    fun getGuidePageUrl(): String {
+        val platform = DeviceUtils.getPlatform()
+        return "https://wxpusher.zjiecode.com/docs/open-app-note/index.html?brand=%s".format(
+            platform.getPlatform()
+        )
+    }
+
+}
