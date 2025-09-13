@@ -206,7 +206,7 @@ class CheckActivity : ComponentActivity() {
 
 
     private fun openBatteryOptimizationSettings() {
-        val manufacturer = Build.MANUFACTURER.toLowerCase()
+        val manufacturer = Build.MANUFACTURER.lowercase()
 
         try {
             val intent = Intent()

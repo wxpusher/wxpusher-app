@@ -4,6 +4,7 @@ import android.os.Build
 import com.heytap.msp.push.HeytapPushManager
 import com.hihonor.push.sdk.HonorPushClient
 import com.huawei.hms.api.HuaweiApiAvailability
+import com.smjcco.wxpusher.base.ApplicationUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.log.WxPusherLog

@@ -63,10 +63,7 @@ class WebViewActivity : ComponentActivity() {
         initWebView()
         requestPermission()
         checkUpdate()
-        WxPusherUtils.getIoScopeScope().launch {
-            val resp = Greeting().greeting()
-            Log.d(TAG, "onCreate() called,resp=" + resp)
-        }
+
     }
 
     /**

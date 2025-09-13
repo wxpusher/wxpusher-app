@@ -128,6 +128,14 @@ dependencies {
         include("*.jar")
         include("*.aar")
     })
-    implementation(libs.androidx.core)
+//    implementation(libs.androidx.core)
+    // AndroidX, The Basics
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("androidx.core:core-ktx:1.10.1")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.activity:activity-ktx:1.7.1")
+    implementation("androidx.fragment:fragment-ktx:1.5.7")
+    implementation("androidx.work:work-runtime-ktx:2.8.1")
+    implementation("androidx.preference:preference-ktx:1.2.0")
 }
 

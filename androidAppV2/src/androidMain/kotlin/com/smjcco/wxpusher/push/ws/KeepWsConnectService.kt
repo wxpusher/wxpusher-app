@@ -9,9 +9,9 @@ import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
+import com.smjcco.wxpusher.base.ApplicationUtils
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.page.WebViewActivity
-import com.smjcco.wxpusher.utils.ApplicationUtils
 
 class KeepWsConnectService : Service() {
     val TAG = "KeepWsConnectService"

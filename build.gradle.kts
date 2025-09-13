@@ -1,7 +1,7 @@
 buildscript {
     dependencies {
 
-        classpath("com.android.tools.build:gradle:8.5.2")
+        classpath("com.android.tools.build:gradle:8.6.0")
         //荣耀AGP插件
         classpath("com.hihonor.mcs:asplugin:2.0.1.300")
         //华为AGP插件
