@@ -6,12 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.smjcco.wxpusher.R
+import com.smjcco.wxpusher.kmp.base.WxpBaseFragment
 
 /**
  * 个人中心Fragment
  * 对应iOS中的WxpProfileViewController
  */
-class ProfileFragment : Fragment() {
+class ProfileFragment : WxpBaseFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
