@@ -3,7 +3,7 @@ package com.smjcco.wxpusher.kmp.app
 import android.content.Intent
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.biz.IWxpAppPageService
-import com.smjcco.wxpusher.kmp.login.WxpLoginActivity
+import com.smjcco.wxpusher.kmp.page.login.WxpLoginActivity
 
 class WxpAppPageServiceImpl : IWxpAppPageService {
 

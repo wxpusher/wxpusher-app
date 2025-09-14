@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.kmp.main.fragment
+package com.smjcco.wxpusher.kmp.page.main.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater

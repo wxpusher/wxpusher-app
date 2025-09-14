@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.kmp.bind
+package com.smjcco.wxpusher.kmp.page.bind
 
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -6,11 +6,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.ProgressBar
 import androidx.appcompat.widget.AppCompatTextView
+import com.google.android.material.button.MaterialButton
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseMvpActivity
-import com.smjcco.wxpusher.kmp.main.WxpMainActivity
+import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
 import com.smjcco.wxpusher.page.bind.IWxpBindView
 import com.smjcco.wxpusher.page.bind.WxpBindPresenter
 
@@ -32,9 +34,9 @@ class WxpBindActivity : WxpBaseMvpActivity<WxpBindPresenter>(), IWxpBindView {
     }
     
     private lateinit var codeTextField: AppCompatTextView
-    private lateinit var copyButton: com.google.android.material.button.MaterialButton
-    private lateinit var checkStatusButton: com.google.android.material.button.MaterialButton
-    private lateinit var loadingIndicator: android.widget.ProgressBar
+    private lateinit var copyButton: MaterialButton
+    private lateinit var checkStatusButton: MaterialButton
+    private lateinit var loadingIndicator: ProgressBar
     
     private var phone: String = ""
     private var code: String = ""
@@ -80,7 +82,7 @@ class WxpBindActivity : WxpBaseMvpActivity<WxpBindPresenter>(), IWxpBindView {
     }
     
     private fun copyCodeToClipboard() {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("绑定码", phoneVerifyCode)
         clipboard.setPrimaryClip(clip)
         WxpToastUtils.showToast(getString(R.string.bind_copy_success))

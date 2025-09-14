@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.kmp.main
+package com.smjcco.wxpusher.kmp.page.main
 
 import android.content.Intent
 import android.os.Bundle
@@ -14,9 +14,9 @@ import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.kmp.base.WxpBaseActivity
 import com.smjcco.wxpusher.kmp.common.WxpSaveKey
-import com.smjcco.wxpusher.kmp.login.WxpLoginActivity
-import com.smjcco.wxpusher.kmp.main.fragment.MessageListFragment
-import com.smjcco.wxpusher.kmp.main.fragment.ProfileFragment
+import com.smjcco.wxpusher.kmp.page.login.WxpLoginActivity
+import com.smjcco.wxpusher.kmp.page.main.fragment.MessageListFragment
+import com.smjcco.wxpusher.kmp.page.main.fragment.ProfileFragment
 
 /**
  * app首页 - 使用ViewPager2 + TabLayout实现Tab切换
@@ -96,19 +96,18 @@ class WxpMainActivity : WxpBaseActivity() {
 
         // 监听Tab切换，更新Toolbar标题
         tabLayout.addOnTabSelectedListener(object :
-            com.google.android.material.tabs
-                .TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
+            TabLayout.OnTabSelectedListener {
+            override fun onTabSelected(tab: TabLayout.Tab?) {
                 tab?.let {
                     title = it.text
                 }
             }
 
-            override fun onTabUnselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
+            override fun onTabUnselected(tab: TabLayout.Tab?) {
                 // 不需要处理
             }
 
-            override fun onTabReselected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
+            override fun onTabReselected(tab: TabLayout.Tab?) {
                 // 不需要处理
             }
         })

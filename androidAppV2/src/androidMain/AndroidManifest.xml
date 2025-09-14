@@ -25,7 +25,7 @@
         tools:remove="android:networkSecurityConfig">
 
         <activity
-            android:name=".kmp.main.WxpMainActivity"
+            android:name=".kmp.page.main.WxpMainActivity"
             android:configChanges="uiMode"
             android:exported="true"
             android:launchMode="singleTask">
@@ -96,12 +96,12 @@
         </activity>
 
         <activity
-            android:name=".kmp.login.WxpLoginActivity"
+            android:name=".kmp.page.login.WxpLoginActivity"
             android:exported="false"
             android:launchMode="singleTask" />
 
         <activity
-            android:name=".kmp.bind.WxpBindActivity"
+            android:name=".kmp.page.bind.WxpBindActivity"
             android:exported="false"
             android:launchMode="singleTask" />
 

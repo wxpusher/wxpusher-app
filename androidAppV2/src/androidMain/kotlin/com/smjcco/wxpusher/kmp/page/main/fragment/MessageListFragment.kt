@@ -1,6 +1,7 @@
-package com.smjcco.wxpusher.kmp.main.fragment
+package com.smjcco.wxpusher.kmp.page.main.fragment
 
 import android.content.Context
+import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -30,6 +31,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.TextView.OnEditorActionListener
+import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
 
 /**
  * 消息列表Fragment
@@ -115,9 +117,9 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         refreshLayout.setOnRefreshListener(object : OnRefreshListener {
             override fun onRefresh(refreshLayout: RefreshLayout) {
                 val scene = if (openAppFirstRefresh) {
-                    com.smjcco.wxpusher.page.messagelist.WxpMessageListReq.SceneAutoRefresh
+                    WxpMessageListReq.SceneAutoRefresh
                 } else {
-                    com.smjcco.wxpusher.page.messagelist.WxpMessageListReq.SceneManual
+                    WxpMessageListReq.SceneManual
                 }
                 presenter.refresh(scene)
                 // 刷新一次以后，就不再是打开app第一次刷新了
@@ -187,7 +189,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         // 震动反馈
         val vibrator = context?.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
         vibrator?.let {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 it.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
             } else {
                 @Suppress("DEPRECATION")

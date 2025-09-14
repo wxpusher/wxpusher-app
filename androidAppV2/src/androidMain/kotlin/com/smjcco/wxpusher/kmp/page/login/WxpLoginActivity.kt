@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.kmp.login
+package com.smjcco.wxpusher.kmp.page.login
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,12 +8,16 @@ import android.text.method.LinkMovementMethod
 import android.text.style.ClickableSpan
 import android.text.style.ForegroundColorSpan
 import android.view.View
+import android.widget.TextView
 import androidx.core.content.ContextCompat
+import com.google.android.material.button.MaterialButton
+import com.google.android.material.checkbox.MaterialCheckBox
+import com.google.android.material.textfield.TextInputEditText
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseMvpActivity
-import com.smjcco.wxpusher.kmp.bind.WxpBindActivity
-import com.smjcco.wxpusher.kmp.main.WxpMainActivity
+import com.smjcco.wxpusher.kmp.page.bind.WxpBindActivity
+import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
 import com.smjcco.wxpusher.page.login.IWxpLoginPresenter
 import com.smjcco.wxpusher.page.login.IWxpLoginView
 import com.smjcco.wxpusher.page.login.WxpLoginPresenter
@@ -21,12 +25,12 @@ import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 
 class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView {
 
-    private lateinit var phoneTextField: com.google.android.material.textfield.TextInputEditText
-    private lateinit var codeTextField: com.google.android.material.textfield.TextInputEditText
-    private lateinit var getCodeButton: com.google.android.material.button.MaterialButton
-    private lateinit var loginButton: com.google.android.material.button.MaterialButton
-    private lateinit var privacyCheckbox: com.google.android.material.checkbox.MaterialCheckBox
-    private lateinit var privacyLabel: android.widget.TextView
+    private lateinit var phoneTextField: TextInputEditText
+    private lateinit var codeTextField: TextInputEditText
+    private lateinit var getCodeButton: MaterialButton
+    private lateinit var loginButton: MaterialButton
+    private lateinit var privacyCheckbox: MaterialCheckBox
+    private lateinit var privacyLabel: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
