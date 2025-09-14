@@ -77,8 +77,7 @@ class WxpMainActivity : WxpBaseActivity() {
     }
 
     private fun setupViewPager() {
-        val adapter = MainPagerAdapter(this)
-        viewPager.adapter = adapter
+        viewPager.adapter = MainPagerAdapter(this)
 
         // 连接TabLayout和ViewPager2
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
@@ -97,7 +96,8 @@ class WxpMainActivity : WxpBaseActivity() {
 
         // 监听Tab切换，更新Toolbar标题
         tabLayout.addOnTabSelectedListener(object :
-            com.google.android.material.tabs.TabLayout.OnTabSelectedListener {
+            com.google.android.material.tabs
+                .TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: com.google.android.material.tabs.TabLayout.Tab?) {
                 tab?.let {
                     title = it.text

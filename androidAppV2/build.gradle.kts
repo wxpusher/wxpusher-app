@@ -46,6 +46,10 @@ kotlin {
             //华为推送
             implementation(libs.huawei.push)
             implementation("com.hihonor.mcs:push:8.0.12.307")
+            //SmartRefreshLayout下拉刷新
+            implementation("io.github.scwang90:refresh-layout-kernel:2.1.0")
+            implementation("io.github.scwang90:refresh-header-classics:2.1.0")
+            implementation("io.github.scwang90:refresh-footer-classics:2.1.0")
         }
         commonMain.dependencies {
             implementation(libs.androidx.lifecycle.viewmodel)
@@ -137,5 +141,10 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.5.7")
     implementation("androidx.work:work-runtime-ktx:2.8.1")
     implementation("androidx.preference:preference-ktx:1.2.0")
+    //SmartRefreshLayout
+    implementation("io.github.scwang90:refresh-layout-kernel:3.0.0-alpha")
+//核心必须依赖
+    implementation("io.github.scwang90:refresh-header-classics:3.0.0-alpha")
+//经典刷新头
 }
 

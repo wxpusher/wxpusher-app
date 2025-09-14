@@ -1,15 +1,24 @@
 package com.smjcco.wxpusher.kmp.main.fragment
 
+import android.content.Context
 import android.os.Bundle
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
+import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.scwang.smart.refresh.footer.ClassicsFooter
+import com.scwang.smart.refresh.header.ClassicsHeader
+import com.scwang.smart.refresh.layout.SmartRefreshLayout
+import com.scwang.smart.refresh.layout.api.RefreshLayout
+import com.scwang.smart.refresh.layout.listener.OnRefreshListener
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.kmp.base.WxpBaseFragment
+import com.smjcco.wxpusher.base.common.WxpDateTimeUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseMvpFragment
+import com.smjcco.wxpusher.page.WebDetailActivity
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListView
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
@@ -21,8 +30,13 @@ import com.smjcco.wxpusher.page.messagelist.WxpMessageListPresenter
  */
 class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxpMessageListView {
 
+    private lateinit var refreshLayout: SmartRefreshLayout
     private lateinit var recyclerView: RecyclerView
+    private lateinit var emptyText: TextView
     private lateinit var adapter: MessageListAdapter
+
+    private var messageList = mutableListOf<WxpMessageListMessage>()
+    private var openAppFirstRefresh = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -35,51 +49,120 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
+        setupRefreshLayout()
         setupRecyclerView()
         presenter.init()
+        //打开就刷新一次
+        refreshLayout.autoRefresh()
     }
 
     private fun initViews(view: View) {
+        refreshLayout = view.findViewById(R.id.refresh_layout)
         recyclerView = view.findViewById(R.id.recycler_view)
+        emptyText = view.findViewById(R.id.empty_text)
+    }
+
+    private fun setupRefreshLayout() {
+        // 设置下拉刷新监听器
+        refreshLayout.setOnRefreshListener(object : OnRefreshListener {
+            override fun onRefresh(refreshLayout: RefreshLayout) {
+                val scene = if (openAppFirstRefresh) {
+                    com.smjcco.wxpusher.page.messagelist.WxpMessageListReq.SceneAutoRefresh
+                } else {
+                    com.smjcco.wxpusher.page.messagelist.WxpMessageListReq.SceneManual
+                }
+                presenter.refresh(scene)
+                // 刷新一次以后，就不再是打开app第一次刷新了
+                openAppFirstRefresh = false
+            }
+        })
+
+        // 设置刷新头
+        val refreshHeader = ClassicsHeader(context)
+        refreshHeader.setLastUpdateText(presenter.getTipsOfLastRefreshTime())
+
+        refreshLayout.setRefreshHeader(refreshHeader)
+
+        // 设置刷新尾（用于加载更多）
+        val refreshFooter = ClassicsFooter(context)
+        refreshLayout.setRefreshFooter(refreshFooter)
+
+        // 设置加载更多监听器
+        refreshLayout.setOnLoadMoreListener { refreshLayout ->
+            presenter.loadMore()
+        }
     }
 
     private fun setupRecyclerView() {
-        adapter = MessageListAdapter()
+        adapter = MessageListAdapter { message ->
+            // 点击消息项，打开网页
+            val urlString = message.url.trim()
+            if (urlString.isNotEmpty()) {
+                WebDetailActivity.openUrl(requireActivity(), urlString)
+                // 标记消息为已读
+                message.read = true
+                adapter.notifyDataSetChanged()
+            }
+        }
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
     }
 
     override fun showMessageRefreshing(refreshing: Boolean) {
-        TODO("Not yet implemented")
+        if (!refreshing) {
+            refreshLayout.finishRefresh()
+            loadDataFinish()
+        }
     }
 
     override fun showMessageMoreLoading(loading: Boolean, hasMore: Boolean) {
-        TODO("Not yet implemented")
+        if (!loading) {
+            refreshLayout.finishLoadMore()
+        }
+        // 如果没有更多数据，禁用加载更多
+        refreshLayout.setNoMoreData(!hasMore)
     }
 
     override fun onMessageList(data: List<WxpMessageListMessage>) {
-        TODO("Not yet implemented")
+        messageList.clear()
+        messageList.addAll(data)
+        adapter.notifyDataSetChanged()
+        loadDataFinish()
     }
 
     override fun onFeedback() {
-        TODO("Not yet implemented")
+        // 震动反馈
+        val vibrator = context?.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        vibrator?.let {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                it.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else {
+                @Suppress("DEPRECATION")
+                it.vibrate(50)
+            }
+        }
     }
 
     override fun onOpenSubscribeManagerPage(url: String) {
-        TODO("Not yet implemented")
+        WebDetailActivity.openUrl(requireActivity(), url)
     }
 
     override fun createPresenter(): IWxpMessageListPresenter {
         return WxpMessageListPresenter(this)
     }
 
+    private fun loadDataFinish() {
+        refreshLayout.finishRefresh()
+        // 显示/隐藏空状态
+        emptyText.visibility = if (messageList.isEmpty()) View.VISIBLE else View.GONE
+    }
 
     /**
      * 消息列表适配器
      */
-    private inner class MessageListAdapter : RecyclerView.Adapter<MessageListAdapter.ViewHolder>() {
-
-        private val messages = mutableListOf<String>() // TODO: 替换为实际的消息数据模型
+    private inner class MessageListAdapter(
+        private val onItemClick: (WxpMessageListMessage) -> Unit
+    ) : RecyclerView.Adapter<MessageListAdapter.ViewHolder>() {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
@@ -88,15 +171,41 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-            // TODO: 绑定消息数据
-            holder.bind(messages[position])
+            holder.bind(messageList[position])
         }
 
-        override fun getItemCount(): Int = messages.size
+        override fun getItemCount(): Int = messageList.size
 
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-            fun bind(message: String) {
-                // TODO: 绑定消息数据到视图
+            private val unreadDot: View = itemView.findViewById(R.id.unread_dot)
+            private val messageTitle: TextView = itemView.findViewById(R.id.message_title)
+            private val linkIcon: View = itemView.findViewById(R.id.link_icon)
+            private val sourceLabel: TextView = itemView.findViewById(R.id.source_label)
+            private val dateLabel: TextView = itemView.findViewById(R.id.date_label)
+
+            fun bind(message: WxpMessageListMessage) {
+                messageTitle.text = message.summary
+                sourceLabel.text = "来源: ${message.name ?: "未知"}"
+                dateLabel.text = WxpDateTimeUtils.formatDateTime(message.createTime)
+
+                // 设置未读状态
+                unreadDot.visibility = if (message.read) View.GONE else View.VISIBLE
+
+                // 设置链接图标
+                val sourceUrl = message.sourceUrl?.trim() ?: ""
+                val showLink = sourceUrl.isNotEmpty()
+                linkIcon.visibility = if (showLink) View.VISIBLE else View.GONE
+
+                if (showLink) {
+                    linkIcon.setOnClickListener {
+//                        WebDetailActivity.openUrl(itemView.context, sourceUrl)
+                    }
+                }
+
+                // 设置点击事件
+                itemView.setOnClickListener {
+                    onItemClick(message)
+                }
             }
         }
     }
