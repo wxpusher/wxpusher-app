@@ -8,7 +8,12 @@ import android.os.Vibrator
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.TextView.OnEditorActionListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.scwang.smart.refresh.footer.ClassicsFooter
@@ -19,19 +24,11 @@ import com.scwang.smart.refresh.layout.listener.OnRefreshListener
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.WxpDateTimeUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseMvpFragment
-import com.smjcco.wxpusher.page.WebDetailActivity
+import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListView
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListPresenter
-import android.widget.EditText
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
-import android.widget.Button
-import android.widget.TextView.OnEditorActionListener
-import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
 
 /**
