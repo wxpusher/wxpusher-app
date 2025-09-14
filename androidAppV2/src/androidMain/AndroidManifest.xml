@@ -105,6 +105,10 @@
             android:exported="false"
             android:launchMode="singleTask" />
 
+        <activity
+            android:name=".kmp.page.web.WxpWebViewActivity"
+            android:exported="true" />
+
 
         <!-- 华为推送-->
         <service

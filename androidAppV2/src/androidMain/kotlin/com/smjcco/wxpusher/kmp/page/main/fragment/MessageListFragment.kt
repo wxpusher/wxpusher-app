@@ -31,6 +31,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.TextView.OnEditorActionListener
+import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
 
 /**
@@ -102,7 +103,8 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                 val key = searchEditText.text.toString()
                 presenter.searchIfChanged(key)
                 // 隐藏键盘
-                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                val imm =
+                    context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
                 imm?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
                 searchEditText.clearFocus()
                 return@OnEditorActionListener true
@@ -154,7 +156,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         // 点击消息项，打开网页
         val urlString = message.url.trim()
         if (urlString.isNotEmpty()) {
-            WebDetailActivity.openUrl(requireActivity(), urlString)
+            WxpWebViewActivity.start(requireActivity(), urlString)
             // 标记消息为已读
             message.read = true
             adapter.notifyDataSetChanged()
@@ -199,7 +201,9 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     }
 
     override fun onOpenSubscribeManagerPage(url: String) {
-        WebDetailActivity.openUrl(requireActivity(), url)
+        activity?.let {
+            WxpWebViewActivity.start(it, url)
+        }
     }
 
     override fun createPresenter(): IWxpMessageListPresenter {
@@ -239,7 +243,8 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
             private val dateLabel: TextView = itemView.findViewById(R.id.date_label)
 
             fun bind(message: WxpMessageListMessage) {
-                messageTitle.text = message.summary+ message.summary+ message.summary+message.summary+ message.summary+ message.summary
+                messageTitle.text =
+                    message.summary + message.summary + message.summary + message.summary + message.summary + message.summary
                 sourceLabel.text = "来源: ${message.name ?: "未知"}"
                 dateLabel.text = WxpDateTimeUtils.formatDateTime(message.createTime)
 
