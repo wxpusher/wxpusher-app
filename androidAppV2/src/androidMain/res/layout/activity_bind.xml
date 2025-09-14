@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/page_bg_fit_theme"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingTop="20dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="20dp">
+
+        <!-- 描述文本 -->
+        <TextView
+            android:id="@+id/description_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:lineSpacingExtra="4dp"
+            android:text="@string/bind_description"
+            android:textColor="@color/text_fit_theme"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- 第一步标题 -->
+        <LinearLayout
+            android:id="@+id/step_one_title_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/description_label">
+
+            <View
+                android:layout_width="5dp"
+                android:layout_height="20dp"
+                android:background="@color/AccentColor" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/bind_step_one_title"
+                android:textColor="@color/AccentColor"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- 复制绑定码说明 -->
+        <TextView
+            android:id="@+id/copy_code_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/bind_copy_code_desc"
+            android:textColor="@color/text_fit_theme"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/step_one_title_view" />
+
+        <!-- 绑定码输入框和复制按钮 -->
+        <LinearLayout
+            android:id="@+id/code_input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/copy_code_label">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/code_text_field"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="16dp"
+                android:layout_weight="1"
+                android:background="@drawable/input_field_background"
+                android:ellipsize="middle"
+                android:enabled="false"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textColor="@color/text_fit_theme"
+                android:textSize="16sp"
+                tools:text="BIND_XXX" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/copy_button"
+                android:layout_width="wrap_content"
+                android:layout_height="45dp"
+                android:layout_gravity="center_vertical"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/bind_copy_button"
+                android:textColor="@color/white"
+                app:backgroundTint="@color/AccentColor"
+                app:cornerRadius="4dp" />
+
+        </LinearLayout>
+
+        <!-- 第二步标题 -->
+        <LinearLayout
+            android:id="@+id/step_two_title_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/code_input_layout">
+
+            <View
+                android:layout_width="5dp"
+                android:layout_height="20dp"
+                android:background="@color/AccentColor" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/bind_step_two_title"
+                android:textColor="@color/AccentColor"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- 第二步说明 -->
+        <TextView
+            android:id="@+id/step_two_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:lineSpacingExtra="4dp"
+            android:text="@string/bind_step_two_desc"
+            android:textColor="@color/text_fit_theme"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/step_two_title_view" />
+
+        <!-- 第三步标题 -->
+        <LinearLayout
+            android:id="@+id/step_three_title_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/step_two_label">
+
+            <View
+                android:layout_width="5dp"
+                android:layout_height="20dp"
+                android:background="@color/AccentColor" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="@string/bind_step_three_title"
+                android:textColor="@color/AccentColor"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- 第三步说明 -->
+        <TextView
+            android:id="@+id/step_three_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:lineSpacingExtra="4dp"
+            android:text="@string/bind_step_three_desc"
+            android:textColor="@color/text_fit_theme"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/step_three_title_view" />
+
+        <!-- 查询绑定状态按钮容器 -->
+        <FrameLayout
+            android:id="@+id/check_status_button_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/step_three_label">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/check_status_button"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                android:text="@string/bind_check_status_button"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                app:backgroundTint="@color/AccentColor"
+                app:cornerRadius="4dp" />
+
+            <ProgressBar
+                android:id="@+id/loading_indicator"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/white"
+                android:visibility="gone" />
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

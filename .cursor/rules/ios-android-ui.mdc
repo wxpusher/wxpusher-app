@@ -1,0 +1,6 @@
+---
+alwaysApply: false
+description:本规则用于描述，把iOS的UI转成Android的UI需要注意的一些内容
+---
+当用户请求，把iOS的UI转成Android UI的时候，请你先仔细阅读用户给出的ISO的UI的实现，弄清楚iOS的UI是如何布局的，显示出来是什么样子。然后使用Android的Android官方推荐的material的相关设计，来重新实现相同或者类似的效果，不需要按照iOS的UI 1比1对应实现，转换的Android UI只需要实现iOS一样的功能，同时要符合Android的设计理念和规范。
+

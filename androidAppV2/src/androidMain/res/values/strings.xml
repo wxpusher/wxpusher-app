@@ -44,4 +44,18 @@
     <string name="login_agree_privacy_first">请先同意用户和隐私协议</string>
     <string name="login_sending">发送中…</string>
     <string name="login_jump_privacy">跳转到隐私协议页面</string>
+    
+    <!-- 绑定页面 -->
+    <string name="bind_page_title">UID绑定</string>
+    <string name="bind_description">你好，你的手机号没有注册,你需要先和已经存在的UID绑定才可以接收消息，绑定方式如下：</string>
+    <string name="bind_step_one_title">第一步</string>
+    <string name="bind_step_two_title">第二步</string>
+    <string name="bind_step_three_title">第三步</string>
+    <string name="bind_copy_code_desc">复制下面的绑定码</string>
+    <string name="bind_code_hint">绑定码</string>
+    <string name="bind_copy_button">复制绑定码</string>
+    <string name="bind_step_two_desc">关注微信公众号WxPusher，将复制的绑定码发给公众号</string>
+    <string name="bind_step_three_desc">发送绑定码后，请点击下面的按钮，查询绑定状态</string>
+    <string name="bind_check_status_button">查询绑定状态</string>
+    <string name="bind_copy_success">复制成功</string>
 </resources>

@@ -11,6 +11,8 @@
 
     <color name="text_fit_theme_first">#FFFFFF</color>
     <color name="bg_fit_theme_first">#121212</color>
-
+    
+    <!-- 输入框背景颜色 -->
+    <color name="input_field_bg">#2A2A2A</color>
 
 </resources> 

@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseMvpActivity
+import com.smjcco.wxpusher.kmp.bind.WxpBindActivity
 import com.smjcco.wxpusher.kmp.main.WxpMainActivity
 import com.smjcco.wxpusher.page.login.IWxpLoginPresenter
 import com.smjcco.wxpusher.page.login.IWxpLoginView
@@ -101,6 +102,7 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
 
     private fun jumpToPrivacy() {
         // TODO: 实现跳转到隐私协议页面
+        WxpBindActivity.start(this, "13002899981", "110120", "BIND_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
     }
 
     override fun createPresenter(): IWxpLoginPresenter {

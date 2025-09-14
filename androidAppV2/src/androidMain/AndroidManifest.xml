@@ -100,6 +100,11 @@
             android:exported="false"
             android:launchMode="singleTask" />
 
+        <activity
+            android:name=".kmp.bind.WxpBindActivity"
+            android:exported="false"
+            android:launchMode="singleTask" />
+
 
         <!-- 华为推送-->
         <service
