@@ -23,6 +23,13 @@ import com.smjcco.wxpusher.page.messagelist.IWxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListView
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListPresenter
+import android.widget.EditText
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
+import android.widget.Button
+import android.widget.TextView.OnEditorActionListener
 
 /**
  * 消息列表Fragment
@@ -34,6 +41,9 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyText: TextView
     private lateinit var adapter: MessageListAdapter
+    private lateinit var searchEditText: EditText
+    private lateinit var searchCancelBtn: TextView
+    private lateinit var searchBarContainer: LinearLayout
 
     private var messageList = mutableListOf<WxpMessageListMessage>()
     private var openAppFirstRefresh = true
@@ -64,6 +74,39 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         refreshLayout = view.findViewById(R.id.refresh_layout)
         recyclerView = view.findViewById(R.id.recycler_view)
         emptyText = view.findViewById(R.id.empty_text)
+        searchEditText = view.findViewById(R.id.search_edit_text)
+        searchCancelBtn = view.findViewById(R.id.search_cancel_btn)
+        searchBarContainer = view.findViewById(R.id.search_bar_container)
+
+        // 输入框获取焦点时显示取消按钮
+        searchEditText.setOnFocusChangeListener { _, hasFocus ->
+            if (hasFocus) {
+                searchCancelBtn.visibility = View.VISIBLE
+            }
+        }
+        // 点击取消按钮
+        searchCancelBtn.setOnClickListener {
+            searchEditText.clearFocus()
+            searchEditText.setText("")
+            searchCancelBtn.visibility = View.GONE
+            // 隐藏键盘
+            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+            presenter.searchIfChanged("")
+        }
+        // 输入框点击键盘搜索
+        searchEditText.setOnEditorActionListener(OnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                val key = searchEditText.text.toString()
+                presenter.searchIfChanged(key)
+                // 隐藏键盘
+                val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                imm?.hideSoftInputFromWindow(searchEditText.windowToken, 0)
+                searchEditText.clearFocus()
+                return@OnEditorActionListener true
+            }
+            false
+        })
     }
 
 
