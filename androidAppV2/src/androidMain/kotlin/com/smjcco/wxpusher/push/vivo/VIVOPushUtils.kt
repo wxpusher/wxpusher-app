@@ -1,7 +1,7 @@
 package com.smjcco.wxpusher.push.vivo
 
 import android.app.Application
-import com.smjcco.wxpusher.base.WxpSaveService
+import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.PushManager

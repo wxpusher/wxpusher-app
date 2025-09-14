@@ -2,7 +2,7 @@ package com.smjcco.wxpusher.push
 
 import android.app.Activity
 import android.app.AlertDialog
-import com.smjcco.wxpusher.base.WxpSaveService
+import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.page.WebDetailActivity
 import com.smjcco.wxpusher.utils.PermissionUtils

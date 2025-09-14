@@ -13,7 +13,7 @@ import com.smjcco.wxpusher.page.CheckActivity
 import com.smjcco.wxpusher.page.WebDetailActivity
 import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.utils.AppDataUtils
-import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
@@ -55,7 +55,7 @@ class WxPusherWebInterface {
             //加载本地资源
             if (uri.path != null && uri.scheme == "file"
                 && uri.path.startsWith("/data/user/")
-                && uri.path.contains("${ApplicationUtils.application.packageName}")
+                && uri.path.contains("${ApplicationUtils.getApplication().packageName}")
             ) {
                 return true
             }
@@ -172,9 +172,9 @@ class WxPusherWebInterface {
     @JavascriptInterface
     fun togoCheckPermission() {
         if (!checkSecurity()) return
-        val intent = Intent(ApplicationUtils.application, CheckActivity::class.java)
+        val intent = Intent(ApplicationUtils.getApplication(), CheckActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        ApplicationUtils.application.startActivity(intent)
+        ApplicationUtils.getApplication().startActivity(intent)
     }
 
     @JavascriptInterface
@@ -198,7 +198,7 @@ class WxPusherWebInterface {
         intent.putExtra(Intent.EXTRA_TEXT, content)
         val chooser = Intent.createChooser(intent, "分享到")
         chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        ApplicationUtils.application.startActivity(chooser)
+        ApplicationUtils.getApplication().startActivity(chooser)
     }
 
     /**
@@ -215,7 +215,7 @@ class WxPusherWebInterface {
             val intent = Intent(Intent.ACTION_VIEW)
             intent.data = android.net.Uri.parse(url)
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            ApplicationUtils.application.startActivity(intent)
+            ApplicationUtils.getApplication().startActivity(intent)
         } catch (e: Exception) {
             WxPusherLog.w(TAG, "打开浏览器失败: ${e.message}")
             WxPusherUtils.toast("打开浏览器失败")
@@ -233,7 +233,7 @@ class WxPusherWebInterface {
             return
         }
         val clipboardManager =
-            ApplicationUtils.application.getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            ApplicationUtils.getApplication().getSystemService(Context.CLIPBOARD_SERVICE) as android.content.ClipboardManager
         val clipData = android.content.ClipData.newPlainText("WxPusher", text)
         clipboardManager.setPrimaryClip(clipData)
     }

@@ -8,12 +8,13 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.widget.Button
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import com.smjcco.wxpusher.base.common.WxpDialogUtils
+import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.ws.KeepWsConnectService
@@ -85,7 +86,30 @@ class TestActivity : ComponentActivity() {
         permission.setOnClickListener {
             requester()
         }
+        
+        val testDialog: Button = findViewById(R.id.test_dialog)
+        testDialog.setOnClickListener {
+            testDialogFunction()
+        }
 
+    }
+    
+    private fun testDialogFunction() {
+        // 测试弹窗功能
+        val params = WxpDialogParams(
+            title = "测试弹窗",
+            message = "这是一个测试弹窗，用于验证Android的WxpDialogUtils_showDialog方法是否正常工作。",
+            leftText = "取消",
+            leftBlock = {
+                WxPusherLog.i("TestActivity", "用户点击了取消按钮")
+            },
+            rightText = "确认",
+            rightBlock = {
+                WxPusherLog.i("TestActivity", "用户点击了确认按钮")
+            }
+        )
+        
+        WxpDialogUtils.showDialog(params)
     }
 
 

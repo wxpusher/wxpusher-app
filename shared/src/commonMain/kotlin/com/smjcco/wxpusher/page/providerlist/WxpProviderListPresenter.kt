@@ -2,10 +2,10 @@ package com.smjcco.wxpusher.page.providerlist
 
 import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.api.WxpApiService
-import com.smjcco.wxpusher.base.WxpBaseMvpPresenter
-import com.smjcco.wxpusher.base.WxpToastUtils
-import com.smjcco.wxpusher.base.runAtMainSuspend
-import com.smjcco.wxpusher.biz.common.WxpAppDataService
+import com.smjcco.wxpusher.base.common.WxpBaseMvpPresenter
+import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.base.common.runAtMainSuspend
+import com.smjcco.wxpusher.base.biz.WxpAppDataService
 
 class WxpProviderListPresenter(view: IWxpProviderListView) :
     WxpBaseMvpPresenter<IWxpProviderListView, IWxpProviderListPresenter>(view),

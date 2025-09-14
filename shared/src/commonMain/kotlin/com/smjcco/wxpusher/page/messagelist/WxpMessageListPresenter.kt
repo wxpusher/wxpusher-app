@@ -2,12 +2,12 @@ package com.smjcco.wxpusher.page.messagelist
 
 import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.api.WxpApiService
-import com.smjcco.wxpusher.base.WxpBaseMvpPresenter
-import com.smjcco.wxpusher.base.WxpDateTimeUtils
-import com.smjcco.wxpusher.base.WxpLogUtils
-import com.smjcco.wxpusher.base.WxpSaveService
-import com.smjcco.wxpusher.base.runAtMainSuspend
-import com.smjcco.wxpusher.biz.common.WxpAppDataService
+import com.smjcco.wxpusher.base.common.WxpBaseMvpPresenter
+import com.smjcco.wxpusher.base.common.WxpDateTimeUtils
+import com.smjcco.wxpusher.base.common.WxpLogUtils
+import com.smjcco.wxpusher.base.common.WxpSaveService
+import com.smjcco.wxpusher.base.common.runAtMainSuspend
+import com.smjcco.wxpusher.base.biz.WxpAppDataService
 
 class WxpMessageListPresenter(view: IWxpMessageListView) :
     WxpBaseMvpPresenter<IWxpMessageListView, IWxpMessageListPresenter>(view),

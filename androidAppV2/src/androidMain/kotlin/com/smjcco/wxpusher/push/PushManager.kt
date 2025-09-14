@@ -13,7 +13,7 @@ import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.push.ws.WsUtils
 import com.smjcco.wxpusher.push.xiaomi.XiaomiUtils
 import com.smjcco.wxpusher.utils.AppDataUtils
-import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
 
 /**
@@ -37,7 +37,7 @@ object PushManager {
             XiaomiUtils.init(application)
         } else if (platform == DevicePlatform.Android_VIVO) {
             WxPusherLog.i(TAG, "初始化VIVO推送")
-            VIVOPushUtils.init(ApplicationUtils.application)
+            VIVOPushUtils.init(ApplicationUtils.getApplication())
         } else if (platform == DevicePlatform.Android_HONOR) {
             WxPusherLog.i(TAG, "初始化荣耀推送")
             HonorPushUtils.init(application)

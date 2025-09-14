@@ -7,7 +7,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.base.WxpSaveService
+import com.smjcco.wxpusher.base.common.WxpSaveService
 
 class AgreePrivateActivity : ComponentActivity() {
     

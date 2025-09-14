@@ -14,7 +14,7 @@ import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.page.WebViewActivity
 import com.smjcco.wxpusher.push.ws.PushMsgDeviceMsg
-import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -106,21 +106,21 @@ object NotificationManager {
 //        }
 
         // 创建Intent，用于在点击通知时启动Activity
-        val intent = Intent(ApplicationUtils.application, WebViewActivity::class.java)
+        val intent = Intent(ApplicationUtils.getApplication(), WebViewActivity::class.java)
         intent.putExtra(
             WebViewActivity.INTENT_KEY_URL,
             "${WxPusherConfig.ApiUrl}/api/message/${message.qid}"
         )
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         val pendingIntent = PendingIntent.getActivity(
-            ApplicationUtils.application,
+            ApplicationUtils.getApplication(),
             messageId.get(),
             intent,
             PendingIntent.FLAG_IMMUTABLE
         )
 
         val notification =
-            NotificationCompat.Builder(ApplicationUtils.application, channel)
+            NotificationCompat.Builder(ApplicationUtils.getApplication(), channel)
                 .setContentTitle(message.title)
                 .setTicker(message.summary)
                 .setContentText(message.summary)
@@ -221,7 +221,7 @@ object NotificationManager {
     fun getSysNotificationManager(): NotificationManager {
         if (sysNotificationManager == null) {
             sysNotificationManager =
-                ApplicationUtils.application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                ApplicationUtils.getApplication().getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         }
         return sysNotificationManager!!
     }

@@ -5,8 +5,8 @@ import com.aliyun.sls.android.producer.LogProducerClient
 import com.aliyun.sls.android.producer.LogProducerConfig
 import com.aliyun.sls.android.producer.LogProducerResult
 import com.smjcco.wxpusher.utils.AppDataUtils
-import com.smjcco.wxpusher.base.ApplicationUtils
-import com.smjcco.wxpusher.base.WxpSaveService
+import com.smjcco.wxpusher.base.common.ApplicationUtils
+import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.utils.RandomUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
@@ -32,7 +32,7 @@ object WxPusherLog {
         val accesskeyid = "LTAI5t7EqUYtLdPRFcN6Ppqq"
         val accesskeysecret = "3p2opJ0jRNJkqjzZOUJM2hE8Uf4eTg"
         val config = LogProducerConfig(
-            ApplicationUtils.application,
+            ApplicationUtils.getApplication(),
             endpoint,
             project,
             logstore,
@@ -61,7 +61,7 @@ object WxPusherLog {
         // 每次发送前会把日志保存到本地的binlog文件，只有发送成功才会删除，保证日志上传At Least Once
         config.setPersistent(1);
         // 持久化的文件名，需要保证文件所在的文件夹已创建。配置多个客户端时，不应设置相同文件
-        config.setPersistentFilePath(ApplicationUtils.application.cacheDir.absolutePath + "/WxPusherLog.iat");
+        config.setPersistentFilePath(ApplicationUtils.getApplication().cacheDir.absolutePath + "/WxPusherLog.iat");
         // 是否每次AddLog强制刷新，高可靠性场景建议打开
         config.setPersistentForceFlush(1);
         // 持久化文件滚动个数，建议设置成10。

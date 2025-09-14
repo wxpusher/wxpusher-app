@@ -2,13 +2,13 @@ package com.smjcco.wxpusher.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 
 object SaveUtils {
     private lateinit var sp: SharedPreferences
 
     fun init() {
-        sp = ApplicationUtils.application.getSharedPreferences("wxpusher-kv", Context.MODE_PRIVATE)
+        sp = ApplicationUtils.getApplication().getSharedPreferences("wxpusher-kv", Context.MODE_PRIVATE)
     }
 
     fun getByKey(key: String): String? {

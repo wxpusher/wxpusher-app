@@ -6,7 +6,7 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Looper
 import android.widget.Toast
-import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,10 +23,10 @@ object WxPusherUtils {
     fun toast(toast: String?) {
         toast?.let {
             if (Looper.myLooper() == Looper.getMainLooper()) {
-                Toast.makeText(ApplicationUtils.application, it, Toast.LENGTH_LONG).show()
+                Toast.makeText(ApplicationUtils.getApplication(), it, Toast.LENGTH_LONG).show()
             } else {
                 mainScope.launch {
-                    Toast.makeText(ApplicationUtils.application, it, Toast.LENGTH_LONG).show()
+                    Toast.makeText(ApplicationUtils.getApplication(), it, Toast.LENGTH_LONG).show()
                 }
 
 
@@ -37,10 +37,10 @@ object WxPusherUtils {
     fun getVersionName(): String {
         try {
             // 获取PackageManager实例
-            val packageManager = ApplicationUtils.application.packageManager
+            val packageManager = ApplicationUtils.getApplication().packageManager
             // 获取当前应用的PackageInfo
             val packageInfo =
-                packageManager.getPackageInfo(ApplicationUtils.application.packageName, 0)
+                packageManager.getPackageInfo(ApplicationUtils.getApplication().packageName, 0)
             // 获取版本号
             return packageInfo.versionName ?: ""
         } catch (e: PackageManager.NameNotFoundException) {
@@ -52,10 +52,10 @@ object WxPusherUtils {
     fun getVersionCode(): Int {
         try {
             // 获取PackageManager实例
-            val packageManager = ApplicationUtils.application.packageManager
+            val packageManager = ApplicationUtils.getApplication().packageManager
             // 获取当前应用的PackageInfo
             val packageInfo =
-                packageManager.getPackageInfo(ApplicationUtils.application.packageName, 0)
+                packageManager.getPackageInfo(ApplicationUtils.getApplication().packageName, 0)
             // 获取版本号
             return packageInfo.versionCode
         } catch (e: PackageManager.NameNotFoundException) {
@@ -71,7 +71,7 @@ object WxPusherUtils {
      */
     fun isNetworkConnected(): Boolean {
         val connectivityManager =
-            ApplicationUtils.application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            ApplicationUtils.getApplication().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val network = connectivityManager.activeNetwork
         val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
         return networkCapabilities != null && (

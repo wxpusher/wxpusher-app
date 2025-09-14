@@ -1,7 +1,7 @@
 package com.smjcco.wxpusher.kmp.base
 
 import android.os.Bundle
-import com.smjcco.wxpusher.base.IWxpBaseMvpPresenter
+import com.smjcco.wxpusher.base.common.IWxpBaseMvpPresenter
 
 abstract class WxpBaseMvpFragment<P : IWxpBaseMvpPresenter<*, *>> : WxpBaseFragment() {
     protected lateinit var presenter: P

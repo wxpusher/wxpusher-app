@@ -16,4 +16,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="申请通知权限" />
+
+    <Button
+        android:id="@+id/test_dialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="测试弹窗功能" />
 </LinearLayout>

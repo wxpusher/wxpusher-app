@@ -3,7 +3,7 @@ package com.smjcco.wxpusher.push.xiaomi
 import android.app.Activity
 import android.app.AlertDialog
 import android.app.Application
-import com.smjcco.wxpusher.base.WxpSaveService
+import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.page.WebDetailActivity

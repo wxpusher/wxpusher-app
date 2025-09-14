@@ -3,7 +3,7 @@ package com.smjcco.wxpusher.api
 import androidx.annotation.Keep
 import com.google.gson.reflect.TypeToken
 import com.smjcco.wxpusher.WxPusherConfig
-import com.smjcco.wxpusher.base.WxpSaveService
+import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.AppDataUtils

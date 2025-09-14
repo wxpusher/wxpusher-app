@@ -6,17 +6,15 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.log.WxPusherLog
 
@@ -131,13 +129,13 @@ object PermissionUtils {
     fun gotoNotificationSettingPage() {
         val intent = Intent()
         intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-        intent.putExtra(Settings.EXTRA_APP_PACKAGE, ApplicationUtils.application.getPackageName())
+        intent.putExtra(Settings.EXTRA_APP_PACKAGE, ApplicationUtils.getApplication().getPackageName())
         intent.putExtra(
             Settings.EXTRA_CHANNEL_ID,
-            ApplicationUtils.application.applicationInfo.uid
+            ApplicationUtils.getApplication().applicationInfo.uid
         )
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        ApplicationUtils.application.startActivity(intent)
+        ApplicationUtils.getApplication().startActivity(intent)
     }
 
     /**
@@ -148,10 +146,10 @@ object PermissionUtils {
         intent.action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
         intent.putExtra(
             Settings.EXTRA_APP_PACKAGE,
-            ApplicationUtils.application.getPackageName()
+            ApplicationUtils.getApplication().getPackageName()
         )
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        ApplicationUtils.application.startActivity(intent)
+        ApplicationUtils.getApplication().startActivity(intent)
     }
 
 

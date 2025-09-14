@@ -9,7 +9,7 @@ import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.page.WebViewActivity
 
@@ -33,10 +33,10 @@ class KeepWsConnectService : Service() {
 
     fun foreground() {
         // 创建Intent，用于在点击通知时启动Activity
-        val intent = Intent(ApplicationUtils.application, WebViewActivity::class.java)
+        val intent = Intent(ApplicationUtils.getApplication(), WebViewActivity::class.java)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         val pendingIntent = PendingIntent.getActivity(
-            ApplicationUtils.application,
+            ApplicationUtils.getApplication(),
             0,
             intent,
             PendingIntent.FLAG_IMMUTABLE

@@ -5,8 +5,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.page.CheckActivity
-import com.smjcco.wxpusher.base.ApplicationUtils
-import com.smjcco.wxpusher.base.WxpSaveService
+import com.smjcco.wxpusher.base.common.ApplicationUtils
+import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.utils.SaveUtils
 
 object WsUtils {
@@ -32,7 +32,7 @@ object WsUtils {
                 "去设置"
             ) { dialog, which ->
                 dialog?.dismiss()
-                val intent = Intent(ApplicationUtils.application, CheckActivity::class.java)
+                val intent = Intent(ApplicationUtils.getApplication(), CheckActivity::class.java)
                 activity.startActivity(intent)
             }
             .setCancelable(false)

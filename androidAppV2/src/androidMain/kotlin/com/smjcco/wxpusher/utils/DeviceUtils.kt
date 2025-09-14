@@ -4,7 +4,7 @@ import android.os.Build
 import com.heytap.msp.push.HeytapPushManager
 import com.hihonor.push.sdk.HonorPushClient
 import com.huawei.hms.api.HuaweiApiAvailability
-import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.log.WxPusherLog
@@ -25,7 +25,7 @@ object DeviceUtils {
     fun isHuaweiMobileServicesAvailable(): Boolean {
         return ConfigManager.getCurrentConfig().huaweiPush
                 && 0 == HuaweiApiAvailability.getInstance()
-            .isHuaweiMobileServicesAvailable(ApplicationUtils.application)
+            .isHuaweiMobileServicesAvailable(ApplicationUtils.getApplication())
     }
 
     /**
@@ -57,7 +57,7 @@ object DeviceUtils {
         //查询官网，国内Magic UI 4.0及以上 支持荣耀推送 ，所以再判断一下是不是Magic UI 4.0
         //如果没有问题，后面判断isMagicOs的逻辑，可以删除掉
         val supportPush =
-            HonorPushClient.getInstance().checkSupportHonorPush(ApplicationUtils.application)
+            HonorPushClient.getInstance().checkSupportHonorPush(ApplicationUtils.getApplication())
         WxPusherLog.i(
             "honor",
             "isHonorDevice=${isHonorDevice()},isMagicOs=${isMagicOs()},checkSupportHonorPush=${supportPush}"
@@ -68,12 +68,12 @@ object DeviceUtils {
 
     fun isVivo(): Boolean {
         return ConfigManager.getCurrentConfig().vivoPush
-                && PushClient.getInstance(ApplicationUtils.application).isSupport()
+                && PushClient.getInstance(ApplicationUtils.getApplication()).isSupport()
     }
 
     fun isOppo(): Boolean {
         return ConfigManager.getCurrentConfig().oppoPush
-                && HeytapPushManager.isSupportPush(ApplicationUtils.application)
+                && HeytapPushManager.isSupportPush(ApplicationUtils.getApplication())
     }
 
     fun getPlatform(): DevicePlatform {

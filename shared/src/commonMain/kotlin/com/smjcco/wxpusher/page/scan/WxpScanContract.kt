@@ -1,7 +1,7 @@
 package com.smjcco.wxpusher.page.scan
 
-import com.smjcco.wxpusher.base.IWxpBaseMvpPresenter
-import com.smjcco.wxpusher.base.IWxpBaseMvpView
+import com.smjcco.wxpusher.base.common.IWxpBaseMvpPresenter
+import com.smjcco.wxpusher.base.common.IWxpBaseMvpView
 
 interface IWxpScanView : IWxpBaseMvpView<IWxpScanPresenter> {
 

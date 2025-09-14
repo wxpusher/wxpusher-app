@@ -1,9 +1,8 @@
 package com.smjcco.wxpusher.web.update
 
-import android.util.Log
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import kotlinx.coroutines.launch
@@ -38,7 +37,7 @@ object WebBundleManager {
     private lateinit var tempDir: File
 
     fun init() {
-        val context = ApplicationUtils.application
+        val context = ApplicationUtils.getApplication()
         webDir = File(context.filesDir, WEB_FOLDER)
         tempDir = File(context.filesDir, TEMP_FOLDER)
 
@@ -58,11 +57,11 @@ object WebBundleManager {
     private fun checkIfNeedUnzipInsetZip() {
         val nowVersion = getNowVersion()
         val insetZipVersion =
-            getVersionFromZip(ApplicationUtils.application.assets.open(BUNDLE_NAME))
+            getVersionFromZip(ApplicationUtils.getApplication().assets.open(BUNDLE_NAME))
 
         if (isVersionGreater(insetZipVersion, nowVersion)) {
             WxPusherLog.i(TAG, "内置包更新，需要重新解压")
-            ApplicationUtils.application.assets.open(BUNDLE_NAME).use {
+            ApplicationUtils.getApplication().assets.open(BUNDLE_NAME).use {
                 extractZipTempDir(it)
                 applyUpdateIfAvailable()
             }
@@ -152,7 +151,7 @@ object WebBundleManager {
                 tempDir.mkdirs()
 
                 // 下载并解压到临时目录
-                val bundleZip = File(ApplicationUtils.application.filesDir, BUNDLE_NAME)
+                val bundleZip = File(ApplicationUtils.getApplication().filesDir, BUNDLE_NAME)
                 if (bundleZip.exists()) {
                     bundleZip.delete()
                 }

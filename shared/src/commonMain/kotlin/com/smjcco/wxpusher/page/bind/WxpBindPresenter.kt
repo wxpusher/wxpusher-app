@@ -1,12 +1,12 @@
 package com.smjcco.wxpusher.page.bind
 
 import com.smjcco.wxpusher.api.WxpApiService
-import com.smjcco.wxpusher.base.WxpBaseInfoService
-import com.smjcco.wxpusher.base.WxpBaseMvpPresenter
-import com.smjcco.wxpusher.base.WxpToastUtils
-import com.smjcco.wxpusher.base.runAtMainSuspend
-import com.smjcco.wxpusher.biz.bean.WxpLoginInfo
-import com.smjcco.wxpusher.biz.common.WxpAppDataService
+import com.smjcco.wxpusher.base.common.WxpBaseInfoService
+import com.smjcco.wxpusher.base.common.WxpBaseMvpPresenter
+import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.base.common.runAtMainSuspend
+import com.smjcco.wxpusher.base.biz.bean.WxpLoginInfo
+import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
 
 class WxpBindPresenter(view: IWxpBindView) :

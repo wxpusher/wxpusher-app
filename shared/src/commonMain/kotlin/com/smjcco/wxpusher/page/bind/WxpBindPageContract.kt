@@ -1,8 +1,7 @@
 package com.smjcco.wxpusher.page.bind
 
-import com.smjcco.wxpusher.base.IWxpBaseMvpPresenter
-import com.smjcco.wxpusher.base.IWxpBaseMvpView
-import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
+import com.smjcco.wxpusher.base.common.IWxpBaseMvpPresenter
+import com.smjcco.wxpusher.base.common.IWxpBaseMvpView
 
 interface IWxpBindView : IWxpBaseMvpView<IWxpBindPresenter> {
 

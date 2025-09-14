@@ -1,10 +1,10 @@
 package com.smjcco.wxpusher.api
 
-import com.smjcco.wxpusher.base.BaseResp
-import com.smjcco.wxpusher.base.WxpNetworkService
-import com.smjcco.wxpusher.base.WxpToastUtils
-import com.smjcco.wxpusher.biz.bean.WxpUpdateInfoReq
-import com.smjcco.wxpusher.biz.common.WxpAppPageService
+import com.smjcco.wxpusher.base.common.BaseResp
+import com.smjcco.wxpusher.base.common.WxpNetworkService
+import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.base.biz.bean.WxpUpdateInfoReq
+import com.smjcco.wxpusher.base.biz.WxpAppPageService
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage

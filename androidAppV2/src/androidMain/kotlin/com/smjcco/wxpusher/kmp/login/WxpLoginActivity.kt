@@ -10,7 +10,7 @@ import android.text.style.ForegroundColorSpan
 import android.view.View
 import androidx.core.content.ContextCompat
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.base.WxpToastUtils
+import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseMvpActivity
 import com.smjcco.wxpusher.kmp.main.WxpMainActivity
 import com.smjcco.wxpusher.page.login.IWxpLoginPresenter

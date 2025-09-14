@@ -2,7 +2,6 @@ package com.smjcco.wxpusher.page
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.net.Uri
@@ -20,7 +19,7 @@ import com.smjcco.wxpusher.dialog.ActionSheetDialogFragment
 import com.smjcco.wxpusher.dialog.ActionSheetItem
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.PushManager
-import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WebViewUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface
@@ -79,7 +78,7 @@ class WebDetailActivity : FragmentActivity() {
                         val intent = Intent(Intent.ACTION_VIEW)
                         intent.data = Uri.parse(url)
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        ApplicationUtils.application.startActivity(intent)
+                        ApplicationUtils.getApplication().startActivity(intent)
                     } catch (e: Exception) {
                         WxPusherLog.w(TAG, "打开浏览器失败: ${e.message}")
                         WxPusherUtils.toast("打开浏览器失败")
@@ -91,7 +90,7 @@ class WebDetailActivity : FragmentActivity() {
                         return@ActionSheetItem
                     }
                     val clipboardManager =
-                        ApplicationUtils.application.getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+                        ApplicationUtils.getApplication().getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
                     val clipData = android.content.ClipData.newPlainText("WxPusher", url)
                     clipboardManager.setPrimaryClip(clipData)
                     WxPusherUtils.toast("复制成功")
@@ -106,7 +105,7 @@ class WebDetailActivity : FragmentActivity() {
                     intent.putExtra(Intent.EXTRA_TEXT, url)
                     val chooser = Intent.createChooser(intent, "分享到")
                     chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    ApplicationUtils.application.startActivity(chooser)
+                    ApplicationUtils.getApplication().startActivity(chooser)
                 },
                 ActionSheetItem("重新加载") {
                     if (url.isEmpty()) {

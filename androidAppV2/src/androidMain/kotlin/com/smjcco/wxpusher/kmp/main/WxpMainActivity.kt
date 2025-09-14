@@ -10,8 +10,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.base.WxpSaveService
-import com.smjcco.wxpusher.biz.common.WxpAppDataService
+import com.smjcco.wxpusher.base.common.WxpSaveService
+import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.kmp.base.WxpBaseActivity
 import com.smjcco.wxpusher.kmp.common.WxpSaveKey
 import com.smjcco.wxpusher.kmp.login.WxpLoginActivity
