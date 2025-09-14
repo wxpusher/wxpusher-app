@@ -1,23 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
-    android:padding="12dp">
+    android:paddingStart="12dp"
+    android:paddingTop="12dp"
+    android:paddingEnd="12dp">
 
     <!-- 未读状态小圆点 -->
     <View
         android:id="@+id/unread_dot"
         android:layout_width="6dp"
         android:layout_height="6dp"
+        android:layout_marginTop="10dp"
         android:background="@drawable/unread_dot_background"
         android:visibility="visible"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/message_title"
-        app:layout_constraintBottom_toBottomOf="@+id/message_title"
         app:layout_constraintVertical_bias="0.3" />
 
     <!-- 消息标题 -->
@@ -26,47 +29,48 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="8dp"
-        android:maxLines="2"
         android:ellipsize="end"
-        android:text="消息标题"
+        android:lineSpacingExtra="2dp"
+        android:maxLines="2"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="16sp"
-        android:lineSpacingExtra="2dp"
+        app:layout_constraintEnd_toStartOf="@+id/link_icon"
         app:layout_constraintStart_toEndOf="@+id/unread_dot"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/link_icon" />
+        tools:text="消息标题消息标题消息标题消息标题消息标题消息标题消息标题消息标题消息标题" />
 
     <!-- 链接图标 -->
     <ImageView
         android:id="@+id/link_icon"
         android:layout_width="20dp"
         android:layout_height="20dp"
-        android:src="@drawable/ic_link"
-        android:contentDescription="链接"
-        android:visibility="gone"
-        android:clickable="true"
-        android:focusable="true"
+        android:layout_marginTop="4dp"
         android:background="?android:attr/selectableItemBackgroundBorderless"
+        android:clickable="true"
+        android:layout_marginStart="4dp"
+        android:contentDescription="来源链接"
+        android:focusable="true"
+        android:src="@drawable/ic_link"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/message_title"
-        app:layout_constraintBottom_toBottomOf="@+id/message_title" />
+        tools:visibility="visible" />
 
     <!-- 来源标签 -->
     <TextView
         android:id="@+id/source_label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:maxLines="1"
+        android:layout_marginTop="0dp"
         android:ellipsize="end"
+        android:maxLines="1"
         android:text="来源: 未知"
         android:textColor="@android:color/darker_gray"
         android:textSize="12sp"
-        app:layout_constraintStart_toStartOf="@+id/message_title"
-        app:layout_constraintTop_toBottomOf="@+id/message_title"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/date_label"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:layout_constraintStart_toStartOf="@+id/message_title"
+        app:layout_constraintTop_toBottomOf="@+id/message_title" />
 
     <!-- 时间标签 -->
     <TextView
@@ -77,19 +81,19 @@
         android:text="12:30"
         android:textColor="@android:color/darker_gray"
         android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/source_label"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/source_label"
-        app:layout_constraintBottom_toBottomOf="@+id/source_label" />
+        app:layout_constraintTop_toTopOf="@+id/source_label" />
 
     <!-- 分割线 -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="12dp"
-        android:background="@android:color/darker_gray"
         android:alpha="0.2"
-        app:layout_constraintTop_toBottomOf="@+id/source_label"
+        android:background="@android:color/darker_gray"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/source_label" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -237,7 +237,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
             private val dateLabel: TextView = itemView.findViewById(R.id.date_label)
 
             fun bind(message: WxpMessageListMessage) {
-                messageTitle.text = message.summary
+                messageTitle.text = message.summary+ message.summary+ message.summary+message.summary+ message.summary+ message.summary
                 sourceLabel.text = "来源: ${message.name ?: "未知"}"
                 dateLabel.text = WxpDateTimeUtils.formatDateTime(message.createTime)
 
