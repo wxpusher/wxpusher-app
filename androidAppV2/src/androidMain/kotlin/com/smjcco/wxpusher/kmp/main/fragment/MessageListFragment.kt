@@ -38,6 +38,10 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     private var messageList = mutableListOf<WxpMessageListMessage>()
     private var openAppFirstRefresh = true
 
+
+    private lateinit var refreshHeader: ClassicsHeader
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -62,6 +66,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         emptyText = view.findViewById(R.id.empty_text)
     }
 
+
     private fun setupRefreshLayout() {
         // 设置下拉刷新监听器
         refreshLayout.setOnRefreshListener(object : OnRefreshListener {
@@ -78,9 +83,8 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         })
 
         // 设置刷新头
-        val refreshHeader = ClassicsHeader(context)
+        refreshHeader = ClassicsHeader(context)
         refreshHeader.setLastUpdateText(presenter.getTipsOfLastRefreshTime())
-
         refreshLayout.setRefreshHeader(refreshHeader)
 
         // 设置刷新尾（用于加载更多）
@@ -95,17 +99,22 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
 
     private fun setupRecyclerView() {
         adapter = MessageListAdapter { message ->
-            // 点击消息项，打开网页
-            val urlString = message.url.trim()
-            if (urlString.isNotEmpty()) {
-                WebDetailActivity.openUrl(requireActivity(), urlString)
-                // 标记消息为已读
-                message.read = true
-                adapter.notifyDataSetChanged()
-            }
+            openMessage(message)
         }
         recyclerView.layoutManager = LinearLayoutManager(context)
         recyclerView.adapter = adapter
+    }
+
+    private fun openMessage(message: WxpMessageListMessage) {
+        // 点击消息项，打开网页
+        val urlString = message.url.trim()
+        if (urlString.isNotEmpty()) {
+            WebDetailActivity.openUrl(requireActivity(), urlString)
+            // 标记消息为已读
+            message.read = true
+            adapter.notifyDataSetChanged()
+        }
+
     }
 
     override fun showMessageRefreshing(refreshing: Boolean) {
@@ -127,6 +136,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         messageList.clear()
         messageList.addAll(data)
         adapter.notifyDataSetChanged()
+        refreshHeader.setLastUpdateText(presenter.getTipsOfLastRefreshTime())
         loadDataFinish()
     }
 
