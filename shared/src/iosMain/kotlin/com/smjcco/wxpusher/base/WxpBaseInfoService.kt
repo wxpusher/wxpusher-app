@@ -10,9 +10,3 @@ actual fun WxpBaseInfoService_getAppVersionName(): String {
 actual fun WxpBaseInfoService_getDeviceName(): String {
     return UIDevice.currentDevice.name
 }
-
-actual fun WxpBaseInfoService_getPlatform(): String {
-    //目前只有iphone，先暂时写死
-    return "iOS"
-}
-

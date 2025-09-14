@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/page_bg_fit_theme"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="32dp">
+
+        <!-- 版权信息固定在底部 -->
+        <TextView
+            android:id="@+id/copyright_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/login_copyright"
+            android:textColor="@color/check_description_color"
+            android:textSize="12sp"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Logo 图标区域 -->
+        <ImageView
+            android:id="@+id/logo_image"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginBottom="24dp"
+            android:src="@mipmap/ic_launcher"
+            android:contentDescription="@string/login_title"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- 主体内容垂直居中 -->
+        <TextView
+            android:id="@+id/title_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/login_title"
+            android:textColor="@color/text_fit_theme"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center"
+            app:layout_constraintBottom_toTopOf="@+id/subtitle_label"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/logo_image"
+            app:layout_constraintVertical_chainStyle="packed"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/subtitle_label"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="@string/login_subtitle"
+            android:textColor="@color/check_description_color"
+            android:textSize="16sp"
+            android:lineSpacingExtra="4dp"
+            android:gravity="center"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toTopOf="@+id/phone_input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/title_label"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="40dp" />
+
+        <!-- 手机号输入框 -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/phone_input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/subtitle_label"
+            app:boxStrokeColor="@color/colorPrimary"
+            app:boxStrokeWidth="1dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:hintTextColor="@color/colorPrimary"
+            app:startIconDrawable="@drawable/ic_phone"
+            app:startIconTint="@color/colorPrimary"
+            app:boxBackgroundColor="@android:color/transparent"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusBottomEnd="12dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/phone_text_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/login_phone_hint"
+                android:inputType="phone"
+                android:maxLength="11"
+                android:textSize="16sp"
+                android:textColor="@color/text_fit_theme"
+                android:background="@android:color/transparent"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- 验证码输入框和获取验证码按钮 -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/code_input_layout"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toStartOf="@+id/get_code_button"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/phone_input_layout"
+            app:boxStrokeColor="@color/colorPrimary"
+            app:boxStrokeWidth="1dp"
+            app:boxStrokeWidthFocused="2dp"
+            app:hintTextColor="@color/colorPrimary"
+            app:startIconDrawable="@drawable/ic_security"
+            app:startIconTint="@color/colorPrimary"
+            app:boxBackgroundColor="@android:color/transparent"
+            app:boxCornerRadiusTopStart="12dp"
+            app:boxCornerRadiusTopEnd="12dp"
+            app:boxCornerRadiusBottomStart="12dp"
+            app:boxCornerRadiusBottomEnd="12dp"
+            android:layout_marginRight="16dp"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/code_text_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/login_code_hint"
+                android:inputType="number"
+                android:maxLength="6"
+                android:textSize="16sp"
+                android:textColor="@color/text_fit_theme"
+                android:background="@android:color/transparent"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:paddingTop="16dp"
+                android:paddingBottom="16dp" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/get_code_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="@string/login_get_code"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:minHeight="56dp"
+            app:backgroundTint="@color/colorPrimary"
+            app:cornerRadius="12dp"
+            app:elevation="3dp"
+            app:layout_constraintBottom_toBottomOf="@+id/code_input_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/code_input_layout"
+            app:layout_constraintWidth_max="140dp" />
+
+        <!-- 登录按钮 -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/login_button"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:text="@string/login_button"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/colorPrimary"
+            app:cornerRadius="12dp"
+            app:elevation="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/code_input_layout" />
+
+        <!-- 隐私协议复选框和标签 -->
+        <LinearLayout
+            android:id="@+id/privacy_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/login_button">
+
+            <com.google.android.material.checkbox.MaterialCheckBox
+                android:id="@+id/privacy_checkbox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:buttonTint="@color/colorPrimary"
+                app:useMaterialThemeColors="true" />
+
+            <TextView
+                android:id="@+id/privacy_label"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:text="同意《隐私协议和用户协议》"
+                android:textColor="@color/text_fit_theme"
+                android:textSize="14sp"
+                android:lineSpacingExtra="2dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp" />
+
+        </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

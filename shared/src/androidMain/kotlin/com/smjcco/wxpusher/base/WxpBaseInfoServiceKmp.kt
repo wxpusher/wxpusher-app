@@ -19,7 +19,3 @@ actual fun WxpBaseInfoService_getAppVersionName(): String {
 }
 
 actual fun WxpBaseInfoService_getDeviceName(): String = Build.BRAND + " " + Build.MODEL
-actual fun WxpBaseInfoService_getPlatform(): String {
-    return ""
-}
-

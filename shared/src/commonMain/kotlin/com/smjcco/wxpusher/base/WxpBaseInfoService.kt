@@ -2,9 +2,20 @@ package com.smjcco.wxpusher.base
 
 expect fun WxpBaseInfoService_getAppVersionName(): String
 expect fun WxpBaseInfoService_getDeviceName(): String
-expect fun WxpBaseInfoService_getPlatform(): String
+
+interface IWxpBaseInfoServiceListener {
+    /**
+     * 获取平台
+     */
+    fun getPlatform(): String
+}
 
 object WxpBaseInfoService {
+    private lateinit var baseInfoListener: IWxpBaseInfoServiceListener
+    fun init(listener: IWxpBaseInfoServiceListener) {
+        this.baseInfoListener = listener
+    }
+
     /**
      * 获取app版本信息
      */
@@ -18,6 +29,6 @@ object WxpBaseInfoService {
     /**
      * 获取平台信息
      */
-    fun getPlatform() = WxpBaseInfoService_getPlatform()
+    fun getPlatform() = baseInfoListener.getPlatform()
 
 }

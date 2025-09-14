@@ -8,6 +8,10 @@ import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.base.ApplicationUtils
+import com.smjcco.wxpusher.base.IWxpBaseInfoServiceListener
+import com.smjcco.wxpusher.base.WxpBaseInfoService
+import com.smjcco.wxpusher.base.WxpSaveService
+import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.SaveUtils
 import com.smjcco.wxpusher.web.update.WebBundleManager
 import com.tencent.upgrade.bean.UpgradeConfig
@@ -19,6 +23,20 @@ class WxPusherApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         ApplicationUtils.application = this
+        //初始化环境
+        WxpConfig.baseUrl = "https://wxpusher.zjiecode.com"
+
+        //初始化存储
+        WxpSaveService.init()
+
+        //初始化设备基础信息
+        WxpBaseInfoService.init(object : IWxpBaseInfoServiceListener {
+            override fun getPlatform(): String {
+                return DeviceUtils.getPlatform().getPlatform()
+            }
+        })
+
+
         SaveUtils.init()
         WxPusherLog.init()
         WxPusherLog.i(TAG, "应用启动")

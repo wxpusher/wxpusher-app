@@ -1,4 +1,6 @@
 <resources>
+    <string name="app_name">WxPusher</string>
+    
     <!-- 检查项标题 -->
     <string name="check_title">系统推送检查</string>
     <string name="check_desc">为了避免收不到消息，收到消息不提醒，延迟收到消息等，请你检查下面的项目：</string>
@@ -29,4 +31,17 @@
     <string name="privacy_agree">同意并继续</string>
     <string name="privacy_disagree">不同意</string>
     <string name="privacy_key">privacy_agreed_key</string>
+    
+    <!-- 登录页面 -->
+    <string name="login_title">用户登录</string>
+    <string name="login_subtitle">首次登录自动注册</string>
+    <string name="login_phone_hint">手机号</string>
+    <string name="login_code_hint">验证码</string>
+    <string name="login_get_code">获取验证码</string>
+    <string name="login_button">登录</string>
+    <string name="login_privacy_text">同意《隐私协议和用户协议》</string>
+    <string name="login_copyright">© 2025 WxPusher</string>
+    <string name="login_agree_privacy_first">请先同意用户和隐私协议</string>
+    <string name="login_sending">发送中…</string>
+    <string name="login_jump_privacy">跳转到隐私协议页面</string>
 </resources>

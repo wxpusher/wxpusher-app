@@ -6,4 +6,12 @@
         <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:colorAccent">@color/colorAccent</item>
     </style>
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/AccentColor</item>
+        <item name="colorAccent">@color/AccentColor</item> <!-- checkboxes, text fields -->
+        <item name="android:colorBackground">@color/white</item> <!-- background -->
+        <item name="android:statusBarColor">@color/AccentColor</item>
+        <item name="actionModeBackground">@color/AccentColorDark</item>
+    </style>
 </resources>

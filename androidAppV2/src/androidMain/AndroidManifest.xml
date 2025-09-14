@@ -19,12 +19,13 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="false"
-        android:theme="@style/AppStyle"
+        android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:node="merge"
         tools:remove="android:networkSecurityConfig">
+
         <activity
-            android:name=".page.WebViewActivity"
+            android:name=".kmp.main.WxpMainActivity"
             android:configChanges="uiMode"
             android:exported="true"
             android:launchMode="singleTask">
@@ -44,6 +45,27 @@
                     android:scheme="wxpusher" />
             </intent-filter>
         </activity>
+<!--        <activity-->
+<!--            android:name=".page.WebViewActivity"-->
+<!--            android:configChanges="uiMode"-->
+<!--            android:exported="true"-->
+<!--            android:launchMode="singleTask">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.VIEW" />-->
+
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--                <category android:name="android.intent.category.BROWSABLE" />-->
+
+<!--                <data-->
+<!--                    android:host="wxpusher.smjcco.com"-->
+<!--                    android:path="/message"-->
+<!--                    android:scheme="wxpusher" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
 
         <activity
             android:name=".page.WebDetailActivity"
@@ -71,6 +93,11 @@
             android:name=".page.AgreePrivateActivity"
             android:exported="true">
 
+        </activity>
+
+        <activity
+            android:name=".kmp.login.WxpLoginActivity"
+            android:exported="false">
         </activity>
 
 
