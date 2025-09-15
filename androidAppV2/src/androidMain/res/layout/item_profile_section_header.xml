@@ -3,23 +3,24 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@android:color/transparent">
+    android:background="#F5F5F5">
 
     <!-- Top spacing -->
     <View
         android:layout_width="match_parent"
-        android:layout_height="16dp" />
+        android:layout_height="20dp" />
 
     <TextView
         android:id="@+id/tv_section_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Section Title"
-        android:textSize="14sp"
-        android:textColor="@android:color/darker_gray"
+        android:textSize="13sp"
+        android:textColor="#666666"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:paddingBottom="8dp"
-        android:textStyle="bold" />
+        android:paddingBottom="12dp"
+        android:textStyle="normal"
+        android:textAllCaps="false" />
 
 </LinearLayout>

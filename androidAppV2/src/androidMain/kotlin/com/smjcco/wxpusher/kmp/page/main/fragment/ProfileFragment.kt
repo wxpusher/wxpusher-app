@@ -337,9 +337,21 @@ class ProfileFragment : WxpBaseFragment() {
 
                 is ItemViewHolder -> {
                     val item = items[position] as ProfileItem
-                    holder.bind(item, onItemClick)
+                    // 检查是否是section中的最后一个item
+                    val isLastInSection = isLastItemInSection(position)
+                    holder.bind(item, onItemClick, isLastInSection)
                 }
             }
+        }
+
+        private fun isLastItemInSection(position: Int): Boolean {
+            // 如果是最后一个item，肯定是section的最后一个
+            if (position == items.size - 1) return true
+            
+            // 如果下一个item是String类型（section header），说明当前item是section的最后一个
+            if (position + 1 < items.size && items[position + 1] is String) return true
+            
+            return false
         }
 
         override fun getItemCount(): Int = items.size
@@ -358,11 +370,15 @@ class ProfileFragment : WxpBaseFragment() {
             private val titleTextView: TextView = itemView.findViewById(R.id.tv_title)
             private val subtitleTextView: TextView = itemView.findViewById(R.id.tv_subtitle)
             private val arrowImageView: ImageView = itemView.findViewById(R.id.iv_arrow)
+            private val dividerView: View = itemView.findViewById(R.id.divider)
 
-            fun bind(item: ProfileItem, onItemClick: (ProfileItem) -> Unit) {
+            fun bind(item: ProfileItem, onItemClick: (ProfileItem) -> Unit, isLastInSection: Boolean = false) {
                 titleTextView.text = item.title
                 subtitleTextView.text = item.subtitle
                 arrowImageView.visibility = if (item.hasArrow) View.VISIBLE else View.GONE
+                
+                // 控制分割线显示：如果是section中的最后一个item，隐藏分割线
+                dividerView.visibility = if (isLastInSection) View.GONE else View.VISIBLE
 
                 itemView.isEnabled = item.isEnabled
                 itemView.alpha = if (item.isEnabled) 1.0f else 0.5f
