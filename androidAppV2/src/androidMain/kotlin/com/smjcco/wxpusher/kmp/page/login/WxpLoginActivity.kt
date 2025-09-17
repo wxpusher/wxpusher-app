@@ -1,6 +1,5 @@
 package com.smjcco.wxpusher.kmp.page.login
 
-import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableString
 import android.text.Spanned
@@ -16,8 +15,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseMvpActivity
-import com.smjcco.wxpusher.kmp.page.bind.WxpBindActivity
-import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
+import com.smjcco.wxpusher.kmp.common.WxpConstants
+import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 import com.smjcco.wxpusher.page.login.IWxpLoginPresenter
 import com.smjcco.wxpusher.page.login.IWxpLoginView
 import com.smjcco.wxpusher.page.login.WxpLoginPresenter
@@ -105,8 +104,7 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
     }
 
     private fun jumpToPrivacy() {
-        // TODO: 实现跳转到隐私协议页面
-        WxpBindActivity.start(this, "13002899981", "110120", "BIND_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+        WxpJumpPageUtils.jumpToWebUrl(WxpConstants.PrivacyUrl, this)
     }
 
     override fun createPresenter(): IWxpLoginPresenter {
@@ -126,13 +124,12 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
     }
 
     override fun onGoBind(phone: String, code: String, data: WxpLoginSendVerifyCodeResp) {
-        // TODO: 实现跳转到绑定手机页面
-//        startActivity(Intent(this, WxpMainActivity::class.java))
-//        finish()
+        WxpJumpPageUtils.jumpToBind(phone, code, data.phoneVerifyCode ?: "", this)
+        finish()
     }
 
     override fun onGoMain() {
-        startActivity(Intent(this, WxpMainActivity::class.java))
+        WxpJumpPageUtils.jumpToMain(this)
         finish()
     }
 }
