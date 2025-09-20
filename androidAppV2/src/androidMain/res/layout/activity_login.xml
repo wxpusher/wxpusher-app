@@ -197,7 +197,7 @@
                     android:id="@+id/privacy_label"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_marginStart="4dp"
                     android:layout_weight="1"
                     android:clickable="true"
                     android:focusable="true"

@@ -4,10 +4,19 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.method.LinkMovementMethod
+import android.text.style.ClickableSpan
+import android.text.style.ForegroundColorSpan
+import android.text.style.StyleSpan
 import android.view.View
 import android.widget.ProgressBar
+import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.WxpToastUtils
@@ -37,6 +46,7 @@ class WxpBindActivity : WxpBaseMvpActivity<WxpBindPresenter>(), IWxpBindView {
     private lateinit var copyButton: MaterialButton
     private lateinit var checkStatusButton: MaterialButton
     private lateinit var loadingIndicator: ProgressBar
+    private lateinit var stepTwoLabel: TextView
     
     private var phone: String = ""
     private var code: String = ""
@@ -69,6 +79,10 @@ class WxpBindActivity : WxpBaseMvpActivity<WxpBindPresenter>(), IWxpBindView {
         copyButton = findViewById(R.id.copy_button)
         checkStatusButton = findViewById(R.id.check_status_button)
         loadingIndicator = findViewById(R.id.loading_indicator)
+        stepTwoLabel = findViewById(R.id.step_two_label)
+        
+        // 设置第二步说明的样式和点击事件
+        setupStepTwoLabel()
     }
     
     private fun setupClickListeners() {
@@ -81,6 +95,58 @@ class WxpBindActivity : WxpBaseMvpActivity<WxpBindPresenter>(), IWxpBindView {
         }
     }
     
+    private fun setupStepTwoLabel() {
+        val originalText = getString(R.string.bind_step_two_desc)
+        val spannableString = SpannableString(originalText)
+        
+        // 查找 "WxPusher" 在文本中的位置
+        val wxpusherText = "WxPusher"
+        val startIndex = originalText.indexOf(wxpusherText)
+        
+        if (startIndex != -1) {
+            val endIndex = startIndex + wxpusherText.length
+            
+            // 设置主题色
+            val accentColor = ContextCompat.getColor(this, R.color.AccentColor)
+            spannableString.setSpan(
+                ForegroundColorSpan(accentColor),
+                startIndex,
+                endIndex,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            
+            // 设置加粗
+            spannableString.setSpan(
+                StyleSpan(Typeface.BOLD),
+                startIndex,
+                endIndex,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+            
+            // 设置点击事件
+            spannableString.setSpan(
+                object : ClickableSpan() {
+                    override fun onClick(widget: View) {
+                        copyWxPusherToClipboard()
+                    }
+                },
+                startIndex,
+                endIndex,
+                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        
+        stepTwoLabel.text = spannableString
+        stepTwoLabel.movementMethod = LinkMovementMethod.getInstance()
+    }
+    
+    private fun copyWxPusherToClipboard() {
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("WxPusher", "wxpusher")
+        clipboard.setPrimaryClip(clip)
+        WxpToastUtils.showToast(getString(R.string.bind_copy_success))
+    }
+
     private fun copyCodeToClipboard() {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("绑定码", phoneVerifyCode)

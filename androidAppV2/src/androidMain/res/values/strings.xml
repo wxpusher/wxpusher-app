@@ -54,7 +54,7 @@
     <string name="bind_copy_code_desc">复制下面的绑定码</string>
     <string name="bind_code_hint">绑定码</string>
     <string name="bind_copy_button">复制绑定码</string>
-    <string name="bind_step_two_desc">关注微信公众号WxPusher，将复制的绑定码发给公众号</string>
+    <string name="bind_step_two_desc">关注微信公众号 WxPusher ，将复制的绑定码发给公众号</string>
     <string name="bind_step_three_desc">发送绑定码后，请点击下面的按钮，查询绑定状态</string>
     <string name="bind_check_status_button">查询绑定状态</string>
     <string name="bind_copy_success">复制成功</string>
