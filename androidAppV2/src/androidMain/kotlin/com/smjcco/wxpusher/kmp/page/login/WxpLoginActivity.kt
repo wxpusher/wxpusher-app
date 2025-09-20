@@ -43,6 +43,7 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
     }
 
     private fun initViews() {
+        supportActionBar?.hide()
         phoneTextField = findViewById(R.id.phone_text_field)
         codeTextField = findViewById(R.id.code_text_field)
         getCodeButton = findViewById(R.id.get_code_button)
