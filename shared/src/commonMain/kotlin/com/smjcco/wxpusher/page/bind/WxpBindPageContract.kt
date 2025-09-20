@@ -9,6 +9,8 @@ interface IWxpBindView : IWxpBaseMvpView<IWxpBindPresenter> {
      * 跳转到主页
      */
     fun onGoMain()
+
+    fun showLoading(show: Boolean);
 }
 
 interface IWxpBindPresenter : IWxpBaseMvpPresenter<IWxpBindView, IWxpBindPresenter> {

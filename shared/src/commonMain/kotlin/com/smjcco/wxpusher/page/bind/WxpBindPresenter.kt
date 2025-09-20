@@ -32,7 +32,9 @@ class WxpBindPresenter(view: IWxpBindView) :
         )
 
         runAtMainSuspend {
+            view?.showLoading(true)
             val loginData = WxpApiService.verifyCodeLogin(req)
+            view?.showLoading(false)
             loginData?.let {
                 if (it.phoneHasRegister) {
                     val loginInfo = WxpLoginInfo(

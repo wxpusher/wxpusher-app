@@ -19,7 +19,9 @@ object WxpJumpPageUtils {
 
     fun jumpToMain(activity: Activity? = null) {
         withActivity(activity) {
-            it.startActivity(Intent(it, WxpMainActivity::class.java))
+            val intent = Intent(it, WxpMainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            it.startActivity(intent)
         }
     }
 
