@@ -3,12 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="?android:attr/selectableItemBackgroundBorderless"
+    android:background="@color/white"
     android:clickable="true"
     android:focusable="true">
 
     <!-- 主要内容区域 -->
     <LinearLayout
+        android:background="?android:attr/selectableItemBackground"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -16,8 +17,7 @@
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:paddingTop="16dp"
-        android:paddingBottom="16dp"
-        android:background="@android:color/white">
+        android:paddingBottom="16dp">
 
         <TextView
             android:id="@+id/tv_title"
