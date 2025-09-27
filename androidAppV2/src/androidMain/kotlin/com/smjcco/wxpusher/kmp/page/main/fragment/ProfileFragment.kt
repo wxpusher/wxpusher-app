@@ -20,6 +20,7 @@ import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.base.common.WxpDialogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseFragment
+import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
@@ -235,12 +236,12 @@ class ProfileFragment : WxpBaseFragment() {
 
     private fun openPushCheckUrl() {
         val url = "https://wxpusher.zjiecode.com/docs/open-app-note/index.html?brand=Android"
-        WxpWebViewActivity.start(requireContext(), url)
+        WxpJumpPageUtils.jumpToWebUrl(url, requireActivity())
     }
 
     private fun openFeedbackUrl() {
         val url = "https://wj.qq.com/s2/22198188/cc95/"
-        WxpWebViewActivity.start(requireContext(), url)
+        WxpJumpPageUtils.jumpToWebUrl(url, requireActivity())
     }
 
     private fun checkForUpdate() {
@@ -347,10 +348,10 @@ class ProfileFragment : WxpBaseFragment() {
         private fun isLastItemInSection(position: Int): Boolean {
             // 如果是最后一个item，肯定是section的最后一个
             if (position == items.size - 1) return true
-            
+
             // 如果下一个item是String类型（section header），说明当前item是section的最后一个
             if (position + 1 < items.size && items[position + 1] is String) return true
-            
+
             return false
         }
 
@@ -372,11 +373,15 @@ class ProfileFragment : WxpBaseFragment() {
             private val arrowImageView: ImageView = itemView.findViewById(R.id.iv_arrow)
             private val dividerView: View = itemView.findViewById(R.id.divider)
 
-            fun bind(item: ProfileItem, onItemClick: (ProfileItem) -> Unit, isLastInSection: Boolean = false) {
+            fun bind(
+                item: ProfileItem,
+                onItemClick: (ProfileItem) -> Unit,
+                isLastInSection: Boolean = false
+            ) {
                 titleTextView.text = item.title
                 subtitleTextView.text = item.subtitle
                 arrowImageView.visibility = if (item.hasArrow) View.VISIBLE else View.GONE
-                
+
                 // 控制分割线显示：如果是section中的最后一个item，隐藏分割线
                 dividerView.visibility = if (isLastInSection) View.GONE else View.VISIBLE
 
