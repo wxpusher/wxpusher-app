@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.os.Message
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -194,10 +195,13 @@ class WxpWebViewActivity : WxpBaseActivity() {
                 error: WebResourceError?
             ) {
                 super.onReceivedError(view, request, error)
-                progressBar.visibility = View.GONE
-                title = "加载失败"
-                WxpToastUtils.showToast("加载失败")
-                updateWebOptionBtnStatus()
+                if (request?.isForMainFrame == true) {
+                    Log.d("WxpWebViewActivity", "onReceivedError: " + error?.description)
+                    progressBar.visibility = View.GONE
+                    title = "加载失败"
+                    WxpToastUtils.showToast("加载失败")
+                    updateWebOptionBtnStatus()
+                }
             }
         }
     }
