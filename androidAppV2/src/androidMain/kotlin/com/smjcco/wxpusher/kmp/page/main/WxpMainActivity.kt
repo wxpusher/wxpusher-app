@@ -10,8 +10,8 @@ import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
+import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.kmp.base.WxpBaseActivity
 import com.smjcco.wxpusher.kmp.common.WxpSaveKey
 import com.smjcco.wxpusher.kmp.page.login.WxpLoginActivity
@@ -41,7 +41,7 @@ class WxpMainActivity : WxpBaseActivity() {
 
         // 设置ViewPager和TabLayout
         setupViewPager()
-
+        title = "消息列表"
     }
 
     /**
@@ -119,6 +119,9 @@ class WxpMainActivity : WxpBaseActivity() {
         return true
     }
 
+    fun setMenu(){
+
+    }
     /**
      * ViewPager2适配器
      */

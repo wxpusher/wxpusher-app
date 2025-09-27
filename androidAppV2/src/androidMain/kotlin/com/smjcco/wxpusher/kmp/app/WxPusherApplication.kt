@@ -27,8 +27,8 @@ class WxPusherApplication : Application() {
         ApplicationUtils.init(this)
 
         //初始化环境
-//        WxpConfig.baseUrl = "https://wxpusher.zjiecode.com"
-        WxpConfig.baseUrl = "http://wxpusher.test.zjiecode.com"
+        WxpConfig.baseUrl = "https://wxpusher.zjiecode.com"
+//        WxpConfig.baseUrl = "http://wxpusher.test.zjiecode.com"
 
         //初始化存储
         WxpSaveService.init()

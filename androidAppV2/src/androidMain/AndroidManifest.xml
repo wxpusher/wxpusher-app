@@ -28,6 +28,8 @@
             android:name=".kmp.page.main.WxpMainActivity"
             android:configChanges="uiMode"
             android:exported="true"
+            android:clearTaskOnLaunch="true"
+            android:screenOrientation="portrait"
             android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

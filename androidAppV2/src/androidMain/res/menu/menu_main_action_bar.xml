@@ -2,10 +2,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/main_menu_notifications_enabled"
-        android:title="选项1"
-        app:showAsAction="ifRoom" />
+        android:title="订阅管理"
+        app:showAsAction="never|withText" />
     <item
         android:id="@+id/main_menu_notifications_enabled2"
-        android:title="选项2"
-        app:showAsAction="ifRoom" />
+        android:title="扫码添加订阅"
+        app:showAsAction="never|withText" />
+    <item
+        android:id="@+id/main_menu_notifications_enabled3"
+        android:title="已读全部消息"
+        app:showAsAction="never|withText" />
 </menu>

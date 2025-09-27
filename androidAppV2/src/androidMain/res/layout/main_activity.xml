@@ -24,14 +24,16 @@
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="60dp"
             android:background="@android:color/white"
             android:elevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:tabGravity="fill"
+            app:tabIndicator="@null"
             app:tabIndicatorColor="?attr/colorPrimary"
+            app:tabIndicatorHeight="0dp"
             app:tabMode="fixed" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
