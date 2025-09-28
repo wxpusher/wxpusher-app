@@ -248,7 +248,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                 dateLabel.text = WxpDateTimeUtils.formatDateTime(message.createTime)
 
                 // 设置未读状态
-                unreadDot.visibility = if (message.read) View.GONE else View.VISIBLE
+                unreadDot.visibility = if (message.read) View.INVISIBLE else View.VISIBLE
 
                 // 设置链接图标
                 val sourceUrl = message.sourceUrl?.trim() ?: ""
