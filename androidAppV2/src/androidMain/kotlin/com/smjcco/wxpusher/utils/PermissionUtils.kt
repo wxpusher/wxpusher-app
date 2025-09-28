@@ -45,6 +45,7 @@ class PermissionRequester(
                     callback?.invoke(it)
                     return@registerForActivityResult
                 }
+                //用户点击拒绝，但是没有选择不再询问，可以给用户解释原因后，再次申请
                 if (ActivityCompat.shouldShowRequestPermissionRationale(
                         activity,
                         permission
@@ -76,7 +77,6 @@ class PermissionRequester(
                         }
                         .create()
                     DialogManager.show(activity, dialog)
-
                 } else {
                     WxPusherLog.i(TAG, "提示申请权限的原因，需要跳转引导")
                     val dialog = AlertDialog.Builder(activity)
@@ -94,7 +94,6 @@ class PermissionRequester(
                                 dialog?.dismiss()
                                 callback?.invoke(false)
                             }
-
                         }
                         .create()
                     DialogManager.show(activity, dialog)
@@ -115,9 +114,9 @@ class PermissionRequester(
             requestSuccessRun?.invoke(true)
             return
         }
+        callback = requestSuccessRun
         requester.launch(permission)
     }
-
 }
 
 object PermissionUtils {
