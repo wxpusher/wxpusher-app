@@ -32,8 +32,6 @@
     <color name="input_border_color">#E0E0E0</color>
     <color name="input_border_valid">#4CAF50</color>
     <color name="input_border_invalid">#F44336</color>
-    
-    <!-- 扫码页面相关颜色 -->
-    <color name="scan_overlay">#20000000</color>
+
 
 </resources>

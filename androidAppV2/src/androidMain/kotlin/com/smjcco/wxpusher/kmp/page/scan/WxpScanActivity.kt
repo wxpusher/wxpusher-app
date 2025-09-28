@@ -9,7 +9,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.hardware.Camera
@@ -17,7 +16,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.os.Vibrator
 import android.provider.MediaStore
 import android.view.Surface
 import android.view.SurfaceHolder
@@ -303,7 +301,7 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
                 0f,
                 scanArea.height - scanLine.height - 16f
             )
-            scanLineAnimator?.duration = 2000
+            scanLineAnimator?.duration = 1000
             scanLineAnimator?.repeatCount = ValueAnimator.INFINITE
             scanLineAnimator?.repeatMode = ValueAnimator.REVERSE
             scanLineAnimator?.start()
