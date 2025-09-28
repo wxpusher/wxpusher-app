@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">WxPusher</string>
-    
+
     <!-- 检查项标题 -->
     <string name="check_title">系统推送检查</string>
     <string name="check_desc">为了避免收不到消息，收到消息不提醒，延迟收到消息等，请你检查下面的项目：</string>
@@ -9,20 +9,25 @@
     <string name="check_notification_settings">通知提醒设置</string>
     <string name="check_autostart">自启动权限</string>
     <string name="check_background_running">后台运行</string>
-    
+
     <!-- 检查项状态 -->
     <string name="check_status_enabled">已打开</string>
     <string name="check_status_disabled">请检查</string>
-    
+
     <!-- 检查项描述 -->
     <string name="check_notification_permission_desc">允许应用发送通知，确保您能及时收到消息提醒</string>
     <string name="check_notification_settings_desc">确保通知的时候有铃声和弹窗，避免错过</string>
     <string name="check_autostart_desc">避免应用在后台被杀死后不能收到消息</string>
     <string name="check_background_running_desc">避免在后台收不到消息，允许应用在后台正常运行，不受电池优化限制</string>
-    
+
     <!-- 操作提示 -->
     <string name="check_click_to_set">点击设置</string>
-    
+
+    <!-- 消息列表-->
+    <string name="message_list_scan_add_sub">扫码添加订阅</string>
+    <string name="message_list_sub_manager">订阅管理</string>
+    <string name="message_list_mark_all_read">已读全部消息</string>
+
     <!-- 隐私协议页面 -->
     <string name="privacy_title">用户协议与隐私政策</string>
     <string name="privacy_content">欢迎使用WxPusher！在使用我们的服务前，请您仔细阅读并同意以下协议：\n\n我们非常重视您的个人信息和隐私保护。为了更好地保障您的权益，请您认真阅读《用户协议》和《隐私政策》的全部内容，同意并接受全部条款后开始使用我们的产品和服务。\n\n1. 我们可能会收集您的设备信息、操作日志等信息，用于向您提供消息推送服务；\n2. 我们会采取业界先进的安全措施保护您的信息安全；</string>
@@ -31,7 +36,7 @@
     <string name="privacy_agree">同意并继续</string>
     <string name="privacy_disagree">不同意</string>
     <string name="privacy_key">privacy_agreed_key</string>
-    
+
     <!-- 登录页面 -->
     <string name="login_title">用户登录</string>
     <string name="login_subtitle">首次登录自动注册</string>
@@ -44,7 +49,7 @@
     <string name="login_agree_privacy_first">请先同意用户和隐私协议</string>
     <string name="login_sending">发送中…</string>
     <string name="login_jump_privacy">跳转到隐私协议页面</string>
-    
+
     <!-- 绑定页面 -->
     <string name="bind_page_title">UID绑定</string>
     <string name="bind_description">你好，你的手机号没有注册,你需要先和已经存在的UID绑定才可以接收消息，绑定方式如下：</string>
@@ -58,7 +63,7 @@
     <string name="bind_step_three_desc">发送绑定码后，请点击下面的按钮，查询绑定状态</string>
     <string name="bind_check_status_button">查询绑定状态</string>
     <string name="bind_copy_success">复制成功</string>
-    
+
     <!-- 解绑页面 -->
     <string name="unbind_title">注销账号</string>
     <string name="unbind_description">你即将注销账号，注销以后\n当前手机号不能再登录。</string>
