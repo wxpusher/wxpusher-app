@@ -99,7 +99,7 @@ class ProfileFragment : WxpBaseFragment() {
                         subtitle = "注销手机号",
                         hasArrow = true
                     ) {
-                        showUnbindPhoneDialog()
+                        WxpJumpPageUtils.jumpToUnbind(requireActivity())
                     }
                 )
             ))
@@ -140,7 +140,7 @@ class ProfileFragment : WxpBaseFragment() {
                     },
                     ProfileItem(
                         title = "软件更新",
-                        subtitle = getAppVersionName(),
+                        subtitle = WxPusherUtils.getVersionName(),
                         hasArrow = true
                     ) {
                         checkForUpdate()
@@ -203,7 +203,7 @@ class ProfileFragment : WxpBaseFragment() {
                 leftText = "取消",
                 rightText = "去设置",
                 rightBlock = {
-                    openAppSettings()
+                    PermissionUtils.gotoNotificationSettingPage()
                 }
             )
             WxpDialogUtils.showDialog(params)
@@ -214,20 +214,10 @@ class ProfileFragment : WxpBaseFragment() {
                 leftText = "取消",
                 rightText = "去设置",
                 rightBlock = {
-                    openAppSettings()
+                    PermissionUtils.gotoNotificationSettingPage()
                 }
             )
             WxpDialogUtils.showDialog(params)
-        }
-    }
-
-    private fun openAppSettings() {
-        try {
-            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-            intent.data = Uri.parse("package:${requireContext().packageName}")
-            startActivity(intent)
-        } catch (e: Exception) {
-            PermissionUtils.gotoNotificationSettingPage()
         }
     }
 
@@ -262,10 +252,6 @@ class ProfileFragment : WxpBaseFragment() {
     private fun openRecordUrl() {
         val url = "https://beian.miit.gov.cn/"
         WxpWebViewActivity.start(requireContext(), url)
-    }
-
-    private fun getAppVersionName(): String {
-        return WxPusherUtils.getVersionName()
     }
 
     // 数据模型类
