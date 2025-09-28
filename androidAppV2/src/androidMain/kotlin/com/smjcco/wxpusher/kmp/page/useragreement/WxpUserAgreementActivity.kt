@@ -56,12 +56,6 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
         setupButtons()
     }
 
-    override fun onResume() {
-        super.onResume()
-        // 检查通知权限状态，如果已经打开，可能需要重新注册推送
-        checkNotificationPermissionOnResume()
-    }
-
     private fun setupPermissionLauncher() {
         notificationPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
@@ -160,22 +154,17 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
     }
 
     private fun onAgreeClicked() {
+        if (PermissionUtils.hasNotificationPermission(this)) {
+            // 已经有权限，直接跳转主页面
+            jumpToMain()
+            return
+        }
+
         // 请求通知权限
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            if (PermissionUtils.hasNotificationPermission(this)) {
-                // 已经有权限，直接跳转主页面
-                jumpToMain()
-            } else {
-                // 请求权限
-                notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
-            }
+            notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
         } else {
-            // Android 13以下，检查通知是否启用
-            if (PermissionUtils.hasNotificationPermission(this)) {
-                jumpToMain()
-            } else {
-                showNotificationSettingsDialog()
-            }
+            showNotificationSettingsDialog()
         }
     }
 
@@ -210,7 +199,7 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
             },
             rightText = "去设置",
             rightBlock = {
-                WxpJumpPageUtils.openAppSettings(this@WxpUserAgreementActivity)
+                WxpJumpPageUtils.jumpToNotificationSettingPage()
             }
         )
         WxpDialogUtils.showDialog(params)
@@ -222,12 +211,5 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
         // 跳转到主页面
         WxpJumpPageUtils.jumpToMain(this)
         finish()
-    }
-
-    private fun checkNotificationPermissionOnResume() {
-        // 当从设置页面返回时，检查权限状态，如果已开启则注册推送
-        if (PermissionUtils.hasNotificationPermission(this)) {
-            // TODO: 这里可能需要触发推送注册，但现在先留空，因为主要在jumpToMain中处理
-        }
     }
 }

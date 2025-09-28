@@ -2,6 +2,8 @@ package com.smjcco.wxpusher.kmp.common.utils
 
 import android.app.Activity
 import android.content.Intent
+import android.provider.Settings
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.kmp.common.withActivity
 import com.smjcco.wxpusher.kmp.page.bind.WxpBindActivity
 import com.smjcco.wxpusher.kmp.page.login.WxpLoginActivity
@@ -67,7 +69,7 @@ object WxpJumpPageUtils {
         }
     }
 
-    fun openAppSettings(activity: Activity? = null) {
+    fun jumpToAppSettings(activity: Activity? = null) {
         withActivity(activity) {
             try {
                 val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -78,6 +80,26 @@ object WxpJumpPageUtils {
             } catch (e: Exception) {
                 e.printStackTrace()
             }
+        }
+    }
+
+    /**
+     * 打开通知设置页面
+     */
+    fun jumpToNotificationSettingPage(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent()
+            intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            intent.putExtra(
+                Settings.EXTRA_APP_PACKAGE,
+                ApplicationUtils.getApplication().getPackageName()
+            )
+            intent.putExtra(
+                Settings.EXTRA_CHANNEL_ID,
+                ApplicationUtils.getApplication().applicationInfo.uid
+            )
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            it.startActivity(intent)
         }
     }
 }

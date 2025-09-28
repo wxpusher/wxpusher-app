@@ -5,6 +5,7 @@ import android.os.Build
 import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.api.DeviceApi
+import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.IWxpBaseInfoServiceListener
 import com.smjcco.wxpusher.base.common.WxpBaseInfoService
@@ -42,6 +43,8 @@ class WxPusherApplication : Application() {
                 return DeviceUtils.getPlatform().getPlatform()
             }
         })
+        //上报一次绑定关系，主要是为了更新设备活跃时间
+        WxpAppDataService.updateDeviceInfo()
 
         //这是之前的一些写法
         SaveUtils.init()

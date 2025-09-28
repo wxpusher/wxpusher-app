@@ -192,7 +192,7 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
     private fun showPermissionDialog() {
         WxpToastUtils.showToast("需要相机权限才能扫描二维码，请前往设置开启")
         ThreadUtils.runOnMainThread({
-            WxpJumpPageUtils.openAppSettings(this)
+            WxpJumpPageUtils.jumpToAppSettings(this)
         }, 1500)
     }
 

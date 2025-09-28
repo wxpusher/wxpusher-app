@@ -16,6 +16,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.dialog.DialogManager
+import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 import com.smjcco.wxpusher.log.WxPusherLog
 
 typealias PermissionRequesterCallback = ((Boolean) -> Unit)?
@@ -127,15 +128,7 @@ object PermissionUtils {
      * 打开通知设置页面
      */
     fun gotoNotificationSettingPage() {
-        val intent = Intent()
-        intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-        intent.putExtra(Settings.EXTRA_APP_PACKAGE, ApplicationUtils.getApplication().getPackageName())
-        intent.putExtra(
-            Settings.EXTRA_CHANNEL_ID,
-            ApplicationUtils.getApplication().applicationInfo.uid
-        )
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        ApplicationUtils.getApplication().startActivity(intent)
+        WxpJumpPageUtils.jumpToNotificationSettingPage()
     }
 
     /**
