@@ -35,6 +35,7 @@ import com.google.zxing.common.HybridBinarizer
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseMvpActivity
+import com.smjcco.wxpusher.kmp.common.utils.ThreadUtils
 import com.smjcco.wxpusher.kmp.common.utils.VibratorUtils
 import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 import com.smjcco.wxpusher.page.scan.IWxpScanView
@@ -53,7 +54,10 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
     private var isScanning = false
     private var scanLineAnimator: ObjectAnimator? = null
     private val multiFormatReader = MultiFormatReader()
-    private val handler = Handler(Looper.getMainLooper())
+
+    // 扫码性能优化
+    private var lastScanTime = 0L
+    private val scanInterval = 100L // 扫描间隔，避免过于频繁
 
     // 相机权限请求
     private val cameraPermissionLauncher = registerForActivityResult(
@@ -138,8 +142,10 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
             BarcodeFormat.UPC_E
         )
         hints[DecodeHintType.CHARACTER_SET] = "UTF-8"
+        hints[DecodeHintType.TRY_HARDER] = true
         multiFormatReader.setHints(hints)
     }
+
 
     private fun checkCameraPermission() {
         when {
@@ -187,7 +193,7 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
 
     private fun showPermissionDialog() {
         WxpToastUtils.showToast("需要相机权限才能扫描二维码，请前往设置开启")
-        handler.postDelayed({
+        ThreadUtils.runOnMainThread({
             WxpJumpPageUtils.openAppSettings(this)
         }, 1500)
     }
@@ -242,13 +248,13 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
      */
     private fun getBestHighQualityPreviewSize(sizes: List<Camera.Size>): Camera.Size? {
         if (sizes.isEmpty()) return null
-        
+
         // 按像素数量排序，选择高质量的尺寸
         val sortedSizes = sizes.sortedByDescending { it.width * it.height }
-        
+
         // 优先选择常见的16:9或4:3比例的高质量尺寸
-        val preferredRatios = listOf(16.0/9.0, 4.0/3.0, 3.0/2.0)
-        
+        val preferredRatios = listOf(16.0 / 9.0, 4.0 / 3.0, 3.0 / 2.0)
+
         for (ratio in preferredRatios) {
             for (size in sortedSizes) {
                 val sizeRatio = size.width.toDouble() / size.height.toDouble()
@@ -260,7 +266,7 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
                 }
             }
         }
-        
+
         // 如果没有找到合适比例的，选择适中分辨率的尺寸
         return sortedSizes.find { it.width * it.height <= 1920 * 1080 } ?: sortedSizes.last()
     }
@@ -272,7 +278,7 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
     private fun setCameraDisplayOrientation(activity: Activity, cameraId: Int, camera: Camera) {
         val info = Camera.CameraInfo()
         Camera.getCameraInfo(cameraId, info)
-        
+
         val rotation = activity.windowManager.defaultDisplay.rotation
         var degrees = 0
         when (rotation) {
@@ -331,20 +337,29 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
     }
 
     private fun decodeQRCode(bitmap: Bitmap) {
-        try {
-            val width = bitmap.width
-            val height = bitmap.height
-            val pixels = IntArray(width * height)
-            bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
+        // 将图片解码也放到后台线程
+        ThreadUtils.runOnBackgroundThread {
+            try {
+                val width = bitmap.width
+                val height = bitmap.height
+                val pixels = IntArray(width * height)
+                bitmap.getPixels(pixels, 0, width, 0, 0, width, height)
 
-            val source = com.google.zxing.RGBLuminanceSource(width, height, pixels)
-            val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
+                val source = com.google.zxing.RGBLuminanceSource(width, height, pixels)
+                val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
 
-            val result = multiFormatReader.decode(binaryBitmap)
-            handleQRCodeResult(result.text)
+                val result = multiFormatReader.decode(binaryBitmap)
 
-        } catch (e: Exception) {
-            WxpToastUtils.showToast("未识别到二维码，请选择包含二维码的图片")
+                // 回到主线程处理结果
+                ThreadUtils.runOnMainThread {
+                    handleQRCodeResult(result.text)
+                }
+
+            } catch (e: Exception) {
+                ThreadUtils.runOnMainThread {
+                    WxpToastUtils.showToast("未识别到二维码，请选择包含二维码的图片")
+                }
+            }
         }
     }
 
@@ -361,31 +376,32 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
 
     override fun onPreviewFrame(data: ByteArray?, camera: Camera?) {
         if (!isScanning || data == null) return
+        ThreadUtils.runOnBackgroundThread {
+            try {
+                val parameters = camera?.parameters
+                val width = parameters?.previewSize?.width ?: 0
+                val height = parameters?.previewSize?.height ?: 0
 
-        try {
-            val parameters = camera?.parameters
-            val width = parameters?.previewSize?.width ?: 0
-            val height = parameters?.previewSize?.height ?: 0
+                if (width > 0 && height > 0) {
+                    // 计算扫描区域的实际位置（相对于预览图像）
+                    val scanRect = calculateScanRect(width, height)
 
-            if (width > 0 && height > 0) {
-                // 计算扫描区域的实际位置（相对于预览图像）
-                val scanRect = calculateScanRect(width, height)
-                
-                val source = PlanarYUVLuminanceSource(
-                    data, width, height,
-                    scanRect.left, scanRect.top,
-                    scanRect.width(), scanRect.height(),
-                    false
-                )
-                val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
+                    val source = PlanarYUVLuminanceSource(
+                        data, width, height,
+                        scanRect.left, scanRect.top,
+                        scanRect.width(), scanRect.height(),
+                        false
+                    )
+                    val binaryBitmap = BinaryBitmap(HybridBinarizer(source))
 
-                val result = multiFormatReader.decode(binaryBitmap)
-                handler.post {
-                    handleQRCodeResult(result.text)
+                    val result = multiFormatReader.decode(binaryBitmap)
+                    ThreadUtils.runOnMainThread {
+                        handleQRCodeResult(result.text)
+                    }
                 }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        } catch (e: Exception) {
-            // 继续扫描
         }
     }
 
@@ -399,30 +415,37 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
             // 获取扫描框在屏幕上的位置
             val scanFrameRect = android.graphics.Rect()
             scanArea.getGlobalVisibleRect(scanFrameRect)
-            
+
             // 获取SurfaceView在屏幕上的位置
             val surfaceRect = android.graphics.Rect()
             surfaceView.getGlobalVisibleRect(surfaceRect)
-            
+
             val surfaceWidth = surfaceRect.width().toFloat()
             val surfaceHeight = surfaceRect.height().toFloat()
-            
+
             if (surfaceWidth <= 0 || surfaceHeight <= 0) {
                 return getDefaultScanRect(previewWidth, previewHeight)
             }
-            
+
             // 计算扫描框相对于SurfaceView的相对位置
-            val relativeLeft = ((scanFrameRect.left - surfaceRect.left).toFloat() / surfaceWidth).coerceIn(0f, 1f)
-            val relativeTop = ((scanFrameRect.top - surfaceRect.top).toFloat() / surfaceHeight).coerceIn(0f, 1f)
-            val relativeRight = ((scanFrameRect.right - surfaceRect.left).toFloat() / surfaceWidth).coerceIn(0f, 1f)
-            val relativeBottom = ((scanFrameRect.bottom - surfaceRect.top).toFloat() / surfaceHeight).coerceIn(0f, 1f)
-            
+            val relativeLeft =
+                ((scanFrameRect.left - surfaceRect.left).toFloat() / surfaceWidth).coerceIn(0f, 1f)
+            val relativeTop =
+                ((scanFrameRect.top - surfaceRect.top).toFloat() / surfaceHeight).coerceIn(0f, 1f)
+            val relativeRight =
+                ((scanFrameRect.right - surfaceRect.left).toFloat() / surfaceWidth).coerceIn(0f, 1f)
+            val relativeBottom =
+                ((scanFrameRect.bottom - surfaceRect.top).toFloat() / surfaceHeight).coerceIn(
+                    0f,
+                    1f
+                )
+
             // 直接按比例映射到预览图像坐标（考虑90度旋转）
             val left = (relativeTop * previewWidth).toInt()
             val top = ((1f - relativeRight) * previewHeight).toInt()
             val right = (relativeBottom * previewWidth).toInt()
             val bottom = ((1f - relativeLeft) * previewHeight).toInt()
-            
+
             return android.graphics.Rect(
                 left.coerceAtLeast(0),
                 top.coerceAtLeast(0),
@@ -433,12 +456,14 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
             return getDefaultScanRect(previewWidth, previewHeight)
         }
     }
-    
+
     /**
      * 获取默认的扫描区域（中心区域）
+     * 使用较大的扫描区域提高识别成功率
      */
     private fun getDefaultScanRect(previewWidth: Int, previewHeight: Int): android.graphics.Rect {
-        val size = Math.min(previewWidth, previewHeight) * 0.7f
+        // 使用更大的扫描区域，提高扫码成功率
+        val size = Math.min(previewWidth, previewHeight) * 0.8f
         val centerX = previewWidth / 2
         val centerY = previewHeight / 2
         val halfSize = (size / 2).toInt()
@@ -465,14 +490,14 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
         if (surfaceHolder.surface == null) {
             return
         }
-        
+
         // 停止预览
         try {
             camera?.stopPreview()
         } catch (e: Exception) {
             // 忽略错误
         }
-        
+
         // 重新设置相机方向和启动预览
         camera?.let { cam ->
             try {
