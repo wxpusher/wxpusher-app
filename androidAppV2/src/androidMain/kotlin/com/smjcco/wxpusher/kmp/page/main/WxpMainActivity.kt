@@ -3,6 +3,7 @@ package com.smjcco.wxpusher.kmp.page.main
 import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -15,6 +16,7 @@ import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.kmp.base.WxpBaseActivity
 import com.smjcco.wxpusher.kmp.common.WxpSaveKey
 import com.smjcco.wxpusher.kmp.page.login.WxpLoginActivity
+import com.smjcco.wxpusher.kmp.page.main.fragment.ITabMenuProvider
 import com.smjcco.wxpusher.kmp.page.main.fragment.MessageListFragment
 import com.smjcco.wxpusher.kmp.page.main.fragment.ProfileFragment
 
@@ -25,11 +27,15 @@ class WxpMainActivity : WxpBaseActivity() {
 
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
+    private lateinit var fragmentList: List<Fragment>
+    private var currentMenuProvider: ITabMenuProvider? = null
+    private var currentMenu: Menu? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
+        fragmentList = listOf<Fragment>(MessageListFragment(), ProfileFragment())
         // 初始化视图
         initViews()
 
@@ -77,7 +83,7 @@ class WxpMainActivity : WxpBaseActivity() {
     }
 
     private fun setupViewPager() {
-        viewPager.adapter = MainPagerAdapter(this)
+        viewPager.adapter = MainPagerAdapter(this, fragmentList)
 
         // 连接TabLayout和ViewPager2
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
@@ -94,12 +100,14 @@ class WxpMainActivity : WxpBaseActivity() {
             }
         }.attach()
 
-        // 监听Tab切换，更新Toolbar标题
+        // 监听Tab切换，更新Toolbar标题和菜单
         tabLayout.addOnTabSelectedListener(object :
             TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 tab?.let {
                     title = it.text
+                    // 更新菜单
+                    updateMenuForCurrentTab(tab.position)
                 }
             }
 
@@ -111,30 +119,80 @@ class WxpMainActivity : WxpBaseActivity() {
                 // 不需要处理
             }
         })
+
+        // 监听ViewPager页面切换（处理手势滑动切换）
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                super.onPageSelected(position)
+                // 延迟更新菜单，确保Fragment已经加载完成
+                viewPager.post {
+                    updateMenuForCurrentTab(position)
+                }
+            }
+        })
+
+        // 延迟初始化第一个tab的菜单，确保Fragment已创建
+        viewPager.post {
+            updateMenuForCurrentTab(0)
+        }
     }
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main_action_bar, menu)
+        // 清空之前的菜单
+        menu.clear()
+        currentMenu = menu
+
+        // 根据当前Fragment设置菜单
+        currentMenuProvider?.let { menuProvider ->
+            val menuResId = menuProvider.getMenuResId()
+            if (menuResId != 0) {
+                menuInflater.inflate(menuResId, menu)
+                menuProvider.onMenuCreated(menu)
+            }
+        }
+
         return true
     }
 
-    fun setMenu(){
-
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        // 将菜单点击事件委托给当前Fragment处理
+        currentMenuProvider?.let { menuProvider ->
+            if (menuProvider.onMenuItemSelected(item)) {
+                return true
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
+
+    /**
+     * 根据当前tab位置更新菜单
+     */
+    private fun updateMenuForCurrentTab(position: Int) {
+        val fragment = fragmentList[position]
+        if (fragment is ITabMenuProvider) {
+            currentMenuProvider = fragment
+            // 重新创建菜单
+            invalidateOptionsMenu()
+        } else {
+            currentMenuProvider = null
+            invalidateOptionsMenu()
+        }
+    }
+
     /**
      * ViewPager2适配器
      */
-    private inner class MainPagerAdapter(activity: AppCompatActivity) :
+    private inner class MainPagerAdapter(
+        activity: AppCompatActivity,
+        var fragmentList: List<Fragment>
+    ) :
         FragmentStateAdapter(activity) {
-        override fun getItemCount(): Int = 2
+
+        override fun getItemCount(): Int = fragmentList.size
 
         override fun createFragment(position: Int): Fragment {
-            return when (position) {
-                0 -> MessageListFragment()
-                1 -> ProfileFragment()
-                else -> MessageListFragment()
-            }
+            return fragmentList[position]
         }
     }
 }

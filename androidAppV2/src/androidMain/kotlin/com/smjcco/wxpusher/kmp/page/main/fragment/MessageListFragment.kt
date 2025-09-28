@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -35,7 +36,8 @@ import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
  * 消息列表Fragment
  * 对应iOS中的MessageListViewController
  */
-class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxpMessageListView {
+class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxpMessageListView,
+    ITabMenuProvider {
 
     private lateinit var refreshLayout: SmartRefreshLayout
     private lateinit var recyclerView: RecyclerView
@@ -266,4 +268,34 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
             }
         }
     }
+
+    // 实现ITabMenuProvider接口
+    override fun getMenuResId(): Int {
+        return R.menu.menu_message_list
+    }
+
+    override fun onMenuItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.menu_subscription_manager -> {
+                // 打开订阅管理页面
+                presenter.openSubscribeManagerPage()
+                true
+            }
+
+            R.id.menu_scan_subscribe -> {
+                // 扫码添加订阅 - 可以实现扫码功能或跳转到添加订阅页面
+                // TODO: 实现扫码功能
+                true
+            }
+
+            R.id.menu_mark_all_read -> {
+                // 标记所有消息为已读
+                presenter.markMessageReadStatus(null, true)
+                true
+            }
+
+            else -> false
+        }
+    }
+
 }

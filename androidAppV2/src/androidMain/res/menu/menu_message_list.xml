@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_subscription_manager"
+        android:title="订阅管理"
+        app:showAsAction="never|withText" />
+    <item
+        android:id="@+id/menu_scan_subscribe"
+        android:title="扫码添加订阅"
+        app:showAsAction="never|withText" />
+    <item
+        android:id="@+id/menu_mark_all_read"
+        android:title="已读全部消息"
+        app:showAsAction="never|withText" />
+</menu>
