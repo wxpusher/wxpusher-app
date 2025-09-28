@@ -14,8 +14,6 @@ import android.graphics.BitmapFactory
 import android.hardware.Camera
 import android.net.Uri
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.provider.MediaStore
 import android.view.Surface
 import android.view.SurfaceHolder
