@@ -4,7 +4,9 @@ import android.app.Activity
 import android.content.Intent
 import com.smjcco.wxpusher.kmp.common.withActivity
 import com.smjcco.wxpusher.kmp.page.bind.WxpBindActivity
+import com.smjcco.wxpusher.kmp.page.login.WxpLoginActivity
 import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
+import com.smjcco.wxpusher.kmp.page.unbind.WxpUnbindActivity
 import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
 
 object WxpJumpPageUtils {
@@ -33,6 +35,20 @@ object WxpJumpPageUtils {
     ) {
         withActivity(activity) {
             WxpBindActivity.start(it, phone, code, phoneVerifyCode)
+        }
+    }
+
+    fun jumpToLogin(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent(it, WxpLoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            it.startActivity(intent)
+        }
+    }
+
+    fun jumpToUnbind(activity: Activity? = null) {
+        withActivity(activity) {
+            WxpUnbindActivity.start(it)
         }
     }
 }

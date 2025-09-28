@@ -190,10 +190,7 @@ class ProfileFragment : WxpBaseFragment() {
     }
 
     private fun showUnbindPhoneDialog() {
-        // TODO: 实现注销手机号页面跳转
-        // 对应iOS的WxpUnbindPhoneViewController，需要创建Android版本的注销手机号Activity
-        // 功能：用户可以注销绑定的手机号，解除账号关联
-        WxpToastUtils.showToast("TODO: 实现注销手机号页面 - 对应iOS的WxpUnbindPhoneViewController")
+        WxpJumpPageUtils.jumpToUnbind(requireActivity())
     }
 
     private fun checkNotificationPermission() {

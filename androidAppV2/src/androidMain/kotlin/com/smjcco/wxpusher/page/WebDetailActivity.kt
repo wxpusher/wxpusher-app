@@ -78,7 +78,7 @@ class WebDetailActivity : FragmentActivity() {
                         val intent = Intent(Intent.ACTION_VIEW)
                         intent.data = Uri.parse(url)
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        ApplicationUtils.getApplication().startActivity(intent)
+                        this.startActivity(intent)
                     } catch (e: Exception) {
                         WxPusherLog.w(TAG, "打开浏览器失败: ${e.message}")
                         WxPusherUtils.toast("打开浏览器失败")
@@ -105,7 +105,7 @@ class WebDetailActivity : FragmentActivity() {
                     intent.putExtra(Intent.EXTRA_TEXT, url)
                     val chooser = Intent.createChooser(intent, "分享到")
                     chooser.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    ApplicationUtils.getApplication().startActivity(chooser)
+                    startActivity(chooser)
                 },
                 ActionSheetItem("重新加载") {
                     if (url.isEmpty()) {

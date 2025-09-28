@@ -1,6 +1,5 @@
 package com.smjcco.wxpusher.base.biz
 
-expect fun WxpAppPageService_jumpToLogin()
 
 interface IWxpAppPageService {
     fun jumpToLogin()

@@ -26,11 +26,11 @@
 
         <activity
             android:name=".kmp.page.main.WxpMainActivity"
+            android:clearTaskOnLaunch="true"
             android:configChanges="uiMode"
             android:exported="true"
-            android:clearTaskOnLaunch="true"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -75,6 +75,10 @@
             android:exported="true"
             android:launchMode="singleTask" />
 
+        <activity
+            android:name=".kmp.page.unbind.WxpUnbindActivity"
+            android:exported="false"
+            android:launchMode="singleTask" />
         <!--        暂时不用长链接服务-->
         <!--        <service-->
         <!--            android:name=".push.ws.KeepWsConnectService"-->

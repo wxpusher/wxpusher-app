@@ -24,5 +24,13 @@
     
     <!-- 输入框背景颜色 -->
     <color name="input_field_bg">#F5F5F5</color>
+    
+    <!-- 解绑页面相关颜色 -->
+    <color name="danger_color">#F44336</color>
+    <color name="text_fit_theme_second">#757575</color>
+    <color name="card_bg_fit_theme">#F8F8F8</color>
+    <color name="input_border_color">#E0E0E0</color>
+    <color name="input_border_valid">#4CAF50</color>
+    <color name="input_border_invalid">#F44336</color>
 
 </resources>
