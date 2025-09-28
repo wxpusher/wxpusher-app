@@ -89,14 +89,14 @@
         <activity
             android:name=".kmp.page.unbind.WxpUnbindActivity"
             android:exported="false"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".kmp.page.scan.WxpScanActivity"
-            android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar.TranslucentStatus" />
+            android:theme="@style/AppTheme.Scan" />
 
         <!--        暂时不用长链接服务-->
         <!--        <service-->
