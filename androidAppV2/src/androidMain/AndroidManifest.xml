@@ -98,6 +98,11 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Scan" />
 
+        <activity
+            android:name=".kmp.page.useragreement.WxpUserAgreementActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
         <!--        暂时不用长链接服务-->
         <!--        <service-->
         <!--            android:name=".push.ws.KeepWsConnectService"-->

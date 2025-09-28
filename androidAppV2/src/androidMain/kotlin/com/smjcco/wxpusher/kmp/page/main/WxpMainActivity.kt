@@ -15,6 +15,7 @@ import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.kmp.base.WxpBaseActivity
 import com.smjcco.wxpusher.kmp.common.WxpSaveKey
+import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 import com.smjcco.wxpusher.kmp.page.login.WxpLoginActivity
 import com.smjcco.wxpusher.kmp.page.main.fragment.ITabMenuProvider
 import com.smjcco.wxpusher.kmp.page.main.fragment.MessageListFragment
@@ -55,10 +56,11 @@ class WxpMainActivity : WxpBaseActivity() {
      */
     private fun checkAppStatus(): Boolean {
         //没有同意隐私协议
-        if (WxpSaveService.get(WxpSaveKey.UserHasAgreement, false)) {
-            // TODO: 打开隐私协议页面
-//            startActivity(Intent(this, LoginActivity::class.java))
-            return true;
+        if (!WxpSaveService.get(WxpSaveKey.UserHasAgreement, false)) {
+            // 打开隐私协议页面
+            WxpJumpPageUtils.jumpToUserAgreement(this)
+            finish()
+            return false;
         }
         val token = WxpAppDataService.getLoginInfo()?.deviceToken
         if (token.isNullOrEmpty()) {

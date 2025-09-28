@@ -9,6 +9,7 @@ import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
 import com.smjcco.wxpusher.kmp.page.unbind.WxpUnbindActivity
 import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.kmp.page.scan.WxpScanActivity
+import com.smjcco.wxpusher.kmp.page.useragreement.WxpUserAgreementActivity
 
 object WxpJumpPageUtils {
 
@@ -57,6 +58,12 @@ object WxpJumpPageUtils {
         withActivity(activity) {
             val intent = Intent(it, WxpScanActivity::class.java)
             it.startActivity(intent)
+        }
+    }
+
+    fun jumpToUserAgreement(activity: Activity? = null) {
+        withActivity(activity) {
+            WxpUserAgreementActivity.start(it)
         }
     }
 
