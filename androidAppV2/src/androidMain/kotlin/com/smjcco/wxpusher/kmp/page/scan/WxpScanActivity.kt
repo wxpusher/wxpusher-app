@@ -200,9 +200,9 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
     private fun initCamera() {
         try {
             camera = Camera.open()
-            camera?.setPreviewDisplay(surfaceHolder)
 
             val parameters = camera?.parameters
+            var previewSize: Camera.Size? = null
             parameters?.let { params ->
                 // 设置对焦模式
                 if (params.supportedFocusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_PICTURE)) {
@@ -213,9 +213,9 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
 
                 // 设置预览尺寸
                 val supportedSizes = params.supportedPreviewSizes
-                // 注意：Camera的宽高是相对于相机传感器的，通常是横向的（width > height）
-                val bestSize = getBestPreviewSize(supportedSizes, surfaceView.height, surfaceView.width)
-                bestSize?.let {
+                // 选择最佳预览尺寸
+                previewSize = getBestPreviewSize(supportedSizes, surfaceView.width, surfaceView.height)
+                previewSize?.let {
                     params.setPreviewSize(it.width, it.height)
                 }
 
@@ -225,6 +225,12 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
             // 设置相机显示方向
             setCameraDisplayOrientation(this, 0, camera!!)
 
+            // 调整SurfaceView的尺寸以保持正确的长宽比
+            previewSize?.let {
+                adjustSurfaceViewSize(it.width, it.height)
+            }
+
+            camera?.setPreviewDisplay(surfaceHolder)
             camera?.setPreviewCallback(this)
             camera?.startPreview()
             isScanning = true
@@ -237,32 +243,74 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
         }
     }
 
-    private fun getBestPreviewSize(sizes: List<Camera.Size>, w: Int, h: Int): Camera.Size? {
-        val aspectTolerance = 0.1
-        val targetRatio = h.toDouble() / w
+    /**
+     * 调整SurfaceView的尺寸以保持正确的长宽比
+     */
+    private fun adjustSurfaceViewSize(previewWidth: Int, previewHeight: Int) {
+        val screenWidth = resources.displayMetrics.widthPixels
+        val screenHeight = resources.displayMetrics.heightPixels
 
+        // 由于相机预览在竖屏模式下会旋转90度，
+        // 预览的width实际对应屏幕的height，预览的height对应屏幕的width
+        val displayRatio = previewHeight.toDouble() / previewWidth.toDouble()
+        val screenRatio = screenHeight.toDouble() / screenWidth.toDouble()
+
+        val layoutParams = surfaceView.layoutParams as FrameLayout.LayoutParams
+        
+        if (displayRatio > screenRatio) {
+            // 预览比屏幕更"窄"，以宽度为准，高度会超出屏幕（裁剪上下部分）
+            layoutParams.width = screenWidth
+            layoutParams.height = (screenWidth / displayRatio).toInt()
+        } else {
+            // 预览比屏幕更"宽"，以高度为准，宽度会超出屏幕（裁剪左右部分）
+            layoutParams.width = (screenHeight * displayRatio).toInt()
+            layoutParams.height = screenHeight
+        }
+        
+        // 居中显示
+        layoutParams.gravity = android.view.Gravity.CENTER
+        
+        surfaceView.post {
+            surfaceView.layoutParams = layoutParams
+        }
+    }
+
+    private fun getBestPreviewSize(sizes: List<Camera.Size>, w: Int, h: Int): Camera.Size? {
+        if (sizes.isEmpty()) return null
+        
+        // 计算目标长宽比（屏幕比例）
+        // 由于相机传感器通常是横向的，我们需要计算正确的比例
+        val targetRatio = h.toDouble() / w
+        val aspectTolerance = 0.2
+        
         var optimalSize: Camera.Size? = null
         var minDiff = Double.MAX_VALUE
-
+        
+        // 首先尝试找到长宽比匹配的尺寸
         for (size in sizes) {
+            // 注意：Camera.Size的width通常是较大的值（横向），height是较小的值
             val ratio = size.width.toDouble() / size.height
-            if (Math.abs(ratio - targetRatio) > aspectTolerance) continue
-            if (Math.abs(size.height - h) < minDiff) {
-                optimalSize = size
-                minDiff = Math.abs(size.height - h).toDouble()
-            }
-        }
-
-        if (optimalSize == null) {
-            minDiff = Double.MAX_VALUE
-            for (size in sizes) {
-                if (Math.abs(size.height - h) < minDiff) {
+            if (Math.abs(ratio - targetRatio) <= aspectTolerance) {
+                val sizeDiff = Math.abs(size.height - h) + Math.abs(size.width - w)
+                if (sizeDiff < minDiff) {
                     optimalSize = size
-                    minDiff = Math.abs(size.height - h).toDouble()
+                    minDiff = sizeDiff.toDouble()
                 }
             }
         }
-
+        
+        // 如果没找到合适长宽比的，选择最接近目标尺寸的
+        if (optimalSize == null) {
+            minDiff = Double.MAX_VALUE
+            for (size in sizes) {
+                val sizeDiff = Math.abs(size.height - h) + Math.abs(size.width - w)
+                if (sizeDiff < minDiff) {
+                    optimalSize = size
+                    minDiff = sizeDiff.toDouble()
+                }
+            }
+        }
+        
         return optimalSize
     }
 
@@ -407,44 +455,47 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
             val surfaceHeight = surfaceRect.height().toFloat()
             
             if (surfaceWidth <= 0 || surfaceHeight <= 0) {
-                // 如果获取不到有效尺寸，返回中心区域
-                val centerSize = Math.min(previewWidth, previewHeight) * 0.6f
-                val centerX = previewWidth / 2
-                val centerY = previewHeight / 2
-                val halfSize = (centerSize / 2).toInt()
-                return android.graphics.Rect(
-                    centerX - halfSize,
-                    centerY - halfSize,
-                    centerX + halfSize,
-                    centerY + halfSize
-                )
+                return getDefaultScanRect(previewWidth, previewHeight)
             }
             
-            val relativeLeft = (scanFrameRect.left - surfaceRect.left).toFloat() / surfaceWidth
-            val relativeTop = (scanFrameRect.top - surfaceRect.top).toFloat() / surfaceHeight
-            val relativeRight = (scanFrameRect.right - surfaceRect.left).toFloat() / surfaceWidth
-            val relativeBottom = (scanFrameRect.bottom - surfaceRect.top).toFloat() / surfaceHeight
+            // 计算扫描框相对于SurfaceView的相对位置
+            val relativeLeft = ((scanFrameRect.left - surfaceRect.left).toFloat() / surfaceWidth).coerceIn(0f, 1f)
+            val relativeTop = ((scanFrameRect.top - surfaceRect.top).toFloat() / surfaceHeight).coerceIn(0f, 1f)
+            val relativeRight = ((scanFrameRect.right - surfaceRect.left).toFloat() / surfaceWidth).coerceIn(0f, 1f)
+            val relativeBottom = ((scanFrameRect.bottom - surfaceRect.top).toFloat() / surfaceHeight).coerceIn(0f, 1f)
             
-            // 将相对位置转换为预览图像坐标
-            val left = (relativeLeft * previewWidth).toInt().coerceAtLeast(0)
-            val top = (relativeTop * previewHeight).toInt().coerceAtLeast(0)
-            val right = (relativeRight * previewWidth).toInt().coerceAtMost(previewWidth)
-            val bottom = (relativeBottom * previewHeight).toInt().coerceAtMost(previewHeight)
+            // 考虑到相机预览是旋转90度的，需要调整坐标映射
+            // 对于竖屏：预览的width对应屏幕的height，预览的height对应屏幕的width
+            val left = (relativeTop * previewWidth).toInt().coerceAtLeast(0)
+            val top = ((1f - relativeRight) * previewHeight).toInt().coerceAtLeast(0)
+            val right = (relativeBottom * previewWidth).toInt().coerceAtMost(previewWidth)
+            val bottom = ((1f - relativeLeft) * previewHeight).toInt().coerceAtMost(previewHeight)
+            
+            // 确保扫描区域有效
+            if (right <= left || bottom <= top) {
+                return getDefaultScanRect(previewWidth, previewHeight)
+            }
             
             return android.graphics.Rect(left, top, right, bottom)
         } catch (e: Exception) {
-            // 异常情况下返回默认扫描区域
-            val size = Math.min(previewWidth, previewHeight) * 0.6f
-            val centerX = previewWidth / 2
-            val centerY = previewHeight / 2
-            val halfSize = (size / 2).toInt()
-            return android.graphics.Rect(
-                centerX - halfSize,
-                centerY - halfSize,
-                centerX + halfSize,
-                centerY + halfSize
-            )
+            return getDefaultScanRect(previewWidth, previewHeight)
         }
+    }
+    
+    /**
+     * 获取默认的扫描区域
+     */
+    private fun getDefaultScanRect(previewWidth: Int, previewHeight: Int): android.graphics.Rect {
+        val size = Math.min(previewWidth, previewHeight) * 0.6f
+        val centerX = previewWidth / 2
+        val centerY = previewHeight / 2
+        val halfSize = (size / 2).toInt()
+        return android.graphics.Rect(
+            centerX - halfSize,
+            centerY - halfSize,
+            centerX + halfSize,
+            centerY + halfSize
+        )
     }
 
     override fun surfaceCreated(holder: SurfaceHolder) {
@@ -471,11 +522,18 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
         }
         
         // 重新设置相机方向和启动预览
-        camera?.let {
-            setCameraDisplayOrientation(this, 0, it)
+        camera?.let { cam ->
             try {
-                it.setPreviewDisplay(surfaceHolder)
-                it.startPreview()
+                // 重新获取预览尺寸并调整SurfaceView
+                val params = cam.parameters
+                val previewSize = params?.previewSize
+                previewSize?.let {
+                    adjustSurfaceViewSize(it.width, it.height)
+                }
+                
+                setCameraDisplayOrientation(this, 0, cam)
+                cam.setPreviewDisplay(surfaceHolder)
+                cam.startPreview()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -511,8 +569,11 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
                 Manifest.permission.CAMERA
             ) == PackageManager.PERMISSION_GRANTED
         ) {
-            if (surfaceHolder.surface.isValid) {
-                initCamera()
+            // 延迟启动相机，确保SurfaceView已经准备好
+            surfaceView.post {
+                if (surfaceHolder.surface.isValid) {
+                    initCamera()
+                }
             }
         }
     }
