@@ -14,7 +14,7 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    
+
     <!-- 声明需要相机特征 -->
     <uses-feature
         android:name="android.hardware.camera"
@@ -93,9 +93,10 @@
 
         <activity
             android:name=".kmp.page.scan.WxpScanActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:configChanges="orientation|keyboardHidden|screenSize" />
+            android:theme="@style/AppTheme.NoActionBar.TranslucentStatus" />
 
         <!--        暂时不用长链接服务-->
         <!--        <service-->

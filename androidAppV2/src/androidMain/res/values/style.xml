@@ -14,4 +14,10 @@
         <item name="android:statusBarColor">@color/AccentColor</item>
         <item name="actionModeBackground">@color/AccentColorDark</item>
     </style>
+
+
+    <style name="AppTheme.NoActionBar.TranslucentStatus" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="actionMenuTextColor">#ffffff</item>
+    </style>
 </resources>
