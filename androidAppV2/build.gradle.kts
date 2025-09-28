@@ -143,8 +143,9 @@ dependencies {
     implementation("androidx.preference:preference-ktx:1.2.0")
     //SmartRefreshLayout
     implementation("io.github.scwang90:refresh-layout-kernel:3.0.0-alpha")
-//核心必须依赖
     implementation("io.github.scwang90:refresh-header-classics:3.0.0-alpha")
-//经典刷新头
+
+    implementation("com.google.zxing:core:3.3.3")
+
 }
 

@@ -8,6 +8,7 @@ import com.smjcco.wxpusher.kmp.page.login.WxpLoginActivity
 import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
 import com.smjcco.wxpusher.kmp.page.unbind.WxpUnbindActivity
 import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
+import com.smjcco.wxpusher.kmp.page.scan.WxpScanActivity
 
 object WxpJumpPageUtils {
 
@@ -49,6 +50,27 @@ object WxpJumpPageUtils {
     fun jumpToUnbind(activity: Activity? = null) {
         withActivity(activity) {
             WxpUnbindActivity.start(it)
+        }
+    }
+
+    fun jumpToScan(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent(it, WxpScanActivity::class.java)
+            it.startActivity(intent)
+        }
+    }
+
+    fun openAppSettings(activity: Activity? = null) {
+        withActivity(activity) {
+            try {
+                val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = android.net.Uri.fromParts("package", it.packageName, null)
+                intent.data = uri
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                it.startActivity(intent)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }

@@ -119,6 +119,13 @@ class ProfileFragment : WxpBaseFragment() {
                         hasArrow = true
                     ) {
                         openPushCheckUrl()
+                    },
+                    ProfileItem(
+                        title = "二维码扫描",
+                        subtitle = "测试扫码功能",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToScan(requireActivity())
                     }
                 )
             ))

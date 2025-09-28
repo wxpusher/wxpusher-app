@@ -1,6 +1,7 @@
 package com.smjcco.wxpusher.kmp.page.main.fragment
 
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.VibrationEffect
@@ -25,6 +26,8 @@ import com.scwang.smart.refresh.layout.listener.OnRefreshListener
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.WxpDateTimeUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseMvpFragment
+import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
+import com.smjcco.wxpusher.kmp.page.scan.WxpScanActivity
 import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListView
@@ -284,7 +287,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
 
             R.id.menu_scan_subscribe -> {
                 // 扫码添加订阅 - 可以实现扫码功能或跳转到添加订阅页面
-                // TODO: 实现扫码功能
+                WxpJumpPageUtils.jumpToScan(requireActivity())
                 true
             }
 
