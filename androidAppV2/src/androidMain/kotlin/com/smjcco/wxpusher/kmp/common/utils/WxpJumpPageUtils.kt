@@ -13,6 +13,7 @@ import com.smjcco.wxpusher.kmp.page.scan.WxpScanActivity
 import com.smjcco.wxpusher.kmp.page.unbind.WxpUnbindActivity
 import com.smjcco.wxpusher.kmp.page.useragreement.WxpUserAgreementActivity
 import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
+import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager
 
 
 object WxpJumpPageUtils {
@@ -44,7 +45,7 @@ object WxpJumpPageUtils {
             )
             intent.putExtra(
                 Settings.EXTRA_CHANNEL_ID,
-                ApplicationUtils.getApplication().applicationInfo.uid
+                WxpNotificationManager.WxPusherSystemChannelId
             )
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             it.startActivity(intent)

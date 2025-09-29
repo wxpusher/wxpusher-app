@@ -53,7 +53,7 @@ object PushManager {
             WxPusherLog.i(TAG, "初始化自建长链接")
             WxpNotificationManager.init()
             WsManager.init()
-            //启动保活
+            //启动保活，必须在最后
             KeepWsAliveService.start()
         }
 

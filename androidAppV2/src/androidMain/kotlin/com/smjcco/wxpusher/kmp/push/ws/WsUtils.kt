@@ -6,6 +6,7 @@ import android.content.Intent
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.dialog.DialogManager
+import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 import com.smjcco.wxpusher.page.CheckActivity
 
 object WsUtils {
@@ -31,8 +32,7 @@ object WsUtils {
                 "去设置"
             ) { dialog, which ->
                 dialog?.dismiss()
-                val intent = Intent(ApplicationUtils.getApplication(), CheckActivity::class.java)
-                activity.startActivity(intent)
+                WxpJumpPageUtils.jumpToSystemNotificationSettingPage()
             }
             .setCancelable(false)
             .setNegativeButton("关闭") { dialog, _ ->

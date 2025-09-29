@@ -18,6 +18,7 @@ import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
+import com.smjcco.wxpusher.kmp.push.ws.ChannelGroup
 import com.smjcco.wxpusher.kmp.push.ws.connect.WsManager
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -166,13 +167,13 @@ class KeepWsAliveService : Service() {
                 notificationChannelId,
                 "WxPusher监听消息通知",
                 NotificationManager.IMPORTANCE_HIGH
-            ).let {
-                it.description = "用于让WxPusher持续监听消息"
-                it.enableLights(true)
-                it.lightColor = Color.GREEN
-                it.enableVibration(true)
-                it.vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
-                it
+            ).apply {
+                description = "用于让WxPusher持续监听消息"
+                enableLights(true)
+                lightColor = Color.GREEN
+                enableVibration(true)
+                vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
+                group = ChannelGroup.WxPusherSystem.id
             }
             notificationManager.createNotificationChannel(channel)
         }
