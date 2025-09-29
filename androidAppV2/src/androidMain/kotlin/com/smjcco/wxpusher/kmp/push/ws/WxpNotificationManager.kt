@@ -66,6 +66,7 @@ object WxpNotificationManager {
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
+                .setGroup("bizMsg")
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 //显示更多文本，长按可以展开

@@ -188,6 +188,7 @@ class KeepWsAliveService : Service() {
             .setContentText("绿色图标表示正在监听中，如果通知消失，你需要重新启动WxPusher")
             .setContentIntent(pendingIntent)
             .setOngoing(true)
+            .setGroup(KeepWsAliveService::class.java.name)
             .setAutoCancel(false)
             .setTicker("WxPusher会在后台持续运行，以接收最新的消息，如果本通知消息，你需要重新启动WxPusher")
             .setPriority(NotificationManager.IMPORTANCE_HIGH)
