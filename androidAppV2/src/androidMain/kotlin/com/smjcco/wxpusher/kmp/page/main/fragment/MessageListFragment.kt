@@ -88,6 +88,11 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         setupBanner()
     }
 
+    override fun onResume() {
+        super.onResume()
+        setupBanner()
+    }
+
     private fun initViews(view: View) {
         refreshLayout = view.findViewById(R.id.refresh_layout)
         recyclerView = view.findViewById(R.id.recycler_view)
@@ -162,7 +167,6 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
             }
             bannerCloseImg.visibility = View.GONE
         }
-
     }
 
     private fun setupRefreshLayout() {
