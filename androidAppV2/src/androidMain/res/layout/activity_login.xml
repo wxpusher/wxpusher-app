@@ -20,9 +20,7 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingStart="32dp"
             android:paddingTop="32dp"
-            android:paddingEnd="32dp"
             android:paddingBottom="32dp">
 
             <!-- 主体内容垂直居中 -->
@@ -68,6 +66,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="40dp"
+                android:paddingStart="32dp"
+                android:paddingEnd="32dp"
                 app:boxBackgroundColor="@android:color/transparent"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -112,6 +112,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginRight="16dp"
+                android:paddingStart="32dp"
                 app:boxBackgroundColor="@android:color/transparent"
                 app:boxCornerRadiusBottomEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
@@ -119,6 +120,7 @@
                 app:boxCornerRadiusTopStart="12dp"
                 app:boxStrokeColor="@color/colorPrimary"
                 app:boxStrokeWidth="1dp"
+
                 app:boxStrokeWidthFocused="2dp"
                 app:hintTextColor="@color/colorPrimary"
                 app:layout_constraintEnd_toStartOf="@+id/get_code_button"
@@ -153,6 +155,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="12dp"
+                android:layout_marginEnd="32dp"
+                android:insetTop="0dp"
+
+                android:insetBottom="0dp"
                 android:minHeight="56dp"
                 android:text="@string/login_get_code"
                 android:textColor="@color/white"
@@ -170,24 +176,31 @@
                 android:id="@+id/login_button"
                 android:layout_width="0dp"
                 android:layout_height="56dp"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="32dp"
+                android:layout_marginEnd="32dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
                 android:text="@string/login_button"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:backgroundTint="@color/colorPrimary"
                 app:cornerRadius="12dp"
-                app:elevation="4dp"
+                app:elevation="3dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/code_input_layout" />
 
             <!-- 隐私协议复选框和标签 -->
             <LinearLayout
+
                 android:id="@+id/privacy_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
                 android:layout_marginTop="24dp"
+                android:layout_marginEnd="32dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
                 app:layout_constraintEnd_toEndOf="parent"
