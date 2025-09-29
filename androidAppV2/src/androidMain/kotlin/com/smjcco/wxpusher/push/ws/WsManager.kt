@@ -136,10 +136,10 @@ object WsManager {
             setConnectStatus(WsConnectStatus.Connecting)
             val wsUrl = getHostUrl()
             WxPusherLog.i(TAG, "wsUrl: ${wsUrl}")
-            val request: Request = Request.Builder()
-                .url(wsUrl)
-                .build()
-            webSocket = client.newWebSocket(request, WsListener())
+//            val request: Request = Request.Builder()
+//                .url(wsUrl)
+//                .build()
+//            webSocket = client.newWebSocket(request, WsListener())
         }
     }
 

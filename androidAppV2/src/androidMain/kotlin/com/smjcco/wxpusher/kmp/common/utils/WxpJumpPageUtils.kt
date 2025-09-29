@@ -2,6 +2,7 @@ package com.smjcco.wxpusher.kmp.common.utils
 
 import android.app.Activity
 import android.content.Intent
+import android.net.Uri
 import android.provider.Settings
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.kmp.common.withActivity
@@ -13,13 +14,14 @@ import com.smjcco.wxpusher.kmp.page.unbind.WxpUnbindActivity
 import com.smjcco.wxpusher.kmp.page.useragreement.WxpUserAgreementActivity
 import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
 
+
 object WxpJumpPageUtils {
 
     fun jumpToSystemAppSettings(activity: Activity? = null) {
         withActivity(activity) {
             try {
                 val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                val uri = android.net.Uri.fromParts("package", it.packageName, null)
+                val uri = Uri.fromParts("package", it.packageName, null)
                 intent.data = uri
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
                 it.startActivity(intent)
@@ -54,7 +56,12 @@ object WxpJumpPageUtils {
      */
     fun jumpToSystemIgnoreBatteryOptimizationSettings(activity: Activity? = null) {
         withActivity(activity) {
-            val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+//            val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+//            it.startActivity(intent)
+
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+            intent.data = Uri.fromParts("package", it.packageName, null)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             it.startActivity(intent)
         }
     }
