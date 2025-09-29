@@ -14,6 +14,7 @@ import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.push.ws.WsUtils
 import com.smjcco.wxpusher.push.xiaomi.XiaomiUtils
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
+import com.smjcco.wxpusher.kmp.service.KeepWsAliveService
 import com.smjcco.wxpusher.utils.PermissionUtils
 
 /**
@@ -50,6 +51,8 @@ object PushManager {
         } else {
             WxPusherLog.i(TAG, "初始化自建长链接")
             WsManager.init()
+            //启动保活
+            KeepWsAliveService.start()
         }
 
     }

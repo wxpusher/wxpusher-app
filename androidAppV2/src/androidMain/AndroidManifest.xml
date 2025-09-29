@@ -3,6 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:node="merge">
 
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_CONNECTED_DEVICE"
+        android:minSdkVersion="34" />
+
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -106,6 +110,12 @@
         <!--            android:name=".push.ws.KeepWsConnectService"-->
         <!--            android:foregroundServiceType="remoteMessaging"-->
         <!--            tools:node="merge" />-->
+
+        <service
+            android:name=".kmp.service.KeepWsAliveService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="connectedDevice" />
 
         <activity
             android:name=".TestActivity"
