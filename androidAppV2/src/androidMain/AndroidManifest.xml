@@ -112,10 +112,20 @@
         <!--            tools:node="merge" />-->
 
         <service
-            android:name=".kmp.service.KeepWsAliveService"
+            android:name=".kmp.keepalive.KeepWsAliveService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
+
+        <receiver
+            android:name=".kmp.keepalive.KeepWsAliveStartReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
 
         <activity
             android:name=".TestActivity"

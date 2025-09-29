@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.kmp.service
+package com.smjcco.wxpusher.kmp.keepalive
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
@@ -89,6 +89,7 @@ class KeepWsAliveService : Service() {
      * 这里添加一个定时器，让服务在稍后重启
      */
     override fun onTaskRemoved(rootIntent: Intent) {
+        WxpLogUtils.i(message = "KeepWsAliveService onTaskRemoved-使用定时器重新启动任务")
         val restartServiceIntent = Intent(applicationContext, KeepWsAliveService::class.java).also {
             it.setPackage(packageName)
         };
@@ -184,6 +185,8 @@ class KeepWsAliveService : Service() {
             .setContentTitle("WxPusher正在监听通知")
             .setContentText("绿色图标表示正在监听中，如果通知消失，你需要重新启动WxPusher")
             .setContentIntent(pendingIntent)
+            .setOngoing(true)
+            .setAutoCancel(false)
             .setTicker("WxPusher会在后台持续运行，以接收最新的消息，如果本通知消息，你需要重新启动WxPusher")
             .setPriority(NotificationManager.IMPORTANCE_HIGH)
             .setSmallIcon(R.mipmap.ic_launcher)

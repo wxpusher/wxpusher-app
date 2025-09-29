@@ -14,7 +14,7 @@ import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.push.ws.WsUtils
 import com.smjcco.wxpusher.push.xiaomi.XiaomiUtils
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
-import com.smjcco.wxpusher.kmp.service.KeepWsAliveService
+import com.smjcco.wxpusher.kmp.keepalive.KeepWsAliveService
 import com.smjcco.wxpusher.utils.PermissionUtils
 
 /**
