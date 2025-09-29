@@ -14,6 +14,7 @@ import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.push.ws.WsUtils
 import com.smjcco.wxpusher.push.xiaomi.XiaomiUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
+import com.smjcco.wxpusher.utils.PermissionUtils
 
 /**
  * 管理push的一堆事儿，对厂商和通道做抽象
@@ -76,10 +77,16 @@ object PushManager {
      * 显示打开通知提醒的弹窗
      */
     fun showOpenNoteRemindSettingDialog(activity: Activity) {
+        //没登录不提醒
         if (WxpAppDataService.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
             return
         }
+        //没有推送id，不提醒
         if (WxpAppDataService.getPushToken().isNullOrEmpty()) {
+            return
+        }
+        //没有推送权限不提醒
+        if (!PermissionUtils.hasNotificationPermission(activity)) {
             return
         }
         val platform = DeviceUtils.getPlatform()
