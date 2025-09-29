@@ -112,13 +112,13 @@
         <!--            tools:node="merge" />-->
 
         <service
-            android:name=".kmp.keepalive.KeepWsAliveService"
+            android:name=".kmp.push.ws.keepalive.KeepWsAliveService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="connectedDevice" />
 
         <receiver
-            android:name=".kmp.keepalive.KeepWsAliveStartReceiver"
+            android:name=".kmp.push.ws.keepalive.KeepWsAliveStartReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

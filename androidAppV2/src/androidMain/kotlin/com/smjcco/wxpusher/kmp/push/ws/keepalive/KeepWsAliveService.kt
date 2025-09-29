@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.kmp.keepalive
+package com.smjcco.wxpusher.kmp.push.ws.keepalive
 
 import android.annotation.SuppressLint
 import android.app.AlarmManager
@@ -18,6 +18,7 @@ import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
+import com.smjcco.wxpusher.kmp.push.ws.connect.WsManager
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -129,7 +130,7 @@ class KeepWsAliveService : Service() {
         GlobalScope.launch(Dispatchers.IO) {
             while (isServiceStarted) {
                 doWork()
-                delay(1 * 1000)
+                delay(30 * 1000)
             }
         }
     }
@@ -151,7 +152,7 @@ class KeepWsAliveService : Service() {
     }
 
     private fun doWork() {
-        WxpLogUtils.i(message = "长链接检查任务")
+        WsManager.tryConnect()
     }
 
     private fun createNotification(): Notification {

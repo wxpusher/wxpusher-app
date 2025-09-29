@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.kmp.push.ws
+package com.smjcco.wxpusher.kmp.push.ws.connect
 
 import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
@@ -94,7 +94,8 @@ object WsManager {
     fun tryConnect() {
         synchronized(this) {
             if (connectStatus.get() == WsConnectStatus.Connected) {
-                WxPusherLog.i(TAG, "connect: 已经链接，不进行链接")
+//                连接状态不打印日志，否则日志太多了
+//                WxPusherLog.i(TAG, "connect: 已经链接，不进行链接")
                 return
             }
             if (connectStatus.get() == WsConnectStatus.Connecting) {

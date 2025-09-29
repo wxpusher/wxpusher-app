@@ -1,10 +1,8 @@
-package com.smjcco.wxpusher.kmp.keepalive
+package com.smjcco.wxpusher.kmp.push.ws.keepalive
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Build
-import com.smjcco.wxpusher.push.PushManager
 
 class KeepWsAliveStartReceiver : BroadcastReceiver() {
 

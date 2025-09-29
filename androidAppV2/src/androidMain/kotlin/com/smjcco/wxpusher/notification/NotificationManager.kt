@@ -12,7 +12,7 @@ import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.ApplicationUtils
-import com.smjcco.wxpusher.kmp.push.ws.PushMsgDeviceMsg
+import com.smjcco.wxpusher.kmp.push.ws.connect.PushMsgDeviceMsg
 import com.smjcco.wxpusher.page.WebViewActivity
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger

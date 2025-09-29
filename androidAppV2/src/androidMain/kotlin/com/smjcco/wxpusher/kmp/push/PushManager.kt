@@ -6,12 +6,12 @@ import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
-import com.smjcco.wxpusher.kmp.keepalive.KeepWsAliveService
+import com.smjcco.wxpusher.kmp.push.ws.keepalive.KeepWsAliveService
 import com.smjcco.wxpusher.kmp.push.honor.HonorPushUtils
 import com.smjcco.wxpusher.kmp.push.huawei.HuaweiPushUtils
 import com.smjcco.wxpusher.kmp.push.oppo.OppoPushUtils
 import com.smjcco.wxpusher.kmp.push.vivo.VIVOPushUtils
-import com.smjcco.wxpusher.kmp.push.ws.WsManager
+import com.smjcco.wxpusher.kmp.push.ws.connect.WsManager
 import com.smjcco.wxpusher.kmp.push.ws.WsUtils
 import com.smjcco.wxpusher.kmp.push.xiaomi.XiaomiUtils
 import com.smjcco.wxpusher.log.WxPusherLog
