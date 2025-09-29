@@ -152,6 +152,13 @@ object WxpNotificationManager {
         return getSysNotificationManager().getNotificationChannel(id) != null
     }
 
+    /**
+     * 查询某一个通知是否存在
+     */
+    fun hasNotificationById(id: Int): Boolean {
+        return getSysNotificationManager().activeNotifications.find { it.id == id } != null
+    }
+
     fun getSysNotificationManager(): NotificationManager {
         if (sysNotificationManager == null) {
             sysNotificationManager =

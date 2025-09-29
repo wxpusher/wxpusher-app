@@ -15,13 +15,16 @@ import com.google.android.material.tabs.TabLayoutMediator
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.WxpSaveService
+import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.base.WxpBaseActivity
 import com.smjcco.wxpusher.kmp.common.WxpSaveKey
+import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
 import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 import com.smjcco.wxpusher.kmp.page.main.fragment.ITabMenuProvider
 import com.smjcco.wxpusher.kmp.page.main.fragment.MessageListFragment
 import com.smjcco.wxpusher.kmp.page.main.fragment.ProfileFragment
 import com.smjcco.wxpusher.kmp.push.PushManager
+import com.smjcco.wxpusher.kmp.push.ws.keepalive.KeepWsAliveService
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.xiaomi.mipush.sdk.MiPushMessage
@@ -238,6 +241,10 @@ class WxpMainActivity : WxpBaseActivity() {
     override fun onResume() {
         super.onResume()
         PushManager.showOpenNoteRemindSettingDialog(this)
+        //显示首页的时候，尝试启动一次保活服务
+        if (DeviceUtils.getPlatform() == DevicePlatform.Android) {
+            KeepWsAliveService.start()
+        }
     }
 
     /**

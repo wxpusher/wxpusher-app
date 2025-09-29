@@ -6,6 +6,7 @@ import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
+import com.smjcco.wxpusher.kmp.common.withActivity
 import com.smjcco.wxpusher.kmp.push.ws.keepalive.KeepWsAliveService
 import com.smjcco.wxpusher.kmp.push.honor.HonorPushUtils
 import com.smjcco.wxpusher.kmp.push.huawei.HuaweiPushUtils
@@ -27,7 +28,7 @@ object PushManager {
     /**
      * 初始化推送
      */
-    fun init(application: Application) {
+    fun init(application: Application = ApplicationUtils.getApplication()) {
         if (!ApplicationUtils.isMainProcess()) {
             WxPusherLog.i(TAG, "非主进程，不初始化")
             return
@@ -54,7 +55,12 @@ object PushManager {
             WxpNotificationManager.init()
             WsManager.init()
             //启动保活，必须在最后
-            KeepWsAliveService.start()
+            withActivity {
+                //有通知栏权限，才能启动保活服务
+                if (PermissionUtils.hasNotificationPermission(it)) {
+                    KeepWsAliveService.start()
+                }
+            }
         }
 
     }

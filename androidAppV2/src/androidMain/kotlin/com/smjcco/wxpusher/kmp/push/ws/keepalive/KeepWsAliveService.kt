@@ -9,6 +9,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.os.IBinder
 import android.os.PowerManager
@@ -19,7 +20,9 @@ import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
 import com.smjcco.wxpusher.kmp.push.ws.ChannelGroup
+import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager
 import com.smjcco.wxpusher.kmp.push.ws.connect.WsManager
+import com.smjcco.wxpusher.utils.PermissionUtils
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -113,7 +116,14 @@ class KeepWsAliveService : Service() {
     @SuppressLint("WakelockTimeout")
     @OptIn(DelicateCoroutinesApi::class)
     private fun startService() {
-        if (isServiceStarted) return
+        if (isServiceStarted) {
+            //检查前台的通知是否存在，不存在就加回来，避免通知被用户删除了
+            if (!WxpNotificationManager.hasNotificationById(KeepWsAliveServiceNotificationId)) {
+                val notification = createNotification()
+                startForeground(KeepWsAliveServiceNotificationId, notification)
+            }
+            return
+        }
         WxpLogUtils.i(message = "KeepWsAliveService is started")
         isServiceStarted = true
         // we need this lock so our service gets not affected by Doze Mode
@@ -192,7 +202,8 @@ class KeepWsAliveService : Service() {
             .setAutoCancel(false)
             .setTicker("WxPusher会在后台持续运行，以接收最新的消息，如果本通知消息，你需要重新启动WxPusher")
             .setPriority(NotificationManager.IMPORTANCE_HIGH)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.mipmap.ic_launcher_green)
+            .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher_green))
         return builder.build()
     }
 }

@@ -106,19 +106,6 @@ object WsManager {
                 WxPusherLog.i(TAG, "connect: 关闭中，不进行链接")
                 return
             }
-            val loginInfo = WxpAppDataService.getLoginInfo()
-            if (loginInfo == null) {
-                WxPusherLog.i(TAG, "connect: 没有loginInfo，不进行链接")
-                return
-            }
-            if (loginInfo.deviceId.isNullOrEmpty()) {
-                WxPusherLog.i(TAG, "connect: 没有deviceId（设备未注册），不进行链接")
-                return
-            }
-            if (loginInfo.deviceToken.isNullOrEmpty()) {
-                WxPusherLog.i(TAG, "connect: 没有deviceToken（可能没有登录/已经退出登录），不进行链接")
-                return
-            }
             if (disableConnect) {
                 WxPusherLog.i(TAG, "connect:客户端版本低，不进行链接")
                 return
