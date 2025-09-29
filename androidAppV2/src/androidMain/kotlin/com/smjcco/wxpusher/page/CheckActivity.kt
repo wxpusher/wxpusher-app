@@ -106,7 +106,7 @@ class CheckActivity : ComponentActivity() {
         titleView.text = getString(R.string.check_notification_settings)
         descriptionView.text = getString(R.string.check_notification_settings_desc)
         itemView.setOnClickListener {
-            PermissionUtils.openNotificationChannelSettings()
+//            PermissionUtils.openNotificationChannelSettings()
         }
     }
 

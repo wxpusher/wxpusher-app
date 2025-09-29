@@ -150,16 +150,14 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
     }
 
     private fun setUpPermissionRequester() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            permissionRequester = PermissionRequester(
-                this, Manifest.permission.POST_NOTIFICATIONS,
-                "需要发送通知权限",
-                "WxPusher是一个消息推送平台，当有新消息到达的时候，我们会第一时间给你发送通知，因此需要你授予发送通知的权限，否则我们无法发送消息通知，你可能会因此遗漏消息，是否授予权限？",
-                "缺少必须的通知权限",
-                "本应用核心功能是发送消息通知，缺少通知权限会导致你无法收到消息通知。\n\n打开方式：点击“去设置”-“通知管理”-打开允许通知"
-            ) {
-                PermissionUtils.gotoNotificationSettingPage()
-            }
+        permissionRequester = PermissionRequester(
+            this, Manifest.permission.POST_NOTIFICATIONS,
+            "需要发送通知权限",
+            "WxPusher是一个消息推送平台，当有新消息到达的时候，我们会第一时间给你发送通知，因此需要你授予发送通知的权限，否则我们无法发送消息通知，你可能会因此遗漏消息，是否授予权限？",
+            "缺少必须的通知权限",
+            "本应用核心功能是发送消息通知，缺少通知权限会导致你无法收到消息通知。\n\n打开方式：点击“去设置”-“通知管理”-打开允许通知"
+        ) {
+            PermissionUtils.gotoNotificationSettingPage()
         }
     }
 
@@ -183,27 +181,14 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
      */
     private fun requestPermission() {
         // 请求通知权限
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && permissionRequester != null) {
-            permissionRequester?.request {
-                if (it) {
-                    jumpToMain()
-                } else {
-                    WxpLogUtils.i(message = "用户拒绝了通知权限")
-                    WxpToastUtils.showToast("你拒绝了通知权限，将无法给你发送通知提醒")
-                    jumpToMain()
-                }
+        permissionRequester?.request {
+            if (it) {
+                jumpToMain()
+            } else {
+                WxpLogUtils.i(message = "用户拒绝了通知权限")
+                WxpToastUtils.showToast("你拒绝了通知权限，将无法给你发送通知提醒")
+                jumpToMain()
             }
-        } else {
-            val params = WxpDialogParams(
-                title = "异常提醒",
-                message = "WxPusher必须要推送权限才能正常工作，你可以稍后在【设置-WxPusher消息推送平台-通知】中打开",
-                leftText = "取消",
-                rightText = "去设置",
-                rightBlock = {
-                    WxpJumpPageUtils.jumpToNotificationSettingPage()
-                }
-            )
-            WxpDialogUtils.showDialog(params)
         }
     }
 
