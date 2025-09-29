@@ -5,8 +5,8 @@ import android.app.AlertDialog
 import android.app.Application
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.dialog.DialogManager
+import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 import com.smjcco.wxpusher.notification.NotificationManager
-import com.smjcco.wxpusher.page.WebDetailActivity
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.xiaomi.mipush.sdk.MiPushClient
@@ -36,26 +36,31 @@ object XiaomiUtils {
             return
         }
         //针对小米，还没有创建推送通道 ，就不进行提醒
+        //在收到一次消息以后，才会有这个通知通道
         if (!NotificationManager.hasNotificationChannel("mipush|com.smjcco.wxpusher|135072")) {
             return
         }
+
         val dialog = AlertDialog.Builder(activity)
             .setTitle("请打开通知提醒设置")
-            .setMessage("如果通知不提醒，不弹窗，请点击「去设置」，选择「订阅消息」-「在锁定屏幕上」设置为【显示通知】\n\n在设置里，你还可以自定义提示铃声。")
+            .setMessage("如果通知不提醒，不弹窗，按照如下2步操作：\n\n1、请点击「去设置」，【打开所有开关】\n\n2、在设置最下面选择「订阅消息」-【打开所有开关】，在设置里，你还可以自定义提示铃声。")
             .setNegativeButton(
                 "去设置"
             ) { dialog, which ->
                 dialog?.dismiss()
                 PermissionUtils.gotoNotificationSettingPage()
+                hasShow = false
             }
             .setCancelable(false)
             .setPositiveButton("查看视频教程") { dialog, _ ->
                 dialog?.dismiss()
-                WebDetailActivity.openUrl(activity, PushManager.getGuidePageUrl())
+                WxpJumpPageUtils.jumpToWebUrl(PushManager.getGuidePageUrl(), activity)
+                hasShow = false
             }
             .setNeutralButton("永不提醒") { dialog, _ ->
                 dialog?.dismiss()
                 WxpSaveService.set(SAVE_SHOW_KEY, "1")
+                hasShow = false
             }
             .create()
         hasShow = true
