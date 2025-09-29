@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.push.vivo
+package com.smjcco.wxpusher.kmp.push.vivo
 
 import android.app.Application
 import com.smjcco.wxpusher.base.common.WxpSaveService

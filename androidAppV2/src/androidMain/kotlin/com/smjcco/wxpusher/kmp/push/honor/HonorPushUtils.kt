@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.push.honor
+package com.smjcco.wxpusher.kmp.push.honor
 
 import android.app.Application
 import com.hihonor.push.sdk.HonorPushCallback

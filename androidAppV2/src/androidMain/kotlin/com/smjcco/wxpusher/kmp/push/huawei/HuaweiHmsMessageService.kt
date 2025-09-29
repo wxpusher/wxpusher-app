@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.push.huawei
+package com.smjcco.wxpusher.kmp.push.huawei
 
 import com.huawei.hms.push.HmsMessageService
 import com.smjcco.wxpusher.bean.DevicePlatform

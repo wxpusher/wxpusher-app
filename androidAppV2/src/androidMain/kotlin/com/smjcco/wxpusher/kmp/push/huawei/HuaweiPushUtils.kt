@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.push.huawei
+package com.smjcco.wxpusher.kmp.push.huawei
 
 import android.app.Application
 import android.text.TextUtils

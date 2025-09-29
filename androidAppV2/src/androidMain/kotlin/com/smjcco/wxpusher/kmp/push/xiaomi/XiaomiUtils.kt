@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.push.xiaomi
+package com.smjcco.wxpusher.kmp.push.xiaomi
 
 import android.app.Activity
 import android.app.AlertDialog

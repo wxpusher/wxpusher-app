@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.push.xiaomi
+package com.smjcco.wxpusher.kmp.push.xiaomi
 
 import android.content.Context
 import com.smjcco.wxpusher.bean.DevicePlatform

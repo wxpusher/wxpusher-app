@@ -1,15 +1,14 @@
-package com.smjcco.wxpusher.push.ws
+package com.smjcco.wxpusher.kmp.push.ws
 
+import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.bean.DevicePlatform
-import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.notification.NotificationManager
-import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotification
-import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
+import com.smjcco.wxpusher.kmp.push.PushManager
+import com.smjcco.wxpusher.log.WxPusherLog
+import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotification
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -29,6 +28,7 @@ object WsManager {
     private val connectListenerList = mutableListOf<IWsConnectChangedListener>()
     private val client = OkHttpClient
         .Builder()
+        //通过发送ping，来保持客户端的连接，服务端长时间没有检测到ping，就会断开连接
         .pingInterval(25, TimeUnit.SECONDS)
         .connectTimeout(10, TimeUnit.SECONDS) // 设置连接超时时间
         .readTimeout(10, TimeUnit.SECONDS)    // 设置读取超时时间
@@ -49,20 +49,12 @@ object WsManager {
             return
         }
         init.set(true)
-        NotificationManager.init()
         //初始化监听器
         initMsgListener()
-        //开始死循环监听链接状态
-        WxPusherUtils.getIoScopeScope().launch {
-            while (true) {
-                if (connectStatus.get() == WsConnectStatus.NotConnect) {
-                    connectInner()
-                }
-                WxPusherLog.d(TAG, "延迟10秒检查链接")
-                delay(10 * 1000)
-            }
-        }
+        //尝试建立连接
+        tryConnect()
     }
+
 
     private fun initMsgListener() {
         //当收到消息的时候，发送到通知栏
@@ -75,36 +67,31 @@ object WsManager {
         val pushTokenListener = object : IWsMessageListener<InitDeviceMsg> {
             override fun onMessage(message: InitDeviceMsg) {
                 WxPusherLog.i(TAG, "收到自建长链接Ws的pushToken=${message.pushToken}")
-//                if (AppDataUtils.getPushToken() == message.pushToken) {
-//                    WxPusherLog.i(
-//                        TAG,
-//                        "自建长链接token未变化，不用更新 pushToken=${message.pushToken}"
-//                    )
-//                    return
-//                }
                 PushManager.onGetPushToken(message.pushToken, DevicePlatform.Android)
             }
         }
         addMsgListener(WsMessageTypeEnum.DEVICE_INIT.code, pushTokenListener)
     }
 
-    private fun getHostUrl(): String {
+    private fun getWsUrl(): String {
         val sb = StringBuilder()
-//        sb.append(WxPusherConfig.WsUrl)
+        sb.append(WxpConfig.baseUrl)
         sb.append("/ws?")
         sb.append("version=${WxPusherUtils.getVersionName()}")
         sb.append("&")
         sb.append("platform=${DeviceUtils.getPlatform().getPlatform()}")
-//        if (!AppDataUtils.getPushToken().isNullOrEmpty()
-//            && AppDataUtils.getPushToken()?.startsWith("PT_") == true
-//        ) {
-//            sb.append("&")
-//            sb.append("pushToken=${AppDataUtils.getPushToken()}")
-//        }
+        val pushToken = WxpAppDataService.getPushToken()
+        if (!pushToken.isNullOrEmpty() && pushToken.startsWith("PT_")) {
+            sb.append("&")
+            sb.append("pushToken=${pushToken}")
+        }
         return sb.toString()
     }
 
-    private fun connectInner() {
+    /**
+     * 尝试进行WS连接
+     */
+    fun tryConnect() {
         synchronized(this) {
             if (connectStatus.get() == WsConnectStatus.Connected) {
                 WxPusherLog.i(TAG, "connect: 已经链接，不进行链接")
@@ -118,11 +105,16 @@ object WsManager {
                 WxPusherLog.i(TAG, "connect: 关闭中，不进行链接")
                 return
             }
-            if (WxpAppDataService.getLoginInfo()?.deviceId.isNullOrEmpty()) {
+            val loginInfo = WxpAppDataService.getLoginInfo()
+            if (loginInfo == null) {
+                WxPusherLog.i(TAG, "connect: 没有loginInfo，不进行链接")
+                return
+            }
+            if (loginInfo.deviceId.isNullOrEmpty()) {
                 WxPusherLog.i(TAG, "connect: 没有deviceId（设备未注册），不进行链接")
                 return
             }
-            if (WxpAppDataService.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
+            if (loginInfo.deviceToken.isNullOrEmpty()) {
                 WxPusherLog.i(TAG, "connect: 没有deviceToken（可能没有登录/已经退出登录），不进行链接")
                 return
             }
@@ -130,16 +122,16 @@ object WsManager {
                 WxPusherLog.i(TAG, "connect:客户端版本低，不进行链接")
                 return
             }
-            webSocket?.close(1000, null)
+            webSocket?.close(1000, "重新建立连接前，关闭原来的WS连接")
 
             WxPusherLog.i(TAG, "connect: 开始WS长链接")
             setConnectStatus(WsConnectStatus.Connecting)
-            val wsUrl = getHostUrl()
+            val wsUrl = getWsUrl()
             WxPusherLog.i(TAG, "wsUrl: ${wsUrl}")
-//            val request: Request = Request.Builder()
-//                .url(wsUrl)
-//                .build()
-//            webSocket = client.newWebSocket(request, WsListener())
+            val request: Request = Request.Builder()
+                .url(wsUrl)
+                .build()
+            webSocket = client.newWebSocket(request, WsListener())
         }
     }
 
@@ -244,7 +236,8 @@ object WsManager {
                 return
             }
             if (bizMsg.msgType == WsMessageTypeEnum.UPDATE_CLIENT.code) {
-                disableConnect = true
+                disconnect()
+                return
             }
             val listenerList: MutableList<IWsMessageListener<*>>? =
                 msgListenerMap.get(baseWsMsg.msgType)

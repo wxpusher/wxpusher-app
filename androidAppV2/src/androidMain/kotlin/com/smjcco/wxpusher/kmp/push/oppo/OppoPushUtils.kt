@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.push.oppo
+package com.smjcco.wxpusher.kmp.push.oppo
 
 import android.app.Application
 import android.text.TextUtils

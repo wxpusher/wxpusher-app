@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.push
+package com.smjcco.wxpusher.kmp.push
 
 import android.app.Activity
 import android.app.AlertDialog
