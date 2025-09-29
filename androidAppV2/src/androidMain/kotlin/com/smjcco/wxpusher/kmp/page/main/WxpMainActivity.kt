@@ -2,6 +2,7 @@ package com.smjcco.wxpusher.kmp.page.main
 
 import android.Manifest
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -71,8 +72,13 @@ class WxpMainActivity : WxpBaseActivity() {
     }
 
     private fun setUpPermissionRequester() {
+        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.POST_NOTIFICATIONS
+        } else {
+            ""
+        }
         permissionRequester = PermissionRequester(
-            this, Manifest.permission.POST_NOTIFICATIONS,
+            this, permission,
             "需要发送通知权限",
             "WxPusher是一个消息推送平台，当有新消息到达的时候，我们会第一时间给你发送通知，因此需要你授予发送通知的权限，否则我们无法发送消息通知，你可能会因此遗漏消息，是否授予权限？",
             "缺少必须的通知权限",
