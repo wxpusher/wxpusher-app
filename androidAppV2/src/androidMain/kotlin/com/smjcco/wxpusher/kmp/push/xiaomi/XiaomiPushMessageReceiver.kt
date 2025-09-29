@@ -2,8 +2,8 @@ package com.smjcco.wxpusher.kmp.push.xiaomi
 
 import android.content.Context
 import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.kmp.push.PushManager
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.xiaomi.mipush.sdk.ErrorCode
 import com.xiaomi.mipush.sdk.MiPushClient

@@ -5,8 +5,8 @@ import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
 import com.smjcco.wxpusher.kmp.push.PushManager
+import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager.sendBizMessageNotification
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotification
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import kotlinx.coroutines.launch
@@ -95,7 +95,7 @@ object WsManager {
         synchronized(this) {
             if (connectStatus.get() == WsConnectStatus.Connected) {
 //                连接状态不打印日志，否则日志太多了
-//                WxPusherLog.i(TAG, "connect: 已经链接，不进行链接")
+                WxPusherLog.d(TAG, "connect: 已经链接，不重建连接")
                 return
             }
             if (connectStatus.get() == WsConnectStatus.Connecting) {

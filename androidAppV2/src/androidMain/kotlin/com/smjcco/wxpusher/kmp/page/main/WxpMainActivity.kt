@@ -21,7 +21,7 @@ import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 import com.smjcco.wxpusher.kmp.page.main.fragment.ITabMenuProvider
 import com.smjcco.wxpusher.kmp.page.main.fragment.MessageListFragment
 import com.smjcco.wxpusher.kmp.page.main.fragment.ProfileFragment
-import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.kmp.push.PushManager
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.xiaomi.mipush.sdk.MiPushMessage

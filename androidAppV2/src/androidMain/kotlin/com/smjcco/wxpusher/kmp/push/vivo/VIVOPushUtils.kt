@@ -3,8 +3,8 @@ package com.smjcco.wxpusher.kmp.push.vivo
 import android.app.Application
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.kmp.push.PushManager
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.push.PushManager
 import com.vivo.push.PushClient
 import com.vivo.push.PushConfig
 import com.vivo.push.listener.IPushQueryActionListener

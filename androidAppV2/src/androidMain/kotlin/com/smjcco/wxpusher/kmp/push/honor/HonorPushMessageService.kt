@@ -5,8 +5,8 @@ import com.hihonor.push.sdk.HonorPushCallback
 import com.hihonor.push.sdk.HonorPushClient
 import com.hihonor.push.sdk.HonorPushDataMsg
 import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.kmp.push.PushManager
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.push.PushManager
 
 
 class HonorPushMessageService : HonorMessageService() {

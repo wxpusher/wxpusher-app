@@ -11,6 +11,7 @@ import com.smjcco.wxpusher.kmp.push.honor.HonorPushUtils
 import com.smjcco.wxpusher.kmp.push.huawei.HuaweiPushUtils
 import com.smjcco.wxpusher.kmp.push.oppo.OppoPushUtils
 import com.smjcco.wxpusher.kmp.push.vivo.VIVOPushUtils
+import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager
 import com.smjcco.wxpusher.kmp.push.ws.connect.WsManager
 import com.smjcco.wxpusher.kmp.push.ws.WsUtils
 import com.smjcco.wxpusher.kmp.push.xiaomi.XiaomiUtils
@@ -50,6 +51,7 @@ object PushManager {
             OppoPushUtils.init(application)
         } else {
             WxPusherLog.i(TAG, "初始化自建长链接")
+            WxpNotificationManager.init()
             WsManager.init()
             //启动保活
             KeepWsAliveService.start()

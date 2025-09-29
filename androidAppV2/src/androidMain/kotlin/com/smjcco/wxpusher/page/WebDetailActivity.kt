@@ -18,8 +18,8 @@ import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.dialog.ActionSheetDialogFragment
 import com.smjcco.wxpusher.dialog.ActionSheetItem
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.base.common.ApplicationUtils
+import com.smjcco.wxpusher.kmp.push.PushManager
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WebViewUtils
 import com.smjcco.wxpusher.web.WxPusherWebInterface

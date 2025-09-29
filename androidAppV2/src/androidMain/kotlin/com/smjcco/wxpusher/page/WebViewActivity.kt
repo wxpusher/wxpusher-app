@@ -13,10 +13,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.smjcco.wxpusher.R
-import com.smjcco.wxpusher.WxPusherConfig
 import com.smjcco.wxpusher.base.common.WxpSaveService
+import com.smjcco.wxpusher.kmp.push.PushManager
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.web.WebViewUtils

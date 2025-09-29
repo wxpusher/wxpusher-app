@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.notification
+package com.smjcco.wxpusher.kmp.push.ws
 
 import android.app.Notification
 import android.app.NotificationChannel
@@ -12,19 +12,17 @@ import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.ApplicationUtils
+import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
 import com.smjcco.wxpusher.kmp.push.ws.connect.PushMsgDeviceMsg
 import com.smjcco.wxpusher.page.WebViewActivity
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 
 
-object NotificationManager {
-    private const val TAG = "WxPusherWebInterface"
+object WxpNotificationManager {
 
     private var messageId = AtomicInteger(10000)
-    private const val UnknownChannelId = "UnknownChannelId"
     const val WxPusherSystemChannelId = "WxPusherSystemChannelId"
-    const val WxPusherSystemForegroundNotificationId = 1
     private var sysNotificationManager: NotificationManager? = null
     private var init = AtomicBoolean(false)
 
@@ -46,13 +44,12 @@ object NotificationManager {
      */
     fun sendBizMessageNotification(message: PushMsgDeviceMsg) {
         val channel: String = WxPusherSystemChannelId
-
         // 创建Intent，用于在点击通知时启动Activity
-        val intent = Intent(ApplicationUtils.getApplication(), WebViewActivity::class.java)
-//        intent.putExtra(
-//            WebViewActivity.INTENT_KEY_URL,
-//            "${WxPusherConfig.ApiUrl}/api/message/${message.qid}"
-//        )
+        val intent = Intent(ApplicationUtils.getApplication(), WxpMainActivity::class.java)
+        intent.putExtra(
+            WebViewActivity.INTENT_KEY_URL,
+            message.url
+        )
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         val pendingIntent = PendingIntent.getActivity(
             ApplicationUtils.getApplication(),
@@ -70,7 +67,7 @@ object NotificationManager {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .setDefaults(Notification.DEFAULT_ALL)
-                .setPriority(Notification.PRIORITY_MAX)
+                .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 //显示更多文本，长按可以展开
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message.summary))
                 .build()

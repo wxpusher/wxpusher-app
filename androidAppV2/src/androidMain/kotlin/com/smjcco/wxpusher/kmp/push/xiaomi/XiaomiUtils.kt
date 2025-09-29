@@ -6,8 +6,8 @@ import android.app.Application
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
-import com.smjcco.wxpusher.notification.NotificationManager
-import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.kmp.push.PushManager
+import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.xiaomi.mipush.sdk.MiPushClient
 
@@ -37,7 +37,7 @@ object XiaomiUtils {
         }
         //针对小米，还没有创建推送通道 ，就不进行提醒
         //在收到一次消息以后，才会有这个通知通道
-        if (!NotificationManager.hasNotificationChannel("mipush|com.smjcco.wxpusher|135072")) {
+        if (!WxpNotificationManager.hasNotificationChannel("mipush|com.smjcco.wxpusher|135072")) {
             return
         }
 

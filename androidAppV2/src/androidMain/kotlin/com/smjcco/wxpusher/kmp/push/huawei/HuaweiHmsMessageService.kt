@@ -3,8 +3,8 @@ package com.smjcco.wxpusher.kmp.push.huawei
 import com.huawei.hms.push.HmsMessageService
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
+import com.smjcco.wxpusher.kmp.push.PushManager
 
 
 class HuaweiHmsMessageService : HmsMessageService() {

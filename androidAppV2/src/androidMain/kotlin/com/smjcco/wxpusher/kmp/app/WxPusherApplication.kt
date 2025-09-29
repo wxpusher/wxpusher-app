@@ -9,9 +9,9 @@ import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.IWxpBaseInfoServiceListener
 import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpSaveService
-import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
+import com.smjcco.wxpusher.kmp.push.PushManager
+import com.smjcco.wxpusher.log.WxPusherLog
 import com.tencent.upgrade.bean.UpgradeConfig
 import com.tencent.upgrade.core.UpgradeManager
 

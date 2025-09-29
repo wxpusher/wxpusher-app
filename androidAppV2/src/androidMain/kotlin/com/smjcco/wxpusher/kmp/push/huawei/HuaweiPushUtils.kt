@@ -6,8 +6,8 @@ import com.huawei.hms.aaid.HmsInstanceId
 import com.huawei.hms.common.ApiException
 import com.huawei.hms.push.HmsMessaging
 import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.kmp.push.PushManager
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import kotlinx.coroutines.launch
 
