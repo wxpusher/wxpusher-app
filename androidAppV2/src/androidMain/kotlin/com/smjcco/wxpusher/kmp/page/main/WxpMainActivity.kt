@@ -1,6 +1,7 @@
 package com.smjcco.wxpusher.kmp.page.main
 
 import android.Manifest
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -21,6 +22,8 @@ import com.smjcco.wxpusher.kmp.page.main.fragment.MessageListFragment
 import com.smjcco.wxpusher.kmp.page.main.fragment.ProfileFragment
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
+import com.xiaomi.mipush.sdk.MiPushMessage
+import com.xiaomi.mipush.sdk.PushMessageHelper
 
 /**
  * app首页 - 使用ViewPager2 + TabLayout实现Tab切换
@@ -34,6 +37,10 @@ class WxpMainActivity : WxpBaseActivity() {
     private var currentMenu: Menu? = null
 
     private var permissionRequester: PermissionRequester? = null
+
+    companion object {
+        const val INTENT_KEY_URL = "url"
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,6 +64,10 @@ class WxpMainActivity : WxpBaseActivity() {
         permissionRequester?.request {
 
         }
+
+        //处理页面参数
+        onIntent(intent)
+        addOnNewIntentListener { onIntent(it) }
     }
 
     private fun setUpPermissionRequester() {
@@ -68,6 +79,28 @@ class WxpMainActivity : WxpBaseActivity() {
             "本应用核心功能是发送消息通知，缺少通知权限会导致你无法收到消息通知。\n\n打开方式：点击“去设置”-“通知管理”-打开允许通知"
         ) {
             PermissionUtils.gotoNotificationSettingPage()
+        }
+    }
+
+    /**
+     * 当打开页面，或者收到newIntent的时候，进行调用
+     */
+    private fun onIntent(intent: Intent?) {
+        if (intent == null) {
+            return
+        }
+        val url = intent.getStringExtra(INTENT_KEY_URL)
+        if (!url.isNullOrEmpty()) {
+            WxpJumpPageUtils.jumpToWebUrl(url, this)
+            return
+        }
+
+        //小米推送的消息，如果有 url，直接打开地址
+        val miPushMessage =
+            intent.getSerializableExtra(PushMessageHelper.KEY_MESSAGE) as MiPushMessage?
+        val miPushUrl = miPushMessage?.extra?.get(INTENT_KEY_URL)
+        if (!miPushUrl.isNullOrEmpty()) {
+            WxpJumpPageUtils.jumpToWebUrl(miPushUrl, this)
         }
     }
 

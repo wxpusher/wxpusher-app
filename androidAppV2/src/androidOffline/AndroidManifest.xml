@@ -4,16 +4,16 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application tools:node="merge">
-        <activity
-            android:name="com.smjcco.wxpusher.page.TestPanelActivity"
-            android:exported="true"
-            android:label="开发测试控制面板"
-            tools:node="merge">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+<!--        <activity-->
+<!--            android:name="com.smjcco.wxpusher.page.TestPanelActivity"-->
+<!--            android:exported="true"-->
+<!--            android:label="开发测试控制面板"-->
+<!--            tools:node="merge">-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+<!--        </activity>-->
 
     </application>
 
