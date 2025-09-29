@@ -6,7 +6,7 @@ import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotification
 import com.smjcco.wxpusher.push.PushManager
-import com.smjcco.wxpusher.utils.DeviceUtils
+import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import kotlinx.coroutines.delay

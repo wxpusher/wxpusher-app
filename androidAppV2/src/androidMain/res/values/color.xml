@@ -21,10 +21,10 @@
     <color name="colorPrimaryDark">#430043</color>
     <color name="colorAccent">#B300B3</color>
     <color name="white">#FFFFFF</color>
-    
+
     <!-- 输入框背景颜色 -->
     <color name="input_field_bg">#F5F5F5</color>
-    
+
     <!-- 解绑页面相关颜色 -->
     <color name="danger_color">#F44336</color>
     <color name="text_fit_theme_second">#757575</color>

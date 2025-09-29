@@ -4,17 +4,14 @@ import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.DialogInterface
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.base.common.WxpDialogUtils
 import com.smjcco.wxpusher.dialog.DialogManager
@@ -144,7 +141,7 @@ object PermissionUtils {
      * 打开通知设置页面
      */
     fun gotoNotificationSettingPage() {
-        WxpJumpPageUtils.jumpToNotificationSettingPage()
+        WxpJumpPageUtils.jumpToSystemNotificationSettingPage()
     }
 
     /**

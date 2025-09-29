@@ -33,8 +33,8 @@ import com.google.zxing.common.HybridBinarizer
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseMvpActivity
+import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
 import com.smjcco.wxpusher.kmp.common.utils.ThreadUtils
-import com.smjcco.wxpusher.kmp.common.utils.VibratorUtils
 import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 import com.smjcco.wxpusher.page.scan.IWxpScanView
 import com.smjcco.wxpusher.page.scan.WxpScanPresenter
@@ -192,7 +192,7 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
     private fun showPermissionDialog() {
         WxpToastUtils.showToast("需要相机权限才能扫描二维码，请前往设置开启")
         ThreadUtils.runOnMainThread({
-            WxpJumpPageUtils.jumpToAppSettings(this)
+            WxpJumpPageUtils.jumpToSystemAppSettings(this)
         }, 1500)
     }
 
@@ -367,7 +367,7 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
         isScanning = false
         stopScanLineAnimation()
 
-        VibratorUtils.vibrator(50)
+        DeviceUtils.vibrator(50)
 
         presenter.scan(result)
     }

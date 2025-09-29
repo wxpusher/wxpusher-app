@@ -13,7 +13,7 @@ import com.smjcco.wxpusher.push.vivo.VIVOPushUtils
 import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.push.ws.WsUtils
 import com.smjcco.wxpusher.push.xiaomi.XiaomiUtils
-import com.smjcco.wxpusher.utils.DeviceUtils
+import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionUtils
 
 /**

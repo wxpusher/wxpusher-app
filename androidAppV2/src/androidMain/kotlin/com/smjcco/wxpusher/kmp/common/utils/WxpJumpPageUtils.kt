@@ -8,12 +8,56 @@ import com.smjcco.wxpusher.kmp.common.withActivity
 import com.smjcco.wxpusher.kmp.page.bind.WxpBindActivity
 import com.smjcco.wxpusher.kmp.page.login.WxpLoginActivity
 import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
-import com.smjcco.wxpusher.kmp.page.unbind.WxpUnbindActivity
-import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.kmp.page.scan.WxpScanActivity
+import com.smjcco.wxpusher.kmp.page.unbind.WxpUnbindActivity
 import com.smjcco.wxpusher.kmp.page.useragreement.WxpUserAgreementActivity
+import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
 
 object WxpJumpPageUtils {
+
+    fun jumpToSystemAppSettings(activity: Activity? = null) {
+        withActivity(activity) {
+            try {
+                val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = android.net.Uri.fromParts("package", it.packageName, null)
+                intent.data = uri
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                it.startActivity(intent)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    /**
+     * 打开通知设置页面
+     */
+    fun jumpToSystemNotificationSettingPage(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent()
+            intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            intent.putExtra(
+                Settings.EXTRA_APP_PACKAGE,
+                ApplicationUtils.getApplication().getPackageName()
+            )
+            intent.putExtra(
+                Settings.EXTRA_CHANNEL_ID,
+                ApplicationUtils.getApplication().applicationInfo.uid
+            )
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            it.startActivity(intent)
+        }
+    }
+
+    /**
+     * 跳转到电池优化设置
+     */
+    fun jumpToSystemIgnoreBatteryOptimizationSettings(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+            it.startActivity(intent)
+        }
+    }
 
     fun jumpToWebUrl(url: String, activity: Activity? = null) {
         withActivity(activity) {
@@ -69,37 +113,4 @@ object WxpJumpPageUtils {
         }
     }
 
-    fun jumpToAppSettings(activity: Activity? = null) {
-        withActivity(activity) {
-            try {
-                val intent = Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                val uri = android.net.Uri.fromParts("package", it.packageName, null)
-                intent.data = uri
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                it.startActivity(intent)
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
-
-    /**
-     * 打开通知设置页面
-     */
-    fun jumpToNotificationSettingPage(activity: Activity? = null) {
-        withActivity(activity) {
-            val intent = Intent()
-            intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
-            intent.putExtra(
-                Settings.EXTRA_APP_PACKAGE,
-                ApplicationUtils.getApplication().getPackageName()
-            )
-            intent.putExtra(
-                Settings.EXTRA_CHANNEL_ID,
-                ApplicationUtils.getApplication().applicationInfo.uid
-            )
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            it.startActivity(intent)
-        }
-    }
 }

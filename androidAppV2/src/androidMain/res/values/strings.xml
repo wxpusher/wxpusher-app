@@ -10,6 +10,7 @@
     <string name="check_autostart">自启动权限</string>
     <string name="check_background_running">后台运行</string>
 
+
     <!-- 检查项状态 -->
     <string name="check_status_enabled">已打开</string>
     <string name="check_status_disabled">请检查</string>
@@ -27,6 +28,11 @@
     <string name="message_list_scan_add_sub">扫码添加订阅</string>
     <string name="message_list_sub_manager">订阅管理</string>
     <string name="message_list_mark_all_read">已读全部消息</string>
+
+
+    <!--    电量优化-->
+    <string name="main_banner_battery_text">关闭电量优化避免无法接收消息</string>
+    <string name="main_banner_battery_button_fix_now">立即修复</string>
 
     <!-- 隐私协议页面 -->
     <string name="privacy_title">用户协议与隐私政策</string>

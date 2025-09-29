@@ -16,8 +16,12 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.scwang.smart.refresh.footer.ClassicsFooter
 import com.scwang.smart.refresh.header.ClassicsHeader
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
@@ -25,7 +29,9 @@ import com.scwang.smart.refresh.layout.api.RefreshLayout
 import com.scwang.smart.refresh.layout.listener.OnRefreshListener
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.WxpDateTimeUtils
+import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.base.WxpBaseMvpFragment
+import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
 import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 import com.smjcco.wxpusher.kmp.page.scan.WxpScanActivity
 import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
@@ -56,6 +62,12 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
 
     private lateinit var refreshHeader: ClassicsHeader
 
+    private lateinit var bannerCardView: View;
+    private lateinit var bannerICImg: AppCompatImageView;
+    private lateinit var bannerTextTv: AppCompatTextView;
+    private lateinit var bannerBtn: MaterialButton;
+    private lateinit var bannerCloseImg: AppCompatImageView;
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,6 +85,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         presenter.init()
         //打开就刷新一次
         refreshLayout.autoRefresh()
+        setupBanner()
     }
 
     private fun initViews(view: View) {
@@ -82,6 +95,12 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         searchEditText = view.findViewById(R.id.search_edit_text)
         searchCancelBtn = view.findViewById(R.id.search_cancel_btn)
         searchBarContainer = view.findViewById(R.id.search_bar_container)
+        //banner
+        bannerCardView = view.findViewById(R.id.main_banner_card)
+        bannerICImg = view.findViewById(R.id.main_banner_ic)
+        bannerTextTv = view.findViewById(R.id.main_banner_text)
+        bannerBtn = view.findViewById(R.id.main_banner_btn)
+        bannerCloseImg = view.findViewById(R.id.main_banner_close)
 
         // 输入框获取焦点时显示取消按钮
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
@@ -115,6 +134,36 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         })
     }
 
+
+    /**
+     * 初始化banner的显示
+     */
+    private fun setupBanner() {
+        //如果是非厂商通道，并且没有忽略电池优化，就提醒用户关闭电池优化
+        if (DeviceUtils.getPlatform() == DevicePlatform.Android && !DeviceUtils.isIgnoringBatteryOptimizations()) {
+            bannerCardView.visibility = View.VISIBLE
+            //设置电池图标
+            bannerICImg.visibility = View.VISIBLE
+            bannerICImg.setImageDrawable(
+                ResourcesCompat.getDrawable(
+                    resources,
+                    R.drawable.ic_battery_alert_red_24dp,
+                    null
+                )
+            )
+            bannerTextTv.visibility = View.VISIBLE
+            bannerTextTv.text = resources.getString(R.string.main_banner_battery_text)
+            bannerBtn.visibility = View.VISIBLE
+            bannerBtn.text = resources.getString(R.string.main_banner_battery_button_fix_now)
+            bannerBtn.setOnClickListener {
+                WxpJumpPageUtils.jumpToSystemIgnoreBatteryOptimizationSettings(
+                    requireActivity()
+                )
+            }
+            bannerCloseImg.visibility = View.GONE
+        }
+
+    }
 
     private fun setupRefreshLayout() {
         // 设置下拉刷新监听器

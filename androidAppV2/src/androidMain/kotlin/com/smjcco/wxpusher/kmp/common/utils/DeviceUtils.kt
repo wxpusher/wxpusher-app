@@ -1,6 +1,10 @@
-package com.smjcco.wxpusher.utils
+package com.smjcco.wxpusher.kmp.common.utils
 
+import android.content.Context
 import android.os.Build
+import android.os.PowerManager
+import android.os.VibrationEffect
+import android.os.Vibrator
 import com.heytap.msp.push.HeytapPushManager
 import com.hihonor.push.sdk.HonorPushClient
 import com.huawei.hms.api.HuaweiApiAvailability
@@ -14,7 +18,7 @@ object DeviceUtils {
     //是否是小米设备
     fun isMIUI(): Boolean {
         return ConfigManager.getCurrentConfig().xiaomiPush
-                && "Xiaomi".equals(android.os.Build.MANUFACTURER, true)
+                && "Xiaomi".equals(Build.MANUFACTURER, true)
     }
 
     /**
@@ -95,6 +99,31 @@ object DeviceUtils {
             return DevicePlatform.Android_HUAWEI
         }
         return DevicePlatform.Android
+    }
+
+    /**
+     * 调用设备振动
+     */
+    fun vibrator(time: Int) {
+        val vibrator = ApplicationUtils.getApplication()
+            .getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+        vibrator?.vibrate(
+            VibrationEffect.createOneShot(
+                time.toLong(),
+                VibrationEffect.DEFAULT_AMPLITUDE
+            )
+        )
+    }
+
+    /**
+     * 是否忽略了电池优化🔋？
+     * Check if battery optimization is enabled, see https://stackoverflow.com/a/49098293/1440785
+     */
+    fun isIgnoringBatteryOptimizations(): Boolean {
+        val context = ApplicationUtils.getApplication()
+        val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+        val appName = context.packageName
+        return powerManager.isIgnoringBatteryOptimizations(appName)
     }
 
 }
