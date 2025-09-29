@@ -1,5 +1,6 @@
 package com.smjcco.wxpusher.kmp.common.utils
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
@@ -55,11 +56,12 @@ object WxpJumpPageUtils {
     /**
      * 跳转到电池优化设置
      */
+    @SuppressLint("BatteryLife")
     fun jumpToSystemIgnoreBatteryOptimizationSettings(activity: Activity? = null) {
         withActivity(activity) {
 //            val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
 //            it.startActivity(intent)
-
+            //下面这个跳转更加精确，原生安卓可以直接弹出申请弹窗
             val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
             intent.data = Uri.fromParts("package", it.packageName, null)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK

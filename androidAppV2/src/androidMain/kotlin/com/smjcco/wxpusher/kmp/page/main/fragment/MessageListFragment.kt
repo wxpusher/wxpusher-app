@@ -166,6 +166,8 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                 )
             }
             bannerCloseImg.visibility = View.GONE
+        } else {
+            bannerCardView.visibility = View.GONE
         }
     }
 
@@ -244,15 +246,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
 
     override fun onFeedback() {
         // 震动反馈
-        val vibrator = context?.getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-        vibrator?.let {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                it.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
-            } else {
-                @Suppress("DEPRECATION")
-                it.vibrate(50)
-            }
-        }
+        DeviceUtils.vibrator(50)
     }
 
     override fun onOpenSubscribeManagerPage(url: String) {
