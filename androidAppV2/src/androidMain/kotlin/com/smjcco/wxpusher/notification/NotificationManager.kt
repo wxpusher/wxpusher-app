@@ -107,10 +107,10 @@ object NotificationManager {
 
         // 创建Intent，用于在点击通知时启动Activity
         val intent = Intent(ApplicationUtils.getApplication(), WebViewActivity::class.java)
-        intent.putExtra(
-            WebViewActivity.INTENT_KEY_URL,
-            "${WxPusherConfig.ApiUrl}/api/message/${message.qid}"
-        )
+//        intent.putExtra(
+//            WebViewActivity.INTENT_KEY_URL,
+//            "${WxPusherConfig.ApiUrl}/api/message/${message.qid}"
+//        )
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         val pendingIntent = PendingIntent.getActivity(
             ApplicationUtils.getApplication(),

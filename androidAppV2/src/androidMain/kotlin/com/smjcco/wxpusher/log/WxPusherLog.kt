@@ -4,12 +4,11 @@ import android.util.Log
 import com.aliyun.sls.android.producer.LogProducerClient
 import com.aliyun.sls.android.producer.LogProducerConfig
 import com.aliyun.sls.android.producer.LogProducerResult
-import com.smjcco.wxpusher.utils.AppDataUtils
+import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
+import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.utils.RandomUtils
-import com.smjcco.wxpusher.utils.SaveUtils
-import com.smjcco.wxpusher.utils.WxPusherUtils
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -20,10 +19,10 @@ object WxPusherLog {
     private val logIdKey = "logIdKey"
 
     fun init() {
-        logId = WxpSaveService.get(logIdKey,"")
+        logId = WxpSaveService.get(logIdKey, "")
         if (logId.isEmpty()) {
             logId = "LogId_" + RandomUtils.generateRandomString(26)
-            SaveUtils.setKeyValue(logIdKey, logId)
+            WxpSaveService.get(logIdKey, logId)
         }
         // endpoint前需要加 https://
         val endpoint = "https://cn-hangzhou.log.aliyuncs.com"
@@ -43,7 +42,7 @@ object WxPusherLog {
         // 设置主题
         config.setTopic("wxpusher");
         // 设置tag信息，此tag会附加在每条日志上
-        config.addTag("version", WxPusherUtils.getVersionName());
+        config.addTag("version", WxpBaseInfoService.getAppVersionName());
         // 每个缓存的日志包的大小上限，取值为1~5242880，单位为字节。默认为1024 * 1024
         config.setPacketLogBytes(1024 * 1024);
         // 每个缓存的日志包中包含日志数量的最大值，取值为1~4096，默认为1024
@@ -134,9 +133,9 @@ object WxPusherLog {
     }
 
     private fun aliLog(log: com.aliyun.sls.android.producer.Log, flush: Boolean = false) {
-        log.putContent("uid", AppDataUtils.getLoginInfo()?.uid)
-        log.putContent("did", AppDataUtils.getLoginInfo()?.deviceId)
-        log.putContent("version", WxPusherUtils.getVersionName())
+        log.putContent("uid", WxpAppDataService.getLoginInfo()?.uid)
+        log.putContent("did", WxpAppDataService.getLoginInfo()?.deviceId)
+        log.putContent("version", WxpBaseInfoService.getAppVersionName())
         //用户没有登录的时候，没有uid，所以用一个logID关联，可以通过uid查询到logid，再通过logid查询所有日志
         log.putContent("logid", logId)
         aliLogClient.addLog(log)

@@ -2,7 +2,8 @@ package com.smjcco.wxpusher.push
 
 import android.app.Activity
 import android.app.Application
-import com.smjcco.wxpusher.api.DeviceApi
+import com.smjcco.wxpusher.base.biz.WxpAppDataService
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.push.honor.HonorPushUtils
@@ -12,8 +13,6 @@ import com.smjcco.wxpusher.push.vivo.VIVOPushUtils
 import com.smjcco.wxpusher.push.ws.WsManager
 import com.smjcco.wxpusher.push.ws.WsUtils
 import com.smjcco.wxpusher.push.xiaomi.XiaomiUtils
-import com.smjcco.wxpusher.utils.AppDataUtils
-import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
 
 /**
@@ -69,18 +68,18 @@ object PushManager {
      */
     fun onGetPushToken(token: String, platform: DevicePlatform) {
         WxPusherLog.i(TAG, "收到设备token，platform=${platform}, token=${token}")
-        AppDataUtils.savePushToken(token)
-        DeviceApi.updateDeviceInfoAsync(platform)
+        WxpAppDataService.savePushToken(token)
+        WxpAppDataService.updateDeviceInfo()
     }
 
     /**
      * 显示打开通知提醒的弹窗
      */
     fun showOpenNoteRemindSettingDialog(activity: Activity) {
-        if (AppDataUtils.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
+        if (WxpAppDataService.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
             return
         }
-        if (AppDataUtils.getPushToken().isNullOrEmpty()) {
+        if (WxpAppDataService.getPushToken().isNullOrEmpty()) {
             return
         }
         val platform = DeviceUtils.getPlatform()

@@ -1,16 +1,14 @@
 package com.smjcco.wxpusher.push.ws
 
-import com.smjcco.wxpusher.WxPusherConfig
+import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.notification.NotificationManager.sendBizMessageNotification
 import com.smjcco.wxpusher.push.PushManager
-import com.smjcco.wxpusher.utils.AppDataUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
-import com.smjcco.wxpusher.web.WxPusherWebInterface
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
@@ -77,13 +75,13 @@ object WsManager {
         val pushTokenListener = object : IWsMessageListener<InitDeviceMsg> {
             override fun onMessage(message: InitDeviceMsg) {
                 WxPusherLog.i(TAG, "收到自建长链接Ws的pushToken=${message.pushToken}")
-                if (AppDataUtils.getPushToken() == message.pushToken) {
-                    WxPusherLog.i(
-                        TAG,
-                        "自建长链接token未变化，不用更新 pushToken=${message.pushToken}"
-                    )
-                    return
-                }
+//                if (AppDataUtils.getPushToken() == message.pushToken) {
+//                    WxPusherLog.i(
+//                        TAG,
+//                        "自建长链接token未变化，不用更新 pushToken=${message.pushToken}"
+//                    )
+//                    return
+//                }
                 PushManager.onGetPushToken(message.pushToken, DevicePlatform.Android)
             }
         }
@@ -92,17 +90,17 @@ object WsManager {
 
     private fun getHostUrl(): String {
         val sb = StringBuilder()
-        sb.append(WxPusherConfig.WsUrl)
+//        sb.append(WxPusherConfig.WsUrl)
         sb.append("/ws?")
         sb.append("version=${WxPusherUtils.getVersionName()}")
         sb.append("&")
         sb.append("platform=${DeviceUtils.getPlatform().getPlatform()}")
-        if (!AppDataUtils.getPushToken().isNullOrEmpty()
-            && AppDataUtils.getPushToken()?.startsWith("PT_") == true
-        ) {
-            sb.append("&")
-            sb.append("pushToken=${AppDataUtils.getPushToken()}")
-        }
+//        if (!AppDataUtils.getPushToken().isNullOrEmpty()
+//            && AppDataUtils.getPushToken()?.startsWith("PT_") == true
+//        ) {
+//            sb.append("&")
+//            sb.append("pushToken=${AppDataUtils.getPushToken()}")
+//        }
         return sb.toString()
     }
 
@@ -120,11 +118,11 @@ object WsManager {
                 WxPusherLog.i(TAG, "connect: 关闭中，不进行链接")
                 return
             }
-            if (AppDataUtils.getLoginInfo()?.deviceId.isNullOrEmpty()) {
+            if (WxpAppDataService.getLoginInfo()?.deviceId.isNullOrEmpty()) {
                 WxPusherLog.i(TAG, "connect: 没有deviceId（设备未注册），不进行链接")
                 return
             }
-            if (AppDataUtils.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
+            if (WxpAppDataService.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
                 WxPusherLog.i(TAG, "connect: 没有deviceToken（可能没有登录/已经退出登录），不进行链接")
                 return
             }

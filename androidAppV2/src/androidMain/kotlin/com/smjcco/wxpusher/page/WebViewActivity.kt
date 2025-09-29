@@ -142,12 +142,13 @@ class WebViewActivity : ComponentActivity() {
 
     private fun getWebPageUrl(): String {
         //如果是一个网址，那就是正式环境，加载bundle
-        if (WxPusherConfig.WebUrl.contains("zjiecode.com")) {
-            val webDir = WebBundleManager.getWebFileDir()
-            return "file://${webDir.absolutePath}/index.html"
-        }
-        //否则是测试环境，直接加载url
-        return WxPusherConfig.WebUrl
+//        if (WxPusherConfig.WebUrl.contains("zjiecode.com")) {
+//            val webDir = WebBundleManager.getWebFileDir()
+//            return "file://${webDir.absolutePath}/index.html"
+//        }
+//        //否则是测试环境，直接加载url
+//        return WxPusherConfig.WebUrl
+        return ""
     }
 
     override fun onBackPressed() {

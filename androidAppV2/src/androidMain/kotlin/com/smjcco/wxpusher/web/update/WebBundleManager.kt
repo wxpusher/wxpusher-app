@@ -1,15 +1,13 @@
 package com.smjcco.wxpusher.web.update
 
-import com.smjcco.wxpusher.WxPusherConfig
-import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.base.common.ApplicationUtils
-import com.smjcco.wxpusher.utils.SaveUtils
+import com.smjcco.wxpusher.base.common.WxpSaveService
+import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
-import java.net.URL
 import java.util.zip.ZipInputStream
 
 object WebBundleManager {
@@ -104,8 +102,8 @@ object WebBundleManager {
      */
     private fun getNowVersion(): String {
         try {
-            val  text = File(webDir, VERSION_FILE).readText()
-            if(text.isEmpty()){
+            val text = File(webDir, VERSION_FILE).readText()
+            if (text.isEmpty()) {
                 return "0.0.0"
             }
             return text
@@ -125,16 +123,18 @@ object WebBundleManager {
     private fun checkUpdate() {
         WxPusherUtils.getIoScopeScope().launch {
             try {
-                //根据功能版本号去查询新的bundle，避免接口不兼容的问题，如果修改了js桥，就必须修改功能版本号
-                val mainVersion = WxPusherUtils.getVersionName().split(".").take(2).joinToString(".")
-                val serverVersion = URL("${WxPusherConfig.WebUrl}/${mainVersion}_${VERSION_FILE}").readText()
-                val localVersion = getNowVersion()
-                if (isVersionGreater(serverVersion, localVersion)) {
-                    WxPusherLog.i(TAG, "检查到新版本，开始下载,version=${serverVersion}")
-                    downloadNewBundle(serverVersion)
-                } else {
-                    WxPusherLog.i(TAG, "无新版本，跳过更新")
-                }
+//                //根据功能版本号去查询新的bundle，避免接口不兼容的问题，如果修改了js桥，就必须修改功能版本号
+//                val mainVersion =
+//                    WxPusherUtils.getVersionName().split(".").take(2).joinToString(".")
+//                val serverVersion =
+//                    URL("${WxPusherConfig.WebUrl}/${mainVersion}_${VERSION_FILE}").readText()
+//                val localVersion = getNowVersion()
+//                if (isVersionGreater(serverVersion, localVersion)) {
+//                    WxPusherLog.i(TAG, "检查到新版本，开始下载,version=${serverVersion}")
+//                    downloadNewBundle(serverVersion)
+//                } else {
+//                    WxPusherLog.i(TAG, "无新版本，跳过更新")
+//                }
             } catch (e: Exception) {
                 WxPusherLog.i(TAG, "检查更新失败")
             }
@@ -144,28 +144,28 @@ object WebBundleManager {
     private fun downloadNewBundle(serverVersion: String) {
         WxPusherUtils.getIoScopeScope().launch {
             try {
-                val url = URL("${WxPusherConfig.WebUrl}/web_bundle.zip")
-                val connection = url.openConnection()
-                // 清空临时目录
-                tempDir.deleteRecursively()
-                tempDir.mkdirs()
-
-                // 下载并解压到临时目录
-                val bundleZip = File(ApplicationUtils.getApplication().filesDir, BUNDLE_NAME)
-                if (bundleZip.exists()) {
-                    bundleZip.delete()
-                }
-                FileOutputStream(bundleZip).use { output ->
-                    connection.getInputStream().use { input ->
-                        input.copyTo(output)
-                    }
-                }
-                WxPusherLog.i(TAG, "新版本下载完成,version=${serverVersion}")
-                bundleZip.inputStream().use {
-                    extractZipTempDir(it)
-                }
-                bundleZip.delete()
-                WxPusherLog.i(TAG, "新版本解压完成,version=${serverVersion}")
+//                val url = URL("${WxPusherConfig.WebUrl}/web_bundle.zip")
+//                val connection = url.openConnection()
+//                // 清空临时目录
+//                tempDir.deleteRecursively()
+//                tempDir.mkdirs()
+//
+//                // 下载并解压到临时目录
+//                val bundleZip = File(ApplicationUtils.getApplication().filesDir, BUNDLE_NAME)
+//                if (bundleZip.exists()) {
+//                    bundleZip.delete()
+//                }
+//                FileOutputStream(bundleZip).use { output ->
+//                    connection.getInputStream().use { input ->
+//                        input.copyTo(output)
+//                    }
+//                }
+//                WxPusherLog.i(TAG, "新版本下载完成,version=${serverVersion}")
+//                bundleZip.inputStream().use {
+//                    extractZipTempDir(it)
+//                }
+//                bundleZip.delete()
+//                WxPusherLog.i(TAG, "新版本解压完成,version=${serverVersion}")
             } catch (e: Exception) {
                 WxPusherLog.w(TAG, "下载新bundle失败", e)
             }
@@ -176,7 +176,7 @@ object WebBundleManager {
      * 在加载的时候，再去复制文件，避免解压失败 ，无法进入
      */
     fun applyUpdateIfAvailable() {
-        if (SaveUtils.getByKey(NEED_APPLY_UPDATE_KEY) == "true") {
+        if (WxpSaveService.get(NEED_APPLY_UPDATE_KEY, "false") == "true") {
             try {
                 WxPusherLog.i(TAG, "删除老版本")
                 // 删除旧文件
@@ -190,7 +190,7 @@ object WebBundleManager {
 
                 // 清理
                 tempDir.deleteRecursively()
-                SaveUtils.setKeyValue(NEED_APPLY_UPDATE_KEY, "false")
+                WxpSaveService.set(NEED_APPLY_UPDATE_KEY, "false")
                 WxPusherLog.i(TAG, "应用新版本完成")
             } catch (e: Exception) {
                 //更新失败，重置一下版本号，下次启动会再次更新
@@ -223,7 +223,7 @@ object WebBundleManager {
                 entry = zip.nextEntry
             }
         }
-        SaveUtils.setKeyValue(NEED_APPLY_UPDATE_KEY, "true")
+        WxpSaveService.set(NEED_APPLY_UPDATE_KEY, "true")
         WxPusherLog.i(TAG, "extractZipTempDir: 完成解压BundleZip")
     }
 }

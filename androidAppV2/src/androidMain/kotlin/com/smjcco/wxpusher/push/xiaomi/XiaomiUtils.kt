@@ -9,7 +9,6 @@ import com.smjcco.wxpusher.notification.NotificationManager
 import com.smjcco.wxpusher.page.WebDetailActivity
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.PermissionUtils
-import com.smjcco.wxpusher.utils.SaveUtils
 import com.xiaomi.mipush.sdk.MiPushClient
 
 object XiaomiUtils {
@@ -56,7 +55,7 @@ object XiaomiUtils {
             }
             .setNeutralButton("永不提醒") { dialog, _ ->
                 dialog?.dismiss()
-                SaveUtils.setKeyValue(SAVE_SHOW_KEY, "1")
+                WxpSaveService.set(SAVE_SHOW_KEY, "1")
             }
             .create()
         hasShow = true

@@ -6,7 +6,6 @@ import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.page.WebDetailActivity
 import com.smjcco.wxpusher.utils.PermissionUtils
-import com.smjcco.wxpusher.utils.SaveUtils
 
 object CommonUtils {
 
@@ -19,7 +18,6 @@ object CommonUtils {
      * 提示保活
      */
     fun showSettingGuide(activity: Activity) {
-
         if (WxpSaveService.get(SAVE_SHOW_KEY, "") == "1") {
             return
         }
@@ -42,7 +40,7 @@ object CommonUtils {
             }
             .setNeutralButton("永不提醒") { dialog, _ ->
                 dialog?.dismiss()
-                SaveUtils.setKeyValue(SAVE_SHOW_KEY, "1")
+                WxpSaveService.set(SAVE_SHOW_KEY, "1")
             }
             .create()
         hasShow = true

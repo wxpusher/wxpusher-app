@@ -20,7 +20,7 @@ object ConfigManager {
     private const val CACHE_FILE_NAME = "config_cache.json"
 
     // 配置URL
-    private var configUrl: String = WxPusherConfig.ConfigUrl
+//    private var configUrl: String = WxPusherConfig.ConfigUrl
 
     // 当前配置，默认使用兜底配置
     private var currentConfig: ConfigItem = ConfigItem()
@@ -128,25 +128,25 @@ object ConfigManager {
     fun refreshConfig(callback: ((Boolean) -> Unit)? = null) {
         WxPusherUtils.getIoScopeScope().launch {
             try {
-                val serverContent = URL(configUrl).readText()
-                val configResponse = GsonUtils.toObj(serverContent, ConfigResponse::class)
-
-                // 保存到缓存
-                configResponse?.let { saveToCache(it) }
-
-                // 更新当前配置
-                val compatibleConfig = configResponse?.configs?.let { findCompatibleConfig(it) }
-                if (compatibleConfig != null) {
-                    currentConfig = compatibleConfig
-                } else {
-                    WxPusherLog.i(TAG, "没有可用配置")
-                }
-
-                callback?.let {
-                    withContext(Dispatchers.Main) {
-                        it(true)
-                    }
-                }
+//                val serverContent = URL(configUrl).readText()
+//                val configResponse = GsonUtils.toObj(serverContent, ConfigResponse::class)
+//
+//                // 保存到缓存
+//                configResponse?.let { saveToCache(it) }
+//
+//                // 更新当前配置
+//                val compatibleConfig = configResponse?.configs?.let { findCompatibleConfig(it) }
+//                if (compatibleConfig != null) {
+//                    currentConfig = compatibleConfig
+//                } else {
+//                    WxPusherLog.i(TAG, "没有可用配置")
+//                }
+//
+//                callback?.let {
+//                    withContext(Dispatchers.Main) {
+//                        it(true)
+//                    }
+//                }
             } catch (e: Exception) {
                 WxPusherLog.w(TAG, "刷新配置失败: ${e.message}", e)
                 callback?.let {

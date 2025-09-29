@@ -3,11 +3,10 @@ package com.smjcco.wxpusher.push.ws
 import android.app.Activity
 import android.app.AlertDialog
 import android.content.Intent
-import com.smjcco.wxpusher.dialog.DialogManager
-import com.smjcco.wxpusher.page.CheckActivity
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
-import com.smjcco.wxpusher.utils.SaveUtils
+import com.smjcco.wxpusher.dialog.DialogManager
+import com.smjcco.wxpusher.page.CheckActivity
 
 object WsUtils {
     private val SAVE_SHOW_KEY = "ws_keep_alive_tips_dialog"
@@ -41,7 +40,7 @@ object WsUtils {
             }
             .setNeutralButton("不再提醒") { dialog, _ ->
                 dialog?.dismiss()
-                SaveUtils.setKeyValue(SAVE_SHOW_KEY, "1")
+                WxpSaveService.set(SAVE_SHOW_KEY, "1")
             }
             .create()
         hasShow = true
