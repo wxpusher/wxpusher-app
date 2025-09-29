@@ -11,6 +11,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.os.Build
 import android.os.IBinder
 import android.os.PowerManager
 import android.os.SystemClock
@@ -184,6 +185,10 @@ class KeepWsAliveService : Service() {
                 enableVibration(true)
                 vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
                 group = ChannelGroup.WxPusherSystem.id
+                //默认不弹窗悬浮弹窗，避免打扰用户
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    setAllowBubbles(false)
+                }
             }
             notificationManager.createNotificationChannel(channel)
         }
