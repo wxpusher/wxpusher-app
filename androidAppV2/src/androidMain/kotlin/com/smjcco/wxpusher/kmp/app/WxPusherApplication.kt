@@ -29,9 +29,6 @@ class WxPusherApplication : Application() {
         WxPusherLog.init()
         WxPusherLog.i(TAG, "应用启动")
 
-        //初始化存储
-        WxpSaveService.init()
-
         //初始化页面跳转
         WxpAppPageService.init(WxpAppPageServiceImpl())
 

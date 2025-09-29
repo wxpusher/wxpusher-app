@@ -51,7 +51,7 @@ class PermissionRequester(
                         permission
                     )
                 ) {
-                    WxPusherLog.i(TAG, "提示申请权限的原因，不需要跳转引导")
+                    WxPusherLog.i(TAG, "提示申请权限被拒绝，解释原因，不需要跳转引导")
                     val dialog = AlertDialog.Builder(activity)
                         .setTitle(explainTitle)
                         .setMessage(explainMessage)
@@ -78,7 +78,7 @@ class PermissionRequester(
                         .create()
                     DialogManager.show(activity, dialog)
                 } else {
-                    WxPusherLog.i(TAG, "提示申请权限的原因，需要跳转引导")
+                    WxPusherLog.i(TAG, "提示申请权限的被拒绝，需要跳转引导用户打开")
                     val dialog = AlertDialog.Builder(activity)
                         .setTitle(guideTitle)
                         .setCancelable(false)
@@ -105,7 +105,7 @@ class PermissionRequester(
      * 申请一个权限
      */
     fun request(requestSuccessRun: PermissionRequesterCallback) {
-        WxPusherLog.i(TAG, "request: 请求用户授权${permission}")
+
         if (ContextCompat.checkSelfPermission(
                 activity,
                 permission
@@ -114,6 +114,7 @@ class PermissionRequester(
             requestSuccessRun?.invoke(true)
             return
         }
+        WxPusherLog.i(TAG, "request: 请求用户授权,permission=${permission}")
         callback = requestSuccessRun
         requester.launch(permission)
     }

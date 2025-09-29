@@ -1,7 +1,9 @@
 package com.smjcco.wxpusher.kmp.page.useragreement
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -11,17 +13,18 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.UnderlineSpan
 import android.view.View
 import android.widget.TextView
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.base.common.WxpDialogUtils
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
+import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseActivity
 import com.smjcco.wxpusher.kmp.common.WxpSaveKey
 import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
+import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 
 class WxpUserAgreementActivity : WxpBaseActivity() {
@@ -31,7 +34,7 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
     private lateinit var agreeButton: MaterialButton
     private lateinit var disagreeButton: MaterialButton
 
-    private lateinit var notificationPermissionLauncher: ActivityResultLauncher<String>
+    private var permissionRequester: PermissionRequester? = null
 
     companion object {
         fun start(context: Context) {
@@ -50,19 +53,12 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
         setContentView(R.layout.activity_user_agreement)
         supportActionBar?.hide()
 
-        setupPermissionLauncher()
         initViews()
         setupClickableText()
         setupButtons()
+        setUpPermissionRequester()
     }
 
-    private fun setupPermissionLauncher() {
-        notificationPermissionLauncher = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted ->
-            handlePermissionResult(isGranted)
-        }
-    }
 
     private fun initViews() {
         titleText = findViewById(R.id.titleText)
@@ -153,18 +149,61 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
         }
     }
 
+    private fun setUpPermissionRequester() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissionRequester = PermissionRequester(
+                this, Manifest.permission.POST_NOTIFICATIONS,
+                "需要发送通知权限",
+                "WxPusher是一个消息推送平台，当有新消息到达的时候，我们会第一时间给你发送通知，因此需要你授予发送通知的权限，否则我们无法发送消息通知，你可能会因此遗漏消息，是否授予权限？",
+                "缺少必须的通知权限",
+                "本应用核心功能是发送消息通知，缺少通知权限会导致你无法收到消息通知。\n\n打开方式：点击“去设置”-“通知管理”-打开允许通知"
+            ) {
+                PermissionUtils.gotoNotificationSettingPage()
+            }
+        }
+    }
+
     private fun onAgreeClicked() {
+        //用户点击后，直接保存用户同意协议
+        WxpSaveService.set(WxpSaveKey.UserHasAgreement, true)
+
+        // 已经有权限，直接跳转主页面
         if (PermissionUtils.hasNotificationPermission(this)) {
-            // 已经有权限，直接跳转主页面
             jumpToMain()
             return
         }
 
+        //没有通知权限， 就请求通知权限
+        requestPermission()
+    }
+
+
+    /**
+     * 没有权限的时候，请求权限
+     */
+    private fun requestPermission() {
         // 请求通知权限
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-            notificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && permissionRequester != null) {
+            permissionRequester?.request {
+                if (it) {
+                    jumpToMain()
+                } else {
+                    WxpLogUtils.i(message = "用户拒绝了通知权限")
+                    WxpToastUtils.showToast("你拒绝了通知权限，将无法给你发送通知提醒")
+                    jumpToMain()
+                }
+            }
         } else {
-            showNotificationSettingsDialog()
+            val params = WxpDialogParams(
+                title = "异常提醒",
+                message = "WxPusher必须要推送权限才能正常工作，你可以稍后在【设置-WxPusher消息推送平台-通知】中打开",
+                leftText = "取消",
+                rightText = "去设置",
+                rightBlock = {
+                    WxpJumpPageUtils.jumpToNotificationSettingPage()
+                }
+            )
+            WxpDialogUtils.showDialog(params)
         }
     }
 
@@ -181,33 +220,7 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
         WxpDialogUtils.showDialog(params)
     }
 
-    private fun handlePermissionResult(isGranted: Boolean) {
-        if (isGranted) {
-            jumpToMain()
-        } else {
-            showNotificationSettingsDialog()
-        }
-    }
-
-    private fun showNotificationSettingsDialog() {
-        val params = WxpDialogParams(
-            title = "异常提醒",
-            message = "WxPusher必须要推送权限才能正常工作，你可以稍后在【设置-WxPusher消息推送平台-通知】中打开",
-            leftText = "取消",
-            leftBlock = {
-                jumpToMain()
-            },
-            rightText = "去设置",
-            rightBlock = {
-                WxpJumpPageUtils.jumpToNotificationSettingPage()
-            }
-        )
-        WxpDialogUtils.showDialog(params)
-    }
-
     private fun jumpToMain() {
-        // 保存用户已同意协议
-        WxpSaveService.set(WxpSaveKey.UserHasAgreement, true)
         // 跳转到主页面
         WxpJumpPageUtils.jumpToMain(this)
         finish()

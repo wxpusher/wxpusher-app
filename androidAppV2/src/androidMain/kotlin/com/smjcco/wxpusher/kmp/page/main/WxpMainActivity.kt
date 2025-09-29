@@ -1,7 +1,6 @@
 package com.smjcco.wxpusher.kmp.page.main
 
 import android.Manifest
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.Menu
@@ -20,7 +19,6 @@ import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.kmp.base.WxpBaseActivity
 import com.smjcco.wxpusher.kmp.common.WxpSaveKey
 import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
-import com.smjcco.wxpusher.kmp.page.login.WxpLoginActivity
 import com.smjcco.wxpusher.kmp.page.main.fragment.ITabMenuProvider
 import com.smjcco.wxpusher.kmp.page.main.fragment.MessageListFragment
 import com.smjcco.wxpusher.kmp.page.main.fragment.ProfileFragment
@@ -48,8 +46,8 @@ class WxpMainActivity : WxpBaseActivity() {
                     this, Manifest.permission.POST_NOTIFICATIONS,
                     "需要发送通知权限",
                     "WxPusher是一个消息推送平台，当有新消息到达的时候，我们会第一时间给你发送通知，因此需要你授予发送通知的权限，否则我们无法发送消息通知，你可能会因此遗漏消息，是否授予权限？",
-                    "缺少通知权限",
-                    "本应用核心功能是发送消息通知，缺少通知权限会导致你遗漏消息。\n\n打开方式：点击“去设置”-“通知管理”-打开允许通知"
+                    "缺少必须的通知权限",
+                    "本应用核心功能是发送消息通知，缺少通知权限会导致你无法收到消息通知。\n\n打开方式：点击“去设置”-“通知管理”-打开允许通知"
                 ) {
                     PermissionUtils.gotoNotificationSettingPage()
                 }.request {
@@ -99,11 +97,11 @@ class WxpMainActivity : WxpBaseActivity() {
             // 打开隐私协议页面
             WxpJumpPageUtils.jumpToUserAgreement(this)
             finish()
-            return false;
+            return true;
         }
         val token = WxpAppDataService.getLoginInfo()?.deviceToken
         if (token.isNullOrEmpty()) {
-            startActivity(Intent(this, WxpLoginActivity::class.java))
+            WxpJumpPageUtils.jumpToLogin(this)
             return true
         }
         return false

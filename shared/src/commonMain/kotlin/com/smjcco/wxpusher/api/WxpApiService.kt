@@ -126,7 +126,7 @@ object WxpApiService {
         req: WxpUpdateInfoReq,
         successBlock: (() -> Unit)? = null
     ): Boolean? {
-        if (req.deviceUuid?.isEmpty() == true || req.pushToken?.isEmpty() == true) {
+        if (req.deviceUuid.isNullOrEmpty() || req.pushToken.isNullOrEmpty()) {
             return false
         }
         return commonRespDeal(block = {

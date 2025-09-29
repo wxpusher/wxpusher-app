@@ -18,6 +18,8 @@ object WxPusherLog {
     private lateinit var logId: String
     private val logIdKey = "logIdKey"
 
+    private val TAG = "WxPusherLog"
+
     fun init() {
         logId = WxpSaveService.get(logIdKey, "")
         if (logId.isEmpty()) {
@@ -100,7 +102,7 @@ object WxPusherLog {
     }
 
     fun d(tag: String?, msg: String) {
-        Log.d(tag, msg)
+        Log.d(TAG + tag, msg)
     }
 
     fun i(tag: String?, msg: String) {
@@ -109,7 +111,7 @@ object WxPusherLog {
         log.putContent("tag", tag)
         log.putContent("msg", msg)
         aliLog(log)
-        Log.i(tag, msg)
+        Log.i(TAG + tag, msg)
     }
 
     fun w(tag: String?, msg: String?, tr: Throwable? = null) {
@@ -119,7 +121,7 @@ object WxPusherLog {
         log.putContent("msg", msg)
         log.putContent("error", throwableToString(tr))
         aliLog(log)
-        Log.w(tag, msg, tr)
+        Log.w(TAG + tag, msg, tr)
     }
 
     fun e(tag: String?, msg: String?, tr: Throwable? = null) {
@@ -129,7 +131,7 @@ object WxPusherLog {
         log.putContent("msg", msg)
         log.putContent("error", throwableToString(tr))
         aliLog(log)
-        Log.e(tag, msg, tr)
+        Log.e(TAG + tag, msg, tr)
     }
 
     private fun aliLog(log: com.aliyun.sls.android.producer.Log, flush: Boolean = false) {
