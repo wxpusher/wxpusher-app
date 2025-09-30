@@ -21,13 +21,12 @@ class WxPusherApplication : Application() {
         super.onCreate()
         ApplicationUtils.init(this)
 
-        //初始化环境
-//        WxpConfig.baseUrl = "https://wxpusher.zjiecode.com"
-        WxpConfig.baseUrl = "http://wxpusher.test.zjiecode.com"
 
         WxpSaveService.init()
         WxpLogUtils.init()
         WxpLogUtils.i(TAG, "应用启动")
+        //初始化一些配置和环境信息
+        WxpConfig.init()
 
         //初始化页面跳转
         WxpAppPageService.init(WxpAppPageServiceImpl())

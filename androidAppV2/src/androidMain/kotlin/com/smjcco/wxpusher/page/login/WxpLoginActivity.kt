@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textfield.TextInputEditText
+import com.smjcco.wxpusher.BuildConfig
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.WxpBaseMvpActivity
 import com.smjcco.wxpusher.base.common.WxpToastUtils
@@ -36,6 +37,14 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
         setupPrivacyLabel()
 
         presenter.init()
+
+        //测试包，添加进入测试面板入口
+        if (!BuildConfig.online) {
+            val titleView = findViewById<View>(R.id.title_label)
+            titleView.setOnClickListener {
+                WxpJumpPageUtils.jumpToTestPanel(this)
+            }
+        }
     }
 
     private fun initViews() {

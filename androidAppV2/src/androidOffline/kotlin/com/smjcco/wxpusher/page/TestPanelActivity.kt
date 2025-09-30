@@ -10,6 +10,8 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import com.smjcco.wxpusher.R
+import com.smjcco.wxpusher.WxpConfig
+import com.smjcco.wxpusher.utils.ThreadUtils
 
 class TestPanelActivity : ComponentActivity() {
 
@@ -30,7 +32,7 @@ class TestPanelActivity : ComponentActivity() {
     private lateinit var webUrlRadioGroup: RadioGroup
     private lateinit var webUrlCustom: RadioButton
     private lateinit var webUrlEditText: EditText
-    
+
     private lateinit var wsUrlRadioGroup: RadioGroup
     private lateinit var wsUrlCustom: RadioButton
     private lateinit var wsUrlEditText: EditText
@@ -55,7 +57,7 @@ class TestPanelActivity : ComponentActivity() {
         webUrlRadioGroup = findViewById(R.id.web_url_radio_group)
         webUrlCustom = findViewById(R.id.web_url_custom)
         webUrlEditText = findViewById(R.id.web_url_edit_text)
-        
+
         wsUrlRadioGroup = findViewById(R.id.ws_url_radio_group)
         wsUrlCustom = findViewById(R.id.ws_url_custom)
         wsUrlEditText = findViewById(R.id.ws_url_edit_text)
@@ -65,37 +67,37 @@ class TestPanelActivity : ComponentActivity() {
 
     private fun loadSavedSettings() {
         // 加载保存的Host设置
-//        val savedHost = AppDataUtils.getApiUrl()
-//        when (savedHost) {
-//            DEFAULT_HOST -> findViewById<RadioButton>(R.id.host_prod).isChecked = true
-//            TEST_HOST -> findViewById<RadioButton>(R.id.host_test).isChecked = true
-//            else -> {
-//                hostCustom.isChecked = true
-//                hostEditText.setText(savedHost)
-//            }
-//        }
-//
-//        // 加载保存的WebUrl设置
-//        val savedWebUrl = AppDataUtils.getWebUrl()
-//        when (savedWebUrl) {
-//            DEFAULT_WEB_URL -> findViewById<RadioButton>(R.id.web_url_prod).isChecked = true
-//            TEST_WEB_URL -> findViewById<RadioButton>(R.id.web_url_test).isChecked = true
-//            else -> {
-//                webUrlCustom.isChecked = true
-//                webUrlEditText.setText(savedWebUrl)
-//            }
-//        }
-//
-//        // 加载保存的WsUrl设置
-//        val savedWsUrl = AppDataUtils.getWsUrl()
-//        when (savedWsUrl) {
-//            DEFAULT_WS_URL -> findViewById<RadioButton>(R.id.ws_url_prod).isChecked = true
-//            TEST_WS_URL -> findViewById<RadioButton>(R.id.ws_url_test).isChecked = true
-//            else -> {
-//                wsUrlCustom.isChecked = true
-//                wsUrlEditText.setText(savedWsUrl)
-//            }
-//        }
+        val savedHost = WxpConfig.baseUrl
+        when (savedHost) {
+            DEFAULT_HOST -> findViewById<RadioButton>(R.id.host_prod).isChecked = true
+            TEST_HOST -> findViewById<RadioButton>(R.id.host_test).isChecked = true
+            else -> {
+                hostCustom.isChecked = true
+                hostEditText.setText(savedHost)
+            }
+        }
+
+        // 加载保存的WebUrl设置
+        val savedWebUrl = ""
+        when (savedWebUrl) {
+            DEFAULT_WEB_URL -> findViewById<RadioButton>(R.id.web_url_prod).isChecked = true
+            TEST_WEB_URL -> findViewById<RadioButton>(R.id.web_url_test).isChecked = true
+            else -> {
+                webUrlCustom.isChecked = true
+                webUrlEditText.setText(savedWebUrl)
+            }
+        }
+
+        // 加载保存的WsUrl设置
+        val savedWsUrl = WxpConfig.wsUrl
+        when (savedWsUrl) {
+            DEFAULT_WS_URL -> findViewById<RadioButton>(R.id.ws_url_prod).isChecked = true
+            TEST_WS_URL -> findViewById<RadioButton>(R.id.ws_url_test).isChecked = true
+            else -> {
+                wsUrlCustom.isChecked = true
+                wsUrlEditText.setText(savedWsUrl)
+            }
+        }
 
         // 设置EditText的可见性
         updateHostEditTextVisibility()
@@ -111,7 +113,7 @@ class TestPanelActivity : ComponentActivity() {
         webUrlRadioGroup.setOnCheckedChangeListener { _, _ ->
             updateWebUrlEditTextVisibility()
         }
-        
+
         wsUrlRadioGroup.setOnCheckedChangeListener { _, _ ->
             updateWsUrlEditTextVisibility()
         }
@@ -128,7 +130,7 @@ class TestPanelActivity : ComponentActivity() {
     private fun updateWebUrlEditTextVisibility() {
         webUrlEditText.visibility = if (webUrlCustom.isChecked) View.VISIBLE else View.GONE
     }
-    
+
     private fun updateWsUrlEditTextVisibility() {
         wsUrlEditText.visibility = if (wsUrlCustom.isChecked) View.VISIBLE else View.GONE
     }
@@ -149,7 +151,7 @@ class TestPanelActivity : ComponentActivity() {
             R.id.web_url_custom -> webUrlEditText.text.toString().trim()
             else -> DEFAULT_WEB_URL
         }
-        
+
         // 保存WsUrl设置
         val selectedWsUrl = when (wsUrlRadioGroup.checkedRadioButtonId) {
             R.id.ws_url_prod -> DEFAULT_WS_URL
@@ -160,21 +162,22 @@ class TestPanelActivity : ComponentActivity() {
 
         // 检查自定义输入是否为空
         if ((hostCustom.isChecked && selectedHost.isEmpty()) ||
-            (webUrlCustom.isChecked && selectedWebUrl.isEmpty()) ||
-            (wsUrlCustom.isChecked && selectedWsUrl.isEmpty())) {
+//            (webUrlCustom.isChecked && selectedWebUrl.isEmpty()) ||
+            (wsUrlCustom.isChecked && selectedWsUrl.isEmpty())
+        ) {
             Toast.makeText(this, "自定义配置不能为空", Toast.LENGTH_SHORT).show()
             return
         }
 
         // 保存配置到SP
-//        AppDataUtils.saveApiUrl(selectedHost)
-//        AppDataUtils.saveWebUrl(selectedWebUrl)
-//        AppDataUtils.saveWsUrl(selectedWsUrl)
+        WxpConfig.saveBaseUrl(selectedHost)
+        WxpConfig.saveWsUrl(selectedWsUrl)
 
         // 提示用户重启后生效
         Toast.makeText(this, "配置已保存，重启后生效", Toast.LENGTH_SHORT).show()
-
         // 关闭页面
         finish()
+        //退出app
+        ThreadUtils.runOnMainThread({ System.exit(0) }, 1000L)
     }
 } 

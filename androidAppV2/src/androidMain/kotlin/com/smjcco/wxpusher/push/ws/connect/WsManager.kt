@@ -116,7 +116,7 @@ object WsManager {
 
     private fun getWsUrl(): String {
         val sb = StringBuilder()
-        sb.append(WxpConfig.baseUrl)
+        sb.append(WxpConfig.wsUrl)
         sb.append("/ws?")
         sb.append("version=${WxpBaseInfoService.getAppVersionName()}")
         sb.append("&")

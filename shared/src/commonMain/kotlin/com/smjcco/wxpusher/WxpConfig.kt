@@ -1,6 +1,24 @@
 package com.smjcco.wxpusher
 
+import com.smjcco.wxpusher.base.common.WxpSaveService
+
 object WxpConfig {
-    //后端地址,比如："https://wxpusher.zjiecode.com"
-    lateinit var baseUrl: String
+    //后端地址
+    var baseUrl: String = "https://wxpusher.zjiecode.com"
+
+    //ws的地址，iOS用不上
+    var wsUrl: String = "wss://wxpusher.zjiecode.com"
+
+    fun init() {
+        baseUrl = WxpSaveService.get("baseUrl", baseUrl)
+        wsUrl = WxpSaveService.get("wsUrl", wsUrl)
+    }
+
+    fun saveBaseUrl(baseUrl: String) {
+        WxpSaveService.set("baseUrl", baseUrl)
+    }
+
+    fun saveWsUrl(wsUrl: String) {
+        WxpSaveService.set("wsUrl", wsUrl)
+    }
 }

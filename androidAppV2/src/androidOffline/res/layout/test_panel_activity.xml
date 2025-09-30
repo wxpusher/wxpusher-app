@@ -115,7 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
-            android:text="WebUrl 设置"
+            android:text="WebUrl 设置(暂时不用了)"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -153,7 +153,6 @@
             android:hint="请输入自定义WebUrl"
             android:inputType="textUri"
             android:visibility="gone" />
-
 
 
         <View

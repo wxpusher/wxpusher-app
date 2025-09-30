@@ -11,7 +11,9 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.smjcco.wxpusher.BuildConfig
 import com.smjcco.wxpusher.R
+import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.base.WxpBaseFragment
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.WxpBaseInfoService
@@ -64,6 +66,21 @@ class ProfileFragment : WxpBaseFragment() {
         val uid = loginInfo?.uid ?: ""
         val deviceId = loginInfo?.deviceId ?: ""
 
+        if (!BuildConfig.online) {
+            sectionData.add(
+                ProfileSection(
+                    title = "测试菜单",
+                    items = listOf(
+                        ProfileItem(
+                            title = "切换环境",
+                            subtitle = WxpConfig.baseUrl,
+                            hasArrow = true
+                        ) {
+                            WxpJumpPageUtils.jumpToTestPanel(requireActivity())
+                        }
+                    )
+                ))
+        }
 
         // 设备和账号
         sectionData.add(

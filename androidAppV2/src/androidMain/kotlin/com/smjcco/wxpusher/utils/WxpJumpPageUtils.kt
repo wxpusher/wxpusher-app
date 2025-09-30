@@ -17,6 +17,7 @@ import com.smjcco.wxpusher.page.unbind.WxpUnbindActivity
 import com.smjcco.wxpusher.page.useragreement.WxpUserAgreementActivity
 import com.smjcco.wxpusher.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager
+import androidx.core.net.toUri
 
 
 object WxpJumpPageUtils {
@@ -138,5 +139,19 @@ object WxpJumpPageUtils {
             WxpUserAgreementActivity.start(it)
         }
     }
+
+    /**
+     * 跳转到测试面板，只有测试环境有效
+     */
+    fun jumpToTestPanel(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                "wxpusher://wxpusher.smjcco.com/test-panel".toUri()
+            )
+            it.startActivity(intent)
+        }
+    }
+
 
 }
