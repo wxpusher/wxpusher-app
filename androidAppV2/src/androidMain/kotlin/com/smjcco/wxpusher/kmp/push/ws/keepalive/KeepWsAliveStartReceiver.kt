@@ -8,7 +8,7 @@ class KeepWsAliveStartReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED) {
-            KeepWsAliveService.start()
+            KeepWsAliveServiceStarter.start(context)
         }
     }
 }

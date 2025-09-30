@@ -1,29 +1,31 @@
 package com.smjcco.wxpusher.kmp.push.ws.connect
 
+import android.app.AlarmManager
 import android.content.Context
+import android.content.Context.ALARM_SERVICE
 import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Build
 import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
-import com.smjcco.wxpusher.base.common.runAtIOSuspend
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
+import com.smjcco.wxpusher.kmp.common.utils.ThreadUtils
 import com.smjcco.wxpusher.kmp.push.PushManager
 import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager.sendBizMessageNotification
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.time.delay
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import okio.ByteString
+import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
@@ -45,6 +47,12 @@ object WsManager {
     //是否已经链接
     private var connectStatus = AtomicReference(WsConnectStatus.NotConnect)
 
+    //不同的重试次数，延迟不一样
+    private val RETRY_SECONDS = listOf(5, 10, 15, 20, 30, 45, 60, 120)
+
+    //持续重试次数
+    private var reTryCount = 0
+
     private var webSocket: WebSocket? = null
 
     private var init = AtomicBoolean(false)
@@ -52,10 +60,15 @@ object WsManager {
     //拒绝链接
     private var disableConnect = false
 
+    private lateinit var alarmManager: AlarmManager
+
+
     fun init() {
         if (init.get()) {
             return
         }
+        alarmManager =
+            ApplicationUtils.getApplication().getSystemService(ALARM_SERVICE) as AlarmManager
         init.set(true)
         //初始化监听器
         initMsgListener()
@@ -144,6 +157,7 @@ object WsManager {
             }
             webSocket?.close(1000, "重新建立连接前，关闭原来的WS连接")
 
+            reTryCount++
             WxPusherLog.i(TAG, "connect: 开始WS长链接")
             setConnectStatus(WsConnectStatus.Connecting)
             val wsUrl = getWsUrl()
@@ -159,9 +173,31 @@ object WsManager {
      * 当连接断开后，延迟一点时间，重新建立连接
      */
     private fun tryConnectDelay() {
-        runAtIOSuspend {
-            delay(30 * 1000)
-            tryConnect()
+        val retrySeconds = RETRY_SECONDS.getOrNull(reTryCount) ?: RETRY_SECONDS.last()
+        WxpLogUtils.d(message = "延迟${retrySeconds}重新尝试WS连接")
+        val reconnectTime = Calendar.getInstance()
+        reconnectTime.add(Calendar.SECOND, retrySeconds)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (alarmManager.canScheduleExactAlarms()) {
+                alarmManager.setExact(
+                    AlarmManager.RTC_WAKEUP,
+                    reconnectTime.timeInMillis,
+                    "WS-RECONNECT",
+                    { tryConnect() },
+                    null
+                )
+            } else {
+                WxpLogUtils.d(message = "不能调用alarmManager，通过post delay来重启WS")
+                ThreadUtils.runOnMainThread({ tryConnect() }, retrySeconds.toLong())
+            }
+        } else {
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                reconnectTime.timeInMillis,
+                "WS-RECONNECT",
+                { tryConnect() },
+                null
+            )
         }
     }
 
@@ -252,6 +288,7 @@ object WsManager {
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             setConnectStatus(WsConnectStatus.Connected)
+            reTryCount = 0
             WxPusherLog.i(TAG, "onMessage() called with: webSocket = $webSocket, text = $text")
             val baseWsMsg = GsonUtils.toObj(text, BaseWsMsg::class.java)
             if (baseWsMsg == null) {
@@ -293,6 +330,7 @@ object WsManager {
         override fun onOpen(webSocket: WebSocket, response: Response) {
             WxPusherLog.i(TAG, "onOpen: WS链接打开")
             setConnectStatus(WsConnectStatus.Connected)
+            reTryCount = 0
         }
     }
 }

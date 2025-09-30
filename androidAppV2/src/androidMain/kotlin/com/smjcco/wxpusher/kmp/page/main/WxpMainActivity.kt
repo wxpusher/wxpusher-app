@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -25,6 +26,7 @@ import com.smjcco.wxpusher.kmp.page.main.fragment.MessageListFragment
 import com.smjcco.wxpusher.kmp.page.main.fragment.ProfileFragment
 import com.smjcco.wxpusher.kmp.push.PushManager
 import com.smjcco.wxpusher.kmp.push.ws.keepalive.KeepWsAliveService
+import com.smjcco.wxpusher.kmp.push.ws.keepalive.KeepWsAliveServiceStarter
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.xiaomi.mipush.sdk.MiPushMessage
@@ -243,8 +245,9 @@ class WxpMainActivity : WxpBaseActivity() {
         PushManager.showOpenNoteRemindSettingDialog(this)
         //显示首页的时候，尝试启动一次保活服务
         if (DeviceUtils.getPlatform() == DevicePlatform.Android) {
-            KeepWsAliveService.start()
+            KeepWsAliveServiceStarter.start(this)
         }
+        WxpJumpPageUtils.jumpToSystemAlarmSettings(this)
     }
 
     /**

@@ -15,6 +15,7 @@ import com.smjcco.wxpusher.kmp.push.vivo.VIVOPushUtils
 import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager
 import com.smjcco.wxpusher.kmp.push.ws.connect.WsManager
 import com.smjcco.wxpusher.kmp.push.ws.WsUtils
+import com.smjcco.wxpusher.kmp.push.ws.keepalive.KeepWsAliveServiceStarter
 import com.smjcco.wxpusher.kmp.push.xiaomi.XiaomiUtils
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.PermissionUtils
@@ -58,7 +59,7 @@ object PushManager {
             withActivity {
                 //有通知栏权限，才能启动保活服务
                 if (PermissionUtils.hasNotificationPermission(it)) {
-                    KeepWsAliveService.start()
+                    KeepWsAliveServiceStarter.start(application)
                 }
             }
         }

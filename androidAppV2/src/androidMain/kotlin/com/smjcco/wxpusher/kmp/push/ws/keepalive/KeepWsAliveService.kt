@@ -16,6 +16,7 @@ import android.os.IBinder
 import android.os.PowerManager
 import android.os.SystemClock
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
@@ -25,12 +26,8 @@ import com.smjcco.wxpusher.kmp.push.ws.ChannelGroup
 import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager
 import com.smjcco.wxpusher.kmp.push.ws.connect.WsManager
 import com.smjcco.wxpusher.log.WxPusherLog
-import com.smjcco.wxpusher.utils.PermissionUtils
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 
 enum class Actions {
@@ -53,14 +50,14 @@ class KeepWsAliveService : Service() {
         fun start(context: Context = ApplicationUtils.getApplication()) {
             Intent(context, KeepWsAliveService::class.java).also {
                 it.action = Actions.START.name
-                context.startForegroundService(it)
+                ContextCompat.startForegroundService(context, it)
             }
         }
 
         fun stop(context: Context = ApplicationUtils.getApplication()) {
             Intent(context, KeepWsAliveService::class.java).also {
                 it.action = Actions.STOP.name
-                context.startForegroundService(it)
+                ContextCompat.startForegroundService(context, it)
             }
         }
     }
