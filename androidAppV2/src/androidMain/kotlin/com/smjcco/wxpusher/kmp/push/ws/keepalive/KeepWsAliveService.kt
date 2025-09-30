@@ -197,15 +197,14 @@ class KeepWsAliveService : Service() {
 
         val builder = NotificationCompat.Builder(this, notificationChannelId)
             .setContentTitle("WxPusher正在监听通知")
-            .setContentText("绿色图标表示正在监听中，如果通知消失，你需要重新启动WxPusher")
+            .setContentText("如果通知消失，请重新启动WxPusher")
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setGroup(KeepWsAliveService::class.java.name)
             .setAutoCancel(false)
-            .setTicker("WxPusher会在后台持续运行，以接收最新的消息，如果本通知消息，你需要重新启动WxPusher")
+            .setTicker("消息监听中，如果通知消失，请重新启动WxPusher")
             .setPriority(NotificationManager.IMPORTANCE_HIGH)
-            .setSmallIcon(R.mipmap.ic_launcher_green)
-            .setLargeIcon(BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher_green))
+            .setSmallIcon(R.mipmap.ic_launcher_transparent)
         return builder.build()
     }
 }

@@ -63,7 +63,7 @@ object WxpNotificationManager {
                 .setContentTitle(message.title)
                 .setTicker(message.summary)
                 .setContentText(message.summary)
-                .setSmallIcon(R.mipmap.ic_launcher)
+                .setSmallIcon(R.mipmap.ic_launcher_transparent)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .setGroup("bizMsg")
