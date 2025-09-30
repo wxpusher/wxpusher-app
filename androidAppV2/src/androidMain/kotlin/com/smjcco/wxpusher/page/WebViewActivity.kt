@@ -3,7 +3,7 @@ package com.smjcco.wxpusher.page
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
+import com.smjcco.wxpusher.page.main.WxpMainActivity
 
 
 class WebViewActivity : ComponentActivity() {

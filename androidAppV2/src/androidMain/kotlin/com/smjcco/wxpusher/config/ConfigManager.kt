@@ -4,7 +4,7 @@ import android.content.Context
 import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpScopeUtils
-import com.smjcco.wxpusher.kmp.common.utils.GsonUtils
+import com.smjcco.wxpusher.utils.GsonUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

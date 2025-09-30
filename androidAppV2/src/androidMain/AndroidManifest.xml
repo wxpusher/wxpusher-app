@@ -26,7 +26,7 @@
 
 
     <application
-        android:name=".kmp.app.WxPusherApplication"
+        android:name=".app.WxPusherApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -37,7 +37,7 @@
         tools:remove="android:networkSecurityConfig">
 
         <activity
-            android:name=".kmp.page.main.WxpMainActivity"
+            android:name=".page.main.WxpMainActivity"
             android:clearTaskOnLaunch="true"
             android:configChanges="uiMode"
             android:exported="true"
@@ -59,27 +59,6 @@
                     android:scheme="wxpusher" />
             </intent-filter>
         </activity>
-        <!--        <activity-->
-        <!--            android:name=".page.WebViewActivity"-->
-        <!--            android:configChanges="uiMode"-->
-        <!--            android:exported="true"-->
-        <!--            android:launchMode="singleTask">-->
-        <!--            <intent-filter>-->
-        <!--                <action android:name="android.intent.action.MAIN" />-->
-        <!--                <category android:name="android.intent.category.LAUNCHER" />-->
-        <!--            </intent-filter>-->
-        <!--            <intent-filter>-->
-        <!--                <action android:name="android.intent.action.VIEW" />-->
-
-        <!--                <category android:name="android.intent.category.DEFAULT" />-->
-        <!--                <category android:name="android.intent.category.BROWSABLE" />-->
-
-        <!--                <data-->
-        <!--                    android:host="wxpusher.smjcco.com"-->
-        <!--                    android:path="/message"-->
-        <!--                    android:scheme="wxpusher" />-->
-        <!--            </intent-filter>-->
-        <!--        </activity>-->
 
         <activity
             android:name=".page.WebViewActivity"
@@ -87,30 +66,42 @@
             android:launchMode="singleTask" />
 
         <activity
-            android:name=".kmp.page.unbind.WxpUnbindActivity"
+            android:name=".page.unbind.WxpUnbindActivity"
             android:exported="false"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
 
         <activity
-            android:name=".kmp.page.scan.WxpScanActivity"
+            android:name=".page.scan.WxpScanActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.Scan" />
 
         <activity
-            android:name=".kmp.page.useragreement.WxpUserAgreementActivity"
+            android:name=".page.useragreement.WxpUserAgreementActivity"
             android:exported="false"
             android:screenOrientation="portrait" />
 
-        <!--        暂时不用长链接服务-->
-        <!--        <service-->
-        <!--            android:name=".push.ws.KeepWsConnectService"-->
-        <!--            android:foregroundServiceType="remoteMessaging"-->
-        <!--            tools:node="merge" />-->
+
+        <activity
+            android:name=".page.login.WxpLoginActivity"
+            android:exported="false"
+            android:launchMode="singleTask" />
+
+        <activity
+            android:name=".page.bind.WxpBindActivity"
+            android:exported="false"
+            android:launchMode="singleTask" />
+
+        <activity
+            android:name=".page.web.WxpWebViewActivity"
+            android:exported="true" />
+
+        <!--自建长连接推送-->
+
 
         <service
-            android:name=".kmp.push.ws.keepalive.KeepWsAliveService"
+            android:name=".push.ws.keepalive.KeepWsAliveService"
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="specialUse">
@@ -121,7 +112,7 @@
 
 
         <receiver
-            android:name=".kmp.push.ws.keepalive.KeepWsAliveStartReceiver"
+            android:name=".push.ws.keepalive.KeepWsAliveStartReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>
@@ -129,39 +120,6 @@
                 <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
             </intent-filter>
         </receiver>
-
-
-        <activity
-            android:name=".TestActivity"
-            android:exported="true">
-
-        </activity>
-        <activity
-            android:name=".page.CheckActivity"
-            android:exported="true">
-
-        </activity>
-        <activity
-            android:name=".page.AgreePrivateActivity"
-            android:exported="true">
-
-        </activity>
-
-        <activity
-            android:name=".kmp.page.login.WxpLoginActivity"
-            android:exported="false"
-            android:launchMode="singleTask" />
-
-        <activity
-            android:name=".kmp.page.bind.WxpBindActivity"
-            android:exported="false"
-            android:launchMode="singleTask" />
-
-        <activity
-            android:name=".kmp.page.web.WxpWebViewActivity"
-            android:exported="true" />
-
-
         <!-- 华为推送-->
         <service
             android:name=".push.huawei.HuaweiHmsMessageService"
