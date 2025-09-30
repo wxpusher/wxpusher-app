@@ -7,7 +7,11 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
+import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
+import com.smjcco.wxpusher.utils.PermissionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
@@ -56,8 +60,16 @@ class KeepWsAliveServiceStarter(private val context: Context) {
         const val WORK_NAME_ONCE = "KeepWsAliveServiceStarter"
 
         fun start(context: Context) {
-            val manager = KeepWsAliveServiceStarter(context)
-            manager.start()
+            //只有走自建通道，并且打开通知权限，才开启WS保活
+            if (DeviceUtils.getPlatform() == DevicePlatform.Android) {
+                val currentActivity = ApplicationUtils.getCurrentActivity()
+                if (currentActivity == null
+                    || PermissionUtils.hasNotificationPermission(currentActivity)
+                ) {
+                    val manager = KeepWsAliveServiceStarter(context)
+                    manager.start()
+                }
+            }
         }
     }
 }

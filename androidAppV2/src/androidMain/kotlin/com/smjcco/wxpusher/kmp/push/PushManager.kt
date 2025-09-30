@@ -56,12 +56,7 @@ object PushManager {
             WxpNotificationManager.init()
             WsManager.init()
             //启动保活，必须在最后
-            withActivity {
-                //有通知栏权限，才能启动保活服务
-                if (PermissionUtils.hasNotificationPermission(it)) {
-                    KeepWsAliveServiceStarter.start(application)
-                }
-            }
+            KeepWsAliveServiceStarter.start(application)
         }
 
     }

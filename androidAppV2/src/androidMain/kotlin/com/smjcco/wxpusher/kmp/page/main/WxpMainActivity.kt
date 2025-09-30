@@ -243,9 +243,7 @@ class WxpMainActivity : WxpBaseActivity() {
         super.onResume()
         PushManager.showOpenNoteRemindSettingDialog(this)
         //显示首页的时候，尝试启动一次保活服务
-        if (DeviceUtils.getPlatform() == DevicePlatform.Android) {
-            KeepWsAliveServiceStarter.start(this)
-        }
+        KeepWsAliveServiceStarter.start(this)
     }
 
     /**

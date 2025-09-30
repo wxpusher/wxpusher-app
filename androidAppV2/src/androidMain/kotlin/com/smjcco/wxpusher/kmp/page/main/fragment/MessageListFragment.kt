@@ -165,7 +165,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                     )
                 }
                 bannerCloseImg.visibility = View.GONE
-            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
                 && !(requireContext().getSystemService(ALARM_SERVICE) as AlarmManager).canScheduleExactAlarms()
             ) {
                 bannerCardView.visibility = View.VISIBLE
