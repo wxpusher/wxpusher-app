@@ -24,6 +24,7 @@ import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
 import com.smjcco.wxpusher.kmp.push.ws.ChannelGroup
 import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager
 import com.smjcco.wxpusher.kmp.push.ws.connect.WsManager
+import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.PermissionUtils
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -159,7 +160,11 @@ class KeepWsAliveService : Service() {
 
     private fun doWork() {
         runAtIOSuspend {
-            WsManager.tryConnect()
+            while (true) {
+                WxPusherLog.d("WxPusherLog", "KeepWsAliveService，running")
+                delay(30000)
+                WsManager.tryConnect()
+            }
         }
     }
 
