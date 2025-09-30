@@ -72,8 +72,8 @@ object WsManager {
         init.set(true)
         //初始化监听器
         initMsgListener()
-        //尝试建立连接
-        tryConnect()
+        //尝试建立连接，并且使用系统闹钟进行检查
+        tryConnectAndAlarmLoopCheck()
         //监听网络变化，尝试建立连接
         listenNetworkAvailable()
     }
@@ -166,6 +166,40 @@ object WsManager {
                 .url(wsUrl)
                 .build()
             webSocket = client.newWebSocket(request, WsListener())
+        }
+    }
+
+    /**
+     * 使用系统闹钟，5分钟检查一次连接，来做兜底。
+     */
+    private fun tryConnectAndAlarmLoopCheck() {
+        WxpLogUtils.d(message = "tryConnectAndAlarmLoopCheck,系统闹钟定时兜底")
+
+        tryConnect()
+        val delayTime = 5
+        val reconnectTime = Calendar.getInstance()
+        reconnectTime.add(Calendar.MINUTE, delayTime)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (alarmManager.canScheduleExactAlarms()) {
+                alarmManager.setExact(
+                    AlarmManager.RTC_WAKEUP,
+                    reconnectTime.timeInMillis,
+                    "WS-tryAlarmLoopCheck",
+                    { tryConnectAndAlarmLoopCheck() },
+                    null
+                )
+            } else {
+                WxpLogUtils.d(message = "tryAlarmLoopCheck,不能调用alarmManager，通过post delay来检查")
+                ThreadUtils.runOnMainThread({ tryConnect() }, delayTime * 60 * 1000L)
+            }
+        } else {
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                reconnectTime.timeInMillis,
+                "WS-tryAlarmLoopCheck",
+                { tryConnectAndAlarmLoopCheck() },
+                null
+            )
         }
     }
 
