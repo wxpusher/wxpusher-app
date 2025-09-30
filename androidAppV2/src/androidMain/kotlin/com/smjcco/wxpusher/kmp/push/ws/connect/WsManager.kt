@@ -2,6 +2,7 @@ package com.smjcco.wxpusher.kmp.push.ws.connect
 
 import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
+import com.smjcco.wxpusher.base.common.runAtIOSuspend
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
 import com.smjcco.wxpusher.kmp.push.PushManager
@@ -9,7 +10,9 @@ import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager.sendBizMessageNoti
 import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.time.delay
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
@@ -123,6 +126,16 @@ object WsManager {
         }
     }
 
+    /**
+     * 当连接断开后，延迟一点时间，重新建立连接
+     */
+    private fun tryConnectDelay() {
+        runAtIOSuspend {
+            delay(30 * 1000)
+            tryConnect()
+        }
+    }
+
     fun addMsgListener(msgType: Int, listener: IWsMessageListener<out BaseWsMsg>) {
         var listenerList = msgListenerMap.get(msgType)
         if (listenerList == null) {
@@ -192,17 +205,20 @@ object WsManager {
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
             WxPusherLog.i(TAG, "onClosed: 链接关闭，code=${code},reason=${reason}")
             setConnectStatus(WsConnectStatus.NotConnect)
+            tryConnectDelay()
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
             WxPusherLog.i(TAG, "onClosing: code=${code},reason=${reason}")
             setConnectStatus(WsConnectStatus.NotConnect)
+            tryConnectDelay()
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
             WxPusherLog.i(TAG, "onFailure: error=${t.message}")
             t.printStackTrace()
             setConnectStatus(WsConnectStatus.NotConnect)
+            tryConnectDelay()
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {

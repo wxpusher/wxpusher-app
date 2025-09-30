@@ -19,6 +19,7 @@ import androidx.core.app.NotificationCompat
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
+import com.smjcco.wxpusher.base.common.runAtIOSuspend
 import com.smjcco.wxpusher.kmp.page.main.WxpMainActivity
 import com.smjcco.wxpusher.kmp.push.ws.ChannelGroup
 import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager
@@ -137,14 +138,7 @@ class KeepWsAliveService : Service() {
                     acquire()
                 }
             }
-
-        // we're starting a loop in a coroutine
-        GlobalScope.launch(Dispatchers.IO) {
-            while (isServiceStarted) {
-                doWork()
-                delay(30 * 1000)
-            }
-        }
+        doWork()
     }
 
     private fun stopService() {
@@ -164,7 +158,9 @@ class KeepWsAliveService : Service() {
     }
 
     private fun doWork() {
-        WsManager.tryConnect()
+        runAtIOSuspend {
+            WsManager.tryConnect()
+        }
     }
 
     private fun createNotification(): Notification {
