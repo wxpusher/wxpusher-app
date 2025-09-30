@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
+import java.net.URL
 
 /**
  * 配置管理器
@@ -17,10 +18,10 @@ import java.io.IOException
  */
 object ConfigManager {
     private const val TAG = "ConfigManager"
-    private const val CACHE_FILE_NAME = "config_cache.json"
+    private const val CACHE_FILE_NAME = "config_cache_v2.json"
 
     // 配置URL
-//    private var configUrl: String = WxPusherConfig.ConfigUrl
+    private lateinit var configUrl: String
 
     // 当前配置，默认使用兜底配置
     private var currentConfig: ConfigItem = ConfigItem()
@@ -31,12 +32,12 @@ object ConfigManager {
     /**
      * 初始化配置管理器
      * @param context 应用上下文
-     * @param url 配置URL
-     * @param defaultConfig 默认配置
      */
     fun init(context: Context) {
         appContext = context.applicationContext
-
+        val mainVersion =
+            WxpBaseInfoService.getAppVersionName().split('.').take(2).joinToString(".")
+        configUrl = "https://static.zjiecode.com/wxpusher/web-app/app-config-${mainVersion}.json"
         // 尝试从缓存加载配置
         loadFromCache()
 
@@ -128,25 +129,25 @@ object ConfigManager {
     fun refreshConfig(callback: ((Boolean) -> Unit)? = null) {
         WxpScopeUtils.getIoScopeScope().launch {
             try {
-//                val serverContent = URL(configUrl).readText()
-//                val configResponse = GsonUtils.toObj(serverContent, ConfigResponse::class)
-//
-//                // 保存到缓存
-//                configResponse?.let { saveToCache(it) }
-//
-//                // 更新当前配置
-//                val compatibleConfig = configResponse?.configs?.let { findCompatibleConfig(it) }
-//                if (compatibleConfig != null) {
-//                    currentConfig = compatibleConfig
-//                } else {
-//                    WxpLogUtils.i(TAG, "没有可用配置")
-//                }
-//
-//                callback?.let {
-//                    withContext(Dispatchers.Main) {
-//                        it(true)
-//                    }
-//                }
+                val serverContent = URL(configUrl).readText()
+                val configResponse = GsonUtils.toObj(serverContent, ConfigResponse::class)
+
+                // 保存到缓存
+                configResponse?.let { saveToCache(it) }
+
+                // 更新当前配置
+                val compatibleConfig = configResponse?.configs?.let { findCompatibleConfig(it) }
+                if (compatibleConfig != null) {
+                    currentConfig = compatibleConfig
+                } else {
+                    WxpLogUtils.i(TAG, "没有可用配置")
+                }
+
+                callback?.let {
+                    withContext(Dispatchers.Main) {
+                        it(true)
+                    }
+                }
             } catch (e: Exception) {
                 WxpLogUtils.w(TAG, "刷新配置失败: ${e.message}", e)
                 callback?.let {

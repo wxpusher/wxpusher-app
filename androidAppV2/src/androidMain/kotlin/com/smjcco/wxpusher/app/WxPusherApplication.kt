@@ -6,13 +6,12 @@ import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.biz.WxpAppPageService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
-import com.smjcco.wxpusher.base.common.IWxpBaseInfoServiceListener
 import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.base.common.init
+import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.push.PushManager
-import com.smjcco.wxpusher.utils.DeviceUtils
 import com.tencent.upgrade.bean.UpgradeConfig
 import com.tencent.upgrade.core.UpgradeManager
 
@@ -34,15 +33,13 @@ class WxPusherApplication : Application() {
         WxpAppPageService.init(WxpAppPageServiceImpl())
 
         //初始化设备基础信息
-        WxpBaseInfoService.init(object : IWxpBaseInfoServiceListener {
-            override fun getPlatform(): String {
-                return DeviceUtils.getPlatform().getPlatform()
-            }
-        })
+        WxpBaseInfoService.init(WxpBaseInfoServiceImpl())
         PushManager.init(this)
         //上报一次绑定关系，主要是为了更新设备活跃时间
         WxpAppDataService.updateDeviceInfo()
         initTbs()
+        //拉取一个简单的配置
+        ConfigManager.init(this)
     }
 
 
