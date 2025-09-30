@@ -1,11 +1,10 @@
 package com.smjcco.wxpusher.kmp.page.main.fragment
 
+import android.app.AlarmManager
 import android.content.Context
-import android.content.Intent
+import android.content.Context.ALARM_SERVICE
 import android.os.Build
 import android.os.Bundle
-import android.os.VibrationEffect
-import android.os.Vibrator
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
@@ -33,7 +32,6 @@ import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.base.WxpBaseMvpFragment
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
 import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
-import com.smjcco.wxpusher.kmp.page.scan.WxpScanActivity
 import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListView
@@ -145,27 +143,50 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
      */
     private fun setupBanner() {
         //如果是非厂商通道，并且没有忽略电池优化，就提醒用户关闭电池优化
-        if (DeviceUtils.getPlatform() == DevicePlatform.Android && !DeviceUtils.isIgnoringBatteryOptimizations()) {
-            bannerCardView.visibility = View.VISIBLE
-            //设置电池图标
-            bannerICImg.visibility = View.VISIBLE
-            bannerICImg.setImageDrawable(
-                ResourcesCompat.getDrawable(
-                    resources,
-                    R.drawable.ic_battery_alert_red_24dp,
-                    null
+        if (DeviceUtils.getPlatform() == DevicePlatform.Android) {
+            if (!DeviceUtils.isIgnoringBatteryOptimizations()) {
+                bannerCardView.visibility = View.VISIBLE
+                //设置电池图标
+                bannerICImg.visibility = View.VISIBLE
+                bannerICImg.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.ic_battery_alert_red_24dp,
+                        null
+                    )
                 )
-            )
-            bannerTextTv.visibility = View.VISIBLE
-            bannerTextTv.text = resources.getString(R.string.main_banner_battery_text)
-            bannerBtn.visibility = View.VISIBLE
-            bannerBtn.text = resources.getString(R.string.main_banner_battery_button_fix_now)
-            bannerBtn.setOnClickListener {
-                WxpJumpPageUtils.jumpToSystemIgnoreBatteryOptimizationSettings(
-                    requireActivity()
+                bannerTextTv.visibility = View.VISIBLE
+                bannerTextTv.text = resources.getString(R.string.main_banner_battery_text)
+                bannerBtn.visibility = View.VISIBLE
+                bannerBtn.text = resources.getString(R.string.main_banner_battery_button_fix_now)
+                bannerBtn.setOnClickListener {
+                    WxpJumpPageUtils.jumpToSystemIgnoreBatteryOptimizationSettings(
+                        requireActivity()
+                    )
+                }
+                bannerCloseImg.visibility = View.GONE
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
+                && !(requireContext().getSystemService(ALARM_SERVICE) as AlarmManager).canScheduleExactAlarms()
+            ) {
+                bannerCardView.visibility = View.VISIBLE
+                //设置闹钟图标
+                bannerICImg.visibility = View.VISIBLE
+                bannerICImg.setImageDrawable(
+                    ResourcesCompat.getDrawable(
+                        resources,
+                        R.drawable.ic_battery_alert_red_24dp,
+                        null
+                    )
                 )
+                bannerTextTv.visibility = View.VISIBLE
+                bannerTextTv.text = resources.getString(R.string.main_banner_alarm_text)
+                bannerBtn.visibility = View.VISIBLE
+                bannerBtn.text = resources.getString(R.string.main_banner_alarm_btn)
+                bannerBtn.setOnClickListener {
+                    WxpJumpPageUtils.jumpToSystemAlarmSettings(requireActivity())
+                }
+                bannerCloseImg.visibility = View.GONE
             }
-            bannerCloseImg.visibility = View.GONE
         } else {
             bannerCardView.visibility = View.GONE
         }

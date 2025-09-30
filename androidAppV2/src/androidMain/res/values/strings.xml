@@ -33,6 +33,8 @@
     <!--    电量优化-->
     <string name="main_banner_battery_text">关闭电量优化避免无法接收消息</string>
     <string name="main_banner_battery_button_fix_now">立即设置</string>
+    <string name="main_banner_alarm_text">请打开闹钟和提醒来及时接收消息</string>
+    <string name="main_banner_alarm_btn">去打开</string>
 
     <!-- 隐私协议页面 -->
     <string name="privacy_title">用户协议与隐私政策</string>

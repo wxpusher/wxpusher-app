@@ -197,7 +197,6 @@ class WxpMainActivity : WxpBaseActivity() {
         }
     }
 
-
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // 清空之前的菜单
         menu.clear()
@@ -247,7 +246,6 @@ class WxpMainActivity : WxpBaseActivity() {
         if (DeviceUtils.getPlatform() == DevicePlatform.Android) {
             KeepWsAliveServiceStarter.start(this)
         }
-        WxpJumpPageUtils.jumpToSystemAlarmSettings(this)
     }
 
     /**
