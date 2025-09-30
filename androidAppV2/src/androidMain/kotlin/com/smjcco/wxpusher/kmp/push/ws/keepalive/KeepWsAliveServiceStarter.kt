@@ -26,7 +26,7 @@ import kotlinx.coroutines.withContext
  */
 class KeepWsAliveServiceStarter(private val context: Context) {
     fun start() {
-        WxpLogUtils.i(message = "通过ServiceStartWorker 拉活 KeepWsAliveService")
+        WxpLogUtils.d(message = "通过ServiceStartWorker 拉活 KeepWsAliveService")
         val workManager = WorkManager.getInstance(context)
         val startServiceRequest = OneTimeWorkRequest.Builder(ServiceStartWorker::class.java).build()
         workManager.enqueueUniqueWork(
@@ -49,7 +49,7 @@ class KeepWsAliveServiceStarter(private val context: Context) {
                 return Result.failure()
             }
             withContext(Dispatchers.IO) {
-                WxpLogUtils.i(message = "ServiceStartWorker call  KeepWsAliveService.start() (work ID: ${id})")
+                WxpLogUtils.d(message = "ServiceStartWorker call  KeepWsAliveService.start() (work ID: ${id})")
                 KeepWsAliveService.start()
             }
             return Result.success()
