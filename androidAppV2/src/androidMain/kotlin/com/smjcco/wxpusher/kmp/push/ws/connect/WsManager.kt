@@ -1,7 +1,12 @@
 package com.smjcco.wxpusher.kmp.push.ws.connect
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.Network
+import android.os.Build
 import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.runAtIOSuspend
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
@@ -56,6 +61,26 @@ object WsManager {
         initMsgListener()
         //尝试建立连接
         tryConnect()
+        //监听网络变化，尝试建立连接
+        listenNetworkAvailable()
+    }
+
+    /**
+     * 监听网络可用的时候，重新建立连接
+     * 避免用户关闭网络后，连接断开，不能及时建立连接
+     */
+    fun listenNetworkAvailable() {
+        val connectivityManager =
+            ApplicationUtils.getApplication()
+                .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        connectivityManager.registerDefaultNetworkCallback(object :
+            ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+                WxPusherLog.i(TAG, "监听到网络可用，尝试重新连接WS连接")
+                tryConnect()
+            }
+        })
     }
 
 
@@ -107,6 +132,10 @@ object WsManager {
             }
             if (connectStatus.get() == WsConnectStatus.Closing) {
                 WxPusherLog.i(TAG, "connect: 关闭中，不进行链接")
+                return
+            }
+            if (!DeviceUtils.isNetworkConnected()) {
+                WxPusherLog.d(TAG, "connect: 网络不可用，不进行链接")
                 return
             }
             if (disableConnect) {
