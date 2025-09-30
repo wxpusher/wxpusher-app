@@ -1,6 +1,8 @@
 package com.smjcco.wxpusher.kmp.common.utils
 
 import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.PowerManager
 import android.os.VibrationEffect
@@ -9,9 +11,9 @@ import com.heytap.msp.push.HeytapPushManager
 import com.hihonor.push.sdk.HonorPushClient
 import com.huawei.hms.api.HuaweiApiAvailability
 import com.smjcco.wxpusher.base.common.ApplicationUtils
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.config.ConfigManager
-import com.smjcco.wxpusher.log.WxPusherLog
 import com.vivo.push.PushClient
 
 object DeviceUtils {
@@ -62,7 +64,7 @@ object DeviceUtils {
         //如果没有问题，后面判断isMagicOs的逻辑，可以删除掉
         val supportPush =
             HonorPushClient.getInstance().checkSupportHonorPush(ApplicationUtils.getApplication())
-        WxPusherLog.i(
+        WxpLogUtils.i(
             "honor",
             "isHonorDevice=${isHonorDevice()},isMagicOs=${isMagicOs()},checkSupportHonorPush=${supportPush}"
         )
@@ -81,23 +83,23 @@ object DeviceUtils {
     }
 
     fun getPlatform(): DevicePlatform {
-        if (isMIUI()) {
-            return DevicePlatform.Android_XIAOMI
-        } else if (isVivo()) {
-            return DevicePlatform.Android_VIVO
-        } else if (isOppo()) {
-            return DevicePlatform.Android_OPPO
-        } else if (isHonorPush()) {
-            //临时逻辑，判断是支持荣耀push，但是没有打开开关，就走自建，避免进入华为的逻辑
-            if (ConfigManager.getCurrentConfig().honorPush) {
-                return DevicePlatform.Android_HONOR
-            } else {
-                return DevicePlatform.Android
-            }
-        } else if (isHuaweiMobileServicesAvailable()) {
-            //华为需要放在最后面，因为安装了HCM就会识别成华为，后面需要处理一下
-            return DevicePlatform.Android_HUAWEI
-        }
+//        if (isMIUI()) {
+//            return DevicePlatform.Android_XIAOMI
+//        } else if (isVivo()) {
+//            return DevicePlatform.Android_VIVO
+//        } else if (isOppo()) {
+//            return DevicePlatform.Android_OPPO
+//        } else if (isHonorPush()) {
+//            //临时逻辑，判断是支持荣耀push，但是没有打开开关，就走自建，避免进入华为的逻辑
+//            if (ConfigManager.getCurrentConfig().honorPush) {
+//                return DevicePlatform.Android_HONOR
+//            } else {
+//                return DevicePlatform.Android
+//            }
+//        } else if (isHuaweiMobileServicesAvailable()) {
+//            //华为需要放在最后面，因为安装了HCM就会识别成华为，后面需要处理一下
+//            return DevicePlatform.Android_HUAWEI
+//        }
         return DevicePlatform.Android
     }
 
@@ -124,6 +126,24 @@ object DeviceUtils {
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         val appName = context.packageName
         return powerManager.isIgnoringBatteryOptimizations(appName)
+    }
+
+    /**
+     * 检查设备是否连接到网络
+     *
+     * @return 如果设备连接到网络，则返回true；否则返回false
+     */
+    fun isNetworkConnected(): Boolean {
+        val connectivityManager =
+            ApplicationUtils.getApplication()
+                .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val network = connectivityManager.activeNetwork
+        val networkCapabilities = connectivityManager.getNetworkCapabilities(network)
+        return networkCapabilities != null && (
+                networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                        || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                        || networkCapabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+                )
     }
 
 }

@@ -1,15 +1,14 @@
 package com.smjcco.wxpusher.config
 
 import android.content.Context
-import android.util.Log
-import com.smjcco.wxpusher.WxPusherConfig
-import com.smjcco.wxpusher.log.WxPusherLog
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.IOException
-import java.net.URL
 
 /**
  * 配置管理器
@@ -57,17 +56,17 @@ object ConfigManager {
                     val compatibleConfig = configResponse?.configs?.let { findCompatibleConfig(it) }
                     if (compatibleConfig != null) {
                         currentConfig = compatibleConfig
-                        WxPusherLog.i(TAG, "从缓存加载配置成功: $currentConfig")
+                        WxpLogUtils.i(TAG, "从缓存加载配置成功: $currentConfig")
                     } else {
-                        WxPusherLog.w(TAG, "缓存中没有兼容的配置")
+                        WxpLogUtils.w(TAG, "缓存中没有兼容的配置")
                     }
                 }
             } else {
-                WxPusherLog.i(TAG, "缓存文件不存在")
+                WxpLogUtils.i(TAG, "缓存文件不存在")
             }
         } catch (e: Exception) {
             // 缓存读取失败，继续使用默认配置
-            WxPusherLog.i(TAG, "读取缓存配置失败: ${e.message}")
+            WxpLogUtils.i(TAG, "读取缓存配置失败: ${e.message}")
         }
     }
 
@@ -79,9 +78,9 @@ object ConfigManager {
             val cacheFile = File(appContext.cacheDir, CACHE_FILE_NAME)
             val configJson = GsonUtils.toJson(configResponse)
             cacheFile.writeText(configJson)
-            WxPusherLog.i(TAG, "配置已保存到缓存")
+            WxpLogUtils.i(TAG, "配置已保存到缓存")
         } catch (e: IOException) {
-            WxPusherLog.w(TAG, "保存配置到缓存失败: ${e.message}", e)
+            WxpLogUtils.w(TAG, "保存配置到缓存失败: ${e.message}", e)
         }
     }
 
@@ -139,7 +138,7 @@ object ConfigManager {
 //                if (compatibleConfig != null) {
 //                    currentConfig = compatibleConfig
 //                } else {
-//                    WxPusherLog.i(TAG, "没有可用配置")
+//                    WxpLogUtils.i(TAG, "没有可用配置")
 //                }
 //
 //                callback?.let {
@@ -148,7 +147,7 @@ object ConfigManager {
 //                    }
 //                }
             } catch (e: Exception) {
-                WxPusherLog.w(TAG, "刷新配置失败: ${e.message}", e)
+                WxpLogUtils.w(TAG, "刷新配置失败: ${e.message}", e)
                 callback?.let {
                     withContext(Dispatchers.Main) {
                         it(false)

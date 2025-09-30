@@ -17,8 +17,8 @@ import androidx.fragment.app.FragmentActivity
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.dialog.ActionSheetDialogFragment
 import com.smjcco.wxpusher.dialog.ActionSheetItem
-import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.base.common.ApplicationUtils
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.kmp.push.PushManager
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.smjcco.wxpusher.web.WebViewUtils
@@ -71,7 +71,7 @@ class WebDetailActivity : FragmentActivity() {
             val items = listOf(
                 ActionSheetItem("在浏览器中打开") {
                     if (url.isEmpty()) {
-                        WxPusherLog.w(TAG, "在浏览器中打开失败，url=null")
+                        WxpLogUtils.w(TAG, "在浏览器中打开失败，url=null")
                         return@ActionSheetItem
                     }
                     try {
@@ -80,13 +80,13 @@ class WebDetailActivity : FragmentActivity() {
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                         this.startActivity(intent)
                     } catch (e: Exception) {
-                        WxPusherLog.w(TAG, "打开浏览器失败: ${e.message}")
+                        WxpLogUtils.w(TAG, "打开浏览器失败: ${e.message}")
                         WxPusherUtils.toast("打开浏览器失败")
                     }
                 },
                 ActionSheetItem("复制链接") {
                     if (url.isEmpty()) {
-                        WxPusherLog.w(TAG, "复制失败，url=null")
+                        WxpLogUtils.w(TAG, "复制失败，url=null")
                         return@ActionSheetItem
                     }
                     val clipboardManager =
@@ -97,7 +97,7 @@ class WebDetailActivity : FragmentActivity() {
                 },
                 ActionSheetItem("分享") {
                     if (url.isEmpty()) {
-                        WxPusherLog.w(TAG, "复制失败，url=null")
+                        WxpLogUtils.w(TAG, "复制失败，url=null")
                         return@ActionSheetItem
                     }
                     val intent = Intent(Intent.ACTION_SEND)
@@ -109,7 +109,7 @@ class WebDetailActivity : FragmentActivity() {
                 },
                 ActionSheetItem("重新加载") {
                     if (url.isEmpty()) {
-                        WxPusherLog.w(TAG, "重新加载，url=null")
+                        WxpLogUtils.w(TAG, "重新加载，url=null")
                         return@ActionSheetItem
                     }
                     webview.reload()
@@ -209,7 +209,7 @@ class WebDetailActivity : FragmentActivity() {
     }
 
     private fun onUiModeChanged(night: Boolean) {
-        WxPusherLog.i(TAG, "onUiModeChanged() called with: night = $night")
+        WxpLogUtils.i(TAG, "onUiModeChanged() called with: night = $night")
         //设置容器背景颜色，保持顶部状态栏好看
         val color: Int = resources.getColor(R.color.dark_bg)
         val bgColor = if (night) color else Color.White.toArgb()

@@ -1,8 +1,8 @@
 package com.smjcco.wxpusher.web.update
 
 import com.smjcco.wxpusher.base.common.ApplicationUtils
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
-import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import kotlinx.coroutines.launch
 import java.io.File
@@ -58,7 +58,7 @@ object WebBundleManager {
             getVersionFromZip(ApplicationUtils.getApplication().assets.open(BUNDLE_NAME))
 
         if (isVersionGreater(insetZipVersion, nowVersion)) {
-            WxPusherLog.i(TAG, "内置包更新，需要重新解压")
+            WxpLogUtils.i(TAG, "内置包更新，需要重新解压")
             ApplicationUtils.getApplication().assets.open(BUNDLE_NAME).use {
                 extractZipTempDir(it)
                 applyUpdateIfAvailable()
@@ -114,9 +114,9 @@ object WebBundleManager {
     }
 
     fun getWebFileDir(): File {
-        WxPusherLog.i(TAG, "Web目录: ${webDir.absolutePath}")
-        WxPusherLog.i(TAG, "Web目录是否存在: ${webDir.exists()}")
-        WxPusherLog.i(TAG, "Web目录文件列表: ${webDir.list()?.joinToString()}")
+        WxpLogUtils.i(TAG, "Web目录: ${webDir.absolutePath}")
+        WxpLogUtils.i(TAG, "Web目录是否存在: ${webDir.exists()}")
+        WxpLogUtils.i(TAG, "Web目录文件列表: ${webDir.list()?.joinToString()}")
         return webDir
     }
 
@@ -130,13 +130,13 @@ object WebBundleManager {
 //                    URL("${WxPusherConfig.WebUrl}/${mainVersion}_${VERSION_FILE}").readText()
 //                val localVersion = getNowVersion()
 //                if (isVersionGreater(serverVersion, localVersion)) {
-//                    WxPusherLog.i(TAG, "检查到新版本，开始下载,version=${serverVersion}")
+//                    WxpLogUtils.i(TAG, "检查到新版本，开始下载,version=${serverVersion}")
 //                    downloadNewBundle(serverVersion)
 //                } else {
-//                    WxPusherLog.i(TAG, "无新版本，跳过更新")
+//                    WxpLogUtils.i(TAG, "无新版本，跳过更新")
 //                }
             } catch (e: Exception) {
-                WxPusherLog.i(TAG, "检查更新失败")
+                WxpLogUtils.i(TAG, "检查更新失败")
             }
         }
     }
@@ -160,14 +160,14 @@ object WebBundleManager {
 //                        input.copyTo(output)
 //                    }
 //                }
-//                WxPusherLog.i(TAG, "新版本下载完成,version=${serverVersion}")
+//                WxpLogUtils.i(TAG, "新版本下载完成,version=${serverVersion}")
 //                bundleZip.inputStream().use {
 //                    extractZipTempDir(it)
 //                }
 //                bundleZip.delete()
-//                WxPusherLog.i(TAG, "新版本解压完成,version=${serverVersion}")
+//                WxpLogUtils.i(TAG, "新版本解压完成,version=${serverVersion}")
             } catch (e: Exception) {
-                WxPusherLog.w(TAG, "下载新bundle失败", e)
+                WxpLogUtils.w(TAG, "下载新bundle失败", e)
             }
         }
     }
@@ -178,7 +178,7 @@ object WebBundleManager {
     fun applyUpdateIfAvailable() {
         if (WxpSaveService.get(NEED_APPLY_UPDATE_KEY, "false") == "true") {
             try {
-                WxPusherLog.i(TAG, "删除老版本")
+                WxpLogUtils.i(TAG, "删除老版本")
                 // 删除旧文件
                 webDir.deleteRecursively()
                 webDir.mkdirs()
@@ -191,10 +191,10 @@ object WebBundleManager {
                 // 清理
                 tempDir.deleteRecursively()
                 WxpSaveService.set(NEED_APPLY_UPDATE_KEY, "false")
-                WxPusherLog.i(TAG, "应用新版本完成")
+                WxpLogUtils.i(TAG, "应用新版本完成")
             } catch (e: Exception) {
                 //更新失败，重置一下版本号，下次启动会再次更新
-                WxPusherLog.w(TAG, "应用更新失败", e)
+                WxpLogUtils.w(TAG, "应用更新失败", e)
             }
         }
     }
@@ -203,7 +203,7 @@ object WebBundleManager {
      * 解压释放到临时目录，后面调用 applyUpdateIfAvailable 即可生效
      */
     private fun extractZipTempDir(input: InputStream) {
-        WxPusherLog.i(TAG, "extractZipTempDir: 开始解压BundleZip")
+        WxpLogUtils.i(TAG, "extractZipTempDir: 开始解压BundleZip")
         tempDir.deleteRecursively()
         tempDir.mkdirs()
         ZipInputStream(input).use { zip ->
@@ -224,6 +224,6 @@ object WebBundleManager {
             }
         }
         WxpSaveService.set(NEED_APPLY_UPDATE_KEY, "true")
-        WxPusherLog.i(TAG, "extractZipTempDir: 完成解压BundleZip")
+        WxpLogUtils.i(TAG, "extractZipTempDir: 完成解压BundleZip")
     }
 }

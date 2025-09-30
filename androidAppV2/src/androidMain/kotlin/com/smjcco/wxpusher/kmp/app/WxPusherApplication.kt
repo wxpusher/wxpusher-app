@@ -8,10 +8,11 @@ import com.smjcco.wxpusher.base.biz.WxpAppPageService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.IWxpBaseInfoServiceListener
 import com.smjcco.wxpusher.base.common.WxpBaseInfoService
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
+import com.smjcco.wxpusher.base.common.init
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
 import com.smjcco.wxpusher.kmp.push.PushManager
-import com.smjcco.wxpusher.log.WxPusherLog
 import com.tencent.upgrade.bean.UpgradeConfig
 import com.tencent.upgrade.core.UpgradeManager
 
@@ -26,8 +27,8 @@ class WxPusherApplication : Application() {
         WxpConfig.baseUrl = "http://wxpusher.test.zjiecode.com"
 
         WxpSaveService.init()
-        WxPusherLog.init()
-        WxPusherLog.i(TAG, "应用启动")
+        WxpLogUtils.init()
+        WxpLogUtils.i(TAG, "应用启动")
 
         //初始化页面跳转
         WxpAppPageService.init(WxpAppPageServiceImpl())
@@ -45,11 +46,11 @@ class WxPusherApplication : Application() {
 
         //这是之前的一些写法
 //        SaveUtils.init()
-//        WxPusherLog.init()
-//        WxPusherLog.i(TAG, "应用启动")
+//        WxpLogUtils.init()
+//        WxpLogUtils.i(TAG, "应用启动")
 //        WxPusherConfig.init()
 //        if (!ApplicationUtils.isMainProcess()) {
-//            WxPusherLog.i(TAG, "非主进程，不上报")
+//            WxpLogUtils.i(TAG, "非主进程，不上报")
 //            return
 //        }
 //        ConfigManager.init(this)
@@ -57,7 +58,7 @@ class WxPusherApplication : Application() {
 //        initTbs()
 //        PushManager.init(this)
 //        //上报一次绑定关系，主要是为了更新设备活跃时间
-//        WxPusherLog.i(TAG, "应用初始化上报token")
+//        WxpLogUtils.i(TAG, "应用初始化上报token")
 //        DeviceApi.updateDeviceInfoAsync(null)
     }
 

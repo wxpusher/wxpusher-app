@@ -13,9 +13,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.smjcco.wxpusher.R
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
+import com.smjcco.wxpusher.base.common.flush
 import com.smjcco.wxpusher.kmp.push.PushManager
-import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.web.WebViewUtils
@@ -41,7 +42,7 @@ class WebViewActivity : ComponentActivity() {
     private var hasInit = false;
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WxPusherLog.i(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
+        WxpLogUtils.i(TAG, "onCreate() called with: savedInstanceState = $savedInstanceState")
         //避免申请权限的时候，重复调用
         if (hasInit) {
             return
@@ -166,7 +167,7 @@ class WebViewActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
-        WxPusherLog.flush()
+        WxpLogUtils.flush()
     }
 
     /**
@@ -203,7 +204,7 @@ class WebViewActivity : ComponentActivity() {
     }
 
     private fun onUiModeChanged(night: Boolean) {
-        WxPusherLog.i(TAG, "onUiModeChanged() called with: night = $night")
+        WxpLogUtils.i(TAG, "onUiModeChanged() called with: night = $night")
         //设置容器背景颜色，保持顶部状态栏好看
         val color: Int = resources.getColor(R.color.dark_bg)
         val bgColor = if (night) color else Color.White.toArgb()

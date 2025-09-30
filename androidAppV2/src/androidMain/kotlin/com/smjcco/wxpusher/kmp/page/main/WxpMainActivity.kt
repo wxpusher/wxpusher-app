@@ -15,7 +15,9 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
+import com.smjcco.wxpusher.base.common.flush
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.base.WxpBaseActivity
 import com.smjcco.wxpusher.kmp.common.WxpSaveKey
@@ -244,6 +246,11 @@ class WxpMainActivity : WxpBaseActivity() {
         PushManager.showOpenNoteRemindSettingDialog(this)
         //显示首页的时候，尝试启动一次保活服务
         KeepWsAliveServiceStarter.start(this)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        WxpLogUtils.flush()
     }
 
     /**

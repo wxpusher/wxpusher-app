@@ -15,7 +15,6 @@ import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
 import com.smjcco.wxpusher.kmp.common.utils.ThreadUtils
 import com.smjcco.wxpusher.kmp.push.PushManager
 import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager.sendBizMessageNotification
-import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.WxPusherUtils
 import kotlinx.coroutines.launch
@@ -90,7 +89,7 @@ object WsManager {
             ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 super.onAvailable(network)
-                WxPusherLog.i(TAG, "监听到网络可用，尝试重新连接WS连接")
+                WxpLogUtils.i(TAG, "监听到网络可用，尝试重新连接WS连接")
                 tryConnect()
             }
         })
@@ -107,7 +106,7 @@ object WsManager {
         addMsgListener(WsMessageTypeEnum.PUSH_NOTE.code, pushListener)
         val pushTokenListener = object : IWsMessageListener<InitDeviceMsg> {
             override fun onMessage(message: InitDeviceMsg) {
-                WxPusherLog.i(TAG, "收到自建长链接Ws的pushToken=${message.pushToken}")
+                WxpLogUtils.i(TAG, "收到自建长链接Ws的pushToken=${message.pushToken}")
                 PushManager.onGetPushToken(message.pushToken, DevicePlatform.Android)
             }
         }
@@ -136,32 +135,32 @@ object WsManager {
         synchronized(this) {
             if (connectStatus.get() == WsConnectStatus.Connected) {
 //                连接状态不打印日志，否则日志太多了
-                WxPusherLog.d(TAG, "connect: 已经链接，不重建连接")
+                WxpLogUtils.d(TAG, "connect: 已经链接，不重建连接")
                 return
             }
             if (connectStatus.get() == WsConnectStatus.Connecting) {
-                WxPusherLog.i(TAG, "connect: 链接中，不进行链接")
+                WxpLogUtils.i(TAG, "connect: 链接中，不进行链接")
                 return
             }
             if (connectStatus.get() == WsConnectStatus.Closing) {
-                WxPusherLog.i(TAG, "connect: 关闭中，不进行链接")
+                WxpLogUtils.i(TAG, "connect: 关闭中，不进行链接")
                 return
             }
             if (!DeviceUtils.isNetworkConnected()) {
-                WxPusherLog.d(TAG, "connect: 网络不可用，不进行链接")
+                WxpLogUtils.d(TAG, "connect: 网络不可用，不进行链接")
                 return
             }
             if (disableConnect) {
-                WxPusherLog.i(TAG, "connect:客户端版本低，不进行链接")
+                WxpLogUtils.i(TAG, "connect:客户端版本低，不进行链接")
                 return
             }
             webSocket?.close(1000, "重新建立连接前，关闭原来的WS连接")
 
             reTryCount++
-            WxPusherLog.i(TAG, "connect: 开始WS长链接")
+            WxpLogUtils.i(TAG, "connect: 开始WS长链接")
             setConnectStatus(WsConnectStatus.Connecting)
             val wsUrl = getWsUrl()
-            WxPusherLog.i(TAG, "wsUrl: ${wsUrl}")
+            WxpLogUtils.i(TAG, "wsUrl: ${wsUrl}")
             val request: Request = Request.Builder()
                 .url(wsUrl)
                 .build()
@@ -263,7 +262,7 @@ object WsManager {
      * 关闭链接
      */
     fun disconnect() {
-        WxPusherLog.i(TAG, "disconnect() called,主动断开ws链接")
+        WxpLogUtils.i(TAG, "disconnect() called,主动断开ws链接")
         disableConnect = true
         webSocket?.close(1000, null)
     }
@@ -302,19 +301,19 @@ object WsManager {
         private val TAG = "WsManager"
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-            WxPusherLog.i(TAG, "onClosed: 链接关闭，code=${code},reason=${reason}")
+            WxpLogUtils.i(TAG, "onClosed: 链接关闭，code=${code},reason=${reason}")
             setConnectStatus(WsConnectStatus.NotConnect)
             tryConnectDelay()
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            WxPusherLog.i(TAG, "onClosing: code=${code},reason=${reason}")
+            WxpLogUtils.i(TAG, "onClosing: code=${code},reason=${reason}")
             setConnectStatus(WsConnectStatus.NotConnect)
             tryConnectDelay()
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            WxPusherLog.i(TAG, "onFailure: error=${t.message}")
+            WxpLogUtils.i(TAG, "onFailure: error=${t.message}")
             t.printStackTrace()
             setConnectStatus(WsConnectStatus.NotConnect)
             tryConnectDelay()
@@ -323,20 +322,20 @@ object WsManager {
         override fun onMessage(webSocket: WebSocket, text: String) {
             setConnectStatus(WsConnectStatus.Connected)
             reTryCount = 0
-            WxPusherLog.i(TAG, "onMessage() called with: webSocket = $webSocket, text = $text")
+            WxpLogUtils.i(TAG, "onMessage() called with: webSocket = $webSocket, text = $text")
             val baseWsMsg = GsonUtils.toObj(text, BaseWsMsg::class.java)
             if (baseWsMsg == null) {
-                WxPusherLog.i(TAG, "onMessage() 消息基础类型反序列化错误：text=${text}")
+                WxpLogUtils.i(TAG, "onMessage() 消息基础类型反序列化错误：text=${text}")
                 return
             }
             val typeEnum = WsMessageTypeEnum.findByCode(baseWsMsg.msgType)
             if (typeEnum == null) {
-                WxPusherLog.i(TAG, "onMessage() 不能识别的消息类型：text=${text}")
+                WxpLogUtils.i(TAG, "onMessage() 不能识别的消息类型：text=${text}")
                 return
             }
             val bizMsg = GsonUtils.toObj(text, typeEnum.cls)
             if (bizMsg == null) {
-                WxPusherLog.i(TAG, "onMessage() 消息反序列化错误：text=${text}")
+                WxpLogUtils.i(TAG, "onMessage() 消息反序列化错误：text=${text}")
                 return
             }
             if (bizMsg.msgType == WsMessageTypeEnum.UPDATE_CLIENT.code) {
@@ -346,7 +345,7 @@ object WsManager {
             val listenerList: MutableList<IWsMessageListener<*>>? =
                 msgListenerMap.get(baseWsMsg.msgType)
             if (listenerList.isNullOrEmpty()) {
-                WxPusherLog.i(TAG, "onMessage() 没有消息监听器")
+                WxpLogUtils.i(TAG, "onMessage() 没有消息监听器")
                 return
             }
             WxPusherUtils.getMainScope().launch {
@@ -357,12 +356,12 @@ object WsManager {
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
-            WxPusherLog.i(TAG, "onMessage: 收到二进制数据")
+            WxpLogUtils.i(TAG, "onMessage: 收到二进制数据")
             setConnectStatus(WsConnectStatus.Connected)
         }
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            WxPusherLog.i(TAG, "onOpen: WS链接打开")
+            WxpLogUtils.i(TAG, "onOpen: WS链接打开")
             setConnectStatus(WsConnectStatus.Connected)
             reTryCount = 0
         }

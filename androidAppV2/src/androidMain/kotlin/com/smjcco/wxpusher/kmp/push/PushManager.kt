@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
 import com.smjcco.wxpusher.kmp.common.withActivity
@@ -17,7 +18,6 @@ import com.smjcco.wxpusher.kmp.push.ws.connect.WsManager
 import com.smjcco.wxpusher.kmp.push.ws.WsUtils
 import com.smjcco.wxpusher.kmp.push.ws.keepalive.KeepWsAliveServiceStarter
 import com.smjcco.wxpusher.kmp.push.xiaomi.XiaomiUtils
-import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.PermissionUtils
 
 /**
@@ -31,28 +31,28 @@ object PushManager {
      */
     fun init(application: Application = ApplicationUtils.getApplication()) {
         if (!ApplicationUtils.isMainProcess()) {
-            WxPusherLog.i(TAG, "非主进程，不初始化")
+            WxpLogUtils.i(TAG, "非主进程，不初始化")
             return
         }
 
         val platform = DeviceUtils.getPlatform()
         if (platform == DevicePlatform.Android_XIAOMI) {
-            WxPusherLog.i(TAG, "初始化小米推送")
+            WxpLogUtils.i(TAG, "初始化小米推送")
             XiaomiUtils.init(application)
         } else if (platform == DevicePlatform.Android_VIVO) {
-            WxPusherLog.i(TAG, "初始化VIVO推送")
+            WxpLogUtils.i(TAG, "初始化VIVO推送")
             VIVOPushUtils.init(ApplicationUtils.getApplication())
         } else if (platform == DevicePlatform.Android_HONOR) {
-            WxPusherLog.i(TAG, "初始化荣耀推送")
+            WxpLogUtils.i(TAG, "初始化荣耀推送")
             HonorPushUtils.init(application)
         } else if (platform == DevicePlatform.Android_HUAWEI) {
-            WxPusherLog.i(TAG, "初始化华为推送")
+            WxpLogUtils.i(TAG, "初始化华为推送")
             HuaweiPushUtils.init(application)
         } else if (platform == DevicePlatform.Android_OPPO) {
-            WxPusherLog.i(TAG, "初始化OPPO推送")
+            WxpLogUtils.i(TAG, "初始化OPPO推送")
             OppoPushUtils.init(application)
         } else {
-            WxPusherLog.i(TAG, "初始化自建长链接")
+            WxpLogUtils.i(TAG, "初始化自建长链接")
             WxpNotificationManager.init()
             WsManager.init()
             //启动保活，必须在最后
@@ -66,7 +66,7 @@ object PushManager {
      */
     fun onGetPushTokenFail(platform: DevicePlatform) {
         if (platform != DevicePlatform.Android) {
-            WxPusherLog.i(TAG, "获取厂商pushToken失败，初始化自建长链接")
+            WxpLogUtils.i(TAG, "获取厂商pushToken失败，初始化自建长链接")
             WsManager.init()
         }
     }
@@ -75,7 +75,7 @@ object PushManager {
      * 当获取到推动token的时候，管理token的上报，更新
      */
     fun onGetPushToken(token: String, platform: DevicePlatform) {
-        WxPusherLog.i(TAG, "收到设备token，platform=${platform}, token=${token}")
+        WxpLogUtils.i(TAG, "收到设备token，platform=${platform}, token=${token}")
         WxpAppDataService.savePushToken(token)
         WxpAppDataService.updateDeviceInfo()
     }

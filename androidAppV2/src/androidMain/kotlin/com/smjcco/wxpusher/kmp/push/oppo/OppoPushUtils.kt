@@ -3,9 +3,9 @@ package com.smjcco.wxpusher.kmp.push.oppo
 import android.app.Application
 import com.heytap.msp.push.HeytapPushManager
 import com.heytap.msp.push.callback.ICallBackResultService
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.push.PushManager
-import com.smjcco.wxpusher.log.WxPusherLog
 
 object OppoPushUtils {
     private val TAG = "Oppo"
@@ -23,13 +23,13 @@ object OppoPushUtils {
                     miniPackageName: String?
                 ) {
                     if (responseCode != 0) {
-                        WxPusherLog.w(
+                        WxpLogUtils.w(
                             TAG,
                             "OPPO推送-注册错误，onRegister()， responseCode = $responseCode"
                         )
                         PushManager.onGetPushTokenFail(DevicePlatform.Android_OPPO)
                     } else if (registerID.isNullOrEmpty()) {
-                        WxPusherLog.w(
+                        WxpLogUtils.w(
                             TAG,
                             "OPPO推送- token为空，responseCode = $responseCode"
                         )
@@ -52,7 +52,7 @@ object OppoPushUtils {
                 }
 
                 override fun onError(p0: Int, p1: String?, p2: String?, p3: String?) {
-                    WxPusherLog.w(
+                    WxpLogUtils.w(
                         TAG,
                         "OPPO推送错误，onError() called with: p0 = $p0, p1 = $p1, p2 = $p2, p3 = $p3"
                     )

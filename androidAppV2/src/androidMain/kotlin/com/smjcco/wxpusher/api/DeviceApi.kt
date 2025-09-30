@@ -28,7 +28,7 @@ object DeviceApi {
     suspend fun getSubscribeList(): List<SubscribeListItem> {
 //        val deviceToken = AppDataUtils.getLoginInfo()?.deviceToken
 //        if (deviceToken.isNullOrEmpty()) {
-//            WxPusherLog.i(TAG, "getSubscribeList: 没有deviceToken")
+//            WxpLogUtils.i(TAG, "getSubscribeList: 没有deviceToken")
 //            return Collections.emptyList()
 //        }
 
@@ -47,7 +47,7 @@ object DeviceApi {
 //                    }
 //                    val bodyByte = response.body?.bytes()
 //                    val bodyStr = bodyByte?.let { String(it) }
-//                    WxPusherLog.i(TAG, "获取订阅列表,结果=${bodyStr}")
+//                    WxpLogUtils.i(TAG, "获取订阅列表,结果=${bodyStr}")
 //                    val type = object : TypeToken<BaseResp<List<SubscribeListItem>>>() {}.type
 //                    val respData: BaseResp<List<SubscribeListItem>>? =
 //                        GsonUtils.toObj(bodyStr, type)
@@ -69,17 +69,17 @@ object DeviceApi {
     private suspend fun updateDeviceInfo(platform: DevicePlatform?): Boolean {
 //        val deviceToken = AppDataUtils.getLoginInfo()?.deviceToken
 //        if (deviceToken.isNullOrEmpty()) {
-//            WxPusherLog.i(TAG, "updateDeviceInfo: 没有deviceToken")
+//            WxpLogUtils.i(TAG, "updateDeviceInfo: 没有deviceToken")
 //            return false
 //        }
 //        val pushToken = AppDataUtils.getPushToken()
 //        if (pushToken.isNullOrEmpty()) {
-//            WxPusherLog.i(TAG, "updateDeviceInfo: 没有pushToken")
+//            WxpLogUtils.i(TAG, "updateDeviceInfo: 没有pushToken")
 //            return false
 //        }
 //        val deviceUuid = AppDataUtils.getLoginInfo()?.deviceId
 //        if (deviceUuid.isNullOrEmpty()) {
-//            WxPusherLog.i(TAG, "updateDeviceInfo: 没有deviceUuid")
+//            WxpLogUtils.i(TAG, "updateDeviceInfo: 没有deviceUuid")
 //            return false
 //        }
 //        val reqBody = GsonUtils.toJson(
@@ -89,7 +89,7 @@ object DeviceApi {
 //            )
 //        )
 //        if (reqBody == updateDataCache && WxpSaveService.get(UpDateTokenDate,"") == DateUtils.getDate()) {
-//            WxPusherLog.i(TAG, "updateDeviceInfo: 数据为变更，无需上报")
+//            WxpLogUtils.i(TAG, "updateDeviceInfo: 数据为变更，无需上报")
 //            return false
 //        }
 //        try {
@@ -102,7 +102,7 @@ object DeviceApi {
 //                    .header("versionName", WxPusherUtils.getVersionName())
 //                    .put(requestBody)
 //                    .build()
-//                WxPusherLog.i(TAG, "updateDeviceInfo: 开始上报更新PT,${reqBody}")
+//                WxpLogUtils.i(TAG, "updateDeviceInfo: 开始上报更新PT,${reqBody}")
 //                client.newCall(request).execute().use { response: Response ->
 //                    val status = response.isSuccessful
 //                    if (!status) {
@@ -110,7 +110,7 @@ object DeviceApi {
 //                    }
 //                    val bodyByte = response.body?.bytes()
 //                    val bodyStr = bodyByte?.let { String(it) }
-//                    WxPusherLog.i(TAG, "updateDeviceInfo: 上报更新PT,结果=${bodyStr}")
+//                    WxpLogUtils.i(TAG, "updateDeviceInfo: 上报更新PT,结果=${bodyStr}")
 //                    val respData = GsonUtils.toObj(bodyStr, BaseResp::class)
 //                    if (respData?.isSuccess() == true) {
 //                        SaveUtils.setKeyValue(UpDateTokenDate, DateUtils.getDate())

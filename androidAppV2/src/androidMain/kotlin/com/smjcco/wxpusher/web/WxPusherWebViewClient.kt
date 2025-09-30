@@ -9,8 +9,8 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.ProgressBar
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.dialog.DialogManager
-import com.smjcco.wxpusher.log.WxPusherLog
 import com.smjcco.wxpusher.utils.WxPusherUtils
 
 class WxPusherWebViewClient(
@@ -41,7 +41,7 @@ class WxPusherWebViewClient(
                     val intent = Intent(Intent.ACTION_VIEW, uri)
                     activity.startActivity(intent)
                 } catch (e: Exception) {
-                    WxPusherLog.w(TAG, "打开特定scheme错误", e)
+                    WxpLogUtils.w(TAG, "打开特定scheme错误", e)
                     WxPusherUtils.toast("打开${uri.scheme}错误")
                 }
             }
@@ -64,7 +64,7 @@ class WxPusherWebViewClient(
         request: WebResourceRequest?,
         error: WebResourceError?
     ) {
-        WxPusherLog.e(TAG, "加载页面错误: ${error?.description}")
+        WxpLogUtils.e(TAG, "加载页面错误: ${error?.description}")
         super.onReceivedError(view, request, error)
     }
 

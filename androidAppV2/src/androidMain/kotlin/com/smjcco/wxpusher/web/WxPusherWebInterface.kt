@@ -3,7 +3,7 @@ package com.smjcco.wxpusher.web
 import android.app.Activity
 import android.webkit.WebView
 import com.smjcco.wxpusher.base.common.ApplicationUtils
-import com.smjcco.wxpusher.log.WxPusherLog
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import java.net.URI
 
 /**
@@ -46,14 +46,14 @@ class WxPusherWebInterface {
             val host = uri.host
             WHITELIST_HOSTS.contains(host)
         } catch (e: Exception) {
-            WxPusherLog.w(TAG, "验证host失败: ${e.message}")
+            WxpLogUtils.w(TAG, "验证host失败: ${e.message}")
             false
         }
     }
 
     private fun checkSecurity(): Boolean {
         if (!isHostAllowed(webUrl)) {
-            WxPusherLog.w(TAG, "非白名单域名访问接口: $webUrl")
+            WxpLogUtils.w(TAG, "非白名单域名访问接口: $webUrl")
             return false
         }
         return true
@@ -67,7 +67,7 @@ class WxPusherWebInterface {
 //
 //    @JavascriptInterface
 //    fun updateDeviceInfo() {
-//        WxPusherLog.i(TAG, "web side要求上报token")
+//        WxpLogUtils.i(TAG, "web side要求上报token")
 //        DeviceApi.updateDeviceInfoAsync(DeviceUtils.getPlatform())
 //    }
 //
@@ -122,7 +122,7 @@ class WxPusherWebInterface {
 //    @JavascriptInterface
 //    fun loginSuccess() {
 //        if (!checkSecurity()) return
-//        WxPusherLog.i(TAG, "loginSuccess() called")
+//        WxpLogUtils.i(TAG, "loginSuccess() called")
 //        DeviceApi.updateDeviceInfoAsync(DeviceUtils.getPlatform())
 //    }
 //
@@ -132,7 +132,7 @@ class WxPusherWebInterface {
 //    @JavascriptInterface
 //    fun logout() {
 //        if (!checkSecurity()) return
-//        WxPusherLog.i(TAG, "logout() called")
+//        WxpLogUtils.i(TAG, "logout() called")
 //    }
 //
 //    @JavascriptInterface
@@ -174,7 +174,7 @@ class WxPusherWebInterface {
 //    fun share(content: String?) {
 //        if (!checkSecurity()) return
 //        if (content.isNullOrEmpty()) {
-//            WxPusherLog.w(TAG, "复制失败，content=null")
+//            WxpLogUtils.w(TAG, "复制失败，content=null")
 //            return
 //        }
 //        val intent = Intent(Intent.ACTION_SEND)
@@ -192,7 +192,7 @@ class WxPusherWebInterface {
 //    fun openInBrowser(url: String?) {
 //        if (!checkSecurity()) return
 //        if (url.isNullOrEmpty()) {
-//            WxPusherLog.w(TAG, "openInBrowser失败，url=null")
+//            WxpLogUtils.w(TAG, "openInBrowser失败，url=null")
 //            return
 //        }
 //        try {
@@ -201,7 +201,7 @@ class WxPusherWebInterface {
 //            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
 //            ApplicationUtils.getApplication().startActivity(intent)
 //        } catch (e: Exception) {
-//            WxPusherLog.w(TAG, "打开浏览器失败: ${e.message}")
+//            WxpLogUtils.w(TAG, "打开浏览器失败: ${e.message}")
 //            WxPusherUtils.toast("打开浏览器失败")
 //        }
 //    }
@@ -213,7 +213,7 @@ class WxPusherWebInterface {
 //    fun copy(text: String?) {
 //        if (!checkSecurity()) return
 //        if (text.isNullOrEmpty()) {
-//            WxPusherLog.w(TAG, "复制失败，text=null")
+//            WxpLogUtils.w(TAG, "复制失败，text=null")
 //            return
 //        }
 //        val clipboardManager =

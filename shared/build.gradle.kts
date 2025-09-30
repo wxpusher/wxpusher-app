@@ -69,6 +69,7 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.kotlinx.coroutines.android)
+            implementation("com.aliyun.openservices:aliyun-log-android-sdk:2.6.13")
         }
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
