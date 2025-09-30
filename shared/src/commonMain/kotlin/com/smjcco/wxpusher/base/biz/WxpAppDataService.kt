@@ -9,7 +9,9 @@ import com.smjcco.wxpusher.base.common.runAtMainSuspend
 import com.smjcco.wxpusher.base.biz.bean.WxpLoginInfo
 import com.smjcco.wxpusher.base.biz.bean.WxpPlatformEnum
 import com.smjcco.wxpusher.base.biz.bean.WxpUpdateInfoReq
+import com.smjcco.wxpusher.base.common.WxpDateTimeUtils
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
+import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 
 object WxpAppDataService {
@@ -21,6 +23,10 @@ object WxpAppDataService {
     private const val WsUrlKey = "WsUrlKey"
 
     private const val mergeIOSDataHasRun = "mergeIOSDataHasRun"
+
+    //上报的信息 ，避免重复上报
+    private var hasUpdateInfoData: WxpUpdateInfoReq? = null
+    private var hasUpdateInfoDataTime: Long = 0L
 
     /**
      * 针对iOS，第一次启动的时候，进行一次数据迁移，避免用户重新登录
@@ -52,11 +58,18 @@ object WxpAppDataService {
      * 重点是pushToken和设备的绑定关系
      */
     fun updateDeviceInfo() {
-        runAtMainSuspend {
+        runAtIOSuspend {
             val loginInfo = getLoginInfo()
             val updateInfoReq = WxpUpdateInfoReq(loginInfo?.deviceId, getPushToken())
+            if (hasUpdateInfoData != null && updateInfoReq == updateInfoReq
+                && WxpDateTimeUtils.getTimestamp() - hasUpdateInfoDataTime < 3600000 //距离上次上报小于1小时，就不上报了
+            ) {
+                return@runAtIOSuspend
+            }
+            hasUpdateInfoData = updateInfoReq
+            hasUpdateInfoDataTime = WxpDateTimeUtils.getTimestamp()
             WxpApiService.updateDeviceInfo(updateInfoReq) {
-                println("更新pushToken成功,updateInfoReq=${updateInfoReq}")
+                WxpLogUtils.i(message = "更新pushToken成功,updateInfoReq=${updateInfoReq}")
             }
         }
     }

@@ -5,6 +5,7 @@ import com.smjcco.wxpusher.base.common.WxpNetworkService
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.base.biz.bean.WxpUpdateInfoReq
 import com.smjcco.wxpusher.base.biz.WxpAppPageService
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
@@ -129,6 +130,7 @@ object WxpApiService {
         if (req.deviceUuid.isNullOrEmpty() || req.pushToken.isNullOrEmpty()) {
             return false
         }
+        WxpLogUtils.d(message = "上报设备信息-updateDeviceInfo")
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .put(WxpNetworkService.getUrl("/api/need-login/device/update-device-info")) {
