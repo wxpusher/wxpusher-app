@@ -26,13 +26,13 @@ object WsUtils {
             return
         }
         val dialog = AlertDialog.Builder(activity)
-            .setTitle("保活提示")
-            .setMessage("由于Android的系统限制，应用在后台会被限制运行，导致收不到消息，请打开后台限制。")
+            .setTitle("保持后台运行提醒")
+            .setMessage("由于Android的系统限制，需要给应用后台运行的权限才可以接收消息，请你关闭电池优化或者关闭后台运行限制。")
             .setPositiveButton(
                 "去设置"
             ) { dialog, which ->
                 dialog?.dismiss()
-                WxpJumpPageUtils.jumpToSystemNotificationSettingPage()
+                WxpJumpPageUtils.jumpToSystemIgnoreBatteryOptimizationSettings()
             }
             .setCancelable(false)
             .setNegativeButton("关闭") { dialog, _ ->
