@@ -24,8 +24,8 @@ import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseActivity
 import com.smjcco.wxpusher.kmp.common.WxpSaveKey
 import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
-import com.smjcco.wxpusher.utils.PermissionRequester
-import com.smjcco.wxpusher.utils.PermissionUtils
+import com.smjcco.wxpusher.kmp.common.utils.PermissionRequester
+import com.smjcco.wxpusher.kmp.common.utils.PermissionUtils
 
 class WxpUserAgreementActivity : WxpBaseActivity() {
 

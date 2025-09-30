@@ -8,7 +8,7 @@ import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 import com.smjcco.wxpusher.kmp.push.PushManager
 import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager
-import com.smjcco.wxpusher.utils.PermissionUtils
+import com.smjcco.wxpusher.kmp.common.utils.PermissionUtils
 import com.xiaomi.mipush.sdk.MiPushClient
 
 object XiaomiUtils {

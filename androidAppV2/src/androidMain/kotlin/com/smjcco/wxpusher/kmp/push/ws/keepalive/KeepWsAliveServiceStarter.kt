@@ -11,7 +11,7 @@ import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
-import com.smjcco.wxpusher.utils.PermissionUtils
+import com.smjcco.wxpusher.kmp.common.utils.PermissionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

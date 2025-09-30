@@ -1,9 +1,10 @@
 package com.smjcco.wxpusher.config
 
 import android.content.Context
+import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpLogUtils
-import com.smjcco.wxpusher.utils.GsonUtils
-import com.smjcco.wxpusher.utils.WxPusherUtils
+import com.smjcco.wxpusher.base.common.WxpScopeUtils
+import com.smjcco.wxpusher.kmp.common.utils.GsonUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -88,7 +89,7 @@ object ConfigManager {
      * 查找与当前应用版本兼容的配置
      */
     private fun findCompatibleConfig(configs: List<ConfigItem>): ConfigItem? {
-        val appVersion = WxPusherUtils.getVersionName()
+        val appVersion = WxpBaseInfoService.getAppVersionName()
         // 按版本号降序排序，找到第一个版本号小于等于当前应用版本的配置
         return configs.sortedByDescending { it.version }
             .firstOrNull { compareVersions(appVersion, it.version) >= 0 }
@@ -125,7 +126,7 @@ object ConfigManager {
      * @param callback 刷新结果回调
      */
     fun refreshConfig(callback: ((Boolean) -> Unit)? = null) {
-        WxPusherUtils.getIoScopeScope().launch {
+        WxpScopeUtils.getIoScopeScope().launch {
             try {
 //                val serverContent = URL(configUrl).readText()
 //                val configResponse = GsonUtils.toObj(serverContent, ConfigResponse::class)

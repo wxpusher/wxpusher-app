@@ -7,8 +7,6 @@ import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
-import com.smjcco.wxpusher.kmp.common.withActivity
-import com.smjcco.wxpusher.kmp.push.ws.keepalive.KeepWsAliveService
 import com.smjcco.wxpusher.kmp.push.honor.HonorPushUtils
 import com.smjcco.wxpusher.kmp.push.huawei.HuaweiPushUtils
 import com.smjcco.wxpusher.kmp.push.oppo.OppoPushUtils
@@ -18,7 +16,7 @@ import com.smjcco.wxpusher.kmp.push.ws.connect.WsManager
 import com.smjcco.wxpusher.kmp.push.ws.WsUtils
 import com.smjcco.wxpusher.kmp.push.ws.keepalive.KeepWsAliveServiceStarter
 import com.smjcco.wxpusher.kmp.push.xiaomi.XiaomiUtils
-import com.smjcco.wxpusher.utils.PermissionUtils
+import com.smjcco.wxpusher.kmp.common.utils.PermissionUtils
 
 /**
  * 管理push的一堆事儿，对厂商和通道做抽象

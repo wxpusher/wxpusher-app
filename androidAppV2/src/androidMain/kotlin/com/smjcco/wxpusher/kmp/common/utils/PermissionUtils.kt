@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.utils
+package com.smjcco.wxpusher.kmp.common.utils
 
 import android.Manifest
 import android.app.Activity
@@ -16,7 +16,6 @@ import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.base.common.WxpDialogUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.dialog.DialogManager
-import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 
 typealias PermissionRequesterCallback = ((Boolean) -> Unit)?
 typealias PermissionRequesterGotoSetting = (() -> Unit)?

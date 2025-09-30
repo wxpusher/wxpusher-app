@@ -1,11 +1,10 @@
-package com.smjcco.wxpusher.utils
+package com.smjcco.wxpusher.kmp.common.utils
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
-
 
 object GsonUtils {
     private val GSON: Gson = GsonBuilder().disableHtmlEscaping().create()

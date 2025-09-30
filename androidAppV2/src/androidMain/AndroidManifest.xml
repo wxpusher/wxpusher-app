@@ -82,8 +82,7 @@
         <!--        </activity>-->
 
         <activity
-            android:name=".page.WebDetailActivity"
-            android:configChanges="uiMode"
+            android:name=".page.WebViewActivity"
             android:exported="true"
             android:launchMode="singleTask" />
 

@@ -7,7 +7,6 @@ import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
-import com.smjcco.wxpusher.page.CheckActivity
 
 object WsUtils {
     private val SAVE_SHOW_KEY = "ws_keep_alive_tips_dialog"

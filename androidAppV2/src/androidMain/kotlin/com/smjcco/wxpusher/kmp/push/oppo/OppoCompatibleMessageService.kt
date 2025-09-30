@@ -4,7 +4,7 @@ import android.content.Context
 import com.heytap.msp.push.mode.DataMessage
 import com.heytap.msp.push.service.CompatibleDataMessageCallbackService
 import com.smjcco.wxpusher.base.common.WxpLogUtils
-import com.smjcco.wxpusher.utils.GsonUtils
+import com.smjcco.wxpusher.kmp.common.utils.GsonUtils
 
 class OppoCompatibleMessageService : CompatibleDataMessageCallbackService() {
 

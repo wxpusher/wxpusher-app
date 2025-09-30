@@ -13,14 +13,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
+import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.base.common.WxpDialogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.kmp.base.WxpBaseFragment
+import com.smjcco.wxpusher.kmp.common.utils.PermissionUtils
 import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 import com.smjcco.wxpusher.kmp.page.web.WxpWebViewActivity
-import com.smjcco.wxpusher.utils.PermissionUtils
-import com.smjcco.wxpusher.utils.WxPusherUtils
 import com.tencent.upgrade.core.UpgradeManager
 import com.tencent.upgrade.core.UpgradeReqCallbackForUserManualCheck
 
@@ -144,7 +144,7 @@ class ProfileFragment : WxpBaseFragment() {
                     },
                     ProfileItem(
                         title = "软件更新",
-                        subtitle = WxPusherUtils.getVersionName(),
+                        subtitle = WxpBaseInfoService.getAppVersionName(),
                         hasArrow = true
                     ) {
                         checkForUpdate()

@@ -9,14 +9,15 @@ import android.os.Build
 import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
+import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpLogUtils
+import com.smjcco.wxpusher.base.common.WxpScopeUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.common.utils.DeviceUtils
 import com.smjcco.wxpusher.kmp.common.utils.ThreadUtils
 import com.smjcco.wxpusher.kmp.push.PushManager
 import com.smjcco.wxpusher.kmp.push.ws.WxpNotificationManager.sendBizMessageNotification
-import com.smjcco.wxpusher.utils.GsonUtils
-import com.smjcco.wxpusher.utils.WxPusherUtils
+import com.smjcco.wxpusher.kmp.common.utils.GsonUtils
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -117,7 +118,7 @@ object WsManager {
         val sb = StringBuilder()
         sb.append(WxpConfig.baseUrl)
         sb.append("/ws?")
-        sb.append("version=${WxPusherUtils.getVersionName()}")
+        sb.append("version=${WxpBaseInfoService.getAppVersionName()}")
         sb.append("&")
         sb.append("platform=${DeviceUtils.getPlatform().getPlatform()}")
         val pushToken = WxpAppDataService.getPushToken()
@@ -275,7 +276,7 @@ object WsManager {
         if (connectStatus.get() != status &&
             (status == WsConnectStatus.Connected || status == WsConnectStatus.NotConnect)
         ) {
-            WxPusherUtils.getMainScope().launch {
+            WxpScopeUtils.getMainScope().launch {
                 connectListenerList.forEach {
                     it.onChanged(status == WsConnectStatus.Connected)
                 }
@@ -348,7 +349,7 @@ object WsManager {
                 WxpLogUtils.i(TAG, "onMessage() 没有消息监听器")
                 return
             }
-            WxPusherUtils.getMainScope().launch {
+            WxpScopeUtils.getMainScope().launch {
                 listenerList.forEach {
                     (it as IWsMessageListener<BaseWsMsg>).onMessage(bizMsg)
                 }

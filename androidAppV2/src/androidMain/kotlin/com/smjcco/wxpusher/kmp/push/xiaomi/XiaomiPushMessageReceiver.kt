@@ -4,7 +4,7 @@ import android.content.Context
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.kmp.push.PushManager
-import com.smjcco.wxpusher.utils.GsonUtils
+import com.smjcco.wxpusher.kmp.common.utils.GsonUtils
 import com.xiaomi.mipush.sdk.ErrorCode
 import com.xiaomi.mipush.sdk.MiPushClient
 import com.xiaomi.mipush.sdk.MiPushCommandMessage

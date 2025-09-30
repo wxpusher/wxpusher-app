@@ -4,8 +4,8 @@ import android.app.Activity
 import android.app.AlertDialog
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.dialog.DialogManager
-import com.smjcco.wxpusher.page.WebDetailActivity
-import com.smjcco.wxpusher.utils.PermissionUtils
+import com.smjcco.wxpusher.kmp.common.utils.PermissionUtils
+import com.smjcco.wxpusher.kmp.common.utils.WxpJumpPageUtils
 
 object CommonUtils {
 
@@ -36,7 +36,7 @@ object CommonUtils {
             .setCancelable(false)
             .setPositiveButton("查看视频教程") { dialog, _ ->
                 dialog?.dismiss()
-                WebDetailActivity.openUrl(activity, PushManager.getGuidePageUrl())
+                WxpJumpPageUtils.jumpToWebUrl(PushManager.getGuidePageUrl(), activity)
             }
             .setNeutralButton("永不提醒") { dialog, _ ->
                 dialog?.dismiss()
