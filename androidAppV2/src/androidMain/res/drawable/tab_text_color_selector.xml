@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 选中状态的文本颜色 -->
+    <item android:state_selected="true" android:color="?attr/colorPrimary" />
+    <!-- 未选中状态的文本颜色 -->
+    <item android:color="@color/text_fit_theme" />
+</selector>

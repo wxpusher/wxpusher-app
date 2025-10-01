@@ -25,7 +25,7 @@
             android:id="@+id/tab_layout"
             android:layout_width="0dp"
             android:layout_height="60dp"
-            android:background="@android:color/white"
+            android:background="@drawable/tab_background"
             android:elevation="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -34,7 +34,9 @@
             app:tabIndicator="@null"
             app:tabIndicatorColor="?attr/colorPrimary"
             app:tabIndicatorHeight="0dp"
-            app:tabMode="fixed" />
+            app:tabMode="fixed"
+            app:tabTextColor="@drawable/tab_text_color_selector"
+            app:tabSelectedTextColor="?attr/colorPrimary" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
