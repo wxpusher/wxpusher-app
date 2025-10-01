@@ -18,6 +18,7 @@ captures
 **/xcshareddata/WorkspaceSettings.xcsettings
 .fleet
 /androidApp/prod
+/androidAppV2/prod
 /iosApp/Pods
 Pods/
 Build/
