@@ -4,7 +4,7 @@
     <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <item name="colorPrimary">@color/AccentColor</item>
         <item name="colorAccent">@color/AccentColor</item> <!-- checkboxes, text fields -->
-        <item name="android:colorBackground">@color/page_bg_fit_theme</item> <!-- background -->
+        <item name="android:colorBackground">@color/PageBg1</item> <!-- background -->
         <item name="android:statusBarColor">@color/StatusBarColor</item>
     </style>
 

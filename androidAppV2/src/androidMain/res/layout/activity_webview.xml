@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/page_bg_fit_theme"
+    android:background="@color/PageBg1"
     android:orientation="vertical">
 
     <!-- 第三方内容警告 Banner -->
@@ -71,7 +71,7 @@
         android:id="@+id/webOptionView"
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@color/page_bg_fit_theme"
+        android:background="@color/PageBg1"
         android:elevation="8dp"
         android:orientation="vertical">
 

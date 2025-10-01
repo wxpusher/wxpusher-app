@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/white"
+    android:background="@color/bg_fit_theme_first"
     android:clickable="true"
     android:focusable="true">
 
@@ -26,7 +26,7 @@
             android:layout_weight="1"
             android:text="标题"
             android:textSize="16sp"
-            android:textColor="@android:color/black"
+            android:textColor="@color/text_fit_theme_first"
             android:maxLines="1"
             android:ellipsize="end" />
 
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:text="副标题"
             android:textSize="14sp"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="@color/text_fit_theme_second"
             android:layout_marginStart="8dp"
             android:maxLines="1"
             android:ellipsize="end" />
@@ -58,6 +58,6 @@
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
         android:layout_marginStart="16dp"
-        android:background="@drawable/divider_line" />
+        android:background="@color/Divider" />
 
 </LinearLayout>
