@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?android:attr/colorBackground"
-    tools:context=".kmp.page.useragreement.WxpUserAgreementActivity">
+    tools:context=".page.useragreement.WxpUserAgreementActivity">
 
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scrollView"
@@ -70,6 +70,7 @@
             android:layout_height="48dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
+            android:textColor="@color/white"
             android:stateListAnimator="@null"
             android:text="同意并继续"
             android:textSize="16sp"
