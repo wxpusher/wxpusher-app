@@ -4,6 +4,7 @@
     <color name="StatusBarColor">#B300B3</color>
     <color name="Divider">#EEEEEE</color>
     <color name="PageBg1">#FFFFFF</color>
+    <color name="PageBg2">#F5F5F5</color>
 
 
     <color name="accent">#B300B3</color>

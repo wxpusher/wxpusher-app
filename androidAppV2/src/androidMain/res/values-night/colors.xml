@@ -3,6 +3,7 @@
     <color name="StatusBarColor">#121212</color>
     <color name="Divider">#333333</color>
     <color name="PageBg1">#121212</color>
+    <color name="PageBg2">#222222</color>
 
     <color name="text_fit_theme">#FFFFFF</color>
     <color name="dark_bg">#121212</color>

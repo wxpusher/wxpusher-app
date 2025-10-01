@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/PageBg1">
+    android:background="@color/PageBg2">
 
     <!-- Top spacing -->
     <View
