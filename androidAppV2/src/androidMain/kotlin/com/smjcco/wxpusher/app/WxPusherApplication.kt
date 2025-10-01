@@ -21,7 +21,6 @@ class WxPusherApplication : Application() {
         super.onCreate()
         ApplicationUtils.init(this)
 
-
         WxpSaveService.init()
         WxpLogUtils.init()
         WxpLogUtils.i(TAG, "应用启动")

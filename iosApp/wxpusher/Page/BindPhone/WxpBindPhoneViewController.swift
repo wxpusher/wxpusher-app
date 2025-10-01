@@ -6,6 +6,9 @@ import shared
 
 class WxpBindPhoneViewController: WxpBaseMvpUIViewController<IWxpBindPresenter>,IWxpBindView  {
     
+   
+    
+    
     // MARK: - Properties
     private let phone: String
     private let code: String
@@ -257,6 +260,10 @@ class WxpBindPhoneViewController: WxpBaseMvpUIViewController<IWxpBindPresenter>,
     
     func onGoMain() {
         WxpJumpPageUtils.jumpToMain()
+    }
+    
+    func showLoading(show: Bool) {
+        
     }
     
     override func createPresenter() -> Any? {

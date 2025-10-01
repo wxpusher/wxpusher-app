@@ -9,6 +9,12 @@ private class WxpBaseInfoServiceListenerImpl:IWxpBaseInfoServiceListener{
     }
 }
 
+private class IWxpAppPageServiceImpl:IWxpAppPageService{
+    func jumpToLogin() {
+        WxpJumpPageUtils.jumpToLogin()
+    }
+}
+
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     
@@ -23,17 +29,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
+        //初始化存储
+        WxpSaveService.shared.doInit()
+        //初始化配置url等
+        WxpConfig.shared.doInit()
+        
+        //初始化页面信息
+        WxpAppPageService.shared.doInit(service: IWxpAppPageServiceImpl())
+        //初始化基础设备信息
         WxpBaseInfoService.shared.doInit(listener: WxpBaseInfoServiceListenerImpl())
+        
         //迁移一次iOS的老版本的数据，避免用户重新登录
         WxpAppDataService.shared.mergeIOSData()
-        
-        //初始化
-        WxpConfig.shared.baseUrl = "https://wxpusher.zjiecode.com"
-//        WxpConfig.shared.baseUrl = "http://wxpusher.test.zjiecode.com"
-//        WxpConfig.shared.baseUrl = "http://10.0.0.11:6100"
-//        WxpConfig.shared.baseUrl = "http://127.0.0.1:6100"
-        
-        //        WxpConfig.shared.baseUrl = "http://127.0.0.1:6100"
         
         // 注册推送
         UNUserNotificationCenter.current().getNotificationSettings { settings in
@@ -46,11 +53,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
         
         UNUserNotificationCenter.current().delegate = self
-        
-//        if let remoteNotification = launchOptions?[.remoteNotification] as? [String: Any] {
-//            print("通过远程通知冷启动，notification=\(remoteNotification)")
-//            WxpToastUtils.shared.showToast(msg: remoteNotification.description)
-//        }
         
         //设置全局主要颜色
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = UIColor.defAccentPrimaryColor
@@ -112,7 +114,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
         print("[push]-apple push token: \(token)")
         WxpAppDataService.shared.savePushToken(pushToken: token)
-        WxpAppDataService.shared.updateDeviceInfo()
+        WxpAppDataService.shared.updateDeviceInfo(platform: nil)
     }
     
 }
