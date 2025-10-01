@@ -78,8 +78,8 @@
         <!-- 分隔线 -->
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="#E0E0E0" />
+            android:layout_height="1px"
+            android:background="@color/Divider" />
 
         <!-- 按钮容器 -->
         <LinearLayout

@@ -2,6 +2,7 @@
 <resources>
     <color name="AccentColor">#B300B3</color>
     <color name="StatusBarColor">#B300B3</color>
+    <color name="Divider">#EEEEEE</color>
 
     <color name="accent">#B300B3</color>
     <color name="text_fit_theme">#030303</color>

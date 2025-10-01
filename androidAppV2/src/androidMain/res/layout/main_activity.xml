@@ -15,18 +15,27 @@
             android:id="@+id/view_pager"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/tab_layout"
+            app:layout_constraintBottom_toTopOf="@+id/divider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-
+        <!-- 分隔线 -->
+        <View
+            android:id="@+id/divider"
+            android:layout_width="0dp"
+            android:layout_height="1px"
+            android:background="@color/Divider"
+            app:layout_constraintBottom_toTopOf="@+id/tab_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/view_pager" />
         <!-- 底部Tab -->
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
             android:layout_width="0dp"
             android:layout_height="60dp"
             android:background="@drawable/tab_background"
-            android:elevation="8dp"
+            android:elevation="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -35,8 +44,8 @@
             app:tabIndicatorColor="?attr/colorPrimary"
             app:tabIndicatorHeight="0dp"
             app:tabMode="fixed"
-            app:tabTextColor="@drawable/tab_text_color_selector"
-            app:tabSelectedTextColor="?attr/colorPrimary" />
+            app:tabSelectedTextColor="?attr/colorPrimary"
+            app:tabTextColor="@drawable/tab_text_color_selector" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

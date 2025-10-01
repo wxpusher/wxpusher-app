@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="StatusBarColor">#121212</color>
+    <color name="Divider">#333333</color>
 
     <color name="text_fit_theme">#FFFFFF</color>
     <color name="page_bg_fit_theme">#121212</color>
@@ -13,10 +14,10 @@
 
     <color name="text_fit_theme_first">#FFFFFF</color>
     <color name="bg_fit_theme_first">#121212</color>
-    
+
     <!-- 输入框背景颜色 -->
     <color name="input_field_bg">#2A2A2A</color>
-    
+
     <!-- 解绑页面相关颜色 -->
     <color name="danger_color">#F44336</color>
     <color name="text_fit_theme_second">#B0B0B0</color>
