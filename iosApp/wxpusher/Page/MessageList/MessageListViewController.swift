@@ -331,20 +331,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
      * 删除消息确认
      */
     func showDeleteConfirmAlert(message: WxpMessageListMessage) {
-        let alert = UIAlertController(
-            title: "删除消息确认",
-            message: "你确认删除此消息吗？删除后不可恢复",
-            preferredStyle: .alert
-        )
-        
-        // 添加删除按钮（使用.destructive样式）
-        alert.addAction(UIAlertAction(title: "删除", style: .destructive, handler: {[weak self] _ in
-            self?.presenter.deleteById(id: message.messageId)
-        }))
-        
-        alert.addAction(UIAlertAction(title: "取消", style: .cancel))
-        
-        present(alert, animated: true)
+        self.presenter.deleteById(id: message.messageId)
     }
     
     private func setupRefreshControl() {
