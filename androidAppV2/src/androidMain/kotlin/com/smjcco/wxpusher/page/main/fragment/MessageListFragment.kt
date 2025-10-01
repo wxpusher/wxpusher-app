@@ -27,6 +27,8 @@ import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.WxpBaseMvpFragment
 import com.smjcco.wxpusher.base.common.WxpDateTimeUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.dialog.ActionSheetDialogFragment
+import com.smjcco.wxpusher.dialog.ActionSheetItem
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListView
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
@@ -328,13 +330,36 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
 
                 if (showLink) {
                     linkIcon.setOnClickListener {
-//                        WebDetailActivity.openUrl(itemView.context, sourceUrl)
+                        WxpJumpPageUtils.jumpToWebUrl(sourceUrl, requireActivity())
                     }
                 }
 
                 // 设置点击事件
                 itemView.setOnClickListener {
                     onItemClick(message)
+                }
+                //长按事件
+                itemView.setOnLongClickListener {
+                    val readOptText = if (message.read) {
+                        "标记未读"
+                    } else {
+                        "标记已读"
+                    }
+                    val readOpt = ActionSheetItem(readOptText, {
+                        presenter.markMessageReadStatus(message.messageId, !message.read)
+                    })
+                    val removeOpt = ActionSheetItem("删除", {
+                        presenter.deleteById(message.messageId)
+                    })
+                    val actionList = listOf(
+                        listOf(readOpt, removeOpt)
+                    )
+
+                    ActionSheetDialogFragment(actionList).show(
+                        requireActivity().supportFragmentManager,
+                        "${MessageListFragment::class.simpleName}_option"
+                    )
+                    return@setOnLongClickListener true
                 }
             }
         }

@@ -8,6 +8,8 @@ import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.base.common.runAtMainSuspend
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
+import com.smjcco.wxpusher.base.common.WxpDialogParams
+import com.smjcco.wxpusher.base.common.WxpDialogUtils
 
 class WxpMessageListPresenter(view: IWxpMessageListView) :
     WxpBaseMvpPresenter<IWxpMessageListView, IWxpMessageListPresenter>(view),
@@ -221,13 +223,22 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         }
     }
 
-    override fun deleteById(messageId: Long) {
-        runAtMainSuspend {
-            WxpApiService.deleteMessageById(messageId) {
-                messageListData.removeAll { it.messageId == messageId }
-                view?.onMessageList(messageListData)
+    override fun deleteById(id: Long) {
+        val params = WxpDialogParams(
+            title = "确认删除消息",
+            message = "你确认删除此消息吗？删除后不可恢复。",
+            leftText = "取消",
+            rightText = "删除",
+            rightBlock = {
+                runAtMainSuspend {
+                    WxpApiService.deleteMessageById(id) {
+                        messageListData.removeAll { it.messageId == id }
+                        view?.onMessageList(messageListData)
+                    }
+                }
             }
-        }
+        )
+        WxpDialogUtils.showDialog(params)
     }
 
     override fun openSubscribeManagerPage() {
