@@ -201,6 +201,7 @@ class KeepWsAliveService : Service() {
             .setOngoing(true)
             .setGroup(KeepWsAliveService::class.java.name)
             .setAutoCancel(false)
+            .setSilent(true)
             .setTicker("消息监听中，如果本条通知消失，请重新启动WxPusher")
             .setPriority(NotificationManager.IMPORTANCE_HIGH)
             .setSmallIcon(R.mipmap.ic_launcher_transparent)
