@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="AccentColor">#B300B3</color>
-    <color name="AccentColorDark">#430043</color>
+    <color name="StatusBarColor">#B300B3</color>
 
     <color name="accent">#B300B3</color>
     <color name="text_fit_theme">#030303</color>

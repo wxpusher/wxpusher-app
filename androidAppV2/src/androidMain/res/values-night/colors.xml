@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="StatusBarColor">#121212</color>
+
     <color name="text_fit_theme">#FFFFFF</color>
     <color name="page_bg_fit_theme">#121212</color>
     <color name="dark_bg">#121212</color>
