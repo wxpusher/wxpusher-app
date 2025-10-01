@@ -59,7 +59,7 @@
     <string name="login_jump_privacy">跳转到隐私协议页面</string>
 
     <!-- 绑定页面 -->
-    <string name="bind_page_title">UID绑定</string>
+    <string name="bind_page_title">绑定公众号账号</string>
     <string name="bind_description">你好，你的手机号没有注册,你需要先和已经存在的UID绑定才可以接收消息，绑定方式如下：</string>
     <string name="bind_step_one_title">第一步</string>
     <string name="bind_step_two_title">第二步</string>
