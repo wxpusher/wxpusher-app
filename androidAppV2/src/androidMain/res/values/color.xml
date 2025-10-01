@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="AccentColor">#B300B3</color>
-    <color name="StatusBarColor">#B300B3</color>
+    <!-- 用红色action bar的页面的状态栏颜色-->
+    <color name="AccentStatusBarColor">#B300B3</color>
+    <!-- 没有红色action bar的页面的状态栏颜色-->
+    <color name="LightStatusBarColor">#FFFFFF</color>
     <color name="Divider">#EEEEEE</color>
     <color name="PageBg1">#FFFFFF</color>
     <color name="PageBg2">#F5F5F5</color>

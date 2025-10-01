@@ -80,13 +80,15 @@
         <activity
             android:name=".page.useragreement.WxpUserAgreementActivity"
             android:exported="false"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait"
+            android:theme="@style/PageTheme" />
 
 
         <activity
             android:name=".page.login.WxpLoginActivity"
             android:exported="false"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            android:theme="@style/PageTheme" />
 
         <activity
             android:name=".page.bind.WxpBindActivity"

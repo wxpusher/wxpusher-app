@@ -5,7 +5,12 @@
         <item name="colorPrimary">@color/AccentColor</item>
         <item name="colorAccent">@color/AccentColor</item> <!-- checkboxes, text fields -->
         <item name="android:colorBackground">@color/PageBg1</item> <!-- background -->
-        <item name="android:statusBarColor">@color/StatusBarColor</item>
+        <item name="android:statusBarColor">@color/AccentStatusBarColor</item>
+    </style>
+
+    <style name="PageTheme" parent="AppTheme">
+        <item name="android:statusBarColor">@color/LightStatusBarColor</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
 
