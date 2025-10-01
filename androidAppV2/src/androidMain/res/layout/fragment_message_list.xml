@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:visibility="gone"
+        app:cardBackgroundColor="@color/card_bg_fit_theme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -50,6 +51,7 @@
                 android:maxLines="1"
                 android:text="@string/main_banner_battery_text"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/text_fit_theme"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/main_banner_battery_image"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -105,12 +107,13 @@
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
-            <ImageView
+            <androidx.appcompat.widget.AppCompatImageView
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginStart="12dp"
                 android:contentDescription="请输入关键字搜索消息"
-                android:src="@drawable/ic_search" />
+                android:src="@drawable/ic_search"
+                app:tint="@color/text_fit_theme_second" />
 
             <EditText
                 android:id="@+id/search_edit_text"
@@ -128,6 +131,8 @@
                 android:paddingEnd="8dp"
                 android:paddingBottom="8dp"
                 android:singleLine="true"
+                android:textColor="@color/text_fit_theme"
+                android:textColorHint="@color/text_fit_theme_second"
                 android:textSize="16sp" />
         </LinearLayout>
 
@@ -167,7 +172,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="暂无消息"
-        android:textColor="@android:color/darker_gray"
+        android:textColor="@color/text_fit_theme_second"
         android:textSize="16sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
