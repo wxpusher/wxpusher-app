@@ -74,7 +74,7 @@ object PushManager {
     fun onGetPushToken(token: String, platform: DevicePlatform) {
         WxpLogUtils.i(TAG, "收到设备token，platform=${platform}, token=${token}")
         WxpAppDataService.savePushToken(token)
-        WxpAppDataService.updateDeviceInfo()
+        WxpAppDataService.updateDeviceInfo(platform.getPlatform())
     }
 
     /**

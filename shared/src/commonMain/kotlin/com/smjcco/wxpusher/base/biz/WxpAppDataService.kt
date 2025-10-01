@@ -57,11 +57,11 @@ object WxpAppDataService {
      * 上传设备信息到服务器
      * 重点是pushToken和设备的绑定关系
      */
-    fun updateDeviceInfo() {
+    fun updateDeviceInfo(platform: String? = null) {
         runAtIOSuspend {
             val loginInfo = getLoginInfo()
-            val updateInfoReq = WxpUpdateInfoReq(loginInfo?.deviceId, getPushToken())
-            if (hasUpdateInfoData != null && updateInfoReq == updateInfoReq
+            val updateInfoReq = WxpUpdateInfoReq(loginInfo?.deviceId, getPushToken(), platform)
+            if (hasUpdateInfoData != null && hasUpdateInfoData == updateInfoReq
                 && WxpDateTimeUtils.getTimestamp() - hasUpdateInfoDataTime < 3600000 //距离上次上报小于1小时，就不上报了
             ) {
                 return@runAtIOSuspend
