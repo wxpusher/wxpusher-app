@@ -19,13 +19,13 @@ import androidx.core.content.ContextCompat
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
-import com.smjcco.wxpusher.base.common.runAtIOSuspend
 import com.smjcco.wxpusher.page.main.WxpMainActivity
 import com.smjcco.wxpusher.push.ws.ChannelGroup
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager
 import com.smjcco.wxpusher.push.ws.connect.WsManager
+import com.smjcco.wxpusher.utils.ThreadUtils
 import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.delay
+import java.util.Calendar
 
 
 enum class Actions {
@@ -38,13 +38,15 @@ class KeepWsAliveService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
     private var isServiceStarted = false
 
-    private val KeepWsAliveServiceNotificationId = 1
+    private var hasStartCheckLoop = false
 
     override fun onBind(intent: Intent): IBinder? {
         return null
     }
 
     companion object {
+        val KeepWsAliveServiceNotificationId = 1
+
         fun start(context: Context = ApplicationUtils.getApplication()) {
             Intent(context, KeepWsAliveService::class.java).also {
                 it.action = Actions.START.name
@@ -80,6 +82,10 @@ class KeepWsAliveService : Service() {
         WxpLogUtils.i(message = "KeepWsAliveService onCreate")
         val notification = createNotification()
         startForeground(KeepWsAliveServiceNotificationId, notification)
+        if (!hasStartCheckLoop) {
+            hasStartCheckLoop = true
+            tryConnectAndAlarmLoopCheck()
+        }
     }
 
     override fun onDestroy() {
@@ -154,13 +160,7 @@ class KeepWsAliveService : Service() {
     }
 
     private fun doWork() {
-        runAtIOSuspend {
-            while (true) {
-                WxpLogUtils.d("WxpLogUtils", "KeepWsAliveService，running")
-                delay(30000)
-                WsManager.tryConnect()
-            }
-        }
+        WsManager.tryConnect()
     }
 
     private fun createNotification(): Notification {
@@ -206,5 +206,45 @@ class KeepWsAliveService : Service() {
             .setPriority(NotificationManager.IMPORTANCE_HIGH)
             .setSmallIcon(R.mipmap.ic_launcher_transparent)
         return builder.build()
+    }
+
+
+    /**
+     * 使用系统闹钟，5分钟检查一次连接，来做兜底。
+     */
+    private fun tryConnectAndAlarmLoopCheck() {
+        WxpLogUtils.d(message = "tryConnectAndAlarmLoopCheck,系统闹钟定时兜底")
+        val application = ApplicationUtils.getApplication()
+        WsManager.tryConnect()
+        KeepWsAliveServiceStarter.start(application)
+        val delayTime = 5
+        val reconnectTime = Calendar.getInstance()
+        reconnectTime.add(Calendar.MINUTE, delayTime)
+        val alarmManager = application.getSystemService(ALARM_SERVICE) as AlarmManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (alarmManager.canScheduleExactAlarms()) {
+                alarmManager.setExact(
+                    AlarmManager.RTC_WAKEUP,
+                    reconnectTime.timeInMillis,
+                    "WS-tryAlarmLoopCheck",
+                    { tryConnectAndAlarmLoopCheck() },
+                    null
+                )
+            } else {
+                WxpLogUtils.d(message = "tryAlarmLoopCheck,不能调用alarmManager，通过post delay来检查")
+                ThreadUtils.runOnMainThread(
+                    { tryConnectAndAlarmLoopCheck() },
+                    delayTime * 60 * 1000L
+                )
+            }
+        } else {
+            alarmManager.setExact(
+                AlarmManager.RTC_WAKEUP,
+                reconnectTime.timeInMillis,
+                "WS-tryAlarmLoopCheck",
+                { tryConnectAndAlarmLoopCheck() },
+                null
+            )
+        }
     }
 }

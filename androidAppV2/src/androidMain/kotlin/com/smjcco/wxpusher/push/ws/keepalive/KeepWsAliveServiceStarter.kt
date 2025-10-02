@@ -10,6 +10,7 @@ import androidx.work.WorkerParameters
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.push.ws.WxpNotificationManager
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionUtils
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +61,10 @@ class KeepWsAliveServiceStarter(private val context: Context) {
         const val WORK_NAME_ONCE = "KeepWsAliveServiceStarter"
 
         fun start(context: Context) {
+            //如果通知还存在 ，那就说明前台服务应该还在 ，不用再启动一次，主要是为了省电
+            if (WxpNotificationManager.hasNotificationById(KeepWsAliveService.KeepWsAliveServiceNotificationId)) {
+                return
+            }
             //只有走自建通道，并且打开通知权限，才开启WS保活
             if (DeviceUtils.getPlatform() == DevicePlatform.Android) {
                 val currentActivity = ApplicationUtils.getCurrentActivity()
