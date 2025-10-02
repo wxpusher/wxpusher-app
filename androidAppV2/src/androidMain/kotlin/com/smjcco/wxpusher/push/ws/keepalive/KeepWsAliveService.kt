@@ -84,7 +84,8 @@ class KeepWsAliveService : Service() {
         startForeground(KeepWsAliveServiceNotificationId, notification)
         if (!hasStartCheckLoop) {
             hasStartCheckLoop = true
-            tryConnectAndAlarmLoopCheck()
+            //启动检查循环，但是不执行一次内容
+            tryConnectAndAlarmLoopCheck(false)
         }
     }
 
@@ -212,11 +213,13 @@ class KeepWsAliveService : Service() {
     /**
      * 使用系统闹钟，5分钟检查一次连接，来做兜底。
      */
-    private fun tryConnectAndAlarmLoopCheck() {
+    private fun tryConnectAndAlarmLoopCheck(doWork: Boolean = true) {
         WxpLogUtils.d(message = "tryConnectAndAlarmLoopCheck,系统闹钟定时兜底")
         val application = ApplicationUtils.getApplication()
-        WsManager.tryConnect()
-        KeepWsAliveServiceStarter.start(application)
+        if (doWork) {
+            WsManager.tryConnect()
+            KeepWsAliveServiceStarter.start(application)
+        }
         val delayTime = 5
         val reconnectTime = Calendar.getInstance()
         reconnectTime.add(Calendar.MINUTE, delayTime)
