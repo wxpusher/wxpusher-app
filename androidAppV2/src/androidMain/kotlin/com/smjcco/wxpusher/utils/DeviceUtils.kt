@@ -7,12 +7,12 @@ import android.os.Build
 import android.os.PowerManager
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.os.VibratorManager
 import com.heytap.msp.push.HeytapPushManager
 import com.hihonor.push.sdk.HonorPushClient
 import com.huawei.hms.api.HuaweiApiAvailability
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
-import com.smjcco.wxpusher.config.ConfigManager
 import com.vivo.push.PushClient
 
 object DeviceUtils {
@@ -55,12 +55,12 @@ object DeviceUtils {
     fun isMagicOs(): Boolean {
         if (!isHonorDevice()) {
             // 非荣耀设备，暂不支持
-            return false;
+            return false
         }
 
         // Android Q版本对应MagicUI 4.0
         if (Build.VERSION.SDK_INT > 29) {
-            return true;
+            return true
         }
         // Android Q以下版本返回-1
         return false
@@ -73,7 +73,7 @@ object DeviceUtils {
     }
 
     fun isVivo(): Boolean {
-        return PushClient.getInstance(ApplicationUtils.getApplication()).isSupport()
+        return PushClient.getInstance(ApplicationUtils.getApplication()).isSupport
     }
 
     fun isOppo(): Boolean {
@@ -81,20 +81,20 @@ object DeviceUtils {
     }
 
     fun getPlatform(): DevicePlatform {
-        if (isMIUI() && ConfigManager.getCurrentConfig().xiaomiPush) {
-            return DevicePlatform.Android_XIAOMI
-        } else if (isVivo() && ConfigManager.getCurrentConfig().vivoPush) {
-            return DevicePlatform.Android_VIVO
-        } else if (isOppo() && ConfigManager.getCurrentConfig().oppoPush) {
-            return DevicePlatform.Android_OPPO
-        } else if (isHonorPush() && ConfigManager.getCurrentConfig().honorPush) {
-            return DevicePlatform.Android_HONOR
-        } else if (isHuawei() && ConfigManager.getCurrentConfig().huaweiPush) {
-            return DevicePlatform.Android_HUAWEI
-        } else if (isHuaweiMobileServicesAvailable() && ConfigManager.getCurrentConfig().huaweiPushJustHcm) {
-            //华为需要放在最后面，因为安装了HCM就会识别成华为，后面需要处理一下
-            return DevicePlatform.Android_HUAWEI
-        }
+//        if (isMIUI() && ConfigManager.getCurrentConfig().xiaomiPush) {
+//            return DevicePlatform.Android_XIAOMI
+//        } else if (isVivo() && ConfigManager.getCurrentConfig().vivoPush) {
+//            return DevicePlatform.Android_VIVO
+//        } else if (isOppo() && ConfigManager.getCurrentConfig().oppoPush) {
+//            return DevicePlatform.Android_OPPO
+//        } else if (isHonorPush() && ConfigManager.getCurrentConfig().honorPush) {
+//            return DevicePlatform.Android_HONOR
+//        } else if (isHuawei() && ConfigManager.getCurrentConfig().huaweiPush) {
+//            return DevicePlatform.Android_HUAWEI
+//        } else if (isHuaweiMobileServicesAvailable() && ConfigManager.getCurrentConfig().huaweiPushJustHcm) {
+//            //华为需要放在最后面，因为安装了HCM就会识别成华为，后面需要处理一下
+//            return DevicePlatform.Android_HUAWEI
+//        }
         return DevicePlatform.Android
     }
 
@@ -102,14 +102,24 @@ object DeviceUtils {
      * 调用设备振动
      */
     fun vibrator(time: Int) {
-        val vibrator = ApplicationUtils.getApplication()
-            .getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
-        vibrator?.vibrate(
-            VibrationEffect.createOneShot(
-                time.toLong(),
-                VibrationEffect.DEFAULT_AMPLITUDE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val vibratorManager = ApplicationUtils.getApplication()
+                .getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager?
+            val vibrator = vibratorManager?.defaultVibrator
+            // 使用预定义的键盘敲击效果
+            vibrator?.vibrate(
+                VibrationEffect.createOneShot(time.toLong(), VibrationEffect.DEFAULT_AMPLITUDE)
             )
-        )
+        } else {
+            val vibrator = ApplicationUtils.getApplication()
+                .getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator
+            vibrator?.vibrate(
+                VibrationEffect.createOneShot(
+                    time.toLong(),
+                    VibrationEffect.DEFAULT_AMPLITUDE
+                )
+            )
+        }
     }
 
     /**
