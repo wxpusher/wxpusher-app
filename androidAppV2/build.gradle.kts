@@ -68,6 +68,8 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 10500
         versionName = "1.5.0"
+        //指定产物名称
+        setProperty("archivesBaseName", "wxpusher-app-v$versionName")
     }
     packaging {
         resources {
