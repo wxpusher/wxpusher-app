@@ -23,7 +23,6 @@ kotlin {
     sourceSets {
 
         androidMain.dependencies {
-            implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.core.ktx)
             implementation("androidx.work:work-runtime-ktx:2.10.0")
             implementation("com.squareup.okhttp3:okhttp:4.12.0")
@@ -52,7 +51,6 @@ kotlin {
         }
         commonMain.dependencies {
             implementation(libs.androidx.lifecycle.viewmodel)
-            implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(projects.shared)
         }
     }
