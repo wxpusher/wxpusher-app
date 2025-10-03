@@ -34,11 +34,6 @@
 
 # 保持
 
-# 保持所有公共类及其公共成员（方法和字段）不被混淆
--keep public class * {
-    public protected *;
-}
-
 # 保持自定义的 Application 类不被混淆
 -keep public class * extends android.app.Application {
     public protected *;
@@ -72,6 +67,11 @@
 }
 # 保留被 @Keep 注解的类
 -keep @androidx.annotation.Keep class * {
+    *;
+}
+
+# 保留被 @Serializable 注解的类
+-keep @kotlinx.serialization.Serializable class * {
     *;
 }
 
