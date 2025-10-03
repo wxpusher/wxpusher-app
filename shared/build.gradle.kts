@@ -81,7 +81,7 @@ kotlin {
 }
 
 android {
-    namespace = "com.smjcco.wxpusher_app"
+    namespace = "com.smjcco.wxpusher.kmp"
     compileSdk = 35
     defaultConfig {
         minSdk = 24
