@@ -23,8 +23,10 @@ object HuaweiPushUtils {
                     WxpLogUtils.i(TAG, "HuaweiPush 获取token=${token}")
                     PushManager.onGetPushToken(token, DevicePlatform.Android_HUAWEI)
                 } else {
-                    WxpLogUtils.i(TAG, "HuaweiPush 获取token失败，为空")
-                    PushManager.onGetPushTokenFail(DevicePlatform.Android_HUAWEI)
+                    WxpLogUtils.i(
+                        TAG,
+                        "HuaweiPush 获取token失败，为空，等华为的HuaweiHmsMessageService#onNewToken返回"
+                    )
                 }
             } catch (e: ApiException) {
                 WxpLogUtils.e(TAG, "HuaweiPush 获取token失败", e)

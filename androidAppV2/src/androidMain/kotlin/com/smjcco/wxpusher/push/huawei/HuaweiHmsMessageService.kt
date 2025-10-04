@@ -12,6 +12,7 @@ class HuaweiHmsMessageService : HmsMessageService() {
     override fun onNewToken(s: String?) {
         if (s.isNullOrEmpty()) {
             WxpLogUtils.w(TAG, "华为推送-onNewToken=null")
+            PushManager.onGetPushTokenFail(DevicePlatform.Android_HONOR)
             return
         }
         WxpLogUtils.i(TAG, "华为推送-通过HuaweiHmsMessageService获取token=" + s)
