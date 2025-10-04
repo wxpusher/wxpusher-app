@@ -17,6 +17,10 @@ import com.smjcco.wxpusher.config.ConfigManager
 import com.vivo.push.PushClient
 
 object DeviceUtils {
+
+    //运行的时候，如果有降级，就使用这个新的设备类型
+    var runtimePlatform: DevicePlatform? = null
+
     //是否是小米设备
     fun isMIUI(): Boolean {
         return "Xiaomi".equals(Build.MANUFACTURER, true)
@@ -82,6 +86,10 @@ object DeviceUtils {
     }
 
     fun getPlatform(): DevicePlatform {
+        //如果运行过程中有降级，比如注册华为推送失败，最后走了ws，就用降级后的设备类型
+        if (runtimePlatform != null) {
+            return runtimePlatform!!
+        }
         if (isMIUI() && ConfigManager.getCurrentConfig().xiaomiPush) {
             return DevicePlatform.Android_XIAOMI
         } else if (isVivo() && ConfigManager.getCurrentConfig().vivoPush) {
@@ -97,6 +105,10 @@ object DeviceUtils {
             return DevicePlatform.Android_HUAWEI
         }
         return DevicePlatform.Android
+    }
+
+    fun setPlatform(platform: DevicePlatform) {
+        runtimePlatform = platform
     }
 
     /**

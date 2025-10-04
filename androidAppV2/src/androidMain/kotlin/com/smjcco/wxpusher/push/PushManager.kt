@@ -64,6 +64,8 @@ object PushManager {
     fun onGetPushTokenFail(platform: DevicePlatform) {
         if (platform != DevicePlatform.Android) {
             WxpLogUtils.i(TAG, "获取厂商pushToken失败，初始化自建长链接")
+            //厂商推送注册失败了，设备为安卓，默认走ws通道
+            DeviceUtils.setPlatform(DevicePlatform.Android)
             WsManager.init()
         }
     }
