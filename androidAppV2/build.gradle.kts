@@ -71,7 +71,7 @@ android {
         
         ndk {
             // 只保留ARM架构，去掉x86和x86_64，减小包大小
-            abiFilters.addAll(listOf("arm64-v8a", "armeabi-v7a"))
+            abiFilters.addAll(listOf("arm64-v8a"))
         }
     }
     packaging {
