@@ -8,6 +8,7 @@ import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.push.honor.HonorPushUtils
 import com.smjcco.wxpusher.push.huawei.HuaweiPushUtils
+import com.smjcco.wxpusher.push.meizu.MeizuPushUtils
 import com.smjcco.wxpusher.push.oppo.OppoPushUtils
 import com.smjcco.wxpusher.push.vivo.VIVOPushUtils
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager
@@ -48,6 +49,9 @@ object PushManager {
         } else if (platform == DevicePlatform.Android_OPPO) {
             WxpLogUtils.i(TAG, "初始化OPPO推送")
             OppoPushUtils.init(application)
+        } else if (platform == DevicePlatform.Android_MEIZU) {
+            WxpLogUtils.i(TAG, "初始化魅族推送")
+            MeizuPushUtils.init(application)
         } else {
             WxpLogUtils.i(TAG, "初始化自建长链接")
             WxpNotificationManager.init()
@@ -63,7 +67,10 @@ object PushManager {
      */
     fun onGetPushTokenFail(platform: DevicePlatform) {
         if (platform != DevicePlatform.Android) {
-            WxpLogUtils.i(TAG, "获取厂商pushToken失败，初始化自建长链接")
+            WxpLogUtils.i(
+                TAG,
+                "获取厂商pushToken失败【" + platform.getPlatform() + "】，初始化自建长链接"
+            )
             //厂商推送注册失败了，设备为安卓，默认走ws通道
             DeviceUtils.setPlatform(DevicePlatform.Android)
             WsManager.init()

@@ -11,6 +11,7 @@ enum class DevicePlatform(private val platform: String) {
     Android_VIVO("Android_Vivo"),
     Android_HONOR("Android_Honor"),
     Android_OPPO("Android_Oppo"),
+    Android_MEIZU("Android_Meizu"),
     Mac("Mac"),
     Windows("Windows"),
     Linux("Linux"),

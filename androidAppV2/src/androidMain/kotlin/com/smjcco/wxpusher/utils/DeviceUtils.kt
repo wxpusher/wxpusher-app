@@ -11,6 +11,7 @@ import android.os.VibratorManager
 import com.heytap.msp.push.HeytapPushManager
 import com.hihonor.push.sdk.HonorPushClient
 import com.huawei.hms.api.HuaweiApiAvailability
+import com.meizu.cloud.pushsdk.PushManager
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.config.ConfigManager
@@ -103,6 +104,8 @@ object DeviceUtils {
         } else if (isHuaweiMobileServicesAvailable() && ConfigManager.getCurrentConfig().huaweiPushJustHcm) {
             //华为需要放在最后面，因为安装了HCM就会识别成华为，后面需要处理一下
             return DevicePlatform.Android_HUAWEI
+        } else if (PushManager.isBrandMeizu() && ConfigManager.getCurrentConfig().meizuPush) {
+            return DevicePlatform.Android_MEIZU
         }
         return DevicePlatform.Android
     }

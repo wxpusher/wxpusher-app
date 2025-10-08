@@ -211,6 +211,19 @@
                 <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE" />
             </intent-filter>
         </service>
+        <!--魅族推送-->
+        <receiver
+            android:name=".push.meizu.MeizuPushMsgReceiver"
+            android:exported="true"
+            android:permission="com.meizu.cloud.push.permission.MESSAGE">
+            <intent-filter>
+                <action android:name="com.meizu.flyme.push.intent.MESSAGE" />
+                <action android:name="com.meizu.flyme.push.intent.REGISTER.FEEDBACK" />
+                <action android:name="com.meizu.flyme.push.intent.UNREGISTER.FEEDBACK" />
+
+                <category android:name="${applicationId}" />
+            </intent-filter>
+        </receiver>
     </application>
 
     <!--荣耀推送-->

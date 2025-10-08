@@ -15,6 +15,7 @@ data class ConfigItem(
     val huaweiPushJustHcm: Boolean = false,//只通过hcm进行判断，如果线上有华为设备判断失误，可以通过这个降级
     val oppoPush: Boolean = true,
     val honorPush: Boolean = true,
+    val meizuPush: Boolean = true,
 )
 
 /**
