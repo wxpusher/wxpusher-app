@@ -670,6 +670,8 @@
 				INFOPLIST_FILE = "WxPusher-iOS/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WxPusher消息推送平台";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSCameraUsageDescription = "需要使用相机进行二维码扫描";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要访问相册以选择图片进行二维码识别";
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
@@ -719,6 +721,8 @@
 				INFOPLIST_FILE = "WxPusher-iOS/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WxPusher消息推送平台";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSCameraUsageDescription = "需要使用相机进行二维码扫描";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要访问相册以选择图片进行二维码识别";
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";

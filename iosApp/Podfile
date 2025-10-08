@@ -37,6 +37,7 @@ target 'WxPusher-iOS' do
   pods
   pod 'Toaster', '2.3.0'
   pod 'MJRefresh', '3.7.9'
+  pod 'WechatOpenSDK-XCFramework', '2.0.5'
   pod 'shared', :path => '../shared'
   
 end
