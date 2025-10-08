@@ -8,9 +8,7 @@
 	<string>development</string>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>http://wxpusher.test.zjiecode.com</string>
-		<string>https://wxpusher.zjiecode.com</string>
-		<string>applinks:zjiecode.com</string>
+		<string>applinks:wxpusher.zjiecode.com</string>
 	</array>
 	<key>com.apple.security.app-sandbox</key>
 	<true/>
