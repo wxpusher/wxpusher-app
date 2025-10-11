@@ -105,6 +105,16 @@ class WxpMainActivity : WxpBaseActivity() {
             return
         }
 
+        //检查deeplink 里面是否有url，目前魅族系统推送会使用这种方式
+        val data = intent.data
+        if (data != null) {
+            val queryUrl = data.getQueryParameter(INTENT_KEY_URL)
+            if (queryUrl != null && !queryUrl.isEmpty()) {
+                WxpJumpPageUtils.jumpToWebUrl(queryUrl, this)
+                return
+            }
+        }
+
         //小米推送的消息，如果有 url，直接打开地址
         val miPushMessage =
             intent.getSerializableExtra(PushMessageHelper.KEY_MESSAGE) as MiPushMessage?
