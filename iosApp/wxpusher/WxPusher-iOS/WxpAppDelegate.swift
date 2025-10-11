@@ -23,8 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
         
         let sceneConfig = UISceneConfiguration(name: "Default Configuration", sessionRole: connectingSceneSession.role)
-       sceneConfig.delegateClass = SceneDelegate.self
-       return sceneConfig
+        sceneConfig.delegateClass = SceneDelegate.self
+        return sceneConfig
     }
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -56,12 +56,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         //设置全局主要颜色
         UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = UIColor.defAccentPrimaryColor
+        
+        //注册微信open sdk
+        WxpWeixinOpenManager.shared.doInit()
         return true
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
         print("[DEBUG] AppDelegate - applicationDidBecomeActive")
-       
+        
     }
     
     func applicationDidFinishLaunching(_ application: UIApplication) {
@@ -76,16 +79,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         dialogParams.rightText = "我知道了"
         WxpDialogUtils.showDialog(params: dialogParams)
     }
-   
-//    应用前台的时候，会收到消息， 但是不会弹窗提醒
-//    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-//        print("[push]-应用存活-前台，收到用户消息的时候，userInfo=\(userInfo)")
-//        NotificationCenter.default.post(name: notiKey, object: nil, userInfo: userInfo)
-//        completionHandler(.newData)
-//    }
+    
+    //    应用前台的时候，会收到消息， 但是不会弹窗提醒
+    //    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    //        print("[push]-应用存活-前台，收到用户消息的时候，userInfo=\(userInfo)")
+    //        NotificationCenter.default.post(name: notiKey, object: nil, userInfo: userInfo)
+    //        completionHandler(.newData)
+    //    }
     
     
-//  通过这个方法，可以让应用在前台的时候也提醒消息，但是有这个方法，上面的方法就不会调用了
+    //  通过这个方法，可以让应用在前台的时候也提醒消息，但是有这个方法，上面的方法就不会调用了
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         var userInfo = notification.request.content.userInfo
         print("[push]-应用存活-前台，收到用户消息的时候，userInfo=\(userInfo)")
@@ -115,6 +118,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         print("[push]-apple push token: \(token)")
         WxpAppDataService.shared.savePushToken(pushToken: token)
         WxpAppDataService.shared.updateDeviceInfo(platform: nil)
+    }
+    
+    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        return WXApi.handleOpenUniversalLink(userActivity, delegate: WxpWeixinOpenManager.shared)
     }
     
 }
