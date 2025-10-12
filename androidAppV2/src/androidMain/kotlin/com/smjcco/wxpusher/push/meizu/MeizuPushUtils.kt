@@ -32,7 +32,7 @@ object MeizuPushUtils {
 
         val dialog = AlertDialog.Builder(activity)
             .setTitle("请打开通知提醒设置")
-            .setMessage("如果通知不提醒，不弹窗，请按如下步骤进行设置：\n\n1、请点击「去设置」，勾选所有提醒方式。")
+            .setMessage("如果通知不提醒，不弹窗，请按如下步骤进行设置：\n\n1、请点击「去设置」，勾选所有提醒方。\n\n你也可以稍后在【我的】-【通知设置】里面检查")
             .setNegativeButton(
                 "去设置"
             ) { dialog, which ->
