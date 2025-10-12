@@ -113,7 +113,8 @@ object PushManager {
             CommonUtils.showSettingGuide(activity)
         } else if (platform == DevicePlatform.Android_OPPO) {
             CommonUtils.showSettingGuide(activity)
-        } else {
+        } else if (platform == DevicePlatform.Android_MEIZU) {
+            MeizuPushUtils.showSettingGuide(activity)
         }
     }
 
