@@ -40,7 +40,6 @@
         <activity
             android:name=".page.main.WxpMainActivity"
             android:clearTaskOnLaunch="true"
-            android:configChanges="uiMode"
             android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="portrait">
