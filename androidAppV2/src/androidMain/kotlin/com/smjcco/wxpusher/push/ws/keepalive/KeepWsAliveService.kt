@@ -165,6 +165,9 @@ class KeepWsAliveService : Service() {
     }
 
     private fun createNotification(): Notification {
+        //初始化一下通知服务，避免通知分组没有创建
+        WxpNotificationManager.init()
+
         val notificationChannelId = "WxPusherKeepAliveNotificationChannelId"
 
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager

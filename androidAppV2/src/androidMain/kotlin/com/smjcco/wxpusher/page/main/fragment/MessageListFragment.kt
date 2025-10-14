@@ -1,6 +1,9 @@
 package com.smjcco.wxpusher.page.main.fragment
 
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
@@ -14,6 +17,7 @@ import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.AppCompatTextView
+import androidx.core.content.ContextCompat
 import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,6 +39,8 @@ import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
 import com.smjcco.wxpusher.page.web.WxpWebViewActivity
+import com.smjcco.wxpusher.push.IPushTokenChangedListener
+import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
 
@@ -43,7 +49,7 @@ import com.smjcco.wxpusher.utils.WxpJumpPageUtils
  * 对应iOS中的MessageListViewController
  */
 class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxpMessageListView,
-    ITabMenuProvider {
+    ITabMenuProvider, IPushTokenChangedListener {
 
     private lateinit var refreshLayout: SmartRefreshLayout
     private lateinit var recyclerView: RecyclerView
@@ -82,12 +88,25 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         presenter.init()
         //打开就刷新一次
         refreshLayout.autoRefresh()
-        setupBanner()
+        refreshBanner()
+        //监听pushToken变化，刷新banner
+        PushManager.addPushTokenChangedListener(this)
+    }
+
+    override fun onPushToken(platform: DevicePlatform, pushToken: String) {
+        if (platform == DevicePlatform.Android) {
+            refreshBanner()
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        setupBanner()
+        refreshBanner()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        PushManager.removePushTokenChangedListener(this)
     }
 
     private fun initViews(view: View) {
@@ -140,32 +159,9 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     /**
      * 初始化banner的显示
      */
-    private fun setupBanner() {
+    private fun refreshBanner() {
         //如果是非厂商通道，并且没有忽略电池优化，就提醒用户关闭电池优化
         if (DeviceUtils.getPlatform() == DevicePlatform.Android) {
-//            关闭电池优化以后，会自动打开闹钟权限，不需要再引导用户打开
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-//                && !(requireContext().getSystemService(ALARM_SERVICE) as AlarmManager).canScheduleExactAlarms()
-//            ) {
-//                bannerCardView.visibility = View.VISIBLE
-//                //设置闹钟图标
-//                bannerICImg.visibility = View.VISIBLE
-//                bannerICImg.setImageDrawable(
-//                    ResourcesCompat.getDrawable(
-//                        resources,
-//                        R.drawable.ic_battery_alert_red_24dp,
-//                        null
-//                    )
-//                )
-//                bannerTextTv.visibility = View.VISIBLE
-//                bannerTextTv.text = resources.getString(R.string.main_banner_alarm_text)
-//                bannerBtn.visibility = View.VISIBLE
-//                bannerBtn.text = resources.getString(R.string.main_banner_alarm_btn)
-//                bannerBtn.setOnClickListener {
-//                    WxpJumpPageUtils.jumpToSystemAlarmSettings(requireActivity())
-//                }
-//                bannerCloseImg.visibility = View.GONE
-//            } else
             if (!DeviceUtils.isIgnoringBatteryOptimizations()) {
                 bannerCardView.visibility = View.VISIBLE
                 //设置电池图标

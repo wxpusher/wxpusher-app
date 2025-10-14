@@ -17,12 +17,20 @@ import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
 import com.smjcco.wxpusher.push.xiaomi.XiaomiUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionUtils
+import com.smjcco.wxpusher.utils.ThreadUtils
+
+interface IPushTokenChangedListener {
+    fun onPushToken(platform: DevicePlatform, pushToken: String)
+}
 
 /**
  * 管理push的一堆事儿，对厂商和通道做抽象
  */
-object PushManager {
+object PushManager : Runnable {
     private val TAG = "PushManager"
+
+    private val pushTokenChangedListenerList: MutableList<IPushTokenChangedListener> =
+        mutableListOf()
 
     /**
      * 初始化推送
@@ -60,6 +68,20 @@ object PushManager {
             KeepWsAliveServiceStarter.start(application)
         }
 
+        //如果不是安卓，厂商通道设置token注册超时，10秒超时以后，走自建ws推送通道
+        if (platform != DevicePlatform.Android) {
+            ThreadUtils.runOnMainThread(this, 10 * 1000)
+        }
+    }
+
+
+    override fun run() {
+        val platform = DeviceUtils.getPlatform()
+        WxpLogUtils.i(
+            TAG,
+            "获取厂商pushToken超时，platform=【" + platform.getPlatform() + "】，初始化自建长链接"
+        )
+        onGetPushTokenFail(platform)
     }
 
     /**
@@ -71,9 +93,10 @@ object PushManager {
                 TAG,
                 "获取厂商pushToken失败【" + platform.getPlatform() + "】，初始化自建长链接"
             )
+            ThreadUtils.getMainThreadHandler().removeCallbacks(this)
             //厂商推送注册失败了，设备为安卓，默认走ws通道
             DeviceUtils.setPlatform(DevicePlatform.Android)
-            WsManager.init()
+            init()
         }
     }
 
@@ -82,8 +105,24 @@ object PushManager {
      */
     fun onGetPushToken(token: String, platform: DevicePlatform) {
         WxpLogUtils.i(TAG, "收到设备token，platform=${platform}, token=${token}")
+        ThreadUtils.getMainThreadHandler().removeCallbacks(this)
         WxpAppDataService.savePushToken(token)
         WxpAppDataService.updateDeviceInfo(platform.getPlatform())
+
+        // 发送pushToken变更的通知
+        ThreadUtils.runOnMainThread {
+            for (listener in pushTokenChangedListenerList) {
+                listener.onPushToken(platform, token)
+            }
+        }
+    }
+
+    fun addPushTokenChangedListener(listener: IPushTokenChangedListener) {
+        pushTokenChangedListenerList.add(listener)
+    }
+
+    fun removePushTokenChangedListener(listener: IPushTokenChangedListener) {
+        pushTokenChangedListenerList.remove(listener)
     }
 
     /**
@@ -124,5 +163,6 @@ object PushManager {
             platform.getPlatform()
         )
     }
+
 
 }
