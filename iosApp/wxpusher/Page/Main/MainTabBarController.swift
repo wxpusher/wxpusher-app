@@ -26,8 +26,8 @@ class MainTabBarController: UITabBarController {
           
 //        self.delegate = self
         
-        //进行一次检查更新的提醒
-        WxpVersionUpdateChecker(force: false).checkForUpdate()
+        //进行一次检查更新的提醒，iOS不主动检查更新
+//        WxpVersionUpdateChecker(force: false).checkForUpdate()
     }
     
     

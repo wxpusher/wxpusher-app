@@ -206,6 +206,11 @@ class WxpWebViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = false
     }
     
+    
+    func setPageTitle(title:String){
+        self.title = title
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -567,9 +572,9 @@ extension WxpWebViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         // 设置网页标题
         if let webTitle = webView.title, !webTitle.isEmpty {
-            title = webTitle
+            setPageTitle(title: webTitle)
         } else {
-            title = "网页内容"
+            setPageTitle(title: "网页内容")
         }
         
         // 检查是否需要显示第三方内容banner
@@ -583,6 +588,7 @@ extension WxpWebViewController: WKNavigationDelegate {
         
         updateWebOptionBtnStatus()
     }
+    
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         // 设置错误时的标题

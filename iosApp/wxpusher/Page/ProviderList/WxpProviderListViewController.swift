@@ -42,6 +42,10 @@ class WxpProviderListViewController: WxpWebViewController,IWxpProviderListView {
         webView?.load(request)
     }
     
+    //覆盖为空，避免网页改变的时候，改变标题，影响tab的标题
+    override func setPageTitle(title: String) {
+        
+    }
     
     override func updateWebOptionBtnStatus() {
         super.updateWebOptionBtnStatus()
