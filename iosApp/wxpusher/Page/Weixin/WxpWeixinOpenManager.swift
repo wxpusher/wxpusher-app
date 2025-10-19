@@ -48,9 +48,9 @@ class WxpWeixinOpenManager: NSObject {
         print("微信SDK注册结果: \(isRegistered ? "成功" : "失败")")
 #if DEBUG
         // 调用自检函数
-        WXApi.checkUniversalLinkReady { step, result in
-            print("\(step), \(result.success), \(result.errorInfo ?? ""), suggestion=\(result.suggestion ?? "")")
-        }
+//        WXApi.checkUniversalLinkReady { step, result in
+//            print("\(step), \(result.success), \(result.errorInfo ?? ""), suggestion=\(result.suggestion ?? "")")
+//        }
 #endif
     }
     
@@ -66,7 +66,7 @@ class WxpWeixinOpenManager: NSObject {
     
     /// 获取微信版本号
     func getWeChatVersion() -> String {
-        return WXApi.getWXAppInstallUrl() ?? "未知版本"
+        return WXApi.getWXAppInstallUrl()
     }
 }
 
@@ -84,7 +84,7 @@ extension WxpWeixinOpenManager: WXApiDelegate {
     
     /// 收到微信的响应
     func onResp(_ resp: BaseResp) {
-        print("收到微信响应: \(resp), errCode: \(resp.errCode), errStr: \(resp.errStr ?? "")")
+        print("收到微信响应: \(resp), errCode: \(resp.errCode), errStr: \(resp.errStr)")
         
         switch resp {
         case let authResp as SendAuthResp:
@@ -219,17 +219,52 @@ extension WxpWeixinOpenManager {
 extension WxpWeixinOpenManager {
     
     /// 发起微信支付
-    func requestPayment(with parameters: WeChatPaymentParameters, completion: @escaping (Result<Bool, WeChatError>) -> Void) {
-        let req = PayReq()
-        req.partnerId = parameters.partnerId
-        req.prepayId = parameters.prepayId
-        req.nonceStr = parameters.nonceStr
-        req.timeStamp = UInt32(parameters.timeStamp) ?? 0
-        req.package = parameters.package
-        req.sign = parameters.sign
+    func requestPayment(with reqDict: [String: Any]?, completion: @escaping (Result<Bool, WeChatError>) -> Void) {
+        guard let reqDict = reqDict else {
+            completion(.failure(.unknownError("支付参数为空")))
+            return
+        }
+        
+        // 验证必要的参数
+        guard let prepayId = reqDict["prepayid"] as? String,
+              let sign = reqDict["paySign"] as? String,
+              let timeStampString = reqDict["timeStamp"] as? String,
+              let nonceStr = reqDict["nonceStr"] as? String,
+              let partnerId = reqDict["partnerid"] as? String,
+              let package = reqDict["package"] as? String,
+              let timeStamp = UInt32(timeStampString) else {
+            completion(.failure(.unknownError("支付参数格式错误")))
+            return
+        }
+        
+        // 检查微信是否已安装和支持
+        guard isWeChatInstalled() else {
+            completion(.failure(.notInstalled))
+            return
+        }
+        
+        guard isWeChatSupport() else {
+            completion(.failure(.unsupportedVersion))
+            return
+        }
+        
+        let wxPayReq = PayReq()
+        wxPayReq.prepayId = prepayId
+        wxPayReq.sign = sign
+        wxPayReq.timeStamp = timeStamp
+        wxPayReq.nonceStr = nonceStr
+        wxPayReq.partnerId = partnerId
+        wxPayReq.package = package
         
         payCompletion = completion
-        WXApi.send(req)
+        
+        WXApi.send(wxPayReq) { success in
+            if !success {
+                DispatchQueue.main.async {
+                    completion(.failure(.sendRequestFailed))
+                }
+            }
+        }
     }
     
     /// 处理支付响应
