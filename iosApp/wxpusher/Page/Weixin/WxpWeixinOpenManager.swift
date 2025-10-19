@@ -36,7 +36,7 @@ class WxpWeixinOpenManager: NSObject {
     /// 配置微信SDK 初始化
     func doInit() {
         self.appId = "wx906c2d32c1b1a115"
-        self.universalLink = "https://wxpusher.zjiecode.com/launch-app"
+        self.universalLink = "https://wxpusher.zjiecode.com/launch-app/"
        
 
         // 设置微信SDK日志级别
