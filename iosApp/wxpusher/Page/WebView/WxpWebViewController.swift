@@ -101,6 +101,10 @@ class WxpWebViewController: UIViewController {
         return createOptionButton(imageName: "chevron.right", action: #selector(forwardButtonTapped))
     }()
     
+    lazy var closeButton: UIButton = {
+        return createOptionButton(imageName: getLastBtnIcon(), action: #selector(closeButtonTapped))
+    }()
+    
     //webview的前进，后退和刷新操作
     private lazy var webOptionView: UIView = {
         let containerView = UIView()
@@ -110,7 +114,7 @@ class WxpWebViewController: UIViewController {
         let backButton = webBackButton
         let forwardButton = webForwardButton
         let refreshButton = createOptionButton(imageName: "arrow.clockwise", action: #selector(refreshButtonTapped))
-        let closeButton = createOptionButton(imageName: "xmark", action: #selector(closeButtonTapped))
+        let closeButton = closeButton
         
         let dividerLine = UIView()
         dividerLine.backgroundColor = UIColor.defDividerSecoundColor
@@ -164,6 +168,10 @@ class WxpWebViewController: UIViewController {
         containerView.translatesAutoresizingMaskIntoConstraints = false
         return containerView
     }()
+    
+    func getLastBtnIcon()->String{
+        return "xmark"
+    }
     
     // 创建选项按钮的辅助方法
     private func createOptionButton(imageName: String, action: Selector) -> UIButton {
@@ -308,7 +316,7 @@ class WxpWebViewController: UIViewController {
         navigationItem.rightBarButtonItem = nil
     }
     
-    private func updateWebOptionBtnStatus(){
+    func updateWebOptionBtnStatus(){
         webBackButton.isEnabled = webView!.canGoBack
         webForwardButton.isEnabled = webView!.canGoForward
     }
@@ -334,7 +342,7 @@ class WxpWebViewController: UIViewController {
         webView!.reload()
     }
     
-    @objc private func closeButtonTapped() {
+    @objc func closeButtonTapped() {
         navigationController?.popViewController(animated: true)
     }
     

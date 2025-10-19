@@ -42,10 +42,23 @@ class WxpProviderListViewController: WxpWebViewController,IWxpProviderListView {
         webView?.load(request)
     }
     
+    
+    override func updateWebOptionBtnStatus() {
+        super.updateWebOptionBtnStatus()
+        closeButton.isEnabled = webView!.canGoBack
+    }
+    
+    override func getLastBtnIcon() -> String {
+        return "house"
+    }
+    
     // MARK: - Page Action
     @objc func loadPage() {
         presenter?.loadPage()
     }
     
+    @objc override func closeButtonTapped() {
+        presenter?.loadPage()
+    }
     
 }
