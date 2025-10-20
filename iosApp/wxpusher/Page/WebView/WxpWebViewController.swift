@@ -1,7 +1,9 @@
 import UIKit
-import WebKit
-import shared
 
+import shared
+import WechatOpenSDK
+
+@preconcurrency import WebKit
 class WxpWebViewController: UIViewController {
     
     // 白名单域名列表
@@ -15,7 +17,10 @@ class WxpWebViewController: UIViewController {
     private let DevicePlatformKey = "platform"
     private let DeviceVersionNameKey = "versionName"
     
-    private let url: URL
+    var webView: WKWebView?
+    let configuration = WKWebViewConfiguration()
+    
+    private let url: URL?
     private var loadingStartTime: Date?
     private var progressTimer: Timer?
     private var showThirdPartyBanner = true
@@ -96,6 +101,10 @@ class WxpWebViewController: UIViewController {
         return createOptionButton(imageName: "chevron.right", action: #selector(forwardButtonTapped))
     }()
     
+    lazy var closeButton: UIButton = {
+        return createOptionButton(imageName: getLastBtnIcon(), action: #selector(closeButtonTapped))
+    }()
+    
     //webview的前进，后退和刷新操作
     private lazy var webOptionView: UIView = {
         let containerView = UIView()
@@ -105,7 +114,7 @@ class WxpWebViewController: UIViewController {
         let backButton = webBackButton
         let forwardButton = webForwardButton
         let refreshButton = createOptionButton(imageName: "arrow.clockwise", action: #selector(refreshButtonTapped))
-        let closeButton = createOptionButton(imageName: "xmark", action: #selector(closeButtonTapped))
+        let closeButton = closeButton
         
         let dividerLine = UIView()
         dividerLine.backgroundColor = UIColor.defDividerSecoundColor
@@ -160,6 +169,10 @@ class WxpWebViewController: UIViewController {
         return containerView
     }()
     
+    func getLastBtnIcon()->String{
+        return "xmark"
+    }
+    
     // 创建选项按钮的辅助方法
     private func createOptionButton(imageName: String, action: Selector) -> UIButton {
         let button = UIButton(type: .system)
@@ -171,21 +184,15 @@ class WxpWebViewController: UIViewController {
         return button
     }
     
-    private let webView: WKWebView = {
-        let configuration = WKWebViewConfiguration()
-        let webView = WKWebView(frame: .zero, configuration: configuration)
-        webView.translatesAutoresizingMaskIntoConstraints = false
-        
-        webView.isOpaque = false
-        webView.backgroundColor = .clear
-        webView.scrollView.backgroundColor = .clear
-        return webView
-    }()
-    
     private var bannerHeightConstraint: NSLayoutConstraint!
     
     
-    init(url: URL) {
+    init() {
+        self.url = nil
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    init(url: URL?) {
         self.url = url
         super.init(nibName: nil, bundle: nil)
     }
@@ -199,23 +206,41 @@ class WxpWebViewController: UIViewController {
         navigationController?.navigationBar.prefersLargeTitles = false
     }
     
+    
+    func setPageTitle(title:String){
+        self.title = title
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
+        setupWebview()
         setupUI()
         showOption()
         loadWebContent()
+    }
+    
+    private func setupWebview(){
+        
+        self.configuration.userContentController.add(self, name: "wxpusher")
+        
+        self.webView = WKWebView(frame: .zero, configuration: self.configuration)
+        self.webView?.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.webView?.isOpaque = false
+        self.webView?.backgroundColor = .clear
+        self.webView?.scrollView.backgroundColor = .clear
     }
     
     private func setupUI() {
         //先不显示标题，避免加载的时候闪一下
         title = ""
         view.backgroundColor = .systemBackground
-        webView.navigationDelegate = self
-        webView.uiDelegate = self
+        webView?.navigationDelegate = self
+        webView?.uiDelegate = self
         
         //进度条更新观察
-        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
+        webView?.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
         
         //点击三方内容提示
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(bannerTapped))
@@ -224,7 +249,7 @@ class WxpWebViewController: UIViewController {
         
         //设置布局约束
         view.addSubview(thirdPartyBannerView)
-        view.addSubview(webView)
+        view.addSubview(webView!)
         view.addSubview(progressView)
         view.addSubview(webOptionView)
         
@@ -238,12 +263,12 @@ class WxpWebViewController: UIViewController {
             thirdPartyBannerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             bannerHeightConstraint,
             
-            webView.topAnchor.constraint(equalTo: thirdPartyBannerView.bottomAnchor, constant: 0),
-            webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            webView.bottomAnchor.constraint(equalTo: webOptionView.topAnchor),
+            webView!.topAnchor.constraint(equalTo: thirdPartyBannerView.bottomAnchor, constant: 0),
+            webView!.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            webView!.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            webView!.bottomAnchor.constraint(equalTo: webOptionView.topAnchor),
             
-            progressView.topAnchor.constraint(equalTo: webView.topAnchor),
+            progressView.topAnchor.constraint(equalTo: webView!.topAnchor),
             progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             progressView.heightAnchor.constraint(equalToConstant: 1.0),
@@ -296,9 +321,9 @@ class WxpWebViewController: UIViewController {
         navigationItem.rightBarButtonItem = nil
     }
     
-    private func updateWebOptionBtnStatus(){
-        webBackButton.isEnabled = webView.canGoBack
-        webForwardButton.isEnabled = webView.canGoForward
+    func updateWebOptionBtnStatus(){
+        webBackButton.isEnabled = webView!.canGoBack
+        webForwardButton.isEnabled = webView!.canGoForward
     }
     
     @objc private func bannerTapped() {
@@ -307,22 +332,22 @@ class WxpWebViewController: UIViewController {
     
     // MARK: - Web Option Button Actions
     @objc private func backButtonTapped() {
-        if webView.canGoBack {
-            webView.goBack()
+        if webView!.canGoBack {
+            webView!.goBack()
         }
     }
     
     @objc private func forwardButtonTapped() {
-        if webView.canGoForward {
-            webView.goForward()
+        if webView!.canGoForward {
+            webView!.goForward()
         }
     }
     
     @objc private func refreshButtonTapped() {
-        webView.reload()
+        webView!.reload()
     }
     
-    @objc private func closeButtonTapped() {
+    @objc func closeButtonTapped() {
         navigationController?.popViewController(animated: true)
     }
     
@@ -332,9 +357,9 @@ class WxpWebViewController: UIViewController {
             message: "当前页面包含第三方提供的内容。这些内容由第三方独立提供和维护，与WxPusher无关。请谨慎对待页面中的信息，WxPusher不对第三方内容的准确性、安全性或合法性承担责任。\n\n如果您对内容有疑问或遇到问题，请直接联系内容提供方。",
             preferredStyle: .alert
         )
-//        alert.addAction(UIAlertAction(title: "不再提示", style: .destructive) { [weak self] _ in
-//            self?.hideBannerPermanently()
-//        })
+        //        alert.addAction(UIAlertAction(title: "不再提示", style: .destructive) { [weak self] _ in
+        //            self?.hideBannerPermanently()
+        //        })
         alert.addAction(UIAlertAction(title: "我知道了", style: .default, handler: nil))
         
         present(alert, animated: true, completion: nil)
@@ -371,33 +396,35 @@ class WxpWebViewController: UIViewController {
             self.thirdPartyBannerView.isHidden = true
         }
     }
-     
-     private func checkAndShowThirdPartyBanner(for url: URL?) {
-         guard let url = url else { return }
-         
-         if isHostInWhitelist(url.host) {
-             // 白名单内的域名，隐藏banner
-             hideBanner()
-         } else {
-             // 第三方域名，显示banner
-             showBanner()
-         }
-     }
+    
+    private func checkAndShowThirdPartyBanner(for url: URL?) {
+        guard let url = url else { return }
+        
+        if isHostInWhitelist(url.host) {
+            // 白名单内的域名，隐藏banner
+            hideBanner()
+        } else {
+            // 第三方域名，显示banner
+            showBanner()
+        }
+    }
     
     deinit {
-        webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
+        webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
         progressTimer?.invalidate()
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
         if keyPath == #keyPath(WKWebView.estimatedProgress) {
-            progressView.progress = Float(webView.estimatedProgress)
+            progressView.progress = Float(webView!.estimatedProgress)
         }
     }
     
     private func loadWebContent() {
-        let request = createRequestWithTokenIfNeeded(for: url)
-        webView.load(request)
+        if(url != nil){
+            let request = createRequestWithTokenIfNeeded(for: url!)
+            webView!.load(request)
+        }
     }
     
     // MARK: - Helper Methods
@@ -429,16 +456,16 @@ class WxpWebViewController: UIViewController {
     
     /// 复制链接到剪贴板
     private func copyLinkToClipboard() {
-        let urlString = webView.url?.absoluteString ?? url.absoluteString
+        let urlString = webView?.url?.absoluteString ?? url?.absoluteString
         UIPasteboard.general.string = urlString
         WxpToastUtils.shared.showToast(msg: "复制成功")
     }
     
     /// 分享当前URL
     private func shareURL() {
-        let urlString = webView.url?.absoluteString ?? url.absoluteString
-        let activityViewController = UIActivityViewController(activityItems: [urlString], 
-                                                            applicationActivities: nil)
+        let urlString = webView?.url?.absoluteString ?? url?.absoluteString ?? ""
+        let activityViewController = UIActivityViewController(activityItems: [urlString],
+                                                              applicationActivities: nil)
         
         // 在 iPad 上需要设置弹出位置
         if let popoverController = activityViewController.popoverPresentationController {
@@ -455,9 +482,13 @@ class WxpWebViewController: UIViewController {
     
     /// 在系统浏览器中打开链接
     private func openInBrowser() {
-        let urlToOpen = webView.url ?? url
-        if UIApplication.shared.canOpenURL(urlToOpen) {
-            UIApplication.shared.open(urlToOpen, options: [:]) { success in
+        let urlToOpen = webView?.url ?? url
+        if(urlToOpen == nil){
+            WxpToastUtils.shared.showToast(msg: "链接为空，无法分享")
+            return
+        }
+        if (UIApplication.shared.canOpenURL(urlToOpen!)) {
+            UIApplication.shared.open(urlToOpen!, options: [:]) { success in
                 if !success {
                     WxpToastUtils.shared.showToast(msg: "无法打开浏览器")
                 }
@@ -466,6 +497,7 @@ class WxpWebViewController: UIViewController {
             WxpToastUtils.shared.showToast(msg: "无效的链接")
         }
     }
+    
 }
 
 extension WxpWebViewController: WKNavigationDelegate {
@@ -524,7 +556,7 @@ extension WxpWebViewController: WKNavigationDelegate {
         progressTimer?.invalidate()
         progressTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: false) { [weak self] _ in
             // 如果1秒后还在加载，则显示进度条
-            if self?.webView.isLoading == true {
+            if self?.webView?.isLoading == true {
                 self?.progressView.isHidden = false
             }
         }
@@ -540,9 +572,9 @@ extension WxpWebViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         // 设置网页标题
         if let webTitle = webView.title, !webTitle.isEmpty {
-            title = webTitle
+            setPageTitle(title: webTitle)
         } else {
-            title = "网页内容"
+            setPageTitle(title: "网页内容")
         }
         
         // 检查是否需要显示第三方内容banner
@@ -557,6 +589,7 @@ extension WxpWebViewController: WKNavigationDelegate {
         updateWebOptionBtnStatus()
     }
     
+    
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         // 设置错误时的标题
         title = "加载失败"
@@ -567,7 +600,6 @@ extension WxpWebViewController: WKNavigationDelegate {
         progressView.isHidden = true
         progressView.progress = 0.0
         loadingStartTime = nil
-        WxpToastUtils.shared.showToast(msg: "加载失败")
         updateWebOptionBtnStatus()
     }
     
@@ -575,6 +607,75 @@ extension WxpWebViewController: WKNavigationDelegate {
         updateWebOptionBtnStatus()
     }
     
+}
+
+//处理支付结果
+extension WxpWebViewController: WKScriptMessageHandler {
+    //处理h5调用native
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        if(message.name != "wxpusher"){
+            return
+        }
+        if(!isHostInWhitelist(self.webView?.url?.host)){
+            print("非白名单地址，不允许调用桥")
+            return
+        }
+        guard let messageBody = message.body as? [String: Any] else {
+            return
+        }
+        
+        guard let action = messageBody["action"] as? String,
+        let data = messageBody["data"] as? [String:Any] else {
+            return
+        }
+        if(action == "payRequest"){
+            WxpWeixinOpenManager.shared.requestPayment(with: data) { [weak self] result in
+                DispatchQueue.main.async {
+                    self?.handlePaymentResult(result, messageBody: messageBody)
+                }
+            }
+            return
+        }
+    }
+    
+    
+    /// 处理微信支付结果
+    private func handlePaymentResult(_ result: Result<Bool, WeChatError>, messageBody: [String: Any]) {
+        let isSuccess: Bool
+        let message: String
+        
+        switch result {
+        case .success(let success):
+            isSuccess = success
+            message = success ? "支付成功" : "支付失败"
+            
+        case .failure(let error):
+            isSuccess = false
+            message = error.localizedDescription
+        }
+        // 向 H5 页面发送支付结果
+        sendMsgToWebview(action: "payResponse" ,data: ["success":isSuccess,"message":message])
+    }
+    
+    /// 向 WebView 发送支付结果
+    private func sendMsgToWebview(action:String,data: [String: Any]) {
+        guard let webView = webView else { return }
+        do {
+            let jsonData = try JSONSerialization.data(withJSONObject: data)
+            let jsonString = String(data: jsonData, encoding: .utf8)!
+            let js = "window.dispatchEvent(new CustomEvent('nativeEvent_\(action)', { detail: '\(jsonString)'}));"
+            
+            webView.evaluateJavaScript(js) { result, error in
+                if let error = error {
+                    print("发送消息到 WebView 失败: \(error)")
+                } else {
+                    print("发送到webview成功消息")
+                }
+            }
+        } catch {
+            print("JSON序列化失败: \(error)")
+        }
+    }
 }
 
 extension WxpWebViewController: WKUIDelegate {

@@ -28,6 +28,7 @@
 		1A962E752E0B081300C966A3 /* WxpSaveKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E742E0B080A00C966A3 /* WxpSaveKey.swift */; };
 		1A962E772E0B09AD00C966A3 /* WxpDialogUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E762E0B09AD00C966A3 /* WxpDialogUtils.swift */; };
 		1A962E792E0B0B2100C966A3 /* WxpCommonBlockDef.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E782E0B0B1D00C966A3 /* WxpCommonBlockDef.swift */; };
+		1A9820732E96657E00758D7C /* WxpWeixinOpenManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9820722E96657300758D7C /* WxpWeixinOpenManager.swift */; };
 		1A9C3E702DF5963400A25249 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1A9C3E6F2DF5963400A25249 /* Launch Screen.storyboard */; };
 		1A9C3E732DF5984900A25249 /* WxpAppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E712DF5984900A25249 /* WxpAppDelegate.swift */; };
 		1A9C3E742DF5984900A25249 /* WxpSceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E722DF5984900A25249 /* WxpSceneDelegate.swift */; };
@@ -71,6 +72,7 @@
 		1A962E742E0B080A00C966A3 /* WxpSaveKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpSaveKey.swift; sourceTree = "<group>"; };
 		1A962E762E0B09AD00C966A3 /* WxpDialogUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpDialogUtils.swift; sourceTree = "<group>"; };
 		1A962E782E0B0B1D00C966A3 /* WxpCommonBlockDef.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpCommonBlockDef.swift; sourceTree = "<group>"; };
+		1A9820722E96657300758D7C /* WxpWeixinOpenManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpWeixinOpenManager.swift; sourceTree = "<group>"; };
 		1A9C3E6F2DF5963400A25249 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
 		1A9C3E712DF5984900A25249 /* WxpAppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpAppDelegate.swift; sourceTree = "<group>"; };
 		1A9C3E722DF5984900A25249 /* WxpSceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpSceneDelegate.swift; sourceTree = "<group>"; };
@@ -124,6 +126,7 @@
 		1A447DF42DF53ECD005C402F /* Page */ = {
 			isa = PBXGroup;
 			children = (
+				1A9820712E96650700758D7C /* Weixin */,
 				1ACFF6152E65E72000608219 /* ProviderList */,
 				1A49347A2E3DC6CD00EA1C71 /* Main */,
 				1A4934792E3DC6AC00EA1C71 /* Base */,
@@ -215,6 +218,14 @@
 				1A962E722E0B075600C966A3 /* UserAgreementViewController.swift */,
 			);
 			path = UserAgreement;
+			sourceTree = "<group>";
+		};
+		1A9820712E96650700758D7C /* Weixin */ = {
+			isa = PBXGroup;
+			children = (
+				1A9820722E96657300758D7C /* WxpWeixinOpenManager.swift */,
+			);
+			path = Weixin;
 			sourceTree = "<group>";
 		};
 		1A9C3E772DF5A02E00A25249 /* MessageList */ = {
@@ -516,6 +527,7 @@
 				1A447DF92DF53ECD005C402F /* MainTabBarController.swift in Sources */,
 				1A447DFA2DF53ECD005C402F /* WxpWebViewController.swift in Sources */,
 				1A962E752E0B081300C966A3 /* WxpSaveKey.swift in Sources */,
+				1A9820732E96657E00758D7C /* WxpWeixinOpenManager.swift in Sources */,
 				1A9C3E732DF5984900A25249 /* WxpAppDelegate.swift in Sources */,
 				1A9C3E742DF5984900A25249 /* WxpSceneDelegate.swift in Sources */,
 				1A962E6A2E08625700C966A3 /* WxpJumpPageUtils.swift in Sources */,
@@ -662,7 +674,7 @@
 				CODE_SIGN_ENTITLEMENTS = "WxPusher-iOS/wxpusher.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10202;
+				CURRENT_PROJECT_VERSION = 10300;
 				DEVELOPMENT_TEAM = 8UU533BM7N;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -670,6 +682,8 @@
 				INFOPLIST_FILE = "WxPusher-iOS/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WxPusher消息推送平台";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSCameraUsageDescription = "需要使用相机进行二维码扫描";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要访问相册以选择图片进行二维码识别";
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
@@ -680,7 +694,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.smjcco.wxpusher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -710,7 +724,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 10202;
+				CURRENT_PROJECT_VERSION = 10300;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 8UU533BM7N;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -719,6 +733,8 @@
 				INFOPLIST_FILE = "WxPusher-iOS/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WxPusher消息推送平台";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSCameraUsageDescription = "需要使用相机进行二维码扫描";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "需要访问相册以选择图片进行二维码识别";
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = "Launch Screen.storyboard";
@@ -729,7 +745,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.3.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.smjcco.wxpusher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

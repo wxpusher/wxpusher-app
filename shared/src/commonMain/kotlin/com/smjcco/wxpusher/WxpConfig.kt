@@ -5,6 +5,7 @@ import com.smjcco.wxpusher.base.common.WxpSaveService
 object WxpConfig {
     //后端地址
     var baseUrl: String = "https://wxpusher.zjiecode.com"
+//    var baseUrl: String = "http://wxpusher.test.zjiecode.com"
 
     //ws的地址，iOS用不上
     var wsUrl: String = "wss://wxpusher.zjiecode.com"
