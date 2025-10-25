@@ -46,12 +46,6 @@ class WxpWeixinOpenManager: NSObject {
         // 注册微信SDK
         let isRegistered = WXApi.registerApp(appId, universalLink: universalLink)
         print("微信SDK注册结果: \(isRegistered ? "成功" : "失败")")
-#if DEBUG
-        // 调用自检函数
-//        WXApi.checkUniversalLinkReady { step, result in
-//            print("\(step), \(result.success), \(result.errorInfo ?? ""), suggestion=\(result.suggestion ?? "")")
-//        }
-#endif
     }
     
     /// 检查是否安装微信
