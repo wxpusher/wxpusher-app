@@ -18,6 +18,8 @@ import com.smjcco.wxpusher.page.useragreement.WxpUserAgreementActivity
 import com.smjcco.wxpusher.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager
 import androidx.core.net.toUri
+import com.smjcco.wxpusher.base.common.WxpLogUtils
+import com.smjcco.wxpusher.base.common.WxpToastUtils
 
 
 object WxpJumpPageUtils {
@@ -88,9 +90,24 @@ object WxpJumpPageUtils {
 
     fun jumpToWebUrl(url: String, activity: Activity? = null) {
         withActivity(activity) {
-            val intent = Intent(it, WxpWebViewActivity::class.java);
-            intent.putExtra(WxpWebViewActivity.EXTRA_URL, url)
-            it.startActivity(intent)
+            try {
+                val uri = url.toUri()
+                val scheme = uri.scheme?.lowercase()
+                val webSchemes = listOf("http", "https", "about", "file")
+                if (webSchemes.contains(scheme)) {
+                    val intent = Intent(it, WxpWebViewActivity::class.java);
+                    intent.putExtra(WxpWebViewActivity.EXTRA_URL, url)
+                    it.startActivity(intent)
+                } else {
+                    //非标准webview能处理的链接， 使用系统打开
+                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                    it.startActivity(intent)
+
+                }
+            } catch (e: Exception) {
+                WxpToastUtils.showToast("无法打开链接,url=$url")
+                WxpLogUtils.w(message = "打开连接失败,url=${url}", throwable = e)
+            }
         }
     }
 
