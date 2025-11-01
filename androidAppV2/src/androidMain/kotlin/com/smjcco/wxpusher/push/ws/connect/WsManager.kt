@@ -60,7 +60,7 @@ object WsManager {
     //拒绝链接
     private var disableConnect = false
 
-    private lateinit var alarmManager: AlarmManager
+    private var alarmManager: AlarmManager? = null
 
 
     fun init() {
@@ -177,8 +177,8 @@ object WsManager {
         val reconnectTime = Calendar.getInstance()
         reconnectTime.add(Calendar.SECOND, retrySeconds)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (alarmManager.canScheduleExactAlarms()) {
-                alarmManager.setExact(
+            if (alarmManager?.canScheduleExactAlarms() == true) {
+                alarmManager?.setExact(
                     AlarmManager.RTC_WAKEUP,
                     reconnectTime.timeInMillis,
                     "WS-RECONNECT",
@@ -190,7 +190,7 @@ object WsManager {
                 ThreadUtils.runOnMainThread({ tryConnect() }, retrySeconds.toLong())
             }
         } else {
-            alarmManager.setExact(
+            alarmManager?.setExact(
                 AlarmManager.RTC_WAKEUP,
                 reconnectTime.timeInMillis,
                 "WS-RECONNECT",
