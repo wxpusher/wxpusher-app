@@ -6,6 +6,8 @@ import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.Message
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,6 +16,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.JavascriptInterface
 import android.webkit.JsResult
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceError
@@ -26,6 +29,8 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
+import com.google.gson.Gson
+import com.google.gson.JsonObject
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.WxpBaseFragment
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
@@ -34,6 +39,8 @@ import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.base.common.WxpDialogUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.utils.GsonUtils
+import com.smjcco.wxpusher.utils.ThreadUtils
 
 open class WxpWebViewFragment : WxpBaseFragment() {
     companion object Companion {
@@ -72,6 +79,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     private var targetUrl: String = ""
     private var showThirdPartyBanner = true
     private var lastLoadRequest: String? = null
+    private val gson = Gson()
 
 
     override fun onCreateView(
@@ -141,6 +149,9 @@ open class WxpWebViewFragment : WxpBaseFragment() {
 
         // 设置User-Agent
         webSettings.userAgentString = webSettings.userAgentString + "/WxPusher-Android"
+
+        // 添加JavaScript接口，兼容iOS的调用方式
+        webView.addJavascriptInterface(WxpWebBridgeInterface(), "wxpusher")
 
         webView.webViewClient = createWebViewClient()
         webView.webChromeClient = createWebChromeClient()
@@ -464,5 +475,114 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         super.onDestroy()
         webView.destroy()
     }
-}
 
+    /**
+     * JavaScript接口类，处理来自WebView的消息
+     */
+    inner class WxpWebBridgeInterface {
+
+        /**
+         * 接收来自JavaScript的消息
+         * JavaScript调用方式: window.wxpusher.postMessage(JSON.stringify({action: 'payRequest', data: {...}}))
+         */
+        @JavascriptInterface
+        fun postMessage(messageJson: String) {
+            ThreadUtils.runOnMainThread {
+                handleWebBridgeMessage(messageJson)
+            }
+        }
+    }
+
+    /**
+     * 处理WebBridge消息
+     */
+    private fun handleWebBridgeMessage(messageJson: String) {
+        try {
+            // 检查是否为白名单域名
+            val currentUrl = webView.url
+            if (!isHostInWhitelist(currentUrl?.toUri()?.host)) {
+                WxpLogUtils.w(message = "非白名单地址，不允许调用桥: $currentUrl")
+                return
+            }
+
+            // 解析JSON消息
+            val messageBody = GsonUtils.toObj(messageJson, JsonObject::class.java)
+            val action = messageBody?.get("action")?.asString ?: return
+            val dataElement = messageBody.get("data")
+
+            if (dataElement == null || !dataElement.isJsonObject) {
+                WxpLogUtils.w(message = "JS桥，消息格式错误: data字段不存在或不是对象")
+                return
+            }
+
+            val data = dataElement.asJsonObject
+            val dataMap = gson.fromJson(data, Map::class.java) as? Map<String, Any>
+                ?: return
+
+            when (action) {
+                "payRequest" -> {
+                    handlePayRequest(dataMap, messageBody)
+                }
+
+                else -> {
+                    WxpLogUtils.w(message = "未知的action: $action")
+                }
+            }
+        } catch (e: Exception) {
+            WxpLogUtils.w(message = "处理WebBridge消息失败", throwable = e)
+        }
+    }
+
+    /**
+     * 处理支付请求
+     */
+    private fun handlePayRequest(data: Map<String, Any>, messageBody: JsonObject) {
+        WxpLogUtils.i(message = "支付请求: $data")
+
+        // TODO: 拉起微信支付
+        sendMsgToWebView(
+            action = "payResponse",
+            data = mapOf("success" to true, "message" to "支付成功")
+        )
+    }
+
+    /**
+     * 处理支付结果
+     */
+    private fun handlePaymentResult(
+        isSuccess: Boolean,
+        errorMessage: String?,
+        messageBody: JsonObject
+    ) {
+        val result = mapOf(
+            "success" to isSuccess,
+            "message" to (errorMessage ?: if (isSuccess) "支付成功" else "支付失败")
+        )
+        sendMsgToWebView(action = "payResponse", data = result)
+    }
+
+    /**
+     * 向WebView发送消息
+     * 发送的消息会触发window上的CustomEvent: 'nativeEvent_{action}'
+     */
+    private fun sendMsgToWebView(action: String, data: Map<String, Any>) {
+        try {
+            val jsonData = GsonUtils.toJson(data)
+            // 使用单引号包裹JSON字符串，detail中存储的是JSON字符串
+            val js =
+                "window.dispatchEvent(new CustomEvent('nativeEvent_$action', { detail: '$jsonData' }));"
+
+            ThreadUtils.run {
+                webView.evaluateJavascript(js) { result ->
+                    if (result != null) {
+                        WxpLogUtils.d(message = "发送消息到WebView成功: action=$action")
+                    } else {
+                        WxpLogUtils.d(message = "发送消息到WebView失败: action=$action,result=$result")
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            WxpLogUtils.w(message = "发送消息到WebView失败: action=$action", throwable = e)
+        }
+    }
+}
