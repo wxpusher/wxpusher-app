@@ -20,6 +20,9 @@ class WxpProviderListFragment : WxpWebViewFragment(), IWxpProviderListView {
 
     override fun setupUI(view: View) {
         super.setupUI(view)
+        //隐藏左上角的返回按钮
+        getActivityHost()?.supportActionBar?.setDisplayHomeAsUpEnabled(false)
+        //覆盖webview默认的关闭按钮，改成home按钮
         val closeButton: ImageButton = view.findViewById(R.id.closeButton)
         closeButton.setImageResource(R.drawable.ic_home)
     }

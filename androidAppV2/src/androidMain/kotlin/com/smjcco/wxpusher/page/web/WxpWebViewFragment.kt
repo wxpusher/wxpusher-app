@@ -82,7 +82,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         return inflater.inflate(R.layout.fragment_webview, container, false)
     }
 
-    private fun getActivityHost(): AppCompatActivity? {
+    fun getActivityHost(): AppCompatActivity? {
         if (activity == null) {
             return null
         }
