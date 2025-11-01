@@ -155,7 +155,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         webSettings.setSupportZoom(true)
         webSettings.builtInZoomControls = true
         webSettings.displayZoomControls = false
-        webSettings.setSupportMultipleWindows(true)
+        webSettings.setSupportMultipleWindows(false)
         webSettings.mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
 
         // 设置User-Agent
@@ -268,21 +268,8 @@ open class WxpWebViewFragment : WxpBaseFragment() {
                 resultMsg: Message?
             ): Boolean {
                 // 处理target="_blank"链接
-                val newWebView = context?.let { WebView(it) }
-                newWebView?.webViewClient = object : WebViewClient() {
-                    override fun shouldOverrideUrlLoading(
-                        view: WebView?,
-                        request: WebResourceRequest?
-                    ): Boolean {
-                        val url = request?.url?.toString()
-                        if (!url.isNullOrEmpty()) {
-                            webView.loadUrl(url)
-                        }
-                        return true
-                    }
-                }
                 val transport = resultMsg?.obj as? WebView.WebViewTransport
-                transport?.webView = newWebView
+                transport?.webView = view
                 resultMsg?.sendToTarget()
                 return true
             }
