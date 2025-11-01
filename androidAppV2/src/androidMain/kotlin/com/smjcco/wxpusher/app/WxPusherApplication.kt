@@ -12,6 +12,7 @@ import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.base.common.init
 import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.thrid.weixin.WxpWeixinOpenManager
 import com.tencent.upgrade.bean.UpgradeConfig
 import com.tencent.upgrade.core.UpgradeManager
 
@@ -38,6 +39,8 @@ class WxPusherApplication : Application() {
         initTbs()
         //拉取一个简单的配置
         ConfigManager.init(this)
+        //初始化微信SDK
+        WxpWeixinOpenManager.init(this)
     }
 
 

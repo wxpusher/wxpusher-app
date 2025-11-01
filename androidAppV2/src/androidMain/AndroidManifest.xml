@@ -99,6 +99,16 @@
             android:name=".page.web.WxpWebViewActivity"
             android:exported="true" />
 
+        <!--微信回调Activity-->
+        <activity
+            android:name=".thrid.weixin.WXEntryActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:exported="true"
+            android:taskAffinity="${applicationId}"
+            android:launchMode="singleTask">
+        </activity>
+
         <!--自建长连接推送-->
 
 
@@ -231,5 +241,7 @@
         <intent>
             <action android:name="com.hihonor.push.action.BIND_PUSH_SERVICE" />
         </intent>
+        <!--微信包名，Android 11+需要-->
+        <package android:name="com.tencent.mm" />
     </queries>
 </manifest>

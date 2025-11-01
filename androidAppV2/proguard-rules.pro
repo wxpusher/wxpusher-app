@@ -113,6 +113,11 @@
 -dontwarn com.tencent.raft.measure.config.RAFTComConfig
 -dontwarn javax.lang.model.element.Modifier
 
+# 微信OpenSDK混淆规则
+-keep class com.tencent.mm.opensdk.** { *; }
+-keep class com.tencent.wxop.** { *; }
+-keep class com.tencent.mm.sdk.** { *; }
+
 #xiaomi推送
  -keep class com.smjcco.wxpusher.push.xiaomi.XiaomiPushMessageReceiver {*;}
  #华为推送

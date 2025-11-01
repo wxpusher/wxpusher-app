@@ -6,8 +6,6 @@ import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
 import android.os.Message
 import android.util.Log
 import android.view.LayoutInflater
@@ -29,7 +27,6 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
-import com.google.gson.Gson
 import com.google.gson.JsonObject
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.WxpBaseFragment
@@ -39,6 +36,7 @@ import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.base.common.WxpDialogUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.thrid.weixin.WxpWeixinOpenManager
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.ThreadUtils
 
@@ -79,7 +77,6 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     private var targetUrl: String = ""
     private var showThirdPartyBanner = true
     private var lastLoadRequest: String? = null
-    private val gson = Gson()
 
 
     override fun onCreateView(
@@ -516,7 +513,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
             }
 
             val data = dataElement.asJsonObject
-            val dataMap = gson.fromJson(data, Map::class.java) as? Map<String, Any>
+            val dataMap = GsonUtils.jsonToObj(data, Map::class.java) as? Map<String, Any?>
                 ?: return
 
             when (action) {
@@ -536,14 +533,23 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     /**
      * 处理支付请求
      */
-    private fun handlePayRequest(data: Map<String, Any>, messageBody: JsonObject) {
+    private fun handlePayRequest(data: Map<String, Any?>, messageBody: JsonObject) {
         WxpLogUtils.i(message = "支付请求: $data")
 
-        // TODO: 拉起微信支付
-        sendMsgToWebView(
-            action = "payResponse",
-            data = mapOf("success" to true, "message" to "支付成功")
-        )
+        WxpWeixinOpenManager.requestPayment(data) { resp, error ->
+            if (error != null) {
+                val msg = error.message ?: "支付失败"
+                sendMsgToWebView(
+                    action = "payResponse",
+                    data = mapOf("success" to false, "message" to msg)
+                )
+            } else {
+                sendMsgToWebView(
+                    action = "payResponse",
+                    data = mapOf("success" to true, "message" to "支付成功")
+                )
+            }
+        }
     }
 
     /**

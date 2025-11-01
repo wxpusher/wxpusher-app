@@ -2,6 +2,7 @@ package com.smjcco.wxpusher.utils
 
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.google.gson.JsonElement
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import java.lang.reflect.Type
 import kotlin.reflect.KClass
@@ -37,6 +38,18 @@ object GsonUtils {
             } catch (e: Throwable) {
                 WxpLogUtils.w("GSON", "序列化错误", e)
             }
+        }
+        return null
+    }
+
+    fun <T> jsonToObj(json: JsonElement?, cls: Class<T>?): T? {
+        if (json == null || cls == null) {
+            return null
+        }
+        try {
+            return GSON.fromJson(json, cls)
+        } catch (e: Throwable) {
+            WxpLogUtils.w("GSON", "序列化错误", e)
         }
         return null
     }

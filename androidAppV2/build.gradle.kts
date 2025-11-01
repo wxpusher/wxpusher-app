@@ -150,6 +150,8 @@ dependencies {
     implementation("io.github.scwang90:refresh-header-classics:3.0.0-alpha")
 
     implementation("com.google.zxing:core:3.3.3")
+    //微信sdk
+    implementation("com.tencent.mm.opensdk:wechat-sdk-android:6.8.34")
 
 }
 
