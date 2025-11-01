@@ -1,12 +1,17 @@
 package com.smjcco.wxpusher.page.web
 
+import android.content.ContentValues
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Message
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -36,9 +41,18 @@ import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.base.common.WxpDialogUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.dialog.ActionSheetDialogFragment
+import com.smjcco.wxpusher.dialog.ActionSheetItem
 import com.smjcco.wxpusher.thrid.weixin.WxpWeixinOpenManager
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.ThreadUtils
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
 
 open class WxpWebViewFragment : WxpBaseFragment() {
     companion object Companion {
@@ -215,6 +229,9 @@ open class WxpWebViewFragment : WxpBaseFragment() {
 
                 // 更新按钮状态
                 updateWebOptionBtnStatus()
+
+                // 注入JavaScript监听图片长按事件
+                injectImageLongPressListener()
             }
 
             override fun onReceivedError(
@@ -495,12 +512,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
      */
     private fun handleWebBridgeMessage(messageJson: String) {
         try {
-            // 检查是否为白名单域名
-            val currentUrl = webView.url
-            if (!isHostInWhitelist(currentUrl?.toUri()?.host)) {
-                WxpLogUtils.w(message = "非白名单地址，不允许调用桥: $currentUrl")
-                return
-            }
+
 
             // 解析JSON消息
             val messageBody = GsonUtils.toObj(messageJson, JsonObject::class.java)
@@ -513,12 +525,21 @@ open class WxpWebViewFragment : WxpBaseFragment() {
             }
 
             val data = dataElement.asJsonObject
-            val dataMap = GsonUtils.jsonToObj(data, Map::class.java) as? Map<String, Any?>
-                ?: return
-
+            val dataMap = GsonUtils.jsonToObj(data, Map::class.java) as? Map<String, Any?> ?: return
             when (action) {
                 "payRequest" -> {
+                    // 检查是否为白名单域名
+                    val currentUrl = webView.url
+                    if (!isHostInWhitelist(currentUrl?.toUri()?.host)) {
+                        WxpLogUtils.w(message = "非白名单地址，不允许调用桥: $currentUrl")
+                        return
+                    }
                     handlePayRequest(dataMap, messageBody)
+                }
+
+                "imageLongPress" -> {
+                    val imageUrl = dataMap["imageUrl"] as? String ?: ""
+                    handleImageLongPress(imageUrl)
                 }
 
                 else -> {
@@ -589,6 +610,215 @@ open class WxpWebViewFragment : WxpBaseFragment() {
             }
         } catch (e: Exception) {
             WxpLogUtils.w(message = "发送消息到WebView失败: action=$action", throwable = e)
+        }
+    }
+
+    /**
+     * 注入JavaScript代码监听图片长按事件
+     */
+    private fun injectImageLongPressListener() {
+        val js = """
+            (function() {
+                function handleImageLongPress(imgSrc) {
+                    if (imgSrc && imgSrc.startsWith('http')) {
+                        if (window.wxpusher && window.wxpusher.postMessage) {
+                            var message = JSON.stringify({
+                                action: 'imageLongPress',
+                                data: { imageUrl: imgSrc }
+                            });
+                            window.wxpusher.postMessage(message);
+                        }
+                    }
+                }
+                
+                var images = document.getElementsByTagName('img');
+                for (var i = 0; i < images.length; i++) {
+                    images[i].addEventListener('contextmenu', function(e) {
+                        e.preventDefault();
+                        handleImageLongPress(this.src);
+                    });
+                }
+                
+                // 使用 MutationObserver 监听动态添加的图片
+                var observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        mutation.addedNodes.forEach(function(node) {
+                            if (node.nodeType === 1) {
+                                if (node.tagName === 'IMG') {
+                                    node.addEventListener('contextmenu', function(e) {
+                                        e.preventDefault();
+                                        handleImageLongPress(this.src);
+                                    });
+                                }
+                                // 检查子节点中的图片
+                                var imgs = node.getElementsByTagName('img');
+                                for (var j = 0; j < imgs.length; j++) {
+                                    imgs[j].addEventListener('contextmenu', function(e) {
+                                        e.preventDefault();
+                                        handleImageLongPress(this.src);
+                                    });
+                                }
+                            }
+                        });
+                    });
+                });
+                
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            })();
+        """.trimIndent()
+
+        webView.evaluateJavascript(js, null)
+    }
+
+    /**
+     * 处理图片长按事件
+     */
+    private fun handleImageLongPress(imageUrl: String) {
+        if (imageUrl.isBlank()) {
+            return
+        }
+
+        WxpLogUtils.d(message = "图片长按: $imageUrl")
+
+        // 显示菜单
+        showImageActionSheet(imageUrl)
+    }
+
+    /**
+     * 显示图片操作菜单
+     */
+    private fun showImageActionSheet(imageUrl: String) {
+        val saveImageItem = ActionSheetItem("保存图片") {
+            saveImage(imageUrl)
+        }
+
+        val scanQrCodeItem = ActionSheetItem("扫描二维码") {
+            // TODO: 实现扫描二维码功能
+            WxpToastUtils.showToast("扫描二维码功能待实现")
+        }
+
+        val actionList = listOf(
+            listOf(saveImageItem, scanQrCodeItem)
+        )
+
+        ActionSheetDialogFragment(actionList).show(
+            requireActivity().supportFragmentManager,
+            "image_action_sheet"
+        )
+    }
+
+    /**
+     * 保存图片到相册
+     */
+    private fun saveImage(imageUrl: String) {
+        if (imageUrl.isBlank()) {
+            WxpToastUtils.showToast("图片地址无效")
+            return
+        }
+
+        WxpToastUtils.showToast("正在保存...")
+
+        // 在后台线程下载图片并保存
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val bitmap = downloadImage(imageUrl)
+                if (bitmap != null) {
+                    val saved = saveBitmapToGallery(bitmap)
+                    withContext(Dispatchers.Main) {
+                        if (saved) {
+                            WxpToastUtils.showToast("保存成功")
+                        } else {
+                            WxpToastUtils.showToast("保存失败")
+                        }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        WxpToastUtils.showToast("下载图片失败")
+                    }
+                }
+            } catch (e: Exception) {
+                WxpLogUtils.w(message = "保存图片失败", throwable = e)
+                withContext(Dispatchers.Main) {
+                    WxpToastUtils.showToast("保存失败: ${e.message}")
+                }
+            }
+        }
+    }
+
+    /**
+     * 下载图片
+     */
+    private suspend fun downloadImage(imageUrl: String): Bitmap? {
+        return withContext(Dispatchers.IO) {
+            try {
+                val url = URL(imageUrl)
+                val connection = url.openConnection() as HttpURLConnection
+                connection.connectTimeout = 10000
+                connection.readTimeout = 10000
+                connection.doInput = true
+                connection.connect()
+
+                val inputStream: InputStream = connection.inputStream
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                inputStream.close()
+                connection.disconnect()
+
+                bitmap
+            } catch (e: Exception) {
+                WxpLogUtils.w(message = "下载图片失败: $imageUrl", throwable = e)
+                null
+            }
+        }
+    }
+
+    /**
+     * 保存Bitmap到相册
+     */
+    private suspend fun saveBitmapToGallery(bitmap: Bitmap): Boolean {
+        return withContext(Dispatchers.IO) {
+            try {
+                val context = this@WxpWebViewFragment.context ?: return@withContext false
+
+                val contentValues = ContentValues().apply {
+                    put(
+                        MediaStore.MediaColumns.DISPLAY_NAME,
+                        "WxPusher_${System.currentTimeMillis()}.jpg"
+                    )
+                    put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        put(MediaStore.MediaColumns.RELATIVE_PATH, "Pictures/WxPusher")
+                        put(MediaStore.MediaColumns.IS_PENDING, 1)
+                    }
+                }
+
+                val uri = context.contentResolver.insert(
+                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                    contentValues
+                ) ?: return@withContext false
+
+                context.contentResolver.openOutputStream(uri)?.use { outputStream ->
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                }
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    contentValues.clear()
+                    contentValues.put(MediaStore.MediaColumns.IS_PENDING, 0)
+                    context.contentResolver.update(uri, contentValues, null, null)
+                }
+
+                // 通知媒体库更新
+                val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                intent.data = uri
+                context.sendBroadcast(intent)
+
+                true
+            } catch (e: Exception) {
+                WxpLogUtils.w(message = "保存图片到相册失败", throwable = e)
+                false
+            }
         }
     }
 }
