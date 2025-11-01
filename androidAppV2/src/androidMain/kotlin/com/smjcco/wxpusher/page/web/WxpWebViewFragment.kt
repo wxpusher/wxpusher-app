@@ -35,7 +35,7 @@ import com.smjcco.wxpusher.base.common.WxpDialogUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 
-class WxpWebViewFragment : WxpBaseFragment() {
+open class WxpWebViewFragment : WxpBaseFragment() {
     companion object Companion {
         const val EXTRA_URL = "extra_url"
         private const val DEVICE_TOKEN_KEY = "deviceToken"
@@ -94,19 +94,16 @@ class WxpWebViewFragment : WxpBaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        targetUrl = arguments?.getString(EXTRA_URL) ?: ""
-        if (targetUrl.isEmpty()) {
-            WxpToastUtils.showToast("无效的链接")
-            activity?.finish()
-            return
-        }
-
         setupUI(view)
         setupWebView()
-        loadWebContent()
+        targetUrl = arguments?.getString(EXTRA_URL) ?: ""
+        if (targetUrl.isEmpty()) {
+            return
+        }
+        loadWebContent(targetUrl)
     }
 
-    private fun setupUI(view: View) {
+    open fun setupUI(view: View) {
         // 设置标题
         activity?.title = ""
         getActivityHost()?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -282,7 +279,7 @@ class WxpWebViewFragment : WxpBaseFragment() {
         }
     }
 
-    private fun loadWebContent() {
+    fun loadWebContent(targetUrl: String) {
         val headers = createRequestWithTokenIfNeeded(targetUrl)
         webView.loadUrl(targetUrl, headers)
     }
@@ -365,7 +362,7 @@ class WxpWebViewFragment : WxpBaseFragment() {
         webView.reload()
     }
 
-    private fun onCloseButtonClicked() {
+    open fun onCloseButtonClicked() {
         activity?.finish()
     }
 
@@ -468,3 +465,4 @@ class WxpWebViewFragment : WxpBaseFragment() {
         webView.destroy()
     }
 }
+

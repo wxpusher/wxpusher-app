@@ -22,6 +22,7 @@ import com.smjcco.wxpusher.common.WxpSaveKey
 import com.smjcco.wxpusher.page.main.fragment.ITabMenuProvider
 import com.smjcco.wxpusher.page.main.fragment.MessageListFragment
 import com.smjcco.wxpusher.page.main.fragment.ProfileFragment
+import com.smjcco.wxpusher.page.main.fragment.WxpProviderListFragment
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
 import com.smjcco.wxpusher.utils.PermissionRequester
@@ -51,7 +52,8 @@ class WxpMainActivity : WxpBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
-        fragmentList = listOf<Fragment>(MessageListFragment(), ProfileFragment())
+        fragmentList =
+            listOf<Fragment>(MessageListFragment(), WxpProviderListFragment(), ProfileFragment())
         // 初始化视图
         initViews()
 
@@ -162,6 +164,11 @@ class WxpMainActivity : WxpBaseActivity() {
                 }
 
                 1 -> {
+                    tab.text = "消息市场"
+                    tab.setIcon(R.drawable.ic_home)
+                }
+
+                2 -> {
                     tab.text = "我的"
                     tab.setIcon(R.drawable.ic_person)
                 }
