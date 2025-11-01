@@ -7,7 +7,6 @@ import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Message
@@ -43,7 +42,7 @@ import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.dialog.ActionSheetDialogFragment
 import com.smjcco.wxpusher.dialog.ActionSheetItem
-import com.smjcco.wxpusher.thrid.weixin.WxpWeixinOpenManager
+import com.smjcco.wxpusher.wxapi.WxpWeixinOpenManager
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.ThreadUtils

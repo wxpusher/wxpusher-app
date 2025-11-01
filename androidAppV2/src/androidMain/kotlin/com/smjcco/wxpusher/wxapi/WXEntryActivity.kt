@@ -1,4 +1,4 @@
-package com.smjcco.wxpusher.thrid.weixin
+package com.smjcco.wxpusher.wxapi
 
 import android.content.Intent
 import android.os.Bundle
