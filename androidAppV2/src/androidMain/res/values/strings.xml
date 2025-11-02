@@ -76,7 +76,7 @@
     <string name="unbind_title">注销账号</string>
     <string name="unbind_description">你即将注销账号，注销以后\n当前手机号不能再登录。</string>
     <string name="unbind_confirmation_text">请注意：\n\n• 注销后，当前绑定的手机号将无法再次登录\n• 如需继续使用服务，需要重新注册新账号\n\n请确认您已了解上述风险，并确定要继续注销操作。</string>
-    <string name="unbind_input_hint">请输入【注销账号】</string>
+    <string name="unbind_input_hint">请输入【注销账号】4个汉字</string>
     <string name="unbind_confirm_button">确认注销</string>
     <string name="unbind_cancel">取消</string>
 </resources>
