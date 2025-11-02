@@ -82,6 +82,9 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     private var showThirdPartyBanner = true
     private var lastLoadRequest: String? = null
 
+    //图片长按菜单
+    private var imageActionSheetDialogFragment: ActionSheetDialogFragment? = null
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -663,12 +666,13 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         val actionList = listOf(
             listOf(saveImageItem)
         )
-
-        ActionSheetDialogFragment(actionList).show(
+        imageActionSheetDialogFragment?.dismiss()
+        imageActionSheetDialogFragment = ActionSheetDialogFragment(actionList)
+        imageActionSheetDialogFragment?.show(
             requireActivity().supportFragmentManager,
             "image_action_sheet"
         )
-        DeviceUtils.vibrator(50)
+        DeviceUtils.vibrator(100)
     }
 
     /**
