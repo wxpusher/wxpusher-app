@@ -165,7 +165,7 @@ class WxpMainActivity : WxpBaseActivity() {
 
                 1 -> {
                     tab.text = "消息市场"
-                    tab.setIcon(R.drawable.ic_home)
+                    tab.setIcon(R.drawable.ic_cloud)
                 }
 
                 2 -> {
