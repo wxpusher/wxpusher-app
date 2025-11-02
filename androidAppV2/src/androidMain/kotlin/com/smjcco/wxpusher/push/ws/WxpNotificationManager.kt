@@ -133,7 +133,7 @@ object WxpNotificationManager {
      * 创建通知分组
      */
     fun createNotificationChannelGroup(id: String, name: String) {
-        if (!hasNotificationChannelGroup(id)) {
+        if (hasNotificationChannelGroup(id)) {
             return
         }
         val group = NotificationChannelGroup(id, name)
