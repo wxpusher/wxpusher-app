@@ -672,7 +672,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
             requireActivity().supportFragmentManager,
             "image_action_sheet"
         )
-        DeviceUtils.vibrator(50)
+        DeviceUtils.vibrator()
     }
 
     /**

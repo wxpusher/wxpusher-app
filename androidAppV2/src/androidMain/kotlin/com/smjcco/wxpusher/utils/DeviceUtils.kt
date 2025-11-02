@@ -117,15 +117,19 @@ object DeviceUtils {
     /**
      * 调用设备振动
      */
-    fun vibrator(time: Int) {
+    fun vibrator(time: Int = 50) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val vibratorManager = ApplicationUtils.getApplication()
                 .getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager?
             val vibrator = vibratorManager?.defaultVibrator
-            // 使用预定义的键盘敲击效果
-            vibrator?.vibrate(
-                VibrationEffect.createOneShot(time.toLong(), VibrationEffect.DEFAULT_AMPLITUDE)
-            )
+
+            if (time < 100) {
+                vibrator?.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK))
+            } else {
+                vibrator?.vibrate(
+                    VibrationEffect.createOneShot(time.toLong(), VibrationEffect.DEFAULT_AMPLITUDE)
+                )
+            }
         } else {
             val vibrator = ApplicationUtils.getApplication()
                 .getSystemService(Context.VIBRATOR_SERVICE) as? Vibrator

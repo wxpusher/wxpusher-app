@@ -262,7 +262,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
 
     override fun onFeedback() {
         // 震动反馈
-        DeviceUtils.vibrator(50)
+        DeviceUtils.vibrator()
     }
 
     override fun onOpenSubscribeManagerPage(url: String) {

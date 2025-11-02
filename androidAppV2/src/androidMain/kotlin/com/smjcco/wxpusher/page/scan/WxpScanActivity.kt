@@ -365,7 +365,7 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
         isScanning = false
         stopScanLineAnimation()
 
-        DeviceUtils.vibrator(50)
+        DeviceUtils.vibrator()
 
         presenter.scan(result)
     }
