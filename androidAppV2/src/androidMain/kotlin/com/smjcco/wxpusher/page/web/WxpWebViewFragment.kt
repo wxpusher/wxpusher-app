@@ -672,13 +672,13 @@ open class WxpWebViewFragment : WxpBaseFragment() {
             saveImage(imageUrl)
         }
 
-        val scanQrCodeItem = ActionSheetItem("扫描二维码") {
-            // TODO: 实现扫描二维码功能
-            WxpToastUtils.showToast("扫描二维码功能待实现")
-        }
+//        val scanQrCodeItem = ActionSheetItem("扫描二维码") {
+//            // TODO: 实现扫描二维码功能
+//            WxpToastUtils.showToast("扫描二维码功能待实现")
+//        }
 
         val actionList = listOf(
-            listOf(saveImageItem, scanQrCodeItem)
+            listOf(saveImageItem)
         )
 
         ActionSheetDialogFragment(actionList).show(
