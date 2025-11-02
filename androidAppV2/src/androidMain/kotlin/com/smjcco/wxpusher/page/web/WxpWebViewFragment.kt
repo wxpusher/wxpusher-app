@@ -159,6 +159,32 @@ open class WxpWebViewFragment : WxpBaseFragment() {
 
         webView.webViewClient = createWebViewClient()
         webView.webChromeClient = createWebChromeClient()
+
+        // 设置长按监听器，用于检测图片长按事件
+        webView.setOnLongClickListener { view ->
+            handleWebViewLongClick(view as WebView)
+        }
+    }
+
+    /**
+     * 处理WebView长按事件
+     * 使用HitTestResult检测是否点击了图片
+     */
+    private fun handleWebViewLongClick(webView: WebView): Boolean {
+        val hitTestResult = webView.hitTestResult
+        val type = hitTestResult.type
+
+        // 检测是否为图片类型
+        if (type == WebView.HitTestResult.IMAGE_TYPE ||
+            type == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE
+        ) {
+            val imageUrl = hitTestResult.extra
+            if (!imageUrl.isNullOrBlank()) {
+                handleImageLongPress(imageUrl)
+            }
+            return true
+        }
+        return false
     }
 
     private fun createWebViewClient(): WebViewClient {
@@ -222,9 +248,6 @@ open class WxpWebViewFragment : WxpBaseFragment() {
 
                 // 更新按钮状态
                 updateWebOptionBtnStatus()
-
-                // 注入JavaScript监听图片长按事件
-                injectImageLongPressListener()
             }
 
             override fun onReceivedError(
@@ -492,8 +515,6 @@ open class WxpWebViewFragment : WxpBaseFragment() {
      */
     private fun handleWebBridgeMessage(messageJson: String) {
         try {
-
-
             // 解析JSON消息
             val messageBody = GsonUtils.toObj(messageJson, JsonObject::class.java)
             val action = messageBody?.get("action")?.asString ?: return
@@ -515,11 +536,6 @@ open class WxpWebViewFragment : WxpBaseFragment() {
                         return
                     }
                     handlePayRequest(dataMap, messageBody)
-                }
-
-                "imageLongPress" -> {
-                    val imageUrl = dataMap["imageUrl"] as? String ?: ""
-                    handleImageLongPress(imageUrl)
                 }
 
                 else -> {
@@ -577,75 +593,13 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     }
 
     /**
-     * 注入JavaScript代码监听图片长按事件
-     */
-    private fun injectImageLongPressListener() {
-        val js = """
-            (function() {
-                function handleImageLongPress(imgSrc) {
-                    if (imgSrc && imgSrc.startsWith('http')) {
-                        if (window.wxpusher && window.wxpusher.postMessage) {
-                            var message = JSON.stringify({
-                                action: 'imageLongPress',
-                                data: { imageUrl: imgSrc }
-                            });
-                            window.wxpusher.postMessage(message);
-                        }
-                    }
-                }
-                
-                var images = document.getElementsByTagName('img');
-                for (var i = 0; i < images.length; i++) {
-                    images[i].addEventListener('contextmenu', function(e) {
-                        e.preventDefault();
-                        handleImageLongPress(this.src);
-                    });
-                }
-                
-                // 使用 MutationObserver 监听动态添加的图片
-                var observer = new MutationObserver(function(mutations) {
-                    mutations.forEach(function(mutation) {
-                        mutation.addedNodes.forEach(function(node) {
-                            if (node.nodeType === 1) {
-                                if (node.tagName === 'IMG') {
-                                    node.addEventListener('contextmenu', function(e) {
-                                        e.preventDefault();
-                                        handleImageLongPress(this.src);
-                                    });
-                                }
-                                // 检查子节点中的图片
-                                var imgs = node.getElementsByTagName('img');
-                                for (var j = 0; j < imgs.length; j++) {
-                                    imgs[j].addEventListener('contextmenu', function(e) {
-                                        e.preventDefault();
-                                        handleImageLongPress(this.src);
-                                    });
-                                }
-                            }
-                        });
-                    });
-                });
-                
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
-            })();
-        """.trimIndent()
-
-        webView.evaluateJavascript(js, null)
-    }
-
-    /**
      * 处理图片长按事件
      */
     private fun handleImageLongPress(imageUrl: String) {
         if (imageUrl.isBlank()) {
             return
         }
-
         WxpLogUtils.d(message = "图片长按: $imageUrl")
-
         // 显示菜单
         showImageActionSheet(imageUrl)
     }
