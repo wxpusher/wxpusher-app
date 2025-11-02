@@ -153,6 +153,7 @@ class WxpMainActivity : WxpBaseActivity() {
     private fun setupViewPager() {
         pagerAdapter = MainPagerAdapter(this)
         viewPager.adapter = pagerAdapter
+        viewPager.isUserInputEnabled = false
 
         // 连接TabLayout和ViewPager2
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
