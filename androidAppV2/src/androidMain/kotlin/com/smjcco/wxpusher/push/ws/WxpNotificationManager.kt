@@ -10,6 +10,7 @@ import android.content.Intent
 import android.os.Build
 import android.provider.Settings
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.page.WebViewActivity
@@ -122,7 +123,7 @@ object WxpNotificationManager {
     /**
      * 初始化消息通知分组
      */
-    private fun initNotificationChannelGroup() {
+     fun initNotificationChannelGroup() {
         ChannelGroup.entries.forEach {
             createNotificationChannelGroup(it.id, it.title)
         }
@@ -131,15 +132,22 @@ object WxpNotificationManager {
     /**
      * 创建通知分组
      */
-    private fun createNotificationChannelGroup(id: String, name: String) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
-            return
-        }
-        if (getSysNotificationManager().getNotificationChannelGroup(id) != null) {
+    fun createNotificationChannelGroup(id: String, name: String) {
+        if (!hasNotificationChannelGroup(id)) {
             return
         }
         val group = NotificationChannelGroup(id, name)
         getSysNotificationManager().createNotificationChannelGroup(group)
+    }
+
+    fun hasNotificationChannelGroup(id: String): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            return true
+        }
+        if (getSysNotificationManager().getNotificationChannelGroup(id) != null) {
+            return true
+        }
+        return false;
     }
 
     /**

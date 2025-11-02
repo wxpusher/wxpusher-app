@@ -20,6 +20,7 @@ import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.page.main.WxpMainActivity
+import com.smjcco.wxpusher.page.web.WxpImageSaveHelper
 import com.smjcco.wxpusher.push.ws.ChannelGroup
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager
 import com.smjcco.wxpusher.push.ws.connect.WsManager
@@ -189,6 +190,10 @@ class KeepWsAliveService : Service() {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     setAllowBubbles(false)
                 }
+            }
+            //线上发现，发送通知的时候，没有group，所以这里兜底一下
+            if (!WxpNotificationManager.hasNotificationChannelGroup(ChannelGroup.WxPusherSystem.id)) {
+                WxpNotificationManager.initNotificationChannelGroup()
             }
             notificationManager.createNotificationChannel(channel)
         }
