@@ -25,7 +25,6 @@ import java.net.URL
 class WxpImageSaveHelper(private val context: Context) {
 
     companion object {
-        private const val TAG = "WxpImageSaveHelper"
         private const val CONNECT_TIMEOUT = 10000
         private const val READ_TIMEOUT = 10000
     }
