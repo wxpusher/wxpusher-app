@@ -6,14 +6,14 @@ import androidx.appcompat.app.AppCompatActivity
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 
 /**
- * 微信回调Activity
+ * 微信回调Activity，主要是分享
  *
  * 注意事项：
  * 1. 此Activity必须放在wxapi包名下
  * 2. 此Activity必须在AndroidManifest.xml中注册
  * 3. 不要添加intent-filter，避免Android 13无法回跳
  */
-class WXEntryActivity : AppCompatActivity() {
+open class WXEntryActivity : AppCompatActivity() {
 
     private val TAG = "WXEntryActivity"
 

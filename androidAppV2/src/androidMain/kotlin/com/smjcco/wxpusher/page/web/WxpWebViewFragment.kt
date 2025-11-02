@@ -551,38 +551,21 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     }
 
     /**
-     * 处理支付结果
-     */
-    private fun handlePaymentResult(
-        isSuccess: Boolean,
-        errorMessage: String?,
-        messageBody: JsonObject
-    ) {
-        val result = mapOf(
-            "success" to isSuccess,
-            "message" to (errorMessage ?: if (isSuccess) "支付成功" else "支付失败")
-        )
-        sendMsgToWebView(action = "payResponse", data = result)
-    }
-
-    /**
      * 向WebView发送消息
      * 发送的消息会触发window上的CustomEvent: 'nativeEvent_{action}'
      */
     private fun sendMsgToWebView(action: String, data: Map<String, Any>) {
         try {
             val jsonData = GsonUtils.toJson(data)
+            WxpLogUtils.i(message = "发送数据给webview，action=$action,data=$jsonData")
             // 使用单引号包裹JSON字符串，detail中存储的是JSON字符串
             val js =
                 "window.dispatchEvent(new CustomEvent('nativeEvent_$action', { detail: '$jsonData' }));"
-
-            ThreadUtils.run {
-                webView.evaluateJavascript(js) { result ->
-                    if (result != null) {
-                        WxpLogUtils.d(message = "发送消息到WebView成功: action=$action")
-                    } else {
-                        WxpLogUtils.d(message = "发送消息到WebView失败: action=$action,result=$result")
-                    }
+            webView.evaluateJavascript(js) { result ->
+                if (result != null) {
+                    WxpLogUtils.d(message = "发送消息到WebView成功: action=$action")
+                } else {
+                    WxpLogUtils.d(message = "发送消息到WebView失败: action=$action,result=$result")
                 }
             }
         } catch (e: Exception) {
