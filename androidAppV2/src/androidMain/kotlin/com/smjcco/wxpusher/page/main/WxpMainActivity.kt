@@ -38,7 +38,7 @@ class WxpMainActivity : WxpBaseActivity() {
 
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout
-    private lateinit var fragmentList: List<Fragment>
+    private lateinit var pagerAdapter: MainPagerAdapter
     private var currentMenuProvider: ITabMenuProvider? = null
     private var currentMenu: Menu? = null
 
@@ -52,8 +52,6 @@ class WxpMainActivity : WxpBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
-        fragmentList =
-            listOf<Fragment>(MessageListFragment(), WxpProviderListFragment(), ProfileFragment())
         // 初始化视图
         initViews()
 
@@ -153,7 +151,8 @@ class WxpMainActivity : WxpBaseActivity() {
 
 
     private fun setupViewPager() {
-        viewPager.adapter = MainPagerAdapter(this, fragmentList)
+        pagerAdapter = MainPagerAdapter(this)
+        viewPager.adapter = pagerAdapter
 
         // 连接TabLayout和ViewPager2
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
@@ -243,15 +242,14 @@ class WxpMainActivity : WxpBaseActivity() {
      * 根据当前tab位置更新菜单
      */
     private fun updateMenuForCurrentTab(position: Int) {
-        val fragment = fragmentList[position]
+        val fragment = pagerAdapter.getFragmentAt(position)
         if (fragment is ITabMenuProvider) {
             currentMenuProvider = fragment
-            // 重新创建菜单
-            invalidateOptionsMenu()
         } else {
             currentMenuProvider = null
-            invalidateOptionsMenu()
         }
+        // 重新创建菜单
+        invalidateOptionsMenu()
     }
 
     override fun onResume() {
@@ -268,17 +266,37 @@ class WxpMainActivity : WxpBaseActivity() {
 
     /**
      * ViewPager2适配器
+     * 让FragmentStateAdapter来管理Fragment的创建和状态保存/恢复
      */
     private inner class MainPagerAdapter(
-        activity: AppCompatActivity,
-        var fragmentList: List<Fragment>
+        activity: AppCompatActivity
     ) :
         FragmentStateAdapter(activity) {
 
-        override fun getItemCount(): Int = fragmentList.size
+        override fun getItemCount(): Int = 3
 
         override fun createFragment(position: Int): Fragment {
-            return fragmentList[position]
+            return when (position) {
+                0 -> MessageListFragment()
+                1 -> WxpProviderListFragment()
+                2 -> ProfileFragment()
+                else -> throw IllegalArgumentException("Invalid position: $position")
+            }
+        }
+
+        /**
+         * 获取指定位置的Fragment实例
+         * 用于在菜单更新时获取当前Fragment
+         * ViewPager2使用的Fragment tag格式是 "f" + getItemId(position)
+         */
+        fun getFragmentAt(position: Int): Fragment? {
+            return try {
+                val fragmentId = getItemId(position)
+                // ViewPager2使用的Fragment tag格式是 "f" + fragmentId
+                supportFragmentManager.findFragmentByTag("f$fragmentId")
+            } catch (e: Exception) {
+                null
+            }
         }
     }
 }
