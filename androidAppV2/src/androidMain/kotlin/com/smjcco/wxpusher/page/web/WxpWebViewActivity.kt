@@ -25,9 +25,7 @@ class WxpWebViewActivity : WxpBaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_webview)
-        if (savedInstanceState != null) {
-            return
-        }
+
         val targetUrl = intent.getStringExtra(EXTRA_URL) ?: ""
         if (targetUrl.isEmpty()) {
             WxpToastUtils.showToast("无效的链接")
