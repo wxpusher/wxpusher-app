@@ -187,7 +187,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
                         val intent = Intent(Intent.ACTION_VIEW, uri)
                         startActivity(intent)
                     } catch (e: Exception) {
-                        WxpToastUtils.showToast("无法打开链接")
+                        WxpToastUtils.showToast("无法打开链接，reason=${e.message}")
                         WxpLogUtils.w(message = "打开连接失败,url=${uri}", throwable = e)
                     }
                     true
@@ -704,4 +704,12 @@ open class WxpWebViewFragment : WxpBaseFragment() {
                 }
             )
     }
+
+    override fun onDestroyView() {
+        webView.stopLoading()
+        webView.setWebChromeClient(null)
+        webView.destroy()
+        super.onDestroyView()
+    }
+
 }
