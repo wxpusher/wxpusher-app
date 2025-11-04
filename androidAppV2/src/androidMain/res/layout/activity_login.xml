@@ -231,6 +231,82 @@
 
             </LinearLayout>
 
+            <!-- 第三方登录分割线 -->
+            <View
+                android:id="@+id/divider_left"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="32dp"
+                android:layout_marginTop="32dp"
+                android:layout_marginEnd="8dp"
+                android:alpha="0.3"
+                android:background="@color/check_description_color"
+                app:layout_constraintBottom_toBottomOf="@+id/other_login_label"
+                app:layout_constraintEnd_toStartOf="@+id/other_login_label"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/privacy_container" />
+
+            <TextView
+                android:id="@+id/other_login_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="其他登录方式"
+                android:textColor="@color/check_description_color"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/privacy_container" />
+
+            <View
+                android:id="@+id/divider_right"
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="32dp"
+                android:alpha="0.3"
+                android:background="@color/check_description_color"
+                app:layout_constraintBottom_toBottomOf="@+id/other_login_label"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/other_login_label"
+                app:layout_constraintTop_toTopOf="@+id/other_login_label" />
+
+            <!-- 微信登录 -->
+            <LinearLayout
+                android:id="@+id/weixin_login_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="8dp"
+                android:paddingEnd="16dp"
+                android:paddingBottom="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/other_login_label">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/weixin_login_icon"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:src="@drawable/ic_weixin" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/weixin_login_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="微信登录"
+                    android:textColor="@color/text_fit_theme"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View

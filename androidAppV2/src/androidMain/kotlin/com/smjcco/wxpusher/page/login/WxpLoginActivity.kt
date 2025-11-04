@@ -27,6 +27,7 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
     private lateinit var loginButton: MaterialButton
     private lateinit var privacyCheckbox: MaterialCheckBox
     private lateinit var privacyLabel: TextView
+    private lateinit var weixinLoginContainer: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +56,7 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
         loginButton = findViewById(R.id.login_button)
         privacyCheckbox = findViewById(R.id.privacy_checkbox)
         privacyLabel = findViewById(R.id.privacy_label)
+        weixinLoginContainer = findViewById(R.id.weixin_login_container)
     }
 
     private fun setupClickListeners() {
@@ -74,6 +76,14 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
             presenter.verifyCodeLogin(phone = phone, verifyCode = code)
         }
 
+        weixinLoginContainer.setOnClickListener {
+            onWeixinLoginClick()
+        }
+
+    }
+
+    private fun onWeixinLoginClick() {
+        // TODO: 实现微信登录逻辑
     }
 
     private fun setupPrivacyLabel() {
