@@ -21,3 +21,26 @@ data class WxpLoginSendVerifyCodeResp(
     val uid: String?,
     val openId: String?,
 )
+
+/**
+ * 微信登录
+ */
+@Serializable
+data class WxpWeixinLoginReq(
+    val code: String,
+    val bindCode: String?,//如果是绑定手机号的
+    val deviceId: String?,
+    val deviceName: String?,
+    val pushToken: String?,
+)
+
+/**
+ * 微信登录结果
+ */
+@Serializable
+data class WxpWeixinLoginResp(
+    val deviceToken: String?,
+    val deviceId: String?,
+    val uid: String?,
+    val openId: String?,
+)

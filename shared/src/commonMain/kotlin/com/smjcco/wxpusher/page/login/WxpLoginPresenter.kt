@@ -102,4 +102,33 @@ class WxpLoginPresenter(view: IWxpLoginView) :
             }
         }
     }
+
+    override fun wexinLogin(code: String?) {
+        if (code.isNullOrEmpty()) {
+            WxpToastUtils.showToast("微信授权码错误")
+            return
+        }
+        val weixinLoginReq = WxpWeixinLoginReq(
+            code, null,
+            deviceId = WxpAppDataService.getLoginInfo()?.deviceId,
+            deviceName = WxpBaseInfoService.getDeviceName(),
+            pushToken = WxpAppDataService.getPushToken()
+        )
+        
+        runAtMainSuspend {
+            val loginData = WxpApiService.weixinLogin(weixinLoginReq)
+            loginData?.let {
+                val loginInfo = WxpLoginInfo(
+                    deviceId = it.deviceId,
+                    deviceToken = it.deviceToken,
+                    uid = it.uid,
+                    openId = it.openId
+                )
+                WxpAppDataService.saveLoginInfo(loginInfo)
+                WxpAppDataService.updateDeviceInfo()
+                view?.onGoMain()
+            }
+        }
+
+    }
 }

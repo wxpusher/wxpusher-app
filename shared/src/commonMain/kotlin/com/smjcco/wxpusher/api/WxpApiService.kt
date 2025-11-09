@@ -8,6 +8,8 @@ import com.smjcco.wxpusher.base.biz.WxpAppPageService
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
+import com.smjcco.wxpusher.page.login.WxpWeixinLoginReq
+import com.smjcco.wxpusher.page.login.WxpWeixinLoginResp
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
 import com.smjcco.wxpusher.page.scan.WxpScanQrcodeResp
@@ -118,6 +120,18 @@ object WxpApiService {
         }, errorBlock = {
             WxpToastUtils.showToast("失败," + it.message)
         }, successBlock = { successBlock?.invoke() })
+    }
+
+    /**
+     * 通过微信授权码进行登录
+     */
+    suspend fun weixinLogin(req: WxpWeixinLoginReq): WxpWeixinLoginResp? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .post(WxpNetworkService.getUrl("/api/device/weixin-login")) {
+                    setBody(req)
+                }.body()
+        })
     }
 
     /**

@@ -15,9 +15,11 @@ import com.google.android.material.textfield.TextInputEditText
 import com.smjcco.wxpusher.BuildConfig
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.WxpBaseMvpActivity
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.common.WxpConstants
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
+import com.smjcco.wxpusher.wxapi.WxpWeixinOpenManager
 
 class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView {
 
@@ -83,7 +85,13 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
     }
 
     private fun onWeixinLoginClick() {
-        // TODO: 实现微信登录逻辑
+        WxpWeixinOpenManager.requestAuth { response, error ->
+            if (error != null) {
+                WxpToastUtils.showToast(error.message)
+                return@requestAuth
+            }
+            presenter.wexinLogin(response?.code)
+        }
     }
 
     private fun setupPrivacyLabel() {
