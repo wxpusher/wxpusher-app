@@ -79,6 +79,17 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    
+    // 签名配置必须在buildTypes之前定义
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("debug.jks")
+            storePassword = "jz19941002"
+            keyAlias = "smjcco"
+            keyPassword = "jz19941002"
+        }
+    }
+    
     buildTypes {
         getByName("release") {
             // true - 打开混淆
@@ -95,17 +106,10 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+    
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
-    }
-    signingConfigs {
-        getByName("debug") {
-            storeFile = file("debug.jks")
-            storePassword = "jz19941002"
-            keyAlias = "smjcco"
-            keyPassword = "jz19941002"
-        }
     }
 
 
