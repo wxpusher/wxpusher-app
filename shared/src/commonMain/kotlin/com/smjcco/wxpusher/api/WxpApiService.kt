@@ -214,7 +214,7 @@ object WxpApiService {
      * 在用户没有openid的时候，查询一下用户的openid
      */
     suspend fun getOpenId(): String? {
-        val data: Map<String, String>? = commonRespDeal(block = {
+        val data: Map<String?, String?>? = commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .get(WxpNetworkService.getUrl("/api/need-login/device/openid"))
                 .body()
