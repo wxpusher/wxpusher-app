@@ -64,8 +64,8 @@ android {
         applicationId = "com.smjcco.wxpusher"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 10504
-        versionName = "1.5.4"
+        versionCode = 10505
+        versionName = "1.5.5"
         //指定产物名称
         setProperty("archivesBaseName", "wxpusher-app-v$versionName")
         
