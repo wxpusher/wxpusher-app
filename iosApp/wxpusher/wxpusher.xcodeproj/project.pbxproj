@@ -678,6 +678,8 @@
 				DEVELOPMENT_TEAM = 8UU533BM7N;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "WxPusher-iOS/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WxPusher消息推送平台";
@@ -729,6 +731,8 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 8UU533BM7N;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				EXCLUDED_ARCHS = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "WxPusher-iOS/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = "WxPusher消息推送平台";
