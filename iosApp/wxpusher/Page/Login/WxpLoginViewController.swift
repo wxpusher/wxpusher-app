@@ -1,8 +1,8 @@
 import UIKit
-import Moya
-import RxSwift
 import Toaster
 import shared
+import AuthenticationServices
+
 class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWxpLoginView {
     
     // MARK: - UI Components
@@ -174,8 +174,16 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
     
     // MARK: - Actions
     @objc private func jumpPrivacy(){
-        WxpJumpPageUtils.jumpToWebUrl(url: StringConstants.privateUrl)
-//        self.navigationController?.pushViewController(WxpWebViewController(url: URL(string:StringConstants.privateUrl)!), animated: true)
+        //        WxpJumpPageUtils.jumpToWebUrl(url: StringConstants.privateUrl)
+        
+        let request = ASAuthorizationAppleIDProvider().createRequest()
+        // 设置请求的 Scope，定义你希望从用户那里获取的信息
+        request.requestedScopes = [.fullName,.email] // 请求用户的姓名和邮箱
+        
+        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+        authorizationController.delegate = self
+        authorizationController.presentationContextProvider = self
+        authorizationController.performRequests()
     }
     
     @objc private func getCodeButtonTapped() {
@@ -220,5 +228,61 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
     }
     override func createPresenter() -> Any? {
         WxpLoginPresenter(view: self)
+    }
+}
+
+// 处理授权结果的委托
+extension WxpLoginViewController: ASAuthorizationControllerDelegate {
+
+    // 授权成功
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
+            // 获取用户唯一标识符，对于该用户和开发者来说是唯一的
+            let userIdentifier = appleIDCredential.user
+            // 这是一个 JSON Web Token (JWT)，如果需与后端服务器验证，需要传递此令牌
+            let identityToken = appleIDCredential.identityToken
+            // 也是一个 JWT，用于刷新令牌
+            let authorizationCode = appleIDCredential.authorizationCode
+
+            // 只有在首次授权时（或用户重置了其 Apple ID 设置后）才会提供姓名和邮箱
+            let fullName = appleIDCredential.fullName
+            let email = appleIDCredential.email
+
+            // 处理登录逻辑：
+            // 1. 将 userIdentifier 保存到 Keychain 或 UserDefaults，用于下次检查登录状态。
+            // 2. 如果 email 和 fullName 不为空，可能是新用户，将其注册到你的后端服务器。
+            // 3. 将 identityToken 或 authorizationCode 发送给你的后端服务器进行验证。
+
+            // 示例：打印信息
+            print("User ID: \(userIdentifier)")
+            print("User Email: \(email ?? "")")
+            if let givenName = fullName?.givenName, let familyName = fullName?.familyName {
+                print("User Name: \(givenName) \(familyName)")
+            }
+            // 登录成功，跳转到主界面
+//            self.navigateToMainScreen()
+        }
+    }
+
+    // 授权失败
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        // 处理错误
+        let authError = ASAuthorizationError(_nsError: error as NSError)
+        switch authError.code {
+        case .canceled:
+            print("用户取消了授权。")
+        case .unknown, .invalidResponse, .notHandled, .failed:
+            print("授权失败: \(error.localizedDescription)")
+        default:
+            break
+        }
+    }
+}
+
+// 提供呈现上下文的委托
+extension WxpLoginViewController: ASAuthorizationControllerPresentationContextProviding {
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        // 返回授权界面应该出现在哪个窗口上
+        return self.view.window!
     }
 }

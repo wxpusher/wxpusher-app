@@ -44,3 +44,27 @@ data class WxpWeixinLoginResp(
     val uid: String?,
     val openId: String?,
 )
+
+
+/**
+ * 苹果登录
+ */
+@Serializable
+data class WxpAppleLoginReq(
+    val code: String,
+    val bindCode: String?,//如果是绑定手机号的
+    val deviceId: String?,
+    val deviceName: String?,
+    val pushToken: String?,
+)
+
+/**
+ * 苹果登录结果
+ */
+@Serializable
+data class WxpAppleLoginResp(
+    val deviceToken: String?,
+    val deviceId: String?,
+    val uid: String?,
+    val openId: String?,
+)

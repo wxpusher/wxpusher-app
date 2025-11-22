@@ -6,6 +6,8 @@ import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.base.biz.bean.WxpUpdateInfoReq
 import com.smjcco.wxpusher.base.biz.WxpAppPageService
 import com.smjcco.wxpusher.base.common.WxpLogUtils
+import com.smjcco.wxpusher.page.login.WxpAppleLoginReq
+import com.smjcco.wxpusher.page.login.WxpAppleLoginResp
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 import com.smjcco.wxpusher.page.login.WxpWeixinLoginReq
@@ -129,6 +131,18 @@ object WxpApiService {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .post(WxpNetworkService.getUrl("/api/device/weixin-login")) {
+                    setBody(req)
+                }.body()
+        })
+    }
+
+    /**
+     * 苹果登录
+     */
+    suspend fun appleLogin(req: WxpAppleLoginReq): WxpAppleLoginResp? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .post(WxpNetworkService.getUrl("/api/device/apple-login")) {
                     setBody(req)
                 }.body()
         })

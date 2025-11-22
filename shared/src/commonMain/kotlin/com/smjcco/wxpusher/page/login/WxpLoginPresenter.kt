@@ -131,4 +131,31 @@ class WxpLoginPresenter(view: IWxpLoginView) :
         }
 
     }
+    override fun appleLogin(code: String?) {
+        if (code.isNullOrEmpty()) {
+            WxpToastUtils.showToast("苹果登录信息为空")
+            return
+        }
+        val appleLoginReq = WxpAppleLoginReq(
+            code, null,
+            deviceId = WxpAppDataService.getLoginInfo()?.deviceId,
+            deviceName = WxpBaseInfoService.getDeviceName(),
+            pushToken = WxpAppDataService.getPushToken()
+        )
+
+        runAtMainSuspend {
+            val loginData = WxpApiService.appleLogin(appleLoginReq)
+            loginData?.let {
+                val loginInfo = WxpLoginInfo(
+                    deviceId = it.deviceId,
+                    deviceToken = it.deviceToken,
+                    uid = it.uid,
+                    openId = it.openId
+                )
+                WxpAppDataService.saveLoginInfo(loginInfo)
+                WxpAppDataService.updateDeviceInfo()
+                view?.onGoMain()
+            }
+        }
+    }
 }

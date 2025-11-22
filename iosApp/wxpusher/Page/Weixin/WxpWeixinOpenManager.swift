@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import WechatOpenSDK
 
 /// 微信管理单例类
 class WxpWeixinOpenManager: NSObject {

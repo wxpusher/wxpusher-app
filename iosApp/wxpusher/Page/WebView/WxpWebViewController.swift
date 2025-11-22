@@ -1,7 +1,6 @@
 import UIKit
 
 import shared
-import WechatOpenSDK
 
 @preconcurrency import WebKit
 class WxpWebViewController: UIViewController {
