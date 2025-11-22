@@ -3,38 +3,15 @@ inhibit_all_warnings!
 use_modular_headers!
 
 def pods
-  pod 'Moya/RxSwift', '15.0.0'
-  pod 'ExytePopupView','1.2.1'
+#  pod 'Moya/RxSwift', '15.0.0'
+#  pod 'ExytePopupView','1.2.1'
 
-  #    pod 'SnapKit'
-  #    pod 'Material'
-  #    pod 'KVOController'
-  #    pod 'SVProgressHUD'
-  #    pod 'FDFullscreenPopGesture'
-  #    pod 'Moya/RxSwift'
-  #    pod 'ObjectMapper'
-  #    pod 'SwiftyJSON'
-  #    pod 'DeviceKit'
-  #    pod 'IceCream'
-  #    pod 'CryptoSwift'
-  #    pod 'IQKeyboardManagerSwift'
-  #
-  #    pod 'RxSwift'
-  #    pod 'RxCocoa'
-  #    pod 'RxGesture'
-  #    pod 'RxDataSources'
-  #    pod 'NSObject+Rx'
-  #
-  #    pod 'MJRefresh'
-  #    pod 'Kingfisher'
-  #    pod 'DropDown'
 end
 
 
 target 'WxPusher-iOS' do
   platform:ios,'13.0'
   project "wxpusher/wxpusher.xcodeproj"
-  pods
   pod 'Toaster', '2.3.0'
   pod 'MJRefresh', '3.7.9'
   pod 'WechatOpenSDK-XCFramework', '2.0.5'
@@ -49,4 +26,16 @@ target 'WxPusher-Mac' do
   
 end
 
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      # 确保所有 pod 都支持 arm64 模拟器
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'NO'
+      config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = ""
+      
+      # 设置最低 iOS 版本
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '13.0'
+    end
+  end
+end
 

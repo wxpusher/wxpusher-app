@@ -1,33 +1,19 @@
 PODS:
-  - Alamofire (5.8.0)
-  - ExytePopupView (1.2.1)
   - MJRefresh (3.7.9)
-  - Moya/Core (15.0.0):
-    - Alamofire (~> 5.0)
-  - Moya/RxSwift (15.0.0):
-    - Moya/Core
-    - RxSwift (~> 6.0)
-  - RxSwift (6.6.0)
   - shared (1.0):
     - Toaster (= 2.3.0)
   - Toaster (2.3.0)
   - WechatOpenSDK-XCFramework (2.0.5)
 
 DEPENDENCIES:
-  - ExytePopupView (= 1.2.1)
   - MJRefresh (= 3.7.9)
-  - Moya/RxSwift (= 15.0.0)
   - shared (from `../shared`)
   - Toaster (= 2.3.0)
   - WechatOpenSDK-XCFramework (= 2.0.5)
 
 SPEC REPOS:
   trunk:
-    - Alamofire
-    - ExytePopupView
     - MJRefresh
-    - Moya
-    - RxSwift
     - Toaster
     - WechatOpenSDK-XCFramework
 
@@ -36,15 +22,11 @@ EXTERNAL SOURCES:
     :path: "../shared"
 
 SPEC CHECKSUMS:
-  Alamofire: 0e92e751b3e9e66d7982db43919d01f313b8eb91
-  ExytePopupView: e0554c9713665a386a54b356c596858811e84621
   MJRefresh: ff9e531227924c84ce459338414550a05d2aea78
-  Moya: 138f0573e53411fb3dc17016add0b748dfbd78ee
-  RxSwift: a4b44f7d24599f674deebd1818eab82e58410632
   shared: f70abb4412b47a88dd39768078ea98270a675a5a
   Toaster: c3473963c78e8cabbf6ea6f11ad0fdaae6f54987
   WechatOpenSDK-XCFramework: b072030c9eeee91dfff1856a7846f70f7b9a88ed
 
-PODFILE CHECKSUM: dcd50eb02d39cda0825c1335d18be47cbe2cf182
+PODFILE CHECKSUM: ea36281b2064275ab519803ff43cd4ce608415f9
 
 COCOAPODS: 1.15.2
