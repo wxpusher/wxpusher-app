@@ -86,6 +86,52 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         return label
     }()
     
+    private lazy var thirdPartyLoginLabel: UILabel = {
+        let label = UILabel()
+        label.text = "其他登录方式"
+        label.font = .systemFont(ofSize: 12)
+        label.textColor = .gray
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var wechatLoginButton: UIButton = {
+        let button = UIButton(type: .custom)
+        button.setImage(UIImage(named: "ic_weixin"), for: .normal)
+        button.imageView?.contentMode = .scaleAspectFit
+        // 调整内边距，控制图标大小
+        button.contentHorizontalAlignment = .fill
+        button.contentVerticalAlignment = .fill
+        button.imageEdgeInsets = UIEdgeInsets(top: 8, left: 8, bottom: 8, right: 8)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private lazy var appleLoginButton: UIButton = {
+        let button = UIButton(type: .custom)
+        // 使用 Medium 字重，视觉上更协调
+        let config = UIImage.SymbolConfiguration(weight: .medium)
+        button.setImage(UIImage(systemName: "applelogo", withConfiguration: config), for: .normal)
+        button.tintColor = .label
+        button.imageView?.contentMode = .scaleAspectFit
+        button.contentHorizontalAlignment = .fill
+        button.contentVerticalAlignment = .fill
+        // 苹果Logo形状特殊，稍微调小一点内边距使其视觉大小接近圆形图标
+        button.imageEdgeInsets = UIEdgeInsets(top: 4, left: 4, bottom:4, right: 4)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private lazy var thirdPartyStackView: UIStackView = {
+        let stack = UIStackView(arrangedSubviews: [appleLoginButton, wechatLoginButton])
+        stack.axis = .horizontal
+        stack.spacing = 20
+        stack.distribution = .fillEqually
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
+
     private lazy var copyrightLabel: UILabel = {
         let label = UILabel()
         label.text = "© 2025 WxPusher"
@@ -121,6 +167,8 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         view.addSubview(loginButton)
         view.addSubview(privacyCheckbox)
         view.addSubview(privacyLabel)
+        view.addSubview(thirdPartyLoginLabel)
+        view.addSubview(thirdPartyStackView)
         view.addSubview(copyrightLabel)
         
         // Setup constraints
@@ -129,8 +177,21 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
             copyrightLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             copyrightLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
+            // 第三方登录
+            thirdPartyStackView.bottomAnchor.constraint(equalTo: copyrightLabel.topAnchor, constant: -40),
+            thirdPartyStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            thirdPartyStackView.heightAnchor.constraint(equalToConstant: 60),
+            
+            wechatLoginButton.widthAnchor.constraint(equalToConstant: 60),
+            wechatLoginButton.heightAnchor.constraint(equalToConstant: 60),
+            appleLoginButton.widthAnchor.constraint(equalToConstant: 60),
+            appleLoginButton.heightAnchor.constraint(equalToConstant: 60),
+            
+            thirdPartyLoginLabel.bottomAnchor.constraint(equalTo: thirdPartyStackView.topAnchor, constant: -16),
+            thirdPartyLoginLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            
             // 主体内容垂直居中
-            titleLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -120),
+            titleLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -140),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
@@ -168,11 +229,23 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         getCodeButton.addTarget(self, action: #selector(getCodeButtonTapped), for: .touchUpInside)
         loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
         privacyCheckbox.addTarget(self, action: #selector(privacyCheckboxTapped), for: .touchUpInside)
+        
+        //三方登录
+        appleLoginButton.addTarget(self, action: #selector(appleLoginButtonTapped), for: .touchUpInside)
+        wechatLoginButton.addTarget(self, action: #selector(wechatLoginButtonTapped), for: .touchUpInside)
     }
     
    
     
     // MARK: - Actions
+    @objc private func wechatLoginButtonTapped() {
+        
+    }
+    
+    @objc private func appleLoginButtonTapped() {
+        
+    }
+
     @objc private func jumpPrivacy(){
         //        WxpJumpPageUtils.jumpToWebUrl(url: StringConstants.privateUrl)
         
