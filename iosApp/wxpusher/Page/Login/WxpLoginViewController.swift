@@ -5,6 +5,8 @@ import AuthenticationServices
 
 class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWxpLoginView {
     
+    private var isPhoneLoginMode = false
+    
     // MARK: - UI Components
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
@@ -25,6 +27,7 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         return label
     }()
     
+    // MARK: Phone Login Components
     private lazy var phoneTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "手机号"
@@ -63,6 +66,75 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         return button
     }()
     
+    private lazy var phoneLoginContainer: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        view.isHidden = true
+        return view
+    }()
+    
+    // MARK: Main Third Party Components
+    private lazy var mainAppleLoginButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.backgroundColor = UIColor.defAppleBtnBg
+        button.setTitle("  通过 Apple 登录", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
+        button.layer.cornerRadius = 4
+        
+        let config = UIImage.SymbolConfiguration(pointSize: 18, weight: .medium)
+        button.setImage(UIImage(systemName: "applelogo", withConfiguration: config), for: .normal)
+        button.tintColor = .white
+        
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private lazy var mainWechatLoginButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.backgroundColor = UIColor(red: 7/255.0, green: 193/255.0, blue: 96/255.0, alpha: 1.0) // WeChat Green
+        button.setTitle("  通过   微信   登录", for: .normal)
+        button.setTitleColor(.white, for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 17, weight: .medium)
+        button.layer.cornerRadius = 4
+        
+        if let image = UIImage(named: "ic_weixin_btn") {
+            // 调整图片大小
+            let targetHeight: CGFloat = 24
+            let scale = targetHeight / image.size.height
+            let targetWidth = image.size.width * scale
+            let targetSize = CGSize(width: targetWidth, height: targetHeight)
+            
+            let renderer = UIGraphicsImageRenderer(size: targetSize)
+            let scaledImage = renderer.image { _ in
+                image.draw(in: CGRect(origin: .zero, size: targetSize))
+            }
+            
+            // 使用原图渲染，不强制模板模式，防止图标变成白块
+            button.setImage(scaledImage.withRenderingMode(.alwaysOriginal), for: .normal)
+        }
+        
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private lazy var mainThirdPartyContainer: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    // MARK: Common Components
+    private lazy var loginContentStackView: UIStackView = {
+        let stack = UIStackView()
+        stack.axis = .vertical
+        stack.alignment = .fill
+        stack.distribution = .fill
+        stack.spacing = 20
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        return stack
+    }()
+    
     private lazy var privacyCheckbox: UIButton = {
         let button = UIButton(type: .custom)
         button.setImage(UIImage(systemName: "circle"), for: .normal)
@@ -86,13 +158,15 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         return label
     }()
     
+    // MARK: Bottom Switcher & Small Icons
     private lazy var thirdPartyLoginLabel: UILabel = {
         let label = UILabel()
         label.text = "其他登录方式"
-        label.font = .systemFont(ofSize: 12)
+        label.font = .systemFont(ofSize: 14)
         label.textColor = .gray
         label.textAlignment = .center
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.isUserInteractionEnabled = true
         return label
     }()
     
@@ -152,32 +226,82 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         title = "登录"
         setupUI()
         presenter.doInit()
+        updateUIState()
     }
     
     // MARK: - Setup
     private func setupUI() {
         view.backgroundColor = .systemBackground
         
-        // Add subviews
+        // Build Phone Login Container
+        phoneLoginContainer.addSubview(phoneTextField)
+        phoneLoginContainer.addSubview(codeTextField)
+        phoneLoginContainer.addSubview(getCodeButton)
+        phoneLoginContainer.addSubview(loginButton)
+        
+        NSLayoutConstraint.activate([
+            phoneTextField.topAnchor.constraint(equalTo: phoneLoginContainer.topAnchor),
+            phoneTextField.leadingAnchor.constraint(equalTo: phoneLoginContainer.leadingAnchor, constant: 24),
+            phoneTextField.trailingAnchor.constraint(equalTo: phoneLoginContainer.trailingAnchor, constant: -24),
+            phoneTextField.heightAnchor.constraint(equalToConstant: 40),
+            
+            codeTextField.topAnchor.constraint(equalTo: phoneTextField.bottomAnchor, constant: 12),
+            codeTextField.leadingAnchor.constraint(equalTo: phoneLoginContainer.leadingAnchor, constant: 24),
+            codeTextField.trailingAnchor.constraint(equalTo: getCodeButton.leadingAnchor, constant: -12),
+            codeTextField.heightAnchor.constraint(equalToConstant: 40),
+            
+            getCodeButton.centerYAnchor.constraint(equalTo: codeTextField.centerYAnchor),
+            getCodeButton.trailingAnchor.constraint(equalTo: phoneLoginContainer.trailingAnchor, constant: -24),
+            getCodeButton.widthAnchor.constraint(equalToConstant: 130),
+            getCodeButton.heightAnchor.constraint(equalToConstant: 40),
+            
+            loginButton.topAnchor.constraint(equalTo: codeTextField.bottomAnchor, constant: 12),
+            loginButton.leadingAnchor.constraint(equalTo: phoneLoginContainer.leadingAnchor, constant: 24),
+            loginButton.trailingAnchor.constraint(equalTo: phoneLoginContainer.trailingAnchor, constant: -24),
+            loginButton.heightAnchor.constraint(equalToConstant: 40),
+            
+            loginButton.bottomAnchor.constraint(equalTo: phoneLoginContainer.bottomAnchor)
+        ])
+        
+        // Build Main Third Party Container
+        mainThirdPartyContainer.addSubview(mainAppleLoginButton)
+        mainThirdPartyContainer.addSubview(mainWechatLoginButton)
+        
+        NSLayoutConstraint.activate([
+            mainAppleLoginButton.topAnchor.constraint(equalTo: mainThirdPartyContainer.topAnchor),
+            mainAppleLoginButton.leadingAnchor.constraint(equalTo: mainThirdPartyContainer.leadingAnchor, constant: 24),
+            mainAppleLoginButton.trailingAnchor.constraint(equalTo: mainThirdPartyContainer.trailingAnchor, constant: -24),
+            mainAppleLoginButton.heightAnchor.constraint(equalToConstant: 44),
+            
+            mainWechatLoginButton.topAnchor.constraint(equalTo: mainAppleLoginButton.bottomAnchor, constant: 16),
+            mainWechatLoginButton.leadingAnchor.constraint(equalTo: mainThirdPartyContainer.leadingAnchor, constant: 24),
+            mainWechatLoginButton.trailingAnchor.constraint(equalTo: mainThirdPartyContainer.trailingAnchor, constant: -24),
+            mainWechatLoginButton.heightAnchor.constraint(equalToConstant: 44),
+            
+            mainWechatLoginButton.bottomAnchor.constraint(equalTo: mainThirdPartyContainer.bottomAnchor)
+        ])
+        
+        // Add subviews to main view
         view.addSubview(titleLabel)
         view.addSubview(subtitleLabel)
-        view.addSubview(phoneTextField)
-        view.addSubview(codeTextField)
-        view.addSubview(getCodeButton)
-        view.addSubview(loginButton)
+        
+        loginContentStackView.addArrangedSubview(mainThirdPartyContainer)
+        loginContentStackView.addArrangedSubview(phoneLoginContainer)
+        view.addSubview(loginContentStackView)
+        
         view.addSubview(privacyCheckbox)
         view.addSubview(privacyLabel)
         view.addSubview(thirdPartyLoginLabel)
         view.addSubview(thirdPartyStackView)
         view.addSubview(copyrightLabel)
         
-        // Setup constraints
+        // Setup Main Constraints
         NSLayoutConstraint.activate([
-            // 版权信息固定在底部
+            // Copyright
             copyrightLabel.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -20),
             copyrightLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            // 第三方登录
+            // Bottom Switcher / Small Icons
             thirdPartyStackView.bottomAnchor.constraint(equalTo: copyrightLabel.topAnchor, constant: -40),
             thirdPartyStackView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             thirdPartyStackView.heightAnchor.constraint(equalToConstant: 60),
@@ -190,32 +314,20 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
             thirdPartyLoginLabel.bottomAnchor.constraint(equalTo: thirdPartyStackView.topAnchor, constant: -16),
             thirdPartyLoginLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            // 主体内容垂直居中
-            titleLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -140),
+            // Header
+            titleLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: -160),
             titleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
             subtitleLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 4),
             subtitleLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             
-            phoneTextField.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 24),
-            phoneTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            phoneTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+            // Content Area
+            loginContentStackView.topAnchor.constraint(equalTo: subtitleLabel.bottomAnchor, constant: 40),
+            loginContentStackView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            loginContentStackView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             
-            codeTextField.topAnchor.constraint(equalTo: phoneTextField.bottomAnchor, constant: 12),
-            codeTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            codeTextField.trailingAnchor.constraint(equalTo: getCodeButton.leadingAnchor, constant: -12),
-            
-            getCodeButton.centerYAnchor.constraint(equalTo: codeTextField.centerYAnchor),
-            getCodeButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            getCodeButton.widthAnchor.constraint(equalToConstant: 130),
-            getCodeButton.heightAnchor.constraint(equalToConstant: 40),
-            
-            loginButton.topAnchor.constraint(equalTo: codeTextField.bottomAnchor, constant: 12),
-            loginButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            loginButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
-            loginButton.heightAnchor.constraint(equalToConstant: 40),
-            
-            privacyCheckbox.topAnchor.constraint(equalTo: loginButton.bottomAnchor, constant: 12),
+            // Privacy
+            privacyCheckbox.topAnchor.constraint(equalTo: loginContentStackView.bottomAnchor, constant: 20),
             privacyCheckbox.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
             
             privacyLabel.centerYAnchor.constraint(equalTo: privacyCheckbox.centerYAnchor),
@@ -226,37 +338,77 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(jumpPrivacy))
         privacyLabel.addGestureRecognizer(tapGesture)
         
+        let switchModeGesture = UITapGestureRecognizer(target: self, action: #selector(handleSwitchLoginMode))
+        thirdPartyLoginLabel.addGestureRecognizer(switchModeGesture)
+        
         getCodeButton.addTarget(self, action: #selector(getCodeButtonTapped), for: .touchUpInside)
         loginButton.addTarget(self, action: #selector(loginButtonTapped), for: .touchUpInside)
         privacyCheckbox.addTarget(self, action: #selector(privacyCheckboxTapped), for: .touchUpInside)
         
-        //三方登录
+        // 3rd Party Actions
+        mainAppleLoginButton.addTarget(self, action: #selector(appleLoginButtonTapped), for: .touchUpInside)
+        mainWechatLoginButton.addTarget(self, action: #selector(wechatLoginButtonTapped), for: .touchUpInside)
+        
         appleLoginButton.addTarget(self, action: #selector(appleLoginButtonTapped), for: .touchUpInside)
         wechatLoginButton.addTarget(self, action: #selector(wechatLoginButtonTapped), for: .touchUpInside)
+    }
+    
+    private func updateUIState() {
+        if isPhoneLoginMode {
+            // Phone Mode
+            phoneLoginContainer.isHidden = false
+            mainThirdPartyContainer.isHidden = true
+            
+            thirdPartyLoginLabel.text = "其他登录方式"
+            thirdPartyLoginLabel.textColor = .gray
+            thirdPartyStackView.isHidden = false
+        } else {
+            // Third Party Mode (Default)
+            phoneLoginContainer.isHidden = true
+            mainThirdPartyContainer.isHidden = false
+            
+            thirdPartyLoginLabel.text = "使用手机号登录"
+            thirdPartyLoginLabel.textColor = UIColor.defAccentPrimaryColor
+            thirdPartyStackView.isHidden = true
+        }
+    }
+    
+    @objc private func handleSwitchLoginMode() {
+        isPhoneLoginMode.toggle()
+        updateUIState()
     }
     
    
     
     // MARK: - Actions
     @objc private func wechatLoginButtonTapped() {
-        
+        if !privacyCheckbox.isSelected {
+            WxpToastUtils.shared.showToast(msg: "请先同意用户和隐私协议")
+            return
+        }
+        // Wechat login logic...
     }
     
     @objc private func appleLoginButtonTapped() {
-        
+        if !privacyCheckbox.isSelected {
+            WxpToastUtils.shared.showToast(msg: "请先同意用户和隐私协议")
+            return
+        }
+        handleAppleLogin()
     }
-
-    @objc private func jumpPrivacy(){
-        //        WxpJumpPageUtils.jumpToWebUrl(url: StringConstants.privateUrl)
-        
+    
+    private func handleAppleLogin() {
         let request = ASAuthorizationAppleIDProvider().createRequest()
-        // 设置请求的 Scope，定义你希望从用户那里获取的信息
-        request.requestedScopes = [.fullName,.email] // 请求用户的姓名和邮箱
+        request.requestedScopes = [.fullName, .email]
         
         let authorizationController = ASAuthorizationController(authorizationRequests: [request])
         authorizationController.delegate = self
         authorizationController.presentationContextProvider = self
         authorizationController.performRequests()
+    }
+
+    @objc private func jumpPrivacy(){
+        WxpJumpPageUtils.jumpToWebUrl(url: StringConstants.privateUrl)
     }
     
     @objc private func getCodeButtonTapped() {
@@ -282,10 +434,6 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
     }
     
     // MARK: - MVP-VIEW
-//    func onGoBind(phone: String, code: String, data: WxpLoginSendVerifyCodeResp) {
-//        navigationController?.setViewControllers([WxpBindPhoneViewController(phone: phone, code: code, phoneVerifyCode: data.phoneVerifyCode ?? "")], animated: true)
-//    }
-    
     func onGoBindOrCreateAccount(data: WxpBindPageData) {
         
     }
@@ -332,7 +480,7 @@ extension WxpLoginViewController: ASAuthorizationControllerDelegate {
             WxpToastUtils.shared.showToast(msg: "无法将 Identity Token 转换为字符串")
             return
         }
-        appleIDCredential.authorizationCode
+        // appleIDCredential.authorizationCode // Warning: result unused
         
         // 只有在首次授权时（或用户重置了其 Apple ID 设置后）才会提供姓名和邮箱
         let fullName = appleIDCredential.fullName

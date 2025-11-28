@@ -19,6 +19,8 @@ extension UIColor {
     public static let defFontSecondColor: UIColor = UIColor(named: "FontSecondColor")!
     
     public static let defDividerSecoundColor: UIColor = UIColor(named: "DividerSecoundColor")!
+    
+    public static let defAppleBtnBg: UIColor = UIColor(named: "AppleBtnBg")!
 //
 //    public static let defFontReversalPrimaryColor: Color = Color("FontReversalPrimaryColor")
 //    
