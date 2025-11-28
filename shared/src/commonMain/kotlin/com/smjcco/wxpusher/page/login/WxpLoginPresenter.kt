@@ -7,6 +7,7 @@ import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.base.common.runAtMainSuspend
 import com.smjcco.wxpusher.base.biz.bean.WxpLoginInfo
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import kotlinx.coroutines.delay
 
 class WxpLoginPresenter(view: IWxpLoginView) :
@@ -74,7 +75,7 @@ class WxpLoginPresenter(view: IWxpLoginView) :
             WxpToastUtils.showToast("验证码错误")
             return
         }
-
+        WxpLogUtils.i(message = "手机登录，phone=${phone}")
         val req = WxpLoginSendVerifyCodeReq(
             phone = phone,
             code = verifyCode,
@@ -97,24 +98,35 @@ class WxpLoginPresenter(view: IWxpLoginView) :
                     WxpAppDataService.updateDeviceInfo()
                     view?.onGoMain()
                 } else {
-                    view?.onGoBind(phone = phone, code = verifyCode, data = it)
+                    WxpLogUtils.i(message = "手机登录，用户未注册")
+                    view?.onGoBindOrCreateAccount(
+                        WxpBindPageData(
+                            phoneLogin = WxpPhoneBind(
+                                phone, verifyCode, it.phoneVerifyCode
+                            )
+                        )
+                    )
                 }
             }
         }
     }
 
     override fun wexinLogin(code: String?) {
+        WxpLogUtils.i(message = "微信登录，code=${code}")
         if (code.isNullOrEmpty()) {
             WxpToastUtils.showToast("微信授权码错误")
             return
         }
         val weixinLoginReq = WxpWeixinLoginReq(
-            code, null,
+            code,
+            bindCode = null,
+            appleLoginJwtCode = null,
+            appleName = null,
             deviceId = WxpAppDataService.getLoginInfo()?.deviceId,
             deviceName = WxpBaseInfoService.getDeviceName(),
             pushToken = WxpAppDataService.getPushToken()
         )
-        
+
         runAtMainSuspend {
             val loginData = WxpApiService.weixinLogin(weixinLoginReq)
             loginData?.let {
@@ -129,15 +141,18 @@ class WxpLoginPresenter(view: IWxpLoginView) :
                 view?.onGoMain()
             }
         }
-
     }
-    override fun appleLogin(code: String?) {
+
+    override fun appleLogin(code: String?, userId: String?, email: String?, name: String?) {
+        WxpLogUtils.i(message = "苹果登录，code=${code}")
         if (code.isNullOrEmpty()) {
             WxpToastUtils.showToast("苹果登录信息为空")
             return
         }
         val appleLoginReq = WxpAppleLoginReq(
-            code, null,
+            justCreateAccount = false,
+            code = code,
+            name = name,
             deviceId = WxpAppDataService.getLoginInfo()?.deviceId,
             deviceName = WxpBaseInfoService.getDeviceName(),
             pushToken = WxpAppDataService.getPushToken()
@@ -146,15 +161,29 @@ class WxpLoginPresenter(view: IWxpLoginView) :
         runAtMainSuspend {
             val loginData = WxpApiService.appleLogin(appleLoginReq)
             loginData?.let {
-                val loginInfo = WxpLoginInfo(
-                    deviceId = it.deviceId,
-                    deviceToken = it.deviceToken,
-                    uid = it.uid,
-                    openId = it.openId
-                )
-                WxpAppDataService.saveLoginInfo(loginInfo)
-                WxpAppDataService.updateDeviceInfo()
-                view?.onGoMain()
+                if (it.hasRegister == true) {
+                    WxpLogUtils.i(message = "苹果登录，用户已经注册")
+                    val loginInfo = WxpLoginInfo(
+                        deviceId = it.deviceId,
+                        deviceToken = it.deviceToken,
+                        uid = it.uid,
+                        openId = it.openId
+                    )
+                    WxpAppDataService.saveLoginInfo(loginInfo)
+                    WxpAppDataService.updateDeviceInfo()
+                    view?.onGoMain()
+                } else {
+                    WxpLogUtils.i(message = "苹果登录，用户未注册")
+                    view?.onGoBindOrCreateAccount(
+                        WxpBindPageData(
+                            appleLogin = WxpAppleBind(
+                                code,
+                                name
+                            )
+                        )
+                    )
+                }
+
             }
         }
     }

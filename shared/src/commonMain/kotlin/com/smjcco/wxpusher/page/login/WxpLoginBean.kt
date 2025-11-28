@@ -28,7 +28,13 @@ data class WxpLoginSendVerifyCodeResp(
 @Serializable
 data class WxpWeixinLoginReq(
     val code: String,
-    val bindCode: String?,//如果是绑定手机号的
+    //微信登录，绑定手机号
+    val bindCode: String?,
+    //绑定苹果账号，苹果的jwt
+    val appleLoginJwtCode: String?,
+    //用户名，首次授权才有
+    val appleName: String?,
+
     val deviceId: String?,
     val deviceName: String?,
     val pushToken: String?,
@@ -45,14 +51,18 @@ data class WxpWeixinLoginResp(
     val openId: String?,
 )
 
-
 /**
  * 苹果登录
  */
 @Serializable
 data class WxpAppleLoginReq(
-    val code: String,
-    val bindCode: String?,//如果是绑定手机号的
+    //不绑定现有账号，直接创建账号登录
+    val justCreateAccount: Boolean,
+    //苹果登录的jwt code
+    val code: String?,
+    //苹果用户昵称
+    val name: String?,
+
     val deviceId: String?,
     val deviceName: String?,
     val pushToken: String?,
@@ -67,4 +77,5 @@ data class WxpAppleLoginResp(
     val deviceId: String?,
     val uid: String?,
     val openId: String?,
+    val hasRegister: Boolean?
 )

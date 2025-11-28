@@ -11,9 +11,9 @@ interface IWxpLoginView : IWxpBaseMvpView<IWxpLoginPresenter> {
     fun onSendButtonText(msg: String, loading: Boolean)
 
     /**
-     * 去绑定的账号
+     * 去选择注册方式：微信登录绑定、公众号绑定、直接创建新账号
      */
-    fun onGoBind(phone: String, code: String, data: WxpLoginSendVerifyCodeResp)
+    fun onGoBindOrCreateAccount(data: WxpBindPageData)
 
     /**
      * 跳转到主页
@@ -46,6 +46,9 @@ interface IWxpLoginPresenter : IWxpBaseMvpPresenter<IWxpLoginView, IWxpLoginPres
     /**
      * 苹果登录
      * @param code 苹果登录返回的jwt
+     * @param userId 用户id
+     * @param email 电子邮箱，可能是苹果提供的隐私邮箱
+     * @param name 苹果的用户名，只有第一次授权会有
      */
-     fun appleLogin(code: String?)
+    fun appleLogin(code: String?, userId: String?, email: String?, name: String?)
 }

@@ -209,8 +209,12 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
     }
     
     // MARK: - MVP-VIEW
-    func onGoBind(phone: String, code: String, data: WxpLoginSendVerifyCodeResp) {
-        navigationController?.setViewControllers([WxpBindPhoneViewController(phone: phone, code: code, phoneVerifyCode: data.phoneVerifyCode ?? "")], animated: true)
+//    func onGoBind(phone: String, code: String, data: WxpLoginSendVerifyCodeResp) {
+//        navigationController?.setViewControllers([WxpBindPhoneViewController(phone: phone, code: code, phoneVerifyCode: data.phoneVerifyCode ?? "")], animated: true)
+//    }
+    
+    func onGoBindOrCreateAccount(data: WxpBindPageData) {
+        
     }
     
     func onGoMain() {
@@ -236,32 +240,34 @@ extension WxpLoginViewController: ASAuthorizationControllerDelegate {
 
     // 授权成功
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
-        if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
-            // 获取用户唯一标识符，对于该用户和开发者来说是唯一的
-            let userIdentifier = appleIDCredential.user
-            // 这是一个 JSON Web Token (JWT)，如果需与后端服务器验证，需要传递此令牌
-            let identityToken = appleIDCredential.identityToken
-            // 也是一个 JWT，用于刷新令牌
-            let authorizationCode = appleIDCredential.authorizationCode
-
-            // 只有在首次授权时（或用户重置了其 Apple ID 设置后）才会提供姓名和邮箱
-            let fullName = appleIDCredential.fullName
-            let email = appleIDCredential.email
-
-            // 处理登录逻辑：
-            // 1. 将 userIdentifier 保存到 Keychain 或 UserDefaults，用于下次检查登录状态。
-            // 2. 如果 email 和 fullName 不为空，可能是新用户，将其注册到你的后端服务器。
-            // 3. 将 identityToken 或 authorizationCode 发送给你的后端服务器进行验证。
-
-            // 示例：打印信息
-            print("User ID: \(userIdentifier)")
-            print("User Email: \(email ?? "")")
-            if let givenName = fullName?.givenName, let familyName = fullName?.familyName {
-                print("User Name: \(givenName) \(familyName)")
-            }
-            // 登录成功，跳转到主界面
-//            self.navigateToMainScreen()
+        guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
+            WxpToastUtils.shared.showToast(msg: "无法获取 Apple ID Credential")
+            print("无法获取 Apple ID Credential")
+            return
         }
+        
+        // 检查 identityToken 是否为 nil
+        guard let identityTokenData = appleIDCredential.identityToken else {
+            WxpToastUtils.shared.showToast(msg: "Identity Token 为 nil")
+            print("Identity Token 为 nil")
+            return
+        }
+        
+        // 尝试转换为 String
+        guard let identityToken = String(data: identityTokenData, encoding: .utf8) else {
+            print("无法将 Identity Token 转换为字符串")
+            WxpToastUtils.shared.showToast(msg: "无法将 Identity Token 转换为字符串")
+            return
+        }
+        appleIDCredential.authorizationCode
+        
+        // 只有在首次授权时（或用户重置了其 Apple ID 设置后）才会提供姓名和邮箱
+        let fullName = appleIDCredential.fullName
+        let email = appleIDCredential.email
+        let userId = appleIDCredential.user
+        let name = "\(fullName?.givenName ?? "")\(fullName?.familyName ?? "")"
+        
+        presenter.appleLogin(code: identityToken, userId: userId, email: email, name: name)
     }
 
     // 授权失败
@@ -271,8 +277,10 @@ extension WxpLoginViewController: ASAuthorizationControllerDelegate {
         switch authError.code {
         case .canceled:
             print("用户取消了授权。")
+            WxpToastUtils.shared.showToast(msg: "取消苹果账号授权登录")
         case .unknown, .invalidResponse, .notHandled, .failed:
             print("授权失败: \(error.localizedDescription)")
+            WxpToastUtils.shared.showToast(msg: "授权失败: \(error.localizedDescription)")
         default:
             break
         }
