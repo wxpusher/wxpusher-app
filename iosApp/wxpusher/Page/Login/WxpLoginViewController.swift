@@ -381,9 +381,25 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
    
     
     // MARK: - Actions
+    private func checkPrivacyAgree(run:@escaping WxpBlockNoParamNoReturn){
+        let params = WxpDialogParams()
+        params.title = "请同意用户和隐私协议"
+        params.message = "我已经阅读并且同意《用户和隐私协议》"
+        params.leftText = "取消"
+        params.rightText = "同意协议"
+        params.rightBlock = {
+            self.privacyCheckbox.isSelected = true
+            run()
+        }
+        WxpDialogUtils.showDialog(params: params)
+        
+    }
+    
     @objc private func wechatLoginButtonTapped() {
         if !privacyCheckbox.isSelected {
-            WxpToastUtils.shared.showToast(msg: "请先同意用户和隐私协议")
+            checkPrivacyAgree {
+                
+            }
             return
         }
         // Wechat login logic...
@@ -391,10 +407,13 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
     
     @objc private func appleLoginButtonTapped() {
         if !privacyCheckbox.isSelected {
-            WxpToastUtils.shared.showToast(msg: "请先同意用户和隐私协议")
+            checkPrivacyAgree {
+                self.handleAppleLogin()
+            }
             return
         }
-        handleAppleLogin()
+        self.handleAppleLogin()
+        
     }
     
     private func handleAppleLogin() {
@@ -421,7 +440,9 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         guard let code = codeTextField.text else { return }
         
         if !privacyCheckbox.isSelected {
-            WxpToastUtils.shared.showToast(msg: "请先同意用户和隐私协议")
+            checkPrivacyAgree {
+                self.presenter.verifyCodeLogin(phone: phone, verifyCode: code)
+            }
             return
         }
         
