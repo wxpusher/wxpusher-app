@@ -398,11 +398,17 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
     @objc private func wechatLoginButtonTapped() {
         if !privacyCheckbox.isSelected {
             checkPrivacyAgree {
-                
+                self.handleWeixinLogin()
             }
             return
         }
-        // Wechat login logic...
+        self.handleWeixinLogin()
+    }
+    
+    private func handleWeixinLogin() {
+        WxpWeixinOpenManager.shared.requestAuth { [weak self] status in
+            
+        }
     }
     
     @objc private func appleLoginButtonTapped() {
