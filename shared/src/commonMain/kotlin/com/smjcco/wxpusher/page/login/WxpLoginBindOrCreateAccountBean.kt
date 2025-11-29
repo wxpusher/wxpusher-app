@@ -2,6 +2,10 @@ package com.smjcco.wxpusher.page.login
 
 import kotlinx.serialization.Serializable
 
+
+/**
+ * 手机号登录，返回的数据，转到选择注册方式页面使用
+ */
 @Serializable
 data class WxpPhoneBind(
     val phone: String,
@@ -9,6 +13,9 @@ data class WxpPhoneBind(
     val phoneVerifyCode: String?//用于发送给公众号的bindcode
 )
 
+/**
+ * 苹果登录，返回的数据，转到选择注册方式页面使用
+ */
 @Serializable
 data class WxpAppleBind(
     //苹果登录的jwt code

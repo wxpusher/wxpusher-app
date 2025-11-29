@@ -20,8 +20,8 @@ import shared
     }
     
     /**
-    * 跳转到登录页面
-    */
+     * 跳转到登录页面
+     */
     @objc public static func jumpToLogin() {
         runWithWindows(){ window in
             window.rootViewController = UINavigationController(rootViewController:  WxpLoginViewController())
@@ -31,31 +31,32 @@ import shared
     /**
      * 跳转到用户隐私协议
      */
-     public static func jumpToUserAgreement() {
-         runWithWindows(){ window in
-//             let rootVC: UINavigationController = window.rootViewController as! UINavigationController
-//             let vc = UserAgreementViewController()
-//             rootVC.setViewControllers([vc], animated: false)
-             
-             window.rootViewController = UINavigationController(rootViewController:  UserAgreementViewController())
-         }
+    public static func jumpToUserAgreement() {
+        runWithWindows(){ window in
+            window.rootViewController = UINavigationController(rootViewController:  UserAgreementViewController())
+        }
     }
     /**
      * 跳转到主页
      */
     public static func jumpToMain() {
         runWithWindows(){ window in
-//            let rootVC: UINavigationController = window.rootViewController as! UINavigationController
-//            let vc = MainTabBarController()
-//            rootVC.setViewControllers([vc], animated: false)
-            
             window.rootViewController = MainTabBarController()
         }
-   }
-
+    }
+    
     /**
-    * 跳转到web页面
-    */
+     * 跳转到选择注册方式或者绑定的页面
+     */
+    public static func jumpToRegisterOrBind(data: WxpBindPageData) {
+        runWithWindows(){ window in
+            window.rootViewController = WxpRegisterOrBindViewController(bindPageData: data)
+        }
+    }
+    
+    /**
+     * 跳转到web页面
+     */
     public static func jumpToWebUrl(url: String?) {
         runWithWindows(){ window in
             guard let urlString = url?.trimmingCharacters(in: .whitespaces),
@@ -65,7 +66,7 @@ import shared
                 print("URL is empty or nil")
                 return
             }
-
+            
             guard let url = URL(string: urlString) else {
                 // 处理 URL 无效的情况
                 print("Invalid URL: \(urlString)")
@@ -73,8 +74,8 @@ import shared
             }
             let rootView = window.rootViewController
             let webVC = WxpWebViewController(url: url)
-//            let webVC =  WxpFSafariViewController(url: url)
-//            webVC.dismissButtonStyle = .close 
+            //            let webVC =  WxpFSafariViewController(url: url)
+            //            webVC.dismissButtonStyle = .close
             //如果根是navVC，那就压栈
             if(rootView is UINavigationController){
                 let rootVC = rootView as! UINavigationController
@@ -89,7 +90,7 @@ import shared
                 }
             }
         }
-       
+        
     }
     
     /**
@@ -109,8 +110,8 @@ import shared
         }
     }
     /**
-    * 跳转到扫码页面
-    */
+     * 跳转到扫码页面
+     */
     public static func jumpToScan(callback:@escaping WxpQRCodeScanViewController.Callback) {
         runWithWindows(){ window in
             let rootView = window.rootViewController
@@ -129,6 +130,6 @@ import shared
                 }
             }
         }
-       
+        
     }
 }
