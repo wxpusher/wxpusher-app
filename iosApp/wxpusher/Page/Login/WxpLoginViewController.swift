@@ -405,9 +405,15 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         self.handleWeixinLogin()
     }
     
+    //处理微信登录结果
     private func handleWeixinLogin() {
-        WxpWeixinOpenManager.shared.requestAuth { [weak self] status in
-            
+        WxpWeixinOpenManager.shared.requestAuth { [weak self] result in
+            switch result {
+            case .success(let data):
+                self?.presenter.wexinLogin(code: data.code)
+            case .failure(let error):
+                WxpToastUtils.shared.showToast(msg: error.failureReason)
+            }
         }
     }
     
