@@ -50,7 +50,40 @@ import shared
      */
     public static func jumpToRegisterOrBind(data: WxpBindPageData) {
         runWithWindows(){ window in
-            window.rootViewController = WxpRegisterOrBindViewController(bindPageData: data)
+            window.rootViewController = UINavigationController(rootViewController:  WxpRegisterOrBindViewController(bindPageData: data))
+        }
+    }
+    
+    /**
+     * 跳转到通过绑定码，通过微信公众号绑定的页面
+     */
+    public static func jumpToMpBind(data: WxpPhoneBind?) {
+        runWithWindows(){ window in
+            let rootView = window.rootViewController
+            guard let phone = data?.phone,
+                  let code = data?.code,
+                  let phoneVerifyCode = data?.phoneVerifyCode else {
+                return
+            }
+            
+            // 跳转到BindPhone页面
+            let bindPhoneVC = WxpBindPhoneViewController(
+                phone: phone,
+                code: code,
+                phoneVerifyCode: phoneVerifyCode
+            )
+            
+            //如果根是navVC，那就压栈
+            if(rootView is UINavigationController){
+                let rootVC = rootView as! UINavigationController
+                rootVC.pushViewController(bindPhoneVC, animated: true)
+            } else if(rootView is UITabBarController){
+                let tabVC = rootView as! UITabBarController
+                if(tabVC.selectedViewController  is UINavigationController){
+                    let rootVC = tabVC.selectedViewController as! UINavigationController
+                    rootVC.pushViewController(bindPhoneVC, animated: true)
+                }
+            }
         }
     }
     

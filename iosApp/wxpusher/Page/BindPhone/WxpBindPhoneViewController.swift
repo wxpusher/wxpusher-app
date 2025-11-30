@@ -27,9 +27,12 @@ class WxpBindPhoneViewController: WxpBaseMvpUIViewController<IWxpBindPresenter>,
     
     private lazy var descriptionLabel: UILabel = {
         let label = UILabel()
-        label.text = "你好，你的手机号没有注册,你需要先和已经存在的UID绑定才可以接收消息，绑定方式如下："
-        label.textColor = UIColor.defFontPrimaryColor
+        label.text = "你的手机号还没有注册，请你通过如下步骤和微信公众号绑定，绑定后APP可以收到原来发送到公众号的消息，绑定方式如下："
+        label.font = .systemFont(ofSize: 14)
+        label.textColor = .gray
+//        label.textAlignment = .center
         label.numberOfLines = 0
+        
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -69,7 +72,7 @@ class WxpBindPhoneViewController: WxpBaseMvpUIViewController<IWxpBindPresenter>,
     
     private lazy var stepTwoLabel: UILabel = {
         let label = UILabel()
-        label.text = "关注微信公众号WxPusher，将复制的绑定码发给公众号"
+        label.text = "关注微信公众号【WxPusher】，将复制的绑定码发给公众号"
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -125,14 +128,14 @@ class WxpBindPhoneViewController: WxpBaseMvpUIViewController<IWxpBindPresenter>,
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "UID绑定"
+        title = "微信公众号绑定"
         setupUI()
     }
     
     // MARK: - Setup
     private func setupUI() {
         view.backgroundColor = .systemBackground
-        navigationItem.hidesBackButton = true
+        navigationItem.hidesBackButton = false
         
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)

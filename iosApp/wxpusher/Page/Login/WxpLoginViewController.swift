@@ -467,8 +467,9 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
     }
     
     // MARK: - MVP-VIEW
+    
     func onGoBindOrCreateAccount(data: WxpBindPageData) {
-        
+        WxpJumpPageUtils.jumpToRegisterOrBind(data: data)
     }
     
     func onGoMain() {

@@ -243,7 +243,7 @@ class WxpRegisterOrBindViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "账号绑定"
+        title = "选择创建账号方式"
         setupUI()
         updateUIState()
     }
@@ -256,7 +256,7 @@ class WxpRegisterOrBindViewController: UIViewController {
         scrollView.addSubview(contentView)
         
         // Add all subviews to contentView
-        contentView.addSubview(titleLabel)
+//        contentView.addSubview(titleLabel)
         contentView.addSubview(descriptionLabel)
         
         // Option 1 - WeChat Login
@@ -310,12 +310,12 @@ class WxpRegisterOrBindViewController: UIViewController {
             contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor),
             
             // Title
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 24),
-            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
-            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
+//            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 24),
+//            titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
+//            titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
             
             // Description
-            descriptionLabel.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 12),
+            descriptionLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
             descriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
             descriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24),
             
@@ -443,19 +443,7 @@ class WxpRegisterOrBindViewController: UIViewController {
     }
     
     @objc private func optionTwoButtonTapped() {
-        // 绑定到已有公众号
-        guard let phoneLogin = bindPageData.phoneLogin,
-              let phoneVerifyCode = phoneLogin.phoneVerifyCode else {
-            return
-        }
-        
-        // 跳转到BindPhone页面
-        let bindPhoneVC = WxpBindPhoneViewController(
-            phone: phoneLogin.phone,
-            code: phoneLogin.code,
-            phoneVerifyCode: phoneVerifyCode
-        )
-        navigationController?.pushViewController(bindPhoneVC, animated: true)
+        WxpJumpPageUtils.jumpToMpBind(data: bindPageData.phoneLogin)
     }
     
     @objc private func optionThreeButtonTapped() {
