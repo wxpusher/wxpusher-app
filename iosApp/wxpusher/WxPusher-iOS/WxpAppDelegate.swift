@@ -38,6 +38,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         WxpAppPageService.shared.doInit(service: IWxpAppPageServiceImpl())
         //初始化基础设备信息
         WxpBaseInfoService.shared.doInit(listener: WxpBaseInfoServiceListenerImpl())
+        //初始化上层注入的UI-Loading
+        WxpLoadingUtils.shared.setLoadingImpl(loadingImpl: WxpLoadingService())
         
         //迁移一次iOS的老版本的数据，避免用户重新登录
         WxpAppDataService.shared.mergeIOSData()

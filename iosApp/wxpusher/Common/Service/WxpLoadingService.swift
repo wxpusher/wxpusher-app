@@ -1,27 +1,14 @@
 import UIKit
+import shared
 
-@objc class WxpLoadingUtils: NSObject {
+/// kmp接口loading的实现，在应用初始化的时候，会注入到kmpceng
+@objc class WxpLoadingService: NSObject, IWxpLoading {
     
-    private static let shared = WxpLoadingUtils()
+    private static let shared = WxpLoadingService()
     private var loadingView: UIView?
     
-    /**
-     * 显示loading
-     * msg: 提示文字
-     * canDismiss: 点击背景是否可以关闭
-     */
-    @objc public static func showLoading(msg: String? = nil, canDismiss: Bool = false) {
-        shared.show(msg: msg, canDismiss: canDismiss)
-    }
-    
-    /**
-     * 隐藏loading
-     */
-    @objc public static func dismissLoading() {
-        shared.dismiss()
-    }
-    
-    private func show(msg: String?, canDismiss: Bool) {
+    //实现kmp层接口，方便在所有层调用，后续调用，尽量都通过kmp层来调用，不直接调用这2个方法
+    func showLoading(msg: String?, canDismiss: Bool) {
         DispatchQueue.main.async {
             // 移除已存在的loading
             self.dismissInternal()
@@ -97,7 +84,8 @@ import UIKit
         }
     }
     
-    private func dismiss() {
+    //实现kmp层接口，方便在所有层调用，后续调用，尽量都通过kmp层来调用，不直接调用这2个方法
+    func dismissLoading() {
         DispatchQueue.main.async {
             self.dismissInternal()
         }
@@ -108,8 +96,9 @@ import UIKit
         self.loadingView = nil
     }
     
+    //点击外部的时候，关闭loading
     @objc private func dismissTapped() {
-        dismiss()
+        dismissLoading()
     }
 }
 
