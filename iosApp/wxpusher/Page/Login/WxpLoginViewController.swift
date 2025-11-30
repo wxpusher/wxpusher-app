@@ -438,6 +438,7 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
         authorizationController.delegate = self
         authorizationController.presentationContextProvider = self
         authorizationController.performRequests()
+        WxpLoadingUtils.shared.showLoading(msg: "等待苹果授权", canDismiss: true)
     }
 
     @objc private func jumpPrivacy(){
@@ -497,6 +498,7 @@ extension WxpLoginViewController: ASAuthorizationControllerDelegate {
 
     // 授权成功
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        WxpLoadingUtils.shared.dismissLoading()
         guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
             WxpToastUtils.shared.showToast(msg: "无法获取 Apple ID Credential")
             print("无法获取 Apple ID Credential")
@@ -529,6 +531,7 @@ extension WxpLoginViewController: ASAuthorizationControllerDelegate {
 
     // 授权失败
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        WxpLoadingUtils.shared.dismissLoading()
         // 处理错误
         let authError = ASAuthorizationError(_nsError: error as NSError)
         switch authError.code {

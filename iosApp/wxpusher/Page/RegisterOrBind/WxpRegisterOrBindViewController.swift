@@ -446,9 +446,16 @@ class WxpRegisterOrBindViewController: WxpBaseMvpUIViewController<IWxpRegisterOr
     
     // MARK: - Actions
     @objc private func optionOneButtonTapped() {
-        // 通过微信登录绑定
-        // TODO: 实现微信登录绑定逻辑
-        print("选项1：通过微信登录绑定")
+        WxpLoadingUtils.shared.showLoading(msg: "微信授权中", canDismiss: true)
+        WxpWeixinOpenManager.shared.requestAuth { [weak self] result in
+            WxpLoadingUtils.shared.dismissLoading()
+            switch result {
+            case .success(let data):
+                self?.presenter.wexinBind(code: data.code, bindData: self?.bindPageData)
+            case .failure(let error):
+                WxpToastUtils.shared.showToast(msg: error.errorDescription)
+            }
+        }
     }
     
     @objc private func optionTwoButtonTapped() {

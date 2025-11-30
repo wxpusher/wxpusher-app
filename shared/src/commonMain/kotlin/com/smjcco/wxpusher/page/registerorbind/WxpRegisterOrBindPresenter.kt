@@ -5,6 +5,7 @@ import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.biz.bean.WxpLoginInfo
 import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpBaseMvpPresenter
+import com.smjcco.wxpusher.base.common.WxpLoadingUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.base.common.runAtMainSuspend
@@ -26,16 +27,18 @@ class WxpRegisterOrBindPresenter(view: IWxpRegisterOrBindView) :
         }
         val weixinLoginReq = WxpWeixinLoginReq(
             code,
-            bindCode = bindData.phoneLogin?.phoneVerifyCode,
-            appleLoginJwtCode = bindData.appleLogin?.code,
-            appleName = bindData.appleLogin?.code,
+            bindCode = bindData.phoneLogin?.phoneVerifyCode, //绑定手机号
+            appleLoginJwtCode = bindData.appleLogin?.code, //绑定苹果账号
+            appleName = bindData.appleLogin?.name, //苹果账号的名称
             deviceId = WxpAppDataService.getLoginInfo()?.deviceId,
             deviceName = WxpBaseInfoService.getDeviceName(),
             pushToken = WxpAppDataService.getPushToken()
         )
 
         runAtMainSuspend {
+            WxpLoadingUtils.showLoading(msg = "绑定中...")
             val loginData = WxpApiService.weixinLogin(weixinLoginReq)
+            WxpLoadingUtils.dismissLoading()
             loginData?.let {
                 val loginInfo = WxpLoginInfo(
                     deviceId = it.deviceId,
