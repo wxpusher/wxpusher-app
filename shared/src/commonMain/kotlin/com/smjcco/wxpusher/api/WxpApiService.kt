@@ -75,7 +75,7 @@ object WxpApiService {
      * 发送验证码
      * @return 发送是否成功，true表示成功，其他表示异常
      */
-    suspend fun sendLoginPing(): Any? {
+    suspend fun sendLoginPing(): String? {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .get(WxpNetworkService.getUrl("/api/device/login-ping"))

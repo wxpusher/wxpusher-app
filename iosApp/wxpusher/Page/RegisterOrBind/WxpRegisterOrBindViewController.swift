@@ -91,7 +91,7 @@ class WxpRegisterOrBindViewController: WxpBaseMvpUIViewController<IWxpRegisterOr
     
     private lazy var optionOneDescLabel: UILabel = {
         let label = UILabel()
-        label.text = "绑定到本设备的微信，与原WxPusher公众号绑定，和微信公众号数据一致。就算你是新用户，也推荐和微信绑定，方便以后通过微信接收消息。"
+        label.text = "绑定到本设备的微信，与原WxPusher公众号绑定，和微信公众号数据一致。\n新用户，也推荐和微信绑定，方便以后通过微信接收消息。"
         label.font = .systemFont(ofSize: 14)
         label.textColor = .gray
         label.numberOfLines = 0
@@ -466,20 +466,18 @@ class WxpRegisterOrBindViewController: WxpBaseMvpUIViewController<IWxpRegisterOr
         // 创建新账号 - 需要确认对话框
         let params = WxpDialogParams()
         params.title = "确认创建新账号？"
-        params.message = "创建新账号后，会和已有微信账号完全分开，不能复用微信账号的数据。强烈建议使用微信登录绑定已有账号。"
+        params.message = "创建新账号后，会和已有微信账号完全分开，不能和微信账号的数据一致，也不能收到微信的消息。\n\n强烈建议绑定微信创建账号（即使你之前没有用过微信账号也可以绑定）。"
         params.leftText = "取消"
         params.rightText = "确认创建"
         params.rightBlock = { [weak self] in
-            // TODO: 实现创建新账号逻辑
-            print("选项3：创建新账号")
             self?.handleCreateNewAccount()
         }
         WxpDialogUtils.showDialog(params: params)
     }
     
+    //手机号或者苹果登录的时候，创建新账号
     private func handleCreateNewAccount() {
-        // TODO: 实现创建新账号的具体逻辑
-        print("处理创建新账号")
+        self.presenter.createAccount(data: self.bindPageData)
     }
 }
 

@@ -40,12 +40,7 @@ class WxpRegisterOrBindPresenter(view: IWxpRegisterOrBindView) :
             val loginData = WxpApiService.weixinLogin(weixinLoginReq)
             WxpLoadingUtils.dismissLoading()
             loginData?.let {
-                val loginInfo = WxpLoginInfo(
-                    deviceId = it.deviceId,
-                    deviceToken = it.deviceToken,
-                    uid = it.uid,
-                    openId = it.openId
-                )
+                val loginInfo = WxpLoginInfo(it)
                 WxpAppDataService.saveLoginInfo(loginInfo)
                 WxpAppDataService.updateDeviceInfo()
                 view?.onGoMain()
@@ -53,6 +48,9 @@ class WxpRegisterOrBindPresenter(view: IWxpRegisterOrBindView) :
         }
     }
 
+    /**
+     * 手机号或者苹果登录的时候，可以不绑定账号，直接创建新账号
+     */
     override fun createAccount(bindData: WxpBindPageData?) {
         if (bindData == null) {
             return
@@ -71,12 +69,7 @@ class WxpRegisterOrBindPresenter(view: IWxpRegisterOrBindView) :
             runAtMainSuspend {
                 val loginData = WxpApiService.verifyCodeLogin(req)
                 loginData?.let {
-                    val loginInfo = WxpLoginInfo(
-                        deviceId = it.deviceId,
-                        deviceToken = it.deviceToken,
-                        uid = it.uid,
-                        openId = it.openId
-                    )
+                    val loginInfo = WxpLoginInfo(it)
                     WxpAppDataService.saveLoginInfo(loginInfo)
                     WxpAppDataService.updateDeviceInfo()
                     view?.onGoMain()
@@ -104,12 +97,7 @@ class WxpRegisterOrBindPresenter(view: IWxpRegisterOrBindView) :
                 val loginData = WxpApiService.appleLogin(appleLoginReq)
                 loginData?.let {
                     WxpLogUtils.i(message = "登录直接注册苹果账号成功")
-                    val loginInfo = WxpLoginInfo(
-                        deviceId = it.deviceId,
-                        deviceToken = it.deviceToken,
-                        uid = it.uid,
-                        openId = it.openId
-                    )
+                    val loginInfo = WxpLoginInfo(it)
                     WxpAppDataService.saveLoginInfo(loginInfo)
                     WxpAppDataService.updateDeviceInfo()
                     view?.onGoMain()

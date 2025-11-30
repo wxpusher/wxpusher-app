@@ -48,7 +48,14 @@ object WxpAppDataService {
         val deviceToken = WxpSaveService.get("deviceToken", "")
         val pushToken = WxpSaveService.get("pushToken", "")
         WxpLogUtils.d(message = "开始迁移iOS数据，读取数据 deviceToken=" + deviceToken)
-        saveLoginInfo(WxpLoginInfo(deviceToken, deviceId, uid, openId = null))
+        saveLoginInfo(
+            WxpLoginInfo(
+                deviceToken = deviceToken,
+                deviceId = deviceId,
+                uid = uid,
+                openId = null
+            )
+        )
         savePushToken(pushToken)
         WxpSaveService.set(mergeIOSDataHasRun, true)
     }

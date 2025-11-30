@@ -99,13 +99,8 @@ class WxpLoginPresenter(view: IWxpLoginView) :
             val loginData = WxpApiService.verifyCodeLogin(req)
             WxpLoadingUtils.dismissLoading()
             loginData?.let {
-                if (it.phoneHasRegister) {
-                    val loginInfo = WxpLoginInfo(
-                        deviceId = it.deviceId,
-                        deviceToken = it.deviceToken,
-                        uid = it.uid,
-                        openId = it.openId
-                    )
+                if (it.phoneHasRegister == true) {
+                    val loginInfo = WxpLoginInfo(it)
                     WxpAppDataService.saveLoginInfo(loginInfo)
                     WxpAppDataService.updateDeviceInfo()
                     view?.onGoMain()
@@ -144,12 +139,7 @@ class WxpLoginPresenter(view: IWxpLoginView) :
             val loginData = WxpApiService.weixinLogin(weixinLoginReq)
             WxpLoadingUtils.dismissLoading()
             loginData?.let {
-                val loginInfo = WxpLoginInfo(
-                    deviceId = it.deviceId,
-                    deviceToken = it.deviceToken,
-                    uid = it.uid,
-                    openId = it.openId
-                )
+                val loginInfo = WxpLoginInfo(it)
                 WxpAppDataService.saveLoginInfo(loginInfo)
                 WxpAppDataService.updateDeviceInfo()
                 view?.onGoMain()
@@ -179,12 +169,7 @@ class WxpLoginPresenter(view: IWxpLoginView) :
             loginData?.let {
                 if (it.hasRegister == true) {
                     WxpLogUtils.i(message = "苹果登录，用户已经注册")
-                    val loginInfo = WxpLoginInfo(
-                        deviceId = it.deviceId,
-                        deviceToken = it.deviceToken,
-                        uid = it.uid,
-                        openId = it.openId
-                    )
+                    val loginInfo = WxpLoginInfo(it)
                     WxpAppDataService.saveLoginInfo(loginInfo)
                     WxpAppDataService.updateDeviceInfo()
                     view?.onGoMain()

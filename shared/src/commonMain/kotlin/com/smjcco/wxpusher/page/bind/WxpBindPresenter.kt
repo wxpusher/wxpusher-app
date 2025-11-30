@@ -37,13 +37,8 @@ class WxpBindPresenter(view: IWxpBindView) :
             val loginData = WxpApiService.verifyCodeLogin(req)
             view?.showLoading(false)
             loginData?.let {
-                if (it.phoneHasRegister) {
-                    val loginInfo = WxpLoginInfo(
-                        deviceId = it.deviceId,
-                        deviceToken = it.deviceToken,
-                        uid = it.uid,
-                        openId = it.openId
-                    )
+                if (it.phoneHasRegister == true) {
+                    val loginInfo = WxpLoginInfo(it)
                     WxpAppDataService.saveLoginInfo(loginInfo)
                     WxpAppDataService.updateDeviceInfo()
                     view?.onGoMain()
