@@ -2,7 +2,7 @@ import UIKit
 import Toaster
 import shared
 
-class WxpRegisterOrBindViewController: UIViewController {
+class WxpRegisterOrBindViewController: WxpBaseMvpUIViewController<IWxpRegisterOrBindPresenter>,IWxpRegisterOrBindView  {
     
     // MARK: - Properties
     private let bindPageData: WxpBindPageData
@@ -234,6 +234,15 @@ class WxpRegisterOrBindViewController: UIViewController {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - MVP
+    override func createPresenter() -> Any? {
+        return WxpRegisterOrBindPresenter(view: self)
+    }
+    
+    func onGoMain() {
+        WxpJumpPageUtils.jumpToMain()
     }
     
     // MARK: - Lifecycle

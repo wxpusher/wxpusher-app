@@ -12,7 +12,7 @@ object WxpConfig {
 
     fun init() {
         baseUrl = WxpSaveService.get("baseUrl", baseUrl)
-        baseUrl = "http://10.0.0.11:6100"
+        baseUrl = "http://192.168.110.71:6100"
         wsUrl = WxpSaveService.get("wsUrl", wsUrl)
     }
 

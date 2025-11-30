@@ -24,6 +24,7 @@ class WxpBindPresenter(view: IWxpBindView) :
         }
 
         val req = WxpLoginSendVerifyCodeReq(
+            justCreateAccount = false,
             phone = phone,
             code = verifyCode,
             deviceId = WxpAppDataService.getLoginInfo()?.deviceId,

@@ -7,6 +7,7 @@ import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.base.common.runAtMainSuspend
 import com.smjcco.wxpusher.base.biz.bean.WxpLoginInfo
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
+import com.smjcco.wxpusher.base.common.WxpLoadingUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import kotlinx.coroutines.delay
 
@@ -77,6 +78,7 @@ class WxpLoginPresenter(view: IWxpLoginView) :
         }
         WxpLogUtils.i(message = "手机登录，phone=${phone}")
         val req = WxpLoginSendVerifyCodeReq(
+            justCreateAccount = false,
             phone = phone,
             code = verifyCode,
             deviceId = WxpAppDataService.getLoginInfo()?.deviceId,
@@ -84,8 +86,10 @@ class WxpLoginPresenter(view: IWxpLoginView) :
             pushToken = WxpAppDataService.getPushToken()
         )
 
+        WxpLoadingUtils.showLoading(msg = "登录中...")
         runAtMainSuspend {
             val loginData = WxpApiService.verifyCodeLogin(req)
+            WxpLoadingUtils.dismissLoading()
             loginData?.let {
                 if (it.phoneHasRegister) {
                     val loginInfo = WxpLoginInfo(
@@ -128,7 +132,9 @@ class WxpLoginPresenter(view: IWxpLoginView) :
         )
 
         runAtMainSuspend {
+            WxpLoadingUtils.showLoading(msg = "验证中...")
             val loginData = WxpApiService.weixinLogin(weixinLoginReq)
+            WxpLoadingUtils.dismissLoading()
             loginData?.let {
                 val loginInfo = WxpLoginInfo(
                     deviceId = it.deviceId,
@@ -159,7 +165,9 @@ class WxpLoginPresenter(view: IWxpLoginView) :
         )
 
         runAtMainSuspend {
+            WxpLoadingUtils.showLoading(msg = "验证中...")
             val loginData = WxpApiService.appleLogin(appleLoginReq)
+            WxpLoadingUtils.dismissLoading()
             loginData?.let {
                 if (it.hasRegister == true) {
                     WxpLogUtils.i(message = "苹果登录，用户已经注册")

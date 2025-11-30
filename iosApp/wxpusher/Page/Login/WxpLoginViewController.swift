@@ -407,12 +407,14 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
     
     //处理微信登录结果
     private func handleWeixinLogin() {
+        WxpLoadingUtils.shared.showLoading(msg: "微信授权中", canDismiss: true)
         WxpWeixinOpenManager.shared.requestAuth { [weak self] result in
+            WxpLoadingUtils.shared.dismissLoading()
             switch result {
             case .success(let data):
                 self?.presenter.wexinLogin(code: data.code)
             case .failure(let error):
-                WxpToastUtils.shared.showToast(msg: error.failureReason)
+                WxpToastUtils.shared.showToast(msg: error.errorDescription)
             }
         }
     }
@@ -534,8 +536,8 @@ extension WxpLoginViewController: ASAuthorizationControllerDelegate {
             print("用户取消了授权。")
             WxpToastUtils.shared.showToast(msg: "取消苹果账号授权登录")
         case .unknown, .invalidResponse, .notHandled, .failed:
-            print("授权失败: \(error.localizedDescription)")
-            WxpToastUtils.shared.showToast(msg: "授权失败: \(error.localizedDescription)")
+            print("苹果登录失败\n \(error.localizedDescription)")
+            WxpToastUtils.shared.showToast(msg: "苹果登录失败\n \(error.localizedDescription)")
         default:
             break
         }

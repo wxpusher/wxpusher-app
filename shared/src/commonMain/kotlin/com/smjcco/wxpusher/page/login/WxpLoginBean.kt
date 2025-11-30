@@ -4,6 +4,8 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class WxpLoginSendVerifyCodeReq(
+    //不绑定现有账号，直接创建账号登录
+    val justCreateAccount: Boolean,
     val phone: String,
     val code: String,
     val deviceId: String?,
