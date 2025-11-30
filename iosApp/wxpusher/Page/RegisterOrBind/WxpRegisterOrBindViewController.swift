@@ -22,7 +22,7 @@ class WxpRegisterOrBindViewController: UIViewController {
     
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "选择账号绑定方式"
+        label.text = "选择创建账号方式"
         label.font = .systemFont(ofSize: 24, weight: .bold)
         label.textAlignment = .center
         label.textColor = UIColor.defFontPrimaryColor
@@ -32,7 +32,7 @@ class WxpRegisterOrBindViewController: UIViewController {
     
     private lazy var descriptionLabel: UILabel = {
         let label = UILabel()
-        label.text = "检测到您还未注册，请选择以下方式之一来绑定或创建账号"
+        label.text = "你还未注册，请绑定已有账号或者创建新账号"
         label.font = .systemFont(ofSize: 14)
         label.textColor = .gray
         label.textAlignment = .center
@@ -44,10 +44,11 @@ class WxpRegisterOrBindViewController: UIViewController {
     // 方式1：微信登录绑定（强烈推荐）
     private lazy var optionOneContainer: UIView = {
         let container = UIView()
-        container.backgroundColor = UIColor.defAccentPrimaryColor.withAlphaComponent(0.1)
+        let wechatColor = UIColor(red: 7/255.0, green: 193/255.0, blue: 96/255.0, alpha: 1.0)
+        container.backgroundColor = wechatColor.withAlphaComponent(0.1)
         container.layer.cornerRadius = 8
         container.layer.borderWidth = 2
-        container.layer.borderColor = UIColor.defAccentPrimaryColor.cgColor
+        container.layer.borderColor = wechatColor.cgColor
         container.translatesAutoresizingMaskIntoConstraints = false
         return container
     }()
@@ -57,7 +58,7 @@ class WxpRegisterOrBindViewController: UIViewController {
         label.text = "强烈推荐"
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = .white
-        label.backgroundColor = UIColor.defAccentPrimaryColor
+        label.backgroundColor = UIColor(red: 7/255.0, green: 193/255.0, blue: 96/255.0, alpha: 1.0)
         label.textAlignment = .center
         label.layer.cornerRadius = 4
         label.layer.masksToBounds = true
@@ -81,7 +82,7 @@ class WxpRegisterOrBindViewController: UIViewController {
     
     private lazy var optionOneTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "通过微信登录绑定"
+        label.text = "微信一键绑定"
         label.font = .systemFont(ofSize: 18, weight: .semibold)
         label.textColor = UIColor.defFontPrimaryColor
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -90,7 +91,7 @@ class WxpRegisterOrBindViewController: UIViewController {
     
     private lazy var optionOneDescLabel: UILabel = {
         let label = UILabel()
-        label.text = "绑定到已有微信账号，可以复用微信账号的数据"
+        label.text = "绑定到本设备的微信，与原WxPusher公众号绑定，和微信公众号数据一致。就算你是新用户，也推荐和微信绑定，方便以后通过微信接收消息。"
         label.font = .systemFont(ofSize: 14)
         label.textColor = .gray
         label.numberOfLines = 0
@@ -100,8 +101,8 @@ class WxpRegisterOrBindViewController: UIViewController {
     
     private lazy var optionOneButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = UIColor.defAccentPrimaryColor
-        button.setTitle("通过微信绑定", for: .normal)
+        button.backgroundColor = UIColor(red: 7/255.0, green: 193/255.0, blue: 96/255.0, alpha: 1.0)
+        button.setTitle("打开微信一键绑定", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 6
@@ -123,7 +124,7 @@ class WxpRegisterOrBindViewController: UIViewController {
     
     private lazy var optionTwoIcon: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "phone.fill")
+        imageView.image = UIImage(systemName: "newspaper")
         imageView.tintColor = UIColor.defAccentPrimaryColor
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
@@ -132,7 +133,7 @@ class WxpRegisterOrBindViewController: UIViewController {
     
     private lazy var optionTwoTitleLabel: UILabel = {
         let label = UILabel()
-        label.text = "绑定到已有公众号"
+        label.text = "通过微信公众号绑定"
         label.font = .systemFont(ofSize: 18, weight: .semibold)
         label.textColor = UIColor.defFontPrimaryColor
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -141,7 +142,7 @@ class WxpRegisterOrBindViewController: UIViewController {
     
     private lazy var optionTwoDescLabel: UILabel = {
         let label = UILabel()
-        label.text = "通过绑定码绑定到已有WxPusher公众号账号"
+        label.text = "如果你要绑定的微信账号不是本设备登录的，你可以获取一个绑定码，发送给原WxPusher公众号进行绑定。"
         label.font = .systemFont(ofSize: 14)
         label.textColor = .gray
         label.numberOfLines = 0
@@ -152,7 +153,7 @@ class WxpRegisterOrBindViewController: UIViewController {
     private lazy var optionTwoButton: UIButton = {
         let button = UIButton(type: .system)
         button.backgroundColor = UIColor.defAccentPrimaryColor
-        button.setTitle("去绑定", for: .normal)
+        button.setTitle("去通过公众号绑定", for: .normal)
         button.setTitleColor(.white, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 6
@@ -177,7 +178,7 @@ class WxpRegisterOrBindViewController: UIViewController {
         label.text = "不推荐"
         label.font = .systemFont(ofSize: 12, weight: .medium)
         label.textColor = .white
-        label.backgroundColor = .systemOrange
+        label.backgroundColor = .systemRed
         label.textAlignment = .center
         label.layer.cornerRadius = 4
         label.layer.masksToBounds = true
@@ -187,8 +188,8 @@ class WxpRegisterOrBindViewController: UIViewController {
     
     private lazy var optionThreeIcon: UIImageView = {
         let imageView = UIImageView()
-        imageView.image = UIImage(systemName: "exclamationmark.triangle.fill")
-        imageView.tintColor = .systemOrange
+        imageView.image = UIImage(systemName: "person.fill.badge.plus")
+        imageView.tintColor = .gray
         imageView.contentMode = .scaleAspectFit
         imageView.translatesAutoresizingMaskIntoConstraints = false
         return imageView
@@ -205,9 +206,9 @@ class WxpRegisterOrBindViewController: UIViewController {
     
     private lazy var optionThreeDescLabel: UILabel = {
         let label = UILabel()
-        label.text = "创建全新账号，但会和已有微信账号完全分开，不能复用微信账号的数据"
+        label.text = "创建全新的空白账号，和原来微信公众号没有任何关系，数据完全隔离，如果你不添加订阅，不会收到任何消息。"
         label.font = .systemFont(ofSize: 14)
-        label.textColor = .systemOrange
+        label.textColor = .gray
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
@@ -216,7 +217,7 @@ class WxpRegisterOrBindViewController: UIViewController {
     private lazy var optionThreeButton: UIButton = {
         let button = UIButton(type: .system)
         button.backgroundColor = .systemGray3
-        button.setTitle("创建新账号", for: .normal)
+        button.setTitle("创建新的空白账号", for: .normal)
         button.setTitleColor(.label, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 6
