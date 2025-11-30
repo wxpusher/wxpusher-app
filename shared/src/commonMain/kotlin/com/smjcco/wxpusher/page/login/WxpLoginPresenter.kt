@@ -1,14 +1,15 @@
 package com.smjcco.wxpusher.page.login
 
 import com.smjcco.wxpusher.api.WxpApiService
+import com.smjcco.wxpusher.base.biz.WxpAppDataService
+import com.smjcco.wxpusher.base.biz.bean.WxpLoginInfo
 import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpBaseMvpPresenter
-import com.smjcco.wxpusher.base.common.WxpToastUtils
-import com.smjcco.wxpusher.base.common.runAtMainSuspend
-import com.smjcco.wxpusher.base.biz.bean.WxpLoginInfo
-import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.WxpLoadingUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
+import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.base.common.runAtIOSuspend
+import com.smjcco.wxpusher.base.common.runAtMainSuspend
 import kotlinx.coroutines.delay
 
 class WxpLoginPresenter(view: IWxpLoginView) :
@@ -18,6 +19,13 @@ class WxpLoginPresenter(view: IWxpLoginView) :
     private var canSendVerifyCode = true
     override fun init() {
         view?.onSendButtonText("发送验证码", false)
+
+        //在iOS上，打开登录页面的时候，发送一个网络请求，触发网络访问授权弹出，避免登录的时候再弹出，打断登录流程
+        if (WxpBaseInfoService.getPlatform() == "iOS") {
+            runAtIOSuspend {
+                WxpApiService.sendLoginPing()
+            }
+        }
     }
 
     fun sendTimeWait() {

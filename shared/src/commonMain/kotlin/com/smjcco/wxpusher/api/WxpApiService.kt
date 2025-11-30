@@ -1,11 +1,11 @@
 package com.smjcco.wxpusher.api
 
+import com.smjcco.wxpusher.base.biz.WxpAppPageService
+import com.smjcco.wxpusher.base.biz.bean.WxpUpdateInfoReq
 import com.smjcco.wxpusher.base.common.BaseResp
+import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpNetworkService
 import com.smjcco.wxpusher.base.common.WxpToastUtils
-import com.smjcco.wxpusher.base.biz.bean.WxpUpdateInfoReq
-import com.smjcco.wxpusher.base.biz.WxpAppPageService
-import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.page.login.WxpAppleLoginReq
 import com.smjcco.wxpusher.page.login.WxpAppleLoginResp
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
@@ -69,6 +69,20 @@ object WxpApiService {
         }
         return null
     }
+
+
+    /**
+     * 发送验证码
+     * @return 发送是否成功，true表示成功，其他表示异常
+     */
+    suspend fun sendLoginPing(): Any? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .get(WxpNetworkService.getUrl("/api/device/login-ping"))
+                .body()
+        })
+    }
+
 
     /**
      * 发送验证码

@@ -521,12 +521,18 @@ extension WxpLoginViewController: ASAuthorizationControllerDelegate {
         // appleIDCredential.authorizationCode // Warning: result unused
         
         // 只有在首次授权时（或用户重置了其 Apple ID 设置后）才会提供姓名和邮箱
-        let fullName = appleIDCredential.fullName
+       
+        var fullName = ""
+        if(appleIDCredential.fullName != nil){
+            let formatter = PersonNameComponentsFormatter()
+            formatter.style = .default
+            fullName = formatter.string(from: appleIDCredential.fullName!)
+        }
+        
         let email = appleIDCredential.email
         let userId = appleIDCredential.user
-        let name = "\(fullName?.givenName ?? "")\(fullName?.familyName ?? "")"
         
-        presenter.appleLogin(code: identityToken, userId: userId, email: email, name: name)
+        presenter.appleLogin(code: identityToken, userId: userId, email: email, name: fullName)
     }
 
     // 授权失败
