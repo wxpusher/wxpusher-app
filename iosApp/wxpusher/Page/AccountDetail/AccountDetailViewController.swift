@@ -66,7 +66,7 @@ class AccountDetailViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "账号详情"
+        title = "账号信息"
         setupUI()
         
     }

@@ -59,7 +59,9 @@ class WxpProfileViewController: UIViewController {
     private func setupData() {
         
         let uid = WxpAppDataService.shared.getLoginInfo()?.uid ?? ""
+        let spt = WxpAppDataService.shared.getLoginInfo()?.spt ?? ""
         let deviceId = WxpAppDataService.shared.getLoginInfo()?.deviceId ?? ""
+        
         
         // 构建数据源
         sectionData = [
@@ -70,9 +72,20 @@ class WxpProfileViewController: UIViewController {
                                 UIPasteboard.general.string = uid
                                 WxpToastUtils.shared.showToast(msg: "UID复制成功")
                             },
+                ProfileItem(title: "SPT", subtitle: spt.isEmpty ? "无" : spt,
+                            accessoryType: .disclosureIndicator) {
+                                if(!spt.isEmpty){
+                                    UIPasteboard.general.string = spt
+                                    WxpToastUtils.shared.showToast(msg: "SPT复制成功")
+                                }
+                            },
                 ProfileItem(title: "设备ID", subtitle: deviceId,
                             accessoryType: .disclosureIndicator) {
                                 WxpToastUtils.shared.showToast(msg: "设备ID复制成功")
+                            },
+                ProfileItem(title: "账号信息", subtitle: "管理登录方式",
+                            accessoryType: .disclosureIndicator) {
+                                WxpJumpPageUtils.jumpToAccountDetail()
                             },
                 ProfileItem(title: "用户账号", subtitle: "退出登录",
                             accessoryType: .disclosureIndicator) {
