@@ -41,6 +41,7 @@
 		1A9C3E972DFE80E600A25249 /* WxpBaseMvpUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */; };
 		1ABD14242EDAE08D0019AA3A /* WxpRegisterOrBindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ABD14232EDAE08D0019AA3A /* WxpRegisterOrBindViewController.swift */; };
 		1ABD14262EDBF9890019AA3A /* WxpLoadingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ABD14252EDBF9890019AA3A /* WxpLoadingService.swift */; };
+		1ABD142A2EDDE3720019AA3A /* AccountDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ABD14292EDDE36B0019AA3A /* AccountDetailViewController.swift */; };
 		1ACFF6112E63190500608219 /* KtSwiftDialogUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 1ACFF6102E63190500608219 /* KtSwiftDialogUtils.m */; };
 		1ACFF6172E65E74600608219 /* WxpProviderListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACFF6162E65E74600608219 /* WxpProviderListViewController.swift */; };
 		1ADEF6B02ACDC6D6002FEB57 /* WxPusher_MacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADEF6AF2ACDC6D6002FEB57 /* WxPusher_MacApp.swift */; };
@@ -87,6 +88,7 @@
 		1A9C3E962DFE80E600A25249 /* WxpBaseMvpUIViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBaseMvpUIViewController.swift; sourceTree = "<group>"; };
 		1ABD14232EDAE08D0019AA3A /* WxpRegisterOrBindViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpRegisterOrBindViewController.swift; sourceTree = "<group>"; };
 		1ABD14252EDBF9890019AA3A /* WxpLoadingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpLoadingService.swift; sourceTree = "<group>"; };
+		1ABD14292EDDE36B0019AA3A /* AccountDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailViewController.swift; sourceTree = "<group>"; };
 		1AC210E12ACC584B008D86EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1AC210E32ACC5883008D86EA /* wxpusher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = wxpusher.entitlements; sourceTree = "<group>"; };
 		1ACFF60F2E63190500608219 /* KtSwiftDialogUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KtSwiftDialogUtils.h; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 		1A447DF42DF53ECD005C402F /* Page */ = {
 			isa = PBXGroup;
 			children = (
+				1ABD14282EDDE3560019AA3A /* AccountDetail */,
 				1A9C3E7F2DF5ABFC00A25249 /* Login */,
 				1ABD14202EDAE02D0019AA3A /* RegisterOrBind */,
 				1A9C3E8C2DF5DA8600A25249 /* BindPhone */,
@@ -300,6 +303,14 @@
 				1ABD14252EDBF9890019AA3A /* WxpLoadingService.swift */,
 			);
 			path = Service;
+			sourceTree = "<group>";
+		};
+		1ABD14282EDDE3560019AA3A /* AccountDetail */ = {
+			isa = PBXGroup;
+			children = (
+				1ABD14292EDDE36B0019AA3A /* AccountDetailViewController.swift */,
+			);
+			path = AccountDetail;
 			sourceTree = "<group>";
 		};
 		1ACFF6152E65E72000608219 /* ProviderList */ = {
@@ -549,6 +560,7 @@
 				1A447DF92DF53ECD005C402F /* MainTabBarController.swift in Sources */,
 				1A447DFA2DF53ECD005C402F /* WxpWebViewController.swift in Sources */,
 				1ABD14262EDBF9890019AA3A /* WxpLoadingService.swift in Sources */,
+				1ABD142A2EDDE3720019AA3A /* AccountDetailViewController.swift in Sources */,
 				1A962E752E0B081300C966A3 /* WxpSaveKey.swift in Sources */,
 				1A9820732E96657E00758D7C /* WxpWeixinOpenManager.swift in Sources */,
 				1ABD14242EDAE08D0019AA3A /* WxpRegisterOrBindViewController.swift in Sources */,

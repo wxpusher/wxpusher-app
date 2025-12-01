@@ -19,6 +19,24 @@ import shared
         
     }
     
+    public static func runWithRootVC(completion: @escaping (UINavigationController) -> Void){
+        runWithWindows {window in
+            let rootView = window.rootViewController
+            //如果根是navVC，那就压栈
+            if(rootView is UINavigationController){
+                let rootVC = rootView as! UINavigationController
+                completion(rootVC)
+            } else if(rootView is UITabBarController){
+                let tabVC = rootView as! UITabBarController
+                if(tabVC.selectedViewController  is UINavigationController){
+                    let rootVC = tabVC.selectedViewController as! UINavigationController
+                    completion(rootVC)
+                }
+            }
+        }
+        
+    }
+    
     /**
      * 跳转到登录页面
      */
@@ -34,6 +52,17 @@ import shared
     public static func jumpToUserAgreement() {
         runWithWindows(){ window in
             window.rootViewController = UINavigationController(rootViewController:  UserAgreementViewController())
+        }
+    }
+    
+    /**
+     * 跳转到账号详情页面
+     */
+    public static func jumpToAccountDetail(){
+        runWithRootVC { rootVC in
+            let accountDetail = AccountDetailViewController()
+            accountDetail.hidesBottomBarWhenPushed = true
+            rootVC.pushViewController(accountDetail, animated: true)
         }
     }
     /**
