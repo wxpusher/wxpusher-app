@@ -2,8 +2,6 @@ package com.smjcco.wxpusher.page.accountdetail
 
 import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
-import com.smjcco.wxpusher.base.biz.WxpAppDataService.getLoginInfo
-import com.smjcco.wxpusher.base.biz.WxpAppDataService.saveLoginInfo
 import com.smjcco.wxpusher.base.biz.WxpAppPageService
 import com.smjcco.wxpusher.base.common.WxpBaseMvpPresenter
 import com.smjcco.wxpusher.base.common.WxpDialogParams
@@ -71,11 +69,13 @@ class WxpAccountDetailPresenter(view: IWxpAccountDetailView) :
         params.rightText = "退出账号"
         params.rightBlock = {
             runAtMainSuspend {
+                WxpLoadingUtils.showLoading(msg = "退出中...")
                 WxpApiService.logout {
+                    WxpLoadingUtils.dismissLoading()
                     //删除本地的deviceToken
-                    getLoginInfo()?.let {
+                    WxpAppDataService.getLoginInfo()?.let {
                         it.deviceToken = null
-                        saveLoginInfo(it)
+                        WxpAppDataService.saveLoginInfo(it)
                     }
                     WxpAppPageService.jumpToLogin()
                 }
