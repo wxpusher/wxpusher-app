@@ -95,7 +95,7 @@ class WxpProfileViewController: UIViewController {
                                 params.leftText = "取消"
                                 params.rightText = "退出账号"
                                 params.rightBlock = {
-                                    WxpAppDataService.shared.logout()
+//                                    WxpAppDataService.shared.logout()
                                 }
                                 WxpDialogUtils.showDialog(params: params)
                                 

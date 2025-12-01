@@ -41,7 +41,7 @@ interface IWxpLoginPresenter : IWxpBaseMvpPresenter<IWxpLoginView, IWxpLoginPres
      * 微信登录
      * @param code 微信的授权码
      */
-    fun wexinLogin(code: String?)
+    fun weixinLogin(code: String?)
 
     /**
      * 苹果登录

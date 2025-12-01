@@ -118,7 +118,7 @@ class WxpLoginPresenter(view: IWxpLoginView) :
         }
     }
 
-    override fun wexinLogin(code: String?) {
+    override fun weixinLogin(code: String?) {
         WxpLogUtils.i(message = "微信登录，code=${code}")
         if (code.isNullOrEmpty()) {
             WxpToastUtils.showToast("微信授权码错误")

@@ -20,6 +20,7 @@ import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.base.common.WxpDialogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.base.common.runAtMainSuspend
 import com.smjcco.wxpusher.common.WxpConstants
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
@@ -195,7 +196,9 @@ class ProfileFragment : WxpBaseFragment() {
             leftText = "取消",
             rightText = "退出账号",
             rightBlock = {
-                WxpAppDataService.logout()
+                runAtMainSuspend {
+                    WxpAppDataService.logout()
+                }
                 WxpToastUtils.showToast("已退出登录")
                 setupData() // 刷新数据
             }

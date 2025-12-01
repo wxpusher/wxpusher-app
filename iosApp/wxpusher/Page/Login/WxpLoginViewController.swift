@@ -412,7 +412,7 @@ class WxpLoginViewController: WxpBaseMvpUIViewController<IWxpLoginPresenter>,IWx
             WxpLoadingUtils.shared.dismissLoading()
             switch result {
             case .success(let data):
-                self?.presenter.wexinLogin(code: data.code)
+                self?.presenter.weixinLogin(code: data.code)
             case .failure(let error):
                 WxpToastUtils.shared.showToast(msg: error.errorDescription)
             }

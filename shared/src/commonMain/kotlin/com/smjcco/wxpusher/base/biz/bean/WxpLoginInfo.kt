@@ -18,7 +18,7 @@ data class WxpLoginInfo(
     var openId: String? = null, //用户的openid，可能不存在
     var nickName: String? = null,
     var phone: String? = null,
-    var wxBind: Boolean? = null,
+    var weiXinBind: Boolean? = null,
     var appleBind: Boolean? = null
 ) {
     constructor(baseResp: WxpBaseLoginResp) : this(

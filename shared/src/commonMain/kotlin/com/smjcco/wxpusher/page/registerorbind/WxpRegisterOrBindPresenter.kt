@@ -17,7 +17,7 @@ import com.smjcco.wxpusher.page.login.WxpWeixinLoginReq
 class WxpRegisterOrBindPresenter(view: IWxpRegisterOrBindView) :
     WxpBaseMvpPresenter<IWxpRegisterOrBindView, IWxpRegisterOrBindPresenter>(view),
     IWxpRegisterOrBindPresenter {
-    override fun wexinBind(code: String?, bindData: WxpBindPageData?) {
+    override fun weixinBind(code: String?, bindData: WxpBindPageData?) {
         if (bindData == null) {
             return
         }

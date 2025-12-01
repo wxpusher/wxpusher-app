@@ -6,6 +6,9 @@ import com.smjcco.wxpusher.base.common.BaseResp
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpNetworkService
 import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.page.accountdetail.WxpAppleBindReq
+import com.smjcco.wxpusher.page.accountdetail.WxpWeixinBindReq
+import com.smjcco.wxpusher.page.login.WxpAppleBind
 import com.smjcco.wxpusher.page.login.WxpAppleLoginReq
 import com.smjcco.wxpusher.page.login.WxpAppleLoginResp
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
@@ -157,6 +160,30 @@ object WxpApiService {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .post(WxpNetworkService.getUrl("/api/device/apple-login")) {
+                    setBody(req)
+                }.body()
+        })
+    }
+
+    /**
+     * 通过微信授权码绑定到已有账号
+     */
+    suspend fun weixinBind(req: WxpWeixinBindReq): Boolean? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .put(WxpNetworkService.getUrl("/api/need-login/device/weixin-bind")) {
+                    setBody(req)
+                }.body()
+        })
+    }
+
+    /**
+     * 苹果账号绑定到已有账号
+     */
+    suspend fun appleBind(req: WxpAppleBindReq): Boolean? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .put(WxpNetworkService.getUrl("/api/need-login/device/weixin-apple")) {
                     setBody(req)
                 }.body()
         })

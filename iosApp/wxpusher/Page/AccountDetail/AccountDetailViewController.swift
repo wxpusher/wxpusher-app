@@ -6,8 +6,11 @@
 //
 import UIKit
 import shared
+import AuthenticationServices
 
-class AccountDetailViewController: UIViewController {
+class AccountDetailViewController: WxpBaseMvpUIViewController<IWxpAccountDetailPresenter>,IWxpAccountDetailView   {
+   
+    
     
     // MARK: - UI Components
     private lazy var tableView: UITableView = {
@@ -112,51 +115,80 @@ class AccountDetailViewController: UIViewController {
     }
     
     private func setupData() {
-        // TODO: Replace with actual data from your logic
-        let phone = "138****8888"
-        let isWechatBound = true
-        let isAppleBound = false
+        let loginInfo = WxpAppDataService.shared.getLoginInfo()
         
         menuItems = [
             AccountMenuItem(
                 icon: UIImage(systemName: "iphone"),
                 title: "手机账号",
-                value: phone,
+                value: loginInfo?.phone ?? "",
                 accessoryType: .disclosureIndicator,
                 action: { [weak self] in self?.handlePhoneTap() }
             ),
             AccountMenuItem(
-                icon: UIImage(named: "ic_weixin"), // Ensure this image exists
+                icon: UIImage(named: "ic_weixin"),
                 title: "微信绑定",
-                value: isWechatBound ? "已绑定" : "未绑定",
-                accessoryType: .none,
-                action: nil
+                value: loginInfo?.weiXinBind == true ? "已绑定" : "未绑定",
+                accessoryType: loginInfo?.weiXinBind == true ? .none : .disclosureIndicator,
+                action: loginInfo?.weiXinBind == true ? nil : { [weak self] in self?.handleBindWeixinTap()}
             ),
             AccountMenuItem(
                 icon: UIImage(systemName: "applelogo"),
                 title: "Apple账号",
-                value: isAppleBound ? "已绑定" : "未绑定",
-                accessoryType: .none,
-                action: nil
+                value: loginInfo?.appleBind == true  ? "已绑定" : "未绑定",
+                accessoryType: loginInfo?.appleBind == true ? .none : .disclosureIndicator,
+                action: loginInfo?.appleBind == true ? nil : { [weak self] in self?.handleBindAppleTap()}
             )
         ]
         tableView.reloadData()
     }
     
+    // MARK: - MVP
+    override func createPresenter() -> Any? {
+        return WxpAccountDetailPresenter(view: self)
+    }
+    
+    func onAppleBindSuccess() {
+        setupData()
+    }
+    
+    func onWeixinBindSuccess() {
+        setupData()
+    }
+    
     // MARK: - Actions
+    @objc private func handleBindWeixinTap() {
+        WxpLoadingUtils.shared.showLoading(msg: "微信授权中", canDismiss: true)
+        WxpWeixinOpenManager.shared.requestAuth { [weak self] result in
+            WxpLoadingUtils.shared.dismissLoading()
+            switch result {
+            case .success(let data):
+                self?.presenter.weixinBind(code: data.code)
+            case .failure(let error):
+                WxpToastUtils.shared.showToast(msg: error.errorDescription)
+            }
+        }
+    }
+    
+    @objc private func handleBindAppleTap() {
+        let request = ASAuthorizationAppleIDProvider().createRequest()
+        request.requestedScopes = [.fullName, .email]
+        
+        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+        authorizationController.delegate = self
+        authorizationController.presentationContextProvider = self
+        authorizationController.performRequests()
+        WxpLoadingUtils.shared.showLoading(msg: "等待苹果授权", canDismiss: true)
+    }
+    
     @objc private func handlePhoneTap() {
-        print("Change Phone Tapped")
-        // TODO: Jump to change phone page
     }
     
     @objc private func handleLogoutTap() {
-        print("Logout Tapped")
-        // TODO: Implement logout logic
+        presenter.logout()
     }
     
     @objc private func handleDeleteAccountTap() {
-        print("Delete Account Tapped")
-        // TODO: Implement delete account logic
     }
 }
 
@@ -239,5 +271,76 @@ class AccountDetailCell: UITableViewCell {
             
             image.draw(in: CGRect(origin: centerPoint, size: CGSize(width: scaledWidth, height: scaledHeight)))
         }
+    }
+}
+
+
+
+
+// 处理授权结果的委托
+extension AccountDetailViewController: ASAuthorizationControllerDelegate {
+
+    // 授权成功
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
+        WxpLoadingUtils.shared.dismissLoading()
+        guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential else {
+            WxpToastUtils.shared.showToast(msg: "无法获取 Apple ID Credential")
+            print("无法获取 Apple ID Credential")
+            return
+        }
+        
+        // 检查 identityToken 是否为 nil
+        guard let identityTokenData = appleIDCredential.identityToken else {
+            WxpToastUtils.shared.showToast(msg: "Identity Token 为 nil")
+            print("Identity Token 为 nil")
+            return
+        }
+        
+        // 尝试转换为 String
+        guard let identityToken = String(data: identityTokenData, encoding: .utf8) else {
+            print("无法将 Identity Token 转换为字符串")
+            WxpToastUtils.shared.showToast(msg: "无法将 Identity Token 转换为字符串")
+            return
+        }
+        // appleIDCredential.authorizationCode // Warning: result unused
+        
+        // 只有在首次授权时（或用户重置了其 Apple ID 设置后）才会提供姓名和邮箱
+       
+        var fullName = ""
+        if(appleIDCredential.fullName != nil){
+            let formatter = PersonNameComponentsFormatter()
+            formatter.style = .default
+            fullName = formatter.string(from: appleIDCredential.fullName!)
+        }
+        
+        let email = appleIDCredential.email
+        let userId = appleIDCredential.user
+        
+        presenter.appleBind(code: identityToken, userId: userId, email: email, name: fullName)
+    }
+
+    // 授权失败
+    func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
+        WxpLoadingUtils.shared.dismissLoading()
+        // 处理错误
+        let authError = ASAuthorizationError(_nsError: error as NSError)
+        switch authError.code {
+        case .canceled:
+            print("绑定-用户取消了授权。")
+            WxpToastUtils.shared.showToast(msg: "取消苹果授权")
+        case .unknown, .invalidResponse, .notHandled, .failed:
+            print("绑定-苹果登录失败\n \(error.localizedDescription)")
+            WxpToastUtils.shared.showToast(msg: "苹果授权失败\n \(error.localizedDescription)")
+        default:
+            break
+        }
+    }
+}
+
+// 提供呈现上下文的委托
+extension AccountDetailViewController: ASAuthorizationControllerPresentationContextProviding {
+    func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
+        // 返回授权界面应该出现在哪个窗口上
+        return self.view.window!
     }
 }

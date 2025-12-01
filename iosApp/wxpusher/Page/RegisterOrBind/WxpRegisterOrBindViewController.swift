@@ -451,7 +451,7 @@ class WxpRegisterOrBindViewController: WxpBaseMvpUIViewController<IWxpRegisterOr
             WxpLoadingUtils.shared.dismissLoading()
             switch result {
             case .success(let data):
-                self?.presenter.wexinBind(code: data.code, bindData: self?.bindPageData)
+                self?.presenter.weixinBind(code: data.code, bindData: self?.bindPageData)
             case .failure(let error):
                 WxpToastUtils.shared.showToast(msg: error.errorDescription)
             }

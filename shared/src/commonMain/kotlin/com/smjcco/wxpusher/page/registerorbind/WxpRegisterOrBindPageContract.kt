@@ -21,7 +21,7 @@ interface IWxpRegisterOrBindPresenter :
      * @param code 微信的授权码
      * @param bindData 要绑定的的手机登录的手机  或者苹果登录数据
      */
-    fun wexinBind(code: String?, bindData: WxpBindPageData?)
+    fun weixinBind(code: String?, bindData: WxpBindPageData?)
 
     /**
      * 创建一个新账号
