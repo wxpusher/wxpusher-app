@@ -113,7 +113,8 @@ object WxpApiService {
      * 更新设备的pushToken信息
      */
     suspend fun logout(
-        successBlock: (() -> Unit)? = null
+        successBlock: (() -> Unit)? = null,
+        errorBlock: (() -> Unit)? = null
     ): Boolean? {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
@@ -121,7 +122,7 @@ object WxpApiService {
 
                 }.body()
         }, errorBlock = {
-            WxpToastUtils.showToast("失败," + it.message)
+            errorBlock?.invoke()
         }, successBlock = { successBlock?.invoke() })
     }
 

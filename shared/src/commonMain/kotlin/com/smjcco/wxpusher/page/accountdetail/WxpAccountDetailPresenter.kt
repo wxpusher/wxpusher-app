@@ -70,7 +70,7 @@ class WxpAccountDetailPresenter(view: IWxpAccountDetailView) :
         params.rightBlock = {
             runAtMainSuspend {
                 WxpLoadingUtils.showLoading(msg = "退出中...")
-                WxpApiService.logout {
+                WxpApiService.logout(successBlock = {
                     WxpLoadingUtils.dismissLoading()
                     //删除本地的deviceToken
                     WxpAppDataService.getLoginInfo()?.let {
@@ -78,7 +78,9 @@ class WxpAccountDetailPresenter(view: IWxpAccountDetailView) :
                         WxpAppDataService.saveLoginInfo(it)
                     }
                     WxpAppPageService.jumpToLogin()
-                }
+                }, errorBlock = {
+                    WxpLoadingUtils.dismissLoading()
+                })
             }
         }
         WxpDialogUtils.showDialog(params)
