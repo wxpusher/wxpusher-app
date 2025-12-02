@@ -32,12 +32,12 @@ class AccountDetailViewController: WxpBaseMvpUIViewController<IWxpAccountDetailP
     
     private lazy var logoutButton: UIButton = {
         let button = UIButton(type: .system)
-        button.backgroundColor = .systemBackground
+        button.backgroundColor = .secondarySystemGroupedBackground // Use semantic color for dark mode
         button.setTitle("退出登录", for: .normal)
         button.setTitleColor(.gray, for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
         button.layer.cornerRadius = 8
-        // Add border for better visibility on light background
+        // Add border for better visibility on light background, minimal on dark
         button.layer.borderWidth = 0.5
         button.layer.borderColor = UIColor.systemGray4.cgColor
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -64,6 +64,7 @@ class AccountDetailViewController: WxpBaseMvpUIViewController<IWxpAccountDetailP
         let value: String?
         let accessoryType: UITableViewCell.AccessoryType
         let action: (() -> Void)?
+        let tintIcon: Bool // New property
     }
     
     // MARK: - Lifecycle
@@ -123,21 +124,24 @@ class AccountDetailViewController: WxpBaseMvpUIViewController<IWxpAccountDetailP
                 title: "手机账号",
                 value: loginInfo?.phone ?? "",
                 accessoryType: .disclosureIndicator,
-                action: { [weak self] in self?.handlePhoneTap() }
+                action: { [weak self] in self?.handlePhoneTap() },
+                tintIcon: true
             ),
             AccountMenuItem(
                 icon: UIImage(named: "ic_weixin"),
                 title: "微信绑定",
                 value: loginInfo?.weiXinBind == true ? "已绑定" : "未绑定",
                 accessoryType: loginInfo?.weiXinBind == true ? .none : .disclosureIndicator,
-                action: loginInfo?.weiXinBind == true ? nil : { [weak self] in self?.handleBindWeixinTap()}
+                action: loginInfo?.weiXinBind == true ? nil : { [weak self] in self?.handleBindWeixinTap()},
+                tintIcon: false
             ),
             AccountMenuItem(
                 icon: UIImage(systemName: "applelogo"),
                 title: "Apple账号",
                 value: loginInfo?.appleBind == true  ? "已绑定" : "未绑定",
                 accessoryType: loginInfo?.appleBind == true ? .none : .disclosureIndicator,
-                action: loginInfo?.appleBind == true ? nil : { [weak self] in self?.handleBindAppleTap()}
+                action: loginInfo?.appleBind == true ? nil : { [weak self] in self?.handleBindAppleTap()},
+                tintIcon: true
             )
         ]
         tableView.reloadData()
@@ -245,7 +249,17 @@ class AccountDetailCell: UITableViewCell {
             imageView?.image = nil
         }
         
-        imageView?.tintColor = .defFontPrimaryColor
+        if item.tintIcon {
+            imageView?.tintColor = .defFontPrimaryColor
+            if let currentImage = imageView?.image {
+                imageView?.image = currentImage.withRenderingMode(.alwaysTemplate)
+            }
+        } else {
+            if let currentImage = imageView?.image {
+                imageView?.image = currentImage.withRenderingMode(.alwaysOriginal)
+            }
+            imageView?.tintColor = nil // Remove tint
+        }
         
         textLabel?.text = item.title
         detailTextLabel?.text = item.value
@@ -259,7 +273,6 @@ class AccountDetailCell: UITableViewCell {
         format.scale = UIScreen.main.scale
         let renderer = UIGraphicsImageRenderer(size: targetSize, format: format)
         return renderer.image { _ in
-            // Calculate rect to fit aspect ratio
             let widthRatio = targetSize.width / image.size.width
             let heightRatio = targetSize.height / image.size.height
             let scaleFactor = min(widthRatio, heightRatio)
