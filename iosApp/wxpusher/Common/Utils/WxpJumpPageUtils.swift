@@ -65,6 +65,17 @@ import shared
             rootVC.pushViewController(accountDetail, animated: true)
         }
     }
+    
+    /**
+     * 跳转到修改手机号页面
+     */
+    public static func jumpToChangePhone(){
+        runWithRootVC { rootVC in
+            let vc = WxpChangePhoneViewController()
+            vc.hidesBottomBarWhenPushed = true
+            rootVC.pushViewController(vc, animated: true)
+        }
+    }
     /**
      * 跳转到主页
      */

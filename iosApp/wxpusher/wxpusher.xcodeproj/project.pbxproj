@@ -42,6 +42,7 @@
 		1ABD14242EDAE08D0019AA3A /* WxpRegisterOrBindViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ABD14232EDAE08D0019AA3A /* WxpRegisterOrBindViewController.swift */; };
 		1ABD14262EDBF9890019AA3A /* WxpLoadingService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ABD14252EDBF9890019AA3A /* WxpLoadingService.swift */; };
 		1ABD142A2EDDE3720019AA3A /* AccountDetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ABD14292EDDE36B0019AA3A /* AccountDetailViewController.swift */; };
+		1ABD142F2EDF44CB0019AA3A /* WxpChangePhoneViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ABD142E2EDF44C90019AA3A /* WxpChangePhoneViewController.swift */; };
 		1ACFF6112E63190500608219 /* KtSwiftDialogUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 1ACFF6102E63190500608219 /* KtSwiftDialogUtils.m */; };
 		1ACFF6172E65E74600608219 /* WxpProviderListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACFF6162E65E74600608219 /* WxpProviderListViewController.swift */; };
 		1ADEF6B02ACDC6D6002FEB57 /* WxPusher_MacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADEF6AF2ACDC6D6002FEB57 /* WxPusher_MacApp.swift */; };
@@ -89,6 +90,7 @@
 		1ABD14232EDAE08D0019AA3A /* WxpRegisterOrBindViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpRegisterOrBindViewController.swift; sourceTree = "<group>"; };
 		1ABD14252EDBF9890019AA3A /* WxpLoadingService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpLoadingService.swift; sourceTree = "<group>"; };
 		1ABD14292EDDE36B0019AA3A /* AccountDetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountDetailViewController.swift; sourceTree = "<group>"; };
+		1ABD142E2EDF44C90019AA3A /* WxpChangePhoneViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpChangePhoneViewController.swift; sourceTree = "<group>"; };
 		1AC210E12ACC584B008D86EA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1AC210E32ACC5883008D86EA /* wxpusher.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = wxpusher.entitlements; sourceTree = "<group>"; };
 		1ACFF60F2E63190500608219 /* KtSwiftDialogUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KtSwiftDialogUtils.h; sourceTree = "<group>"; };
@@ -132,6 +134,7 @@
 		1A447DF42DF53ECD005C402F /* Page */ = {
 			isa = PBXGroup;
 			children = (
+				1ABD142B2EDF44AC0019AA3A /* ChangePhone */,
 				1ABD14282EDDE3560019AA3A /* AccountDetail */,
 				1A9C3E7F2DF5ABFC00A25249 /* Login */,
 				1ABD14202EDAE02D0019AA3A /* RegisterOrBind */,
@@ -311,6 +314,14 @@
 				1ABD14292EDDE36B0019AA3A /* AccountDetailViewController.swift */,
 			);
 			path = AccountDetail;
+			sourceTree = "<group>";
+		};
+		1ABD142B2EDF44AC0019AA3A /* ChangePhone */ = {
+			isa = PBXGroup;
+			children = (
+				1ABD142E2EDF44C90019AA3A /* WxpChangePhoneViewController.swift */,
+			);
+			path = ChangePhone;
 			sourceTree = "<group>";
 		};
 		1ACFF6152E65E72000608219 /* ProviderList */ = {
@@ -552,6 +563,7 @@
 				1A4934732E2D0F0C00EA1C71 /* WxpCommonNotification.swift in Sources */,
 				1A962E672E08610200C966A3 /* KtSwiftJumpPageUtils.m in Sources */,
 				1A9C3E802DF5ABFC00A25249 /* WxpLoginViewController.swift in Sources */,
+				1ABD142F2EDF44CB0019AA3A /* WxpChangePhoneViewController.swift in Sources */,
 				1A962E732E0B075600C966A3 /* UserAgreementViewController.swift in Sources */,
 				1A962E792E0B0B2100C966A3 /* WxpCommonBlockDef.swift in Sources */,
 				1A49346C2E1A6B6800EA1C71 /* WxpUnbindPhoneViewController.swift in Sources */,

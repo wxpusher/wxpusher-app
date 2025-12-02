@@ -124,7 +124,7 @@ class AccountDetailViewController: WxpBaseMvpUIViewController<IWxpAccountDetailP
                 title: "手机账号",
                 value: loginInfo?.phone ?? "",
                 accessoryType: .disclosureIndicator,
-                action: { [weak self] in self?.handlePhoneTap() },
+                action: {WxpJumpPageUtils.jumpToChangePhone() },
                 tintIcon: true
             ),
             AccountMenuItem(
@@ -183,9 +183,6 @@ class AccountDetailViewController: WxpBaseMvpUIViewController<IWxpAccountDetailP
         authorizationController.presentationContextProvider = self
         authorizationController.performRequests()
         WxpLoadingUtils.shared.showLoading(msg: "等待苹果授权", canDismiss: true)
-    }
-    
-    @objc private func handlePhoneTap() {
     }
     
     @objc private func handleLogoutTap() {
