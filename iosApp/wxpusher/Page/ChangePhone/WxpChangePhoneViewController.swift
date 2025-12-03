@@ -9,7 +9,7 @@ import UIKit
 import Toaster
 import shared
 
-class WxpChangePhoneViewController: UIViewController {
+class WxpChangePhoneViewController: WxpBaseMvpUIViewController<IWxpChangePhonePresenter>,IWxpChangePhoneView    {
     
     /// 外部传入的当前绑定手机号，如果存在则显示
     var phone: String?
@@ -88,7 +88,7 @@ class WxpChangePhoneViewController: UIViewController {
     
     private lazy var sendCodeButton: UIButton = {
         let btn = UIButton(type: .custom)
-        btn.setTitle("获取验证码", for: .normal)
+        btn.setTitle("发送验证码", for: .normal)
         btn.setTitleColor(.defAccentPrimaryColor, for: .normal)
         btn.setTitleColor(.systemGray, for: .disabled)
         btn.titleLabel?.font = .systemFont(ofSize: 14)
@@ -115,8 +115,7 @@ class WxpChangePhoneViewController: UIViewController {
         super.viewDidLoad()
         title = "换绑手机"
         view.backgroundColor = .systemGroupedBackground
-        self.phone = "18200201111"
-        
+        phone = WxpAppDataService.shared.getLoginInfo()?.phone
         setupUI()
         setupConstraints()
         
@@ -223,15 +222,25 @@ class WxpChangePhoneViewController: UIViewController {
     
     @objc private func handleSendCode() {
         dismissKeyboard()
-        // TODO: 调用发送验证码接口
-        // 示例：检查手机号是否为空 -> 发起请求 -> 成功后开始倒计时
-        print("TODO: Send verification code")
+        presenter.sendVerifyCode(phone: newPhoneTextField.text)
     }
     
     @objc private func handleConfirm() {
         dismissKeyboard()
-        // TODO: 调用修改手机号接口
-        // 示例：验证输入合法性 -> 发起请求 -> 成功后返回或提示
-        print("TODO: Submit change phone request")
+        presenter.bindPhone(phone: newPhoneTextField.text, verifyCode: codeTextField.text)
+    }
+    
+    // MARK: - MVP
+    
+    func onChangPhoneFinish() {
+        navigationController?.popViewController(animated: true)
+    }
+    
+    func onSendButtonText(msg: String) {
+        sendCodeButton.setTitle(msg, for: .normal)
+    }
+    
+    override func createPresenter() -> Any? {
+        return WxpChangePhonePresenter(view: self)
     }
 }

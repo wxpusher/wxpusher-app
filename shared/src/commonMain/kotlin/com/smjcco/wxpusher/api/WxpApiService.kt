@@ -8,7 +8,7 @@ import com.smjcco.wxpusher.base.common.WxpNetworkService
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.page.accountdetail.WxpAppleBindReq
 import com.smjcco.wxpusher.page.accountdetail.WxpWeixinBindReq
-import com.smjcco.wxpusher.page.login.WxpAppleBind
+import com.smjcco.wxpusher.page.changephone.WxpPhoneBindReq
 import com.smjcco.wxpusher.page.login.WxpAppleLoginReq
 import com.smjcco.wxpusher.page.login.WxpAppleLoginResp
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
@@ -184,7 +184,19 @@ object WxpApiService {
     suspend fun appleBind(req: WxpAppleBindReq): Boolean? {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
-                .put(WxpNetworkService.getUrl("/api/need-login/device/weixin-apple")) {
+                .put(WxpNetworkService.getUrl("/api/need-login/device/apple-bind")) {
+                    setBody(req)
+                }.body()
+        })
+    }
+
+    /**
+     * 换绑手机号
+     */
+    suspend fun phoneBind(req: WxpPhoneBindReq): Boolean? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .put(WxpNetworkService.getUrl("/api/need-login/device/phone-bind")) {
                     setBody(req)
                 }.body()
         })
