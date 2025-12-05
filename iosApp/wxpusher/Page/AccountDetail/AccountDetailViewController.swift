@@ -190,6 +190,10 @@ class AccountDetailViewController: WxpBaseMvpUIViewController<IWxpAccountDetailP
     }
     
     @objc private func handleDeleteAccountTap() {
+        let vc = WxpRemoveAccountViewController()
+        let navController = UINavigationController(rootViewController: vc)
+        navController.modalPresentationStyle = .pageSheet
+        self.present(navController, animated: true)
     }
 }
 

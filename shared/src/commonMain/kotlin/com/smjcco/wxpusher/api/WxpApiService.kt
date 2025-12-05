@@ -203,6 +203,17 @@ object WxpApiService {
     }
 
     /**
+     * 删除账号
+     */
+    suspend fun removeAccount(): Boolean? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .delete(WxpNetworkService.getUrl("/api/need-login/device/remove-account"))
+                .body()
+        })
+    }
+
+    /**
      * 更新设备的pushToken信息
      */
     suspend fun updateDeviceInfo(

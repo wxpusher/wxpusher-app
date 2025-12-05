@@ -10,8 +10,8 @@ import com.smjcco.wxpusher.base.biz.bean.WxpLoginInfo
 import com.smjcco.wxpusher.base.biz.bean.WxpPlatformEnum
 import com.smjcco.wxpusher.base.biz.bean.WxpUpdateInfoReq
 import com.smjcco.wxpusher.base.common.WxpDateTimeUtils
+import com.smjcco.wxpusher.base.common.WxpLoadingUtils
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
-import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
 
 object WxpAppDataService {
@@ -91,6 +91,21 @@ object WxpAppDataService {
                     it.deviceToken = null
                     saveLoginInfo(it)
                 }
+                WxpAppPageService.jumpToLogin()
+            }
+        }
+    }
+
+    /**
+     * 删除账号
+     */
+    fun removeAccount() {
+        runAtMainSuspend {
+            WxpLoadingUtils.showLoading(msg = "处理中", canDismiss = false)
+            val result = WxpApiService.removeAccount()
+            WxpLoadingUtils.dismissLoading()
+            if (result == true) {
+                WxpSaveService.set(SaveLoginInfoKey, "")
                 WxpAppPageService.jumpToLogin()
             }
         }

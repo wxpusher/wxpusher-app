@@ -83,29 +83,9 @@ class WxpProfileViewController: UIViewController {
                             accessoryType: .disclosureIndicator) {
                                 WxpToastUtils.shared.showToast(msg: "设备ID复制成功")
                             },
-                ProfileItem(title: "账号信息", subtitle: "管理登录方式",
+                ProfileItem(title: "账号信息", subtitle: "管理账号",
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToAccountDetail()
-                            },
-                ProfileItem(title: "用户账号", subtitle: "退出登录",
-                            accessoryType: .disclosureIndicator) {
-                                var params = WxpDialogParams()
-                                params.title = "退出当前账号吗？"
-                                params.message = "退出后需要重新登录才可以接收消息"
-                                params.leftText = "取消"
-                                params.rightText = "退出账号"
-                                params.rightBlock = {
-//                                    WxpAppDataService.shared.logout()
-                                }
-                                WxpDialogUtils.showDialog(params: params)
-                                
-                            },
-                ProfileItem(title: "用户数据", subtitle: "注销手机号",
-                            accessoryType: .disclosureIndicator) {
-                                let unbindVC = WxpUnbindPhoneViewController()
-                                let navController = UINavigationController(rootViewController: unbindVC)
-                                navController.modalPresentationStyle = .pageSheet
-                                self.present(navController, animated: true)
                             }
             ]),
             ("通知提醒", [
