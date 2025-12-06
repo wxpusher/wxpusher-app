@@ -76,6 +76,17 @@ import shared
             rootVC.pushViewController(vc, animated: true)
         }
     }
+    
+    /**
+     * 跳转到删除账号
+     */
+    public static func jumpToRemoveAccount(){
+        runWithRootVC { rootVC in
+            let vc = WxpRemoveAccountViewController()
+            vc.hidesBottomBarWhenPushed = true
+            rootVC.pushViewController(vc, animated: true)
+        }
+    }
     /**
      * 跳转到主页
      */

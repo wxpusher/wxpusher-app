@@ -46,16 +46,8 @@ class WxpRemoveAccountViewController: UIViewController {
     // MARK: - Setup Methods
     private func setupUI() {
         title = "删除账号"
-        view.backgroundColor = .systemBackground
-        
-        // 添加取消按钮
-        navigationItem.leftBarButtonItem = UIBarButtonItem(
-            title: "取消",
-            style: .plain,
-            target: self,
-            action: #selector(cancelButtonTapped)
-        )
-        
+        view.backgroundColor = .systemGroupedBackground
+//        
         // 配置滚动视图
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.showsVerticalScrollIndicator = false
@@ -87,10 +79,10 @@ class WxpRemoveAccountViewController: UIViewController {
         
         // 配置确认文本视图
         confirmationTextView.translatesAutoresizingMaskIntoConstraints = false
-        confirmationTextView.text = "请注意：\n\n• 删除后，数据无法找回\n• 当前手机号将无法再次登录\n• 如账号绑定的微信、苹果账号，也会一并删除\n• 如需继续使用服务，需要重新注册新账号\n\n请确认您已了解上述风险，并确定要继续除账号。"
+        confirmationTextView.text = "请注意：\n\n• 删除后，账号数据无法找回\n• 手机号将无法再次登录\n• 如账号绑定的微信、苹果账号，也会一并删除\n• 如果你是开发账号，删除后将不能再发送消息\n• 如果你存在未结算的资金，删除后停止结算且无法找回\n• 如你需继续使用服务，需要重新注册新账号\n\n请确认您已了解上述风险，并确定要继续除账号。"
         confirmationTextView.font = .systemFont(ofSize: 14)
-        confirmationTextView.textColor = .defFontSecondColor
-        confirmationTextView.backgroundColor = .systemGray6
+        confirmationTextView.textColor = .black
+        confirmationTextView.backgroundColor = .white
         confirmationTextView.layer.cornerRadius = 12
         confirmationTextView.layer.borderWidth = 1
         confirmationTextView.layer.borderColor = UIColor.systemGray4.cgColor
@@ -216,7 +208,17 @@ class WxpRemoveAccountViewController: UIViewController {
     }
     
     @objc private func confirmButtonTapped() {
-        WxpAppDataService.shared.removeAccount()
+        let params = WxpDialogParams()
+        params.title = "最后一次提示"
+        params.message = "删除后账号将无法使用，并且删除所有数据，无法进行找回，点击确认后，立即删除账号，是否继续？"
+        params.leftText = "确认删除"
+        params.leftBlock = {
+            WxpAppDataService.shared.removeAccount()
+        }
+        params.rightText = "取消"
+        WxpDialogUtils.showDialog(params: params)
+        
+        
     }
     
     
