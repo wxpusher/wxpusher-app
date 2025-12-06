@@ -115,7 +115,12 @@ class WxpChangePhoneViewController: WxpBaseMvpUIViewController<IWxpChangePhonePr
         super.viewDidLoad()
         title = "换绑手机"
         view.backgroundColor = .systemGroupedBackground
-        phone = WxpAppDataService.shared.getLoginInfo()?.phone
+        let loginInfo = WxpAppDataService.shared.getLoginInfo()
+        if let p = loginInfo?.phone, !p.isEmpty {
+            phone = WxpMaskUtils.shared.mask(text: p, pre: 3, end: 4)
+        } else {
+            phone = ""
+        }
         setupUI()
         setupConstraints()
         

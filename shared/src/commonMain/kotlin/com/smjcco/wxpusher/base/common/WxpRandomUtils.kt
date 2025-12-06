@@ -2,7 +2,7 @@ package com.smjcco.wxpusher.base.common
 
 import kotlin.random.Random
 
-object RandomUtils {
+object WxpRandomUtils {
     fun generateRandomString(length: Int): String {
         val charPool = ('a'..'z') + ('A'..'Z') + ('0'..'9')
         return (1..length)

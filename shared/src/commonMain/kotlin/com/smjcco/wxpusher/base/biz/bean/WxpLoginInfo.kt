@@ -13,6 +13,7 @@ import kotlin.String
 @Serializable
 @JsonIgnoreUnknownKeys
 data class WxpLoginInfo(
+    var version: Int? = 0, //设备身份信息
     var deviceToken: String? = null, //设备身份信息
     val deviceId: String? = null, //设备id
     val uid: String? = null, //用户uid
@@ -24,6 +25,7 @@ data class WxpLoginInfo(
     var appleBind: Boolean? = null
 ) {
     constructor(baseResp: WxpBaseLoginResp) : this(
+        baseResp.version,
         baseResp.deviceToken,
         baseResp.deviceId,
         baseResp.uid,

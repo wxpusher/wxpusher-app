@@ -24,7 +24,7 @@ private object AliyunLog {
     fun init() {
         logId = WxpSaveService.get(logIdKey, "")
         if (logId.isEmpty()) {
-            logId = "LogId_" + RandomUtils.generateRandomString(26)
+            logId = "LogId_" + WxpRandomUtils.generateRandomString(26)
             WxpSaveService.get(logIdKey, logId)
         }
         // endpoint前需要加 https://

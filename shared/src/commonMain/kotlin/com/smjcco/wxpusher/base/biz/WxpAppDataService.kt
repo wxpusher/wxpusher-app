@@ -1,5 +1,6 @@
 package com.smjcco.wxpusher.base.biz
 
+import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpLogUtils
@@ -27,6 +28,13 @@ object WxpAppDataService {
     //上报的信息 ，避免重复上报
     private var hasUpdateInfoData: WxpUpdateInfoReq? = null
     private var hasUpdateInfoDataTime: Long = 0L
+
+    /**
+     * 数据模块初始化
+     */
+    fun init() {
+        getUserDeviceInfo()
+    }
 
     /**
      * 针对iOS，第一次启动的时候，进行一次数据迁移，避免用户重新登录
@@ -107,6 +115,28 @@ object WxpAppDataService {
             if (result == true) {
                 WxpSaveService.set(SaveLoginInfoKey, "")
                 WxpAppPageService.jumpToLogin()
+            }
+        }
+    }
+
+    /**
+     * 补全用户数据
+     * 因为早期的用户等，登录的时候，数据完整度不够，因此如果数据和服务器版本不一致，就调用这个接口进行一次补全
+     */
+    fun getUserDeviceInfo() {
+        //没有登录不补全
+        if (getLoginInfo()?.deviceToken.isNullOrEmpty()) {
+            return
+        }
+        //用户数据版本和最新版本数据一致，就不用进行补全
+        if (getLoginInfo()?.version == WxpConfig.UserLoginInfoVersion) {
+            return
+        }
+        runAtIOSuspend {
+            val result = WxpApiService.getUserDeviceInfo()
+            result?.let {
+                saveLoginInfo(WxpLoginInfo(result))
+                WxpLogUtils.i(message = "补全用户数据完成")
             }
         }
     }

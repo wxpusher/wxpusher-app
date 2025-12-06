@@ -117,12 +117,17 @@ class AccountDetailViewController: WxpBaseMvpUIViewController<IWxpAccountDetailP
     
     private func setupData() {
         let loginInfo = WxpAppDataService.shared.getLoginInfo()
-        
+        let maskPhone: String
+        if let phone = loginInfo?.phone, !phone.isEmpty {
+            maskPhone = WxpMaskUtils.shared.mask(text: phone, pre: 3, end: 4)
+        } else {
+            maskPhone = "未绑定"
+        }
         menuItems = [
             AccountMenuItem(
                 icon: UIImage(systemName: "iphone"),
                 title: "手机账号",
-                value: loginInfo?.phone ?? "",
+                value: maskPhone,
                 accessoryType: .disclosureIndicator,
                 action: {WxpJumpPageUtils.jumpToChangePhone() },
                 tintIcon: true

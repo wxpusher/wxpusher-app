@@ -1,5 +1,6 @@
 package com.smjcco.wxpusher.page.login
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
@@ -23,6 +24,7 @@ data class WxpLoginSendVerifyCodeReq(
 open class WxpBaseLoginResp {
     constructor()
     constructor(
+        version: Int? = 0,
         deviceToken: String?,
         deviceId: String?,
         uid: String?,
@@ -33,6 +35,7 @@ open class WxpBaseLoginResp {
         wxBind: Boolean?,
         appleBind: Boolean?
     ) {
+        this.version = version
         this.deviceToken = deviceToken
         this.deviceId = deviceId
         this.uid = uid
@@ -44,6 +47,7 @@ open class WxpBaseLoginResp {
         this.appleBind = appleBind
     }
 
+    var version: Int? = 0
     var deviceToken: String? = null
     var deviceId: String? = null
     var uid: String? = null
@@ -69,6 +73,7 @@ class WxpLoginSendVerifyCodeResp : WxpBaseLoginResp {
     constructor() : super()
 
     constructor(
+        version: Int? = null,
         deviceToken: String? = null,
         deviceId: String? = null,
         uid: String? = null,
@@ -80,7 +85,18 @@ class WxpLoginSendVerifyCodeResp : WxpBaseLoginResp {
         appleBind: Boolean? = null,
         phoneHasRegister: Boolean? = null,
         phoneVerifyCode: String? = null
-    ) : super(deviceToken, deviceId, uid, spt, openId, nickName, phone, wxBind, appleBind) {
+    ) : super(
+        version,
+        deviceToken,
+        deviceId,
+        uid,
+        spt,
+        openId,
+        nickName,
+        phone,
+        wxBind,
+        appleBind
+    ) {
         this.phoneHasRegister = phoneHasRegister
         this.phoneVerifyCode = phoneVerifyCode
     }
@@ -120,6 +136,7 @@ class WxpWeixinLoginResp : WxpBaseLoginResp {
     constructor() : super()
 
     constructor(
+        version: Int? = null,
         deviceToken: String? = null,
         deviceId: String? = null,
         uid: String? = null,
@@ -129,7 +146,7 @@ class WxpWeixinLoginResp : WxpBaseLoginResp {
         phone: String? = null,
         wxBind: Boolean? = null,
         appleBind: Boolean? = null,
-    ) : super(deviceToken, deviceId, uid, spt, openId, nickName, phone, wxBind, appleBind)
+    ) : super(version, deviceToken, deviceId, uid, spt, openId, nickName, phone, wxBind, appleBind)
 
 }
 
@@ -161,6 +178,7 @@ class WxpAppleLoginResp : WxpBaseLoginResp {
     constructor() : super()
 
     constructor(
+        version: Int? = null,
         deviceToken: String? = null,
         deviceId: String? = null,
         uid: String? = null,
@@ -171,7 +189,18 @@ class WxpAppleLoginResp : WxpBaseLoginResp {
         wxBind: Boolean? = null,
         appleBind: Boolean? = null,
         hasRegister: Boolean? = null,
-    ) : super(deviceToken, deviceId, uid, spt, openId, nickName, phone, wxBind, appleBind) {
+    ) : super(
+        version,
+        deviceToken,
+        deviceId,
+        uid,
+        spt,
+        openId,
+        nickName,
+        phone,
+        wxBind,
+        appleBind
+    ) {
         this.hasRegister = hasRegister
     }
 

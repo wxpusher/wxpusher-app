@@ -42,6 +42,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         WxpLoadingUtils.shared.setLoadingImpl(loadingImpl: WxpLoadingService())
         
         //迁移一次iOS的老版本的数据，避免用户重新登录
+        WxpAppDataService.shared.doInit()
         WxpAppDataService.shared.mergeIOSData()
         
         // 注册推送

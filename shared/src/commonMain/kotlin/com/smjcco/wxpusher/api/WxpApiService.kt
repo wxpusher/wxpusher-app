@@ -11,6 +11,7 @@ import com.smjcco.wxpusher.page.accountdetail.WxpWeixinBindReq
 import com.smjcco.wxpusher.page.changephone.WxpPhoneBindReq
 import com.smjcco.wxpusher.page.login.WxpAppleLoginReq
 import com.smjcco.wxpusher.page.login.WxpAppleLoginResp
+import com.smjcco.wxpusher.page.login.WxpBaseLoginResp
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 import com.smjcco.wxpusher.page.login.WxpWeixinLoginReq
@@ -303,6 +304,17 @@ object WxpApiService {
             return data.get("openId")
         }
         return null
+    }
+
+    /**
+     * 在用户没有openid的时候，查询一下用户的openid
+     */
+    suspend fun getUserDeviceInfo(): WxpBaseLoginResp? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .get(WxpNetworkService.getUrl("/api/need-login/device/get-user-device-info"))
+                .body()
+        })
     }
 
     /**
