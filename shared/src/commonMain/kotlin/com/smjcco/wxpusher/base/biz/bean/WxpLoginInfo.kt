@@ -3,6 +3,7 @@ package com.smjcco.wxpusher.base.biz.bean
 import com.smjcco.wxpusher.page.login.WxpBaseLoginResp
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 import kotlin.String
 
 
@@ -10,6 +11,7 @@ import kotlin.String
  * 登陆信息
  */
 @Serializable
+@JsonIgnoreUnknownKeys
 data class WxpLoginInfo(
     var deviceToken: String? = null, //设备身份信息
     val deviceId: String? = null, //设备id

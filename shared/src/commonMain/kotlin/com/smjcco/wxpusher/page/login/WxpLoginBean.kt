@@ -1,8 +1,10 @@
 package com.smjcco.wxpusher.page.login
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonIgnoreUnknownKeys
 
 @Serializable
+@JsonIgnoreUnknownKeys
 data class WxpLoginSendVerifyCodeReq(
     //不绑定现有账号，直接创建账号登录
     val justCreateAccount: Boolean,
@@ -17,6 +19,7 @@ data class WxpLoginSendVerifyCodeReq(
  * 无论那种登录方式，都一定会返回的信息
  */
 @Serializable
+@JsonIgnoreUnknownKeys
 open class WxpBaseLoginResp {
     constructor()
     constructor(
@@ -61,6 +64,7 @@ open class WxpBaseLoginResp {
 }
 
 @Serializable
+@JsonIgnoreUnknownKeys
 class WxpLoginSendVerifyCodeResp : WxpBaseLoginResp {
     constructor() : super()
 
@@ -91,6 +95,7 @@ class WxpLoginSendVerifyCodeResp : WxpBaseLoginResp {
  * 微信登录
  */
 @Serializable
+@JsonIgnoreUnknownKeys
 data class WxpWeixinLoginReq(
     val code: String,
     //微信登录，绑定手机号
@@ -110,6 +115,7 @@ data class WxpWeixinLoginReq(
  * 微信登录结果
  */
 @Serializable
+@JsonIgnoreUnknownKeys
 class WxpWeixinLoginResp : WxpBaseLoginResp {
     constructor() : super()
 
@@ -131,6 +137,7 @@ class WxpWeixinLoginResp : WxpBaseLoginResp {
  * 苹果登录
  */
 @Serializable
+@JsonIgnoreUnknownKeys
 data class WxpAppleLoginReq(
     //不绑定现有账号，直接创建账号登录
     val justCreateAccount: Boolean,
@@ -149,6 +156,7 @@ data class WxpAppleLoginReq(
  */
 
 @Serializable
+@JsonIgnoreUnknownKeys
 class WxpAppleLoginResp : WxpBaseLoginResp {
     constructor() : super()
 
