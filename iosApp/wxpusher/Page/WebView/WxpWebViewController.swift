@@ -6,6 +6,7 @@ import shared
 class WxpWebViewController: UIViewController {
     
     // 白名单域名列表
+    // 在白名单的域名会携带token，可以调用桥，不会显示警告提醒
     private let WhitelistHosts: Set<String> = [
         "wxpusher.zjiecode.com",
         "wxpusher.test.zjiecode.com",
@@ -229,6 +230,11 @@ class WxpWebViewController: UIViewController {
         self.webView?.isOpaque = false
         self.webView?.backgroundColor = .clear
         self.webView?.scrollView.backgroundColor = .clear
+        
+        //添加长按手势
+        let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+        longPress.delegate = self
+        self.webView?.addGestureRecognizer(longPress)
     }
     
     private func setupUI() {
@@ -451,6 +457,80 @@ class WxpWebViewController: UIViewController {
         return request
     }
     
+    // MARK: - Long Press Image Save
+    
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        if gesture.state != .began { return }
+        
+        let touchPoint = gesture.location(in: webView)
+        
+        // JS to get image url. Check for IMG tag.
+        let js = """
+            (function(x, y) {
+                var element = document.elementFromPoint(x, y);
+                if (element && element.tagName === 'IMG') {
+                    return element.src;
+                }
+                return null;
+            })(\(touchPoint.x), \(touchPoint.y))
+        """
+        
+        webView?.evaluateJavaScript(js) { [weak self] (result, error) in
+            guard let self = self else { return }
+            if let imageUrlString = result as? String, let url = URL(string: imageUrlString) {
+                self.showSaveImageActionSheet(url: url)
+            }
+        }
+    }
+    
+    private func showSaveImageActionSheet(url: URL) {
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        
+        let saveAction = UIAlertAction(title: "保存图片", style: .default) { [weak self] _ in
+            self?.saveImage(from: url)
+        }
+        
+        let cancelAction = UIAlertAction(title: "取消", style: .cancel, handler: nil)
+        
+        alertController.addAction(saveAction)
+        alertController.addAction(cancelAction)
+        
+        if let popoverController = alertController.popoverPresentationController {
+            popoverController.sourceView = self.webView
+            popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
+            popoverController.permittedArrowDirections = []
+        }
+        
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    private func saveImage(from url: URL) {
+        WxpLoadingUtils.shared.showLoading(msg: "正在保存...", canDismiss: false)
+        
+        URLSession.shared.dataTask(with: url) { [weak self] data, response, error in
+            DispatchQueue.main.async {
+                WxpLoadingUtils.shared.dismissLoading()
+                
+                guard let self = self else { return }
+                guard let data = data, error == nil, let image = UIImage(data: data) else {
+                    let errorMsg = error?.localizedDescription ?? ""
+                    WxpToastUtils.shared.showToast(msg: "图片下载失败，error=\(errorMsg)")
+                    return
+                }
+                
+                UIImageWriteToSavedPhotosAlbum(image, self, #selector(self.image(_:didFinishSavingWithError:contextInfo:)), nil)
+            }
+        }.resume()
+    }
+    
+    @objc func image(_ image: UIImage, didFinishSavingWithError error: Error?, contextInfo: UnsafeMutableRawPointer?) {
+        if let error = error {
+            WxpToastUtils.shared.showToast(msg: "保存失败: \(error.localizedDescription)")
+        } else {
+            WxpToastUtils.shared.showToast(msg: "保存成功，请打开相册查看")
+        }
+    }
+
     // MARK: - Action Methods
     
     /// 复制链接到剪贴板
@@ -682,5 +762,11 @@ extension WxpWebViewController: WKUIDelegate {
         let p = WxpDialogParams(title: message, rightText: "我知道了")
         WxpDialogUtils.showDialog(params: p)
         completionHandler()
+    }
+}
+
+extension WxpWebViewController: UIGestureRecognizerDelegate {
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return true
     }
 }
