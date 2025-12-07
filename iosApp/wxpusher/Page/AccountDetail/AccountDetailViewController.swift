@@ -21,6 +21,12 @@ class AccountDetailViewController: WxpBaseMvpUIViewController<IWxpAccountDetailP
         tableView.separatorStyle = .singleLine
         tableView.backgroundColor = .systemGroupedBackground
         tableView.translatesAutoresizingMaskIntoConstraints = false
+        
+        if #available(iOS 15.0, *) {
+            tableView.sectionHeaderTopPadding = 0
+        }
+        tableView.tableHeaderView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 0.01))
+        
         return tableView
     }()
     
@@ -204,6 +210,10 @@ extension AccountDetailViewController: UITableViewDelegate, UITableViewDataSourc
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 0.01
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
