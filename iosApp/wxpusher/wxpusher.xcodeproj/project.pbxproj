@@ -802,7 +802,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.smjcco.wxpusher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "wxpusher-appstore-distribution-profile-m4";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "wxpusher-appstore-distribution-push-login";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
