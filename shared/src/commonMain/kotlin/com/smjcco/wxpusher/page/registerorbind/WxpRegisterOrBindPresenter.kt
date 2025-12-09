@@ -67,7 +67,9 @@ class WxpRegisterOrBindPresenter(view: IWxpRegisterOrBindView) :
             )
 
             runAtMainSuspend {
+                WxpLoadingUtils.showLoading(msg = "处理中...")
                 val loginData = WxpApiService.verifyCodeLogin(req)
+                WxpLoadingUtils.dismissLoading()
                 loginData?.let {
                     val loginInfo = WxpLoginInfo(it)
                     WxpAppDataService.saveLoginInfo(loginInfo)
@@ -94,7 +96,9 @@ class WxpRegisterOrBindPresenter(view: IWxpRegisterOrBindView) :
             )
 
             runAtMainSuspend {
+                WxpLoadingUtils.showLoading(msg = "处理中...")
                 val loginData = WxpApiService.appleLogin(appleLoginReq)
+                WxpLoadingUtils.dismissLoading()
                 loginData?.let {
                     WxpLogUtils.i(message = "登录直接注册苹果账号成功")
                     val loginInfo = WxpLoginInfo(it)
