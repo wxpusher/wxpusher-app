@@ -1,5 +1,4 @@
 import UIKit
-import SwiftUICore
 import shared
 import MJRefresh
 
