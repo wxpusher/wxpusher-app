@@ -109,6 +109,12 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".page.accountdetail.AccountDetailActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".page.web.WxpWebViewActivity"
             android:exported="true" />
 

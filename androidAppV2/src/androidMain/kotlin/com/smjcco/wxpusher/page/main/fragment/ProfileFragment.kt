@@ -115,6 +115,13 @@ class ProfileFragment : WxpBaseFragment() {
                         hasArrow = true
                     ) {
                         WxpJumpPageUtils.jumpToUnbind(requireActivity())
+                    },
+                    ProfileItem(
+                        title = "账号信息",
+                        subtitle = "管理账号",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToAccountDetail(requireActivity())
                     }
                 )
             ))
