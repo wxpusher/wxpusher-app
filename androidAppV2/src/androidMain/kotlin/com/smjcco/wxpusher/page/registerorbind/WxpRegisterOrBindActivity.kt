@@ -113,7 +113,7 @@ class WxpRegisterOrBindActivity : WxpBaseMvpActivity<IWxpRegisterOrBindPresenter
     }
 
     private fun updateUIState() {
-        // 如果是手机号登录，显示选项2；Android不需要苹果登录
+        // 如果是手机号登录，显示选项2
         val isPhoneLogin = bindPageData.phoneLogin != null
         optionTwoContainer.visibility = if (isPhoneLogin) View.VISIBLE else View.GONE
     }
@@ -155,7 +155,7 @@ class WxpRegisterOrBindActivity : WxpBaseMvpActivity<IWxpRegisterOrBindPresenter
         WxpDialogUtils.showDialog(params)
     }
 
-    // 手机号或者苹果登录的时候，创建新账号
+    // 手机号登录的时候，创建新账号
     private fun handleCreateNewAccount() {
         presenter.createAccount(bindPageData)
     }

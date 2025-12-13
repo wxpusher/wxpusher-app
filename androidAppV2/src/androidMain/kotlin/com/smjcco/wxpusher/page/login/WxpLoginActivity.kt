@@ -158,9 +158,7 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
     }
 
     private fun jumpToPrivacy() {
-        WxpJumpPageUtils.jumpToChangePhone(this)
-
-//        WxpJumpPageUtils.jumpToWebUrl(WxpConstants.PrivacyUrl, this)
+        WxpJumpPageUtils.jumpToWebUrl(WxpConstants.PrivacyUrl, this)
     }
 
     /**
@@ -198,7 +196,8 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
     }
 
     override fun onGoBindOrCreateAccount(data: WxpBindPageData) {
-        TODO("Not yet implemented")
+        WxpJumpPageUtils.jumpToRegisterOrBind(data, this)
+        finish()
     }
 
 
