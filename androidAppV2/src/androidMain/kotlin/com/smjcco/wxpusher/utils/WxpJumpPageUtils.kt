@@ -7,11 +7,16 @@ import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+import androidx.core.net.toUri
 import com.smjcco.wxpusher.base.common.ApplicationUtils
+import com.smjcco.wxpusher.base.common.WxpLogUtils
+import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.common.withActivity
 import com.smjcco.wxpusher.page.bind.WxpBindActivity
+import com.smjcco.wxpusher.page.changephone.WxpChangePhoneActivity
 import com.smjcco.wxpusher.page.login.WxpBindPageData
 import com.smjcco.wxpusher.page.login.WxpLoginActivity
+import com.smjcco.wxpusher.page.login.WxpPhoneBind
 import com.smjcco.wxpusher.page.main.WxpMainActivity
 import com.smjcco.wxpusher.page.registerorbind.WxpRegisterOrBindActivity
 import com.smjcco.wxpusher.page.scan.WxpScanActivity
@@ -19,10 +24,6 @@ import com.smjcco.wxpusher.page.unbind.WxpUnbindActivity
 import com.smjcco.wxpusher.page.useragreement.WxpUserAgreementActivity
 import com.smjcco.wxpusher.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager
-import androidx.core.net.toUri
-import com.smjcco.wxpusher.base.common.WxpLogUtils
-import com.smjcco.wxpusher.base.common.WxpToastUtils
-import com.smjcco.wxpusher.page.login.WxpPhoneBind
 
 
 object WxpJumpPageUtils {
@@ -183,6 +184,16 @@ object WxpJumpPageUtils {
     ) {
         withActivity(activity) {
             WxpBindActivity.start(it, wxpPhoneBind)
+        }
+    }
+
+    /**
+     * 跳转到修改手机号页面
+     */
+    fun jumpToChangePhone(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent(activity, WxpChangePhoneActivity::class.java)
+            it.startActivity(intent)
         }
     }
 

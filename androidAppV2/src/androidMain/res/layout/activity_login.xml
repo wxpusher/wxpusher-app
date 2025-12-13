@@ -218,12 +218,12 @@
                     android:textSize="17sp"
                     android:textStyle="bold"
                     app:backgroundTint="@color/wechat_green"
-                    app:cornerRadius="4dp"
+                    app:cornerRadius="8dp"
                     app:elevation="0dp"
                     app:icon="@drawable/ic_weixin_btn"
                     app:iconGravity="textStart"
                     app:iconPadding="8dp"
-                    app:iconSize="36dp"
+                    app:iconSize="30dp"
                     app:iconTint="@null" />
             </FrameLayout>
 
