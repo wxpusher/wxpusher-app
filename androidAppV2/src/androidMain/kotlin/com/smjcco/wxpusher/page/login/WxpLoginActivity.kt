@@ -120,7 +120,7 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
                 WxpToastUtils.showToast(error.message)
                 return@requestAuth
             }
-//            presenter.wexinLogin(response?.code)
+            presenter.weixinLogin(response?.code)
         }
     }
 
@@ -198,10 +198,7 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
     override fun onGoBindOrCreateAccount(data: WxpBindPageData) {
         TODO("Not yet implemented")
     }
-//    override fun onGoBind(phone: String, code: String, data: WxpLoginSendVerifyCodeResp) {
-//        WxpJumpPageUtils.jumpToBind(phone, code, data.phoneVerifyCode ?: "", this)
-//        finish()
-//    }
+
 
     override fun onGoMain() {
         WxpJumpPageUtils.jumpToMain(this)
