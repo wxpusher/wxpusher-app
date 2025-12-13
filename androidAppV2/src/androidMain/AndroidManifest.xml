@@ -81,7 +81,7 @@
             android:name=".page.useragreement.WxpUserAgreementActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/PageTheme" />
+            android:theme="@style/NoActionTheme" />
 
 
         <activity
@@ -89,7 +89,7 @@
             android:exported="false"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:theme="@style/PageTheme" />
+            android:theme="@style/NoActionTheme" />
 
         <activity
             android:name=".page.registerorbind.WxpRegisterOrBindActivity"

@@ -8,7 +8,7 @@
         <item name="android:statusBarColor">@color/AccentStatusBarColor</item>
     </style>
 
-    <style name="PageTheme" parent="AppTheme">
+    <style name="NoActionTheme" parent="AppTheme">
         <item name="android:statusBarColor">@color/LightStatusBarColor</item>
         <item name="android:windowLightStatusBar">@bool/lightMode</item>
     </style>
