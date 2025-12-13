@@ -101,7 +101,7 @@ class ProfileFragment : WxpBaseFragment() {
                         subtitle = if (spt.isEmpty()) "未登录" else spt,
                         hasArrow = true
                     ) {
-                        copyToClipboard(spt, "UID复制成功")
+                        copyToClipboard(spt, "SPT复制成功")
                     },
                     ProfileItem(
                         title = "设备ID",

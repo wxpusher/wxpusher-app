@@ -53,7 +53,7 @@ class WxpBindActivity : WxpBaseMvpActivity<WxpBindPresenter>(), IWxpBindView {
 
         // 获取传递的参数
         val jsonData = intent.getStringExtra(EXTRA_DATA)
-        val data = WxpPhoneBind.fromJson(jsonData)
+        data = WxpPhoneBind.fromJson(jsonData)
         if (data == null) {
             finish()
             return
@@ -69,7 +69,7 @@ class WxpBindActivity : WxpBaseMvpActivity<WxpBindPresenter>(), IWxpBindView {
         setupClickListeners()
 
         // 设置绑定码
-        codeTextField.setText(data.phoneVerifyCode)
+        codeTextField.setText(data?.phoneVerifyCode)
     }
 
     private fun initViews() {
