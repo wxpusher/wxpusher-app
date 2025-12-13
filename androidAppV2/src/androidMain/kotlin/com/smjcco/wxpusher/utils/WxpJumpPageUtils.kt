@@ -22,7 +22,6 @@ import com.smjcco.wxpusher.page.login.WxpPhoneBind
 import com.smjcco.wxpusher.page.main.WxpMainActivity
 import com.smjcco.wxpusher.page.registerorbind.WxpRegisterOrBindActivity
 import com.smjcco.wxpusher.page.scan.WxpScanActivity
-import com.smjcco.wxpusher.page.unbind.WxpUnbindActivity
 import com.smjcco.wxpusher.page.useragreement.WxpUserAgreementActivity
 import com.smjcco.wxpusher.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager
@@ -130,12 +129,6 @@ object WxpJumpPageUtils {
             val intent = Intent(it, WxpLoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             it.startActivity(intent)
-        }
-    }
-
-    fun jumpToUnbind(activity: Activity? = null) {
-        withActivity(activity) {
-            WxpUnbindActivity.start(it)
         }
     }
 

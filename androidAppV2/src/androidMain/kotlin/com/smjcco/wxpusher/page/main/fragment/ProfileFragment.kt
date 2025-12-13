@@ -111,13 +111,6 @@ class ProfileFragment : WxpBaseFragment() {
                         copyToClipboard(deviceId, "设备ID复制成功")
                     },
                     ProfileItem(
-                        title = "用户数据",
-                        subtitle = "注销手机号",
-                        hasArrow = true
-                    ) {
-                        WxpJumpPageUtils.jumpToUnbind(requireActivity())
-                    },
-                    ProfileItem(
                         title = "账号信息",
                         subtitle = "管理账号",
                         hasArrow = true

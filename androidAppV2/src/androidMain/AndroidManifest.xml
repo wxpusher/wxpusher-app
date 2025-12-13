@@ -66,12 +66,6 @@
             android:launchMode="singleTask" />
 
         <activity
-            android:name=".page.unbind.WxpUnbindActivity"
-            android:exported="false"
-            android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
-
-        <activity
             android:name=".page.scan.WxpScanActivity"
             android:exported="false"
             android:screenOrientation="portrait"
@@ -94,8 +88,8 @@
         <activity
             android:name=".page.registerorbind.WxpRegisterOrBindActivity"
             android:exported="false"
-            android:screenOrientation="portrait"
-            android:launchMode="singleTask" />
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
 
         <activity
             android:name=".page.bind.WxpBindActivity"
