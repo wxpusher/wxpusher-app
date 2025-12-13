@@ -460,7 +460,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     private fun shareURL() {
         val url = webView.url ?: targetUrl
         val intent = Intent(Intent.ACTION_SEND).apply {
-            Intent.normalizeMimeType("text/plain")
+            type = "text/plain"
             putExtra(Intent.EXTRA_TEXT, url)
         }
         startActivity(Intent.createChooser(intent, "分享链接"))
