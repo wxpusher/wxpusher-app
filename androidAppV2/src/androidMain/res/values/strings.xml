@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name">WxPusher</string>
+    <string name="loading">加载中…</string>
 
     <!-- 检查项标题 -->
     <string name="check_title">系统推送检查</string>

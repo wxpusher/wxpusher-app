@@ -8,6 +8,7 @@ import com.smjcco.wxpusher.base.biz.WxpAppPageService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpLogUtils
+import com.smjcco.wxpusher.base.common.WxpLoadingUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.base.common.init
 import com.smjcco.wxpusher.config.ConfigManager
@@ -30,6 +31,9 @@ class WxPusherApplication : Application() {
 
         //初始化页面跳转
         WxpAppPageService.init(WxpAppPageServiceImpl())
+
+        //初始化loading
+        WxpLoadingUtils.setLoadingImpl(WxpLoadingServiceImpl())
 
         //初始化设备基础信息
         WxpBaseInfoService.init(WxpBaseInfoServiceImpl())
