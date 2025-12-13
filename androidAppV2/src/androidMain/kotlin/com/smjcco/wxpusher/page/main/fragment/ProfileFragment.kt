@@ -65,6 +65,7 @@ class ProfileFragment : WxpBaseFragment() {
         val sectionData = mutableListOf<ProfileSection>()
         val loginInfo = WxpAppDataService.getLoginInfo()
         val uid = loginInfo?.uid ?: ""
+        val spt = loginInfo?.spt ?: ""
         val deviceId = loginInfo?.deviceId ?: ""
 
         if (!BuildConfig.online) {
@@ -96,18 +97,18 @@ class ProfileFragment : WxpBaseFragment() {
                         copyToClipboard(uid, "UID复制成功")
                     },
                     ProfileItem(
+                        title = "SPT",
+                        subtitle = if (spt.isEmpty()) "未登录" else spt,
+                        hasArrow = true
+                    ) {
+                        copyToClipboard(spt, "UID复制成功")
+                    },
+                    ProfileItem(
                         title = "设备ID",
                         subtitle = deviceId,
                         hasArrow = true
                     ) {
                         copyToClipboard(deviceId, "设备ID复制成功")
-                    },
-                    ProfileItem(
-                        title = "用户账号",
-                        subtitle = "退出登录",
-                        hasArrow = true
-                    ) {
-                        showLogoutDialog()
                     },
                     ProfileItem(
                         title = "用户数据",
@@ -194,27 +195,6 @@ class ProfileFragment : WxpBaseFragment() {
         val clip = ClipData.newPlainText("WxPusher", text)
         clipboard.setPrimaryClip(clip)
         WxpToastUtils.showToast(successMessage)
-    }
-
-    private fun showLogoutDialog() {
-        val params = WxpDialogParams(
-            title = "退出当前账号吗？",
-            message = "退出后需要重新登录才可以接收消息",
-            leftText = "取消",
-            rightText = "退出账号",
-            rightBlock = {
-                runAtMainSuspend {
-//                    WxpAppDataService.logout()
-                }
-                WxpToastUtils.showToast("已退出登录")
-                setupData() // 刷新数据
-            }
-        )
-        WxpDialogUtils.showDialog(params)
-    }
-
-    private fun showUnbindPhoneDialog() {
-        WxpJumpPageUtils.jumpToUnbind(requireActivity())
     }
 
     private fun checkNotificationPermission() {
