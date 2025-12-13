@@ -136,13 +136,8 @@ class WxpRegisterOrBindActivity : WxpBaseMvpActivity<IWxpRegisterOrBindPresenter
     private fun onOptionTwoButtonClick() {
         // 通过微信公众号绑定
         val phoneLogin = bindPageData.phoneLogin
-        if (phoneLogin != null) {
-            WxpJumpPageUtils.jumpToMpBind(
-                phoneLogin.phone,
-                phoneLogin.code,
-                phoneLogin.phoneVerifyCode ?: "",
-                this
-            )
+        phoneLogin?.let {
+            WxpJumpPageUtils.jumpToMpBind(it, this)
         }
     }
 

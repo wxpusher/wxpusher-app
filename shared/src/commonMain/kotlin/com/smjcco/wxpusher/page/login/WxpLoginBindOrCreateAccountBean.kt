@@ -14,7 +14,20 @@ data class WxpPhoneBind(
     val phone: String,
     val code: String,
     val phoneVerifyCode: String?//用于发送给公众号的bindcode
-)
+) {
+    fun toJson(): String = Json.encodeToString(this)
+
+    companion object {
+        fun fromJson(json: String?): WxpPhoneBind? {
+            return json?.let {
+                if (it.isEmpty()) {
+                    return@let null
+                }
+                return@let Json.decodeFromString(it)
+            }
+        }
+    }
+}
 
 /**
  * 苹果登录，返回的数据，转到选择注册方式页面使用

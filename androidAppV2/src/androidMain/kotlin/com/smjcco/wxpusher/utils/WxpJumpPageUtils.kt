@@ -22,6 +22,7 @@ import com.smjcco.wxpusher.push.ws.WxpNotificationManager
 import androidx.core.net.toUri
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.page.login.WxpPhoneBind
 
 
 object WxpJumpPageUtils {
@@ -121,17 +122,6 @@ object WxpJumpPageUtils {
         }
     }
 
-    fun jumpToBind(
-        phone: String,
-        code: String,
-        phoneVerifyCode: String,
-        activity: Activity? = null
-    ) {
-        withActivity(activity) {
-            WxpBindActivity.start(it, phone, code, phoneVerifyCode)
-        }
-    }
-
     fun jumpToLogin(activity: Activity? = null) {
         withActivity(activity) {
             val intent = Intent(it, WxpLoginActivity::class.java)
@@ -188,13 +178,11 @@ object WxpJumpPageUtils {
      * 跳转到通过绑定码，通过微信公众号绑定的页面
      */
     fun jumpToMpBind(
-        phone: String,
-        code: String,
-        phoneVerifyCode: String,
+        wxpPhoneBind: WxpPhoneBind,
         activity: Activity? = null
     ) {
         withActivity(activity) {
-            WxpBindActivity.start(it, phone, code, phoneVerifyCode)
+            WxpBindActivity.start(it, wxpPhoneBind)
         }
     }
 

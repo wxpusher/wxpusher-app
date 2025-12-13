@@ -21,20 +21,17 @@ import com.google.android.material.button.MaterialButton
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.WxpBaseMvpActivity
 import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.page.login.WxpPhoneBind
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
 
 class WxpBindActivity : WxpBaseMvpActivity<WxpBindPresenter>(), IWxpBindView {
 
     companion object {
-        private const val EXTRA_PHONE = "extra_phone"
-        private const val EXTRA_CODE = "extra_code"
-        private const val EXTRA_PHONE_VERIFY_CODE = "extra_phone_verify_code"
+        private const val EXTRA_DATA = "extra_DATA"
 
-        fun start(context: Context, phone: String, code: String, phoneVerifyCode: String) {
+        fun start(context: Context, wxpPhoneBind: WxpPhoneBind) {
             val intent = Intent(context, WxpBindActivity::class.java).apply {
-                putExtra(EXTRA_PHONE, phone)
-                putExtra(EXTRA_CODE, code)
-                putExtra(EXTRA_PHONE_VERIFY_CODE, phoneVerifyCode)
+                putExtra(EXTRA_DATA, wxpPhoneBind.toJson())
             }
             context.startActivity(intent)
         }
@@ -46,18 +43,20 @@ class WxpBindActivity : WxpBaseMvpActivity<WxpBindPresenter>(), IWxpBindView {
     private lateinit var loadingIndicator: ProgressBar
     private lateinit var stepTwoLabel: TextView
 
-    private var phone: String = ""
-    private var code: String = ""
-    private var phoneVerifyCode: String = ""
+    private var data: WxpPhoneBind? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_bind)
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // 获取传递的参数
-        phone = intent.getStringExtra(EXTRA_PHONE) ?: ""
-        code = intent.getStringExtra(EXTRA_CODE) ?: ""
-        phoneVerifyCode = intent.getStringExtra(EXTRA_PHONE_VERIFY_CODE) ?: ""
+        val jsonData = intent.getStringExtra(EXTRA_DATA)
+        val data = WxpPhoneBind.fromJson(jsonData)
+        if (data == null) {
+            finish()
+            return
+        }
 
         // 设置标题
         title = getString(R.string.bind_page_title)
@@ -69,7 +68,7 @@ class WxpBindActivity : WxpBaseMvpActivity<WxpBindPresenter>(), IWxpBindView {
         setupClickListeners()
 
         // 设置绑定码
-        codeTextField.setText(phoneVerifyCode)
+        codeTextField.setText(data.phoneVerifyCode)
     }
 
     private fun initViews() {
@@ -147,13 +146,13 @@ class WxpBindActivity : WxpBaseMvpActivity<WxpBindPresenter>(), IWxpBindView {
 
     private fun copyCodeToClipboard() {
         val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
-        val clip = ClipData.newPlainText("绑定码", phoneVerifyCode)
+        val clip = ClipData.newPlainText("绑定码", data?.phoneVerifyCode)
         clipboard.setPrimaryClip(clip)
         WxpToastUtils.showToast(getString(R.string.bind_copy_success))
     }
 
     private fun queryBindStatus() {
-        presenter.queryBindStatus(phone, code)
+        presenter.queryBindStatus(data?.phone, data?.code)
     }
 
     override fun showLoading(show: Boolean) {
