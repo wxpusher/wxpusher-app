@@ -31,10 +31,10 @@ class WxPusherApplication : Application() {
 
         //初始化页面跳转
         WxpAppPageService.init(WxpAppPageServiceImpl())
-
         //初始化loading
         WxpLoadingUtils.setLoadingImpl(WxpLoadingServiceImpl())
-
+        //初始化app的数据信息
+        WxpAppDataService.init();
         //初始化设备基础信息
         WxpBaseInfoService.init(WxpBaseInfoServiceImpl())
         PushManager.init(this)
