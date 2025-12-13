@@ -41,6 +41,7 @@ Pod::Spec.new do |spec|
                   echo "Skipping Gradle build task invocation due to OVERRIDE_KOTLIN_BUILD_IDE_SUPPORTED environment variable set to \"YES\""
                   exit 0
                 fi
+                export PATH=$HOME/.rvm/gems/ruby-3.2.2/bin:$HOME/.rvm/gems/ruby-3.2.2@global/bin:$HOME/.rvm/rubies/ruby-3.2.2/bin:$HOME/.rvm/bin:$PATH
                 set -ev
                 REPO_ROOT="$PODS_TARGET_SRCROOT"
                 "$REPO_ROOT/../gradlew" -p "$REPO_ROOT" $KOTLIN_PROJECT_PATH:syncFramework \
