@@ -90,21 +90,6 @@ object WxpAppDataService {
     }
 
     /**
-     * 解除手机号绑定
-     */
-    fun unbindPhone() {
-        runAtMainSuspend {
-            WxpApiService.unbindPhone {
-                getLoginInfo()?.let {
-                    it.deviceToken = null
-                    saveLoginInfo(it)
-                }
-                WxpAppPageService.jumpToLogin()
-            }
-        }
-    }
-
-    /**
      * 删除账号
      */
     fun removeAccount() {

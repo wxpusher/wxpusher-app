@@ -128,22 +128,6 @@ object WxpApiService {
     }
 
     /**
-     * 解绑手机号
-     */
-    suspend fun unbindPhone(
-        successBlock: (() -> Unit)? = null
-    ): Boolean? {
-        return commonRespDeal(block = {
-            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
-                .post(WxpNetworkService.getUrl("/api/need-login/device/unbind")) {
-
-                }.body()
-        }, errorBlock = {
-            WxpToastUtils.showToast("失败," + it.message)
-        }, successBlock = { successBlock?.invoke() })
-    }
-
-    /**
      * 通过微信授权码进行登录
      */
     suspend fun weixinLogin(req: WxpWeixinLoginReq): WxpWeixinLoginResp? {
