@@ -158,7 +158,9 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
     }
 
     private fun jumpToPrivacy() {
-        WxpJumpPageUtils.jumpToWebUrl(WxpConstants.PrivacyUrl, this)
+        WxpJumpPageUtils.jumpToChangePhone(this)
+
+//        WxpJumpPageUtils.jumpToWebUrl(WxpConstants.PrivacyUrl, this)
     }
 
     /**
