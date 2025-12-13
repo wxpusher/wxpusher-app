@@ -109,7 +109,7 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
                 WxpToastUtils.showToast(error.message)
                 return@requestAuth
             }
-            presenter.wexinLogin(response?.code)
+//            presenter.wexinLogin(response?.code)
         }
     }
 

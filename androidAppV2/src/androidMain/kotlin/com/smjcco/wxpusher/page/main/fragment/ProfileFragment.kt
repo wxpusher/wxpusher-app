@@ -197,7 +197,7 @@ class ProfileFragment : WxpBaseFragment() {
             rightText = "退出账号",
             rightBlock = {
                 runAtMainSuspend {
-                    WxpAppDataService.logout()
+//                    WxpAppDataService.logout()
                 }
                 WxpToastUtils.showToast("已退出登录")
                 setupData() // 刷新数据

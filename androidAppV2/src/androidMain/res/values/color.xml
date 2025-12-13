@@ -27,6 +27,7 @@
     <color name="colorPrimaryDark">#430043</color>
     <color name="colorAccent">#B300B3</color>
     <color name="white">#FFFFFF</color>
+    <color name="wechat_green">#07C160</color>
 
     <!-- 输入框背景颜色 -->
     <color name="input_field_bg">#F5F5F5</color>
