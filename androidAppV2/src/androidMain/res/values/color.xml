@@ -9,6 +9,9 @@
     <color name="PageBg1">#FFFFFF</color>
     <color name="PageBg2">#F5F5F5</color>
 
+    <color name="BlackBtnBg">#333333</color>
+    <color name="GrayCardBorder">#C7C7CC</color>
+
 
     <color name="accent">#B300B3</color>
     <color name="text_fit_theme">#030303</color>
@@ -28,6 +31,7 @@
     <color name="colorAccent">#B300B3</color>
     <color name="white">#FFFFFF</color>
     <color name="wechat_green">#07C160</color>
+    <color name="wechat_green_alpha_10">#1A07C160</color>
 
     <!-- 输入框背景颜色 -->
     <color name="input_field_bg">#F5F5F5</color>
@@ -39,6 +43,4 @@
     <color name="input_border_color">#E0E0E0</color>
     <color name="input_border_valid">#4CAF50</color>
     <color name="input_border_invalid">#F44336</color>
-
-
 </resources>

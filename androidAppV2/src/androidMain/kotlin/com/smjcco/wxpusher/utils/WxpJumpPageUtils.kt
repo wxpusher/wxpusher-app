@@ -10,8 +10,10 @@ import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.common.withActivity
 import com.smjcco.wxpusher.page.bind.WxpBindActivity
+import com.smjcco.wxpusher.page.login.WxpBindPageData
 import com.smjcco.wxpusher.page.login.WxpLoginActivity
 import com.smjcco.wxpusher.page.main.WxpMainActivity
+import com.smjcco.wxpusher.page.registerorbind.WxpRegisterOrBindActivity
 import com.smjcco.wxpusher.page.scan.WxpScanActivity
 import com.smjcco.wxpusher.page.unbind.WxpUnbindActivity
 import com.smjcco.wxpusher.page.useragreement.WxpUserAgreementActivity
@@ -170,5 +172,30 @@ object WxpJumpPageUtils {
         }
     }
 
+    /**
+     * 跳转到选择注册方式或者绑定的页面
+     */
+    fun jumpToRegisterOrBind(
+        bindPageData: WxpBindPageData,
+        activity: Activity? = null
+    ) {
+        withActivity(activity) {
+            WxpRegisterOrBindActivity.start(it, bindPageData)
+        }
+    }
+
+    /**
+     * 跳转到通过绑定码，通过微信公众号绑定的页面
+     */
+    fun jumpToMpBind(
+        phone: String,
+        code: String,
+        phoneVerifyCode: String,
+        activity: Activity? = null
+    ) {
+        withActivity(activity) {
+            WxpBindActivity.start(it, phone, code, phoneVerifyCode)
+        }
+    }
 
 }

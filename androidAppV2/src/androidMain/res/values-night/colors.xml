@@ -6,6 +6,9 @@
     <color name="PageBg1">#121212</color>
     <color name="PageBg2">#333333</color>
 
+    <color name="BlackBtnBg">#999999</color>
+    <color name="GrayCardBorder">#48484A</color>
+
     <color name="text_fit_theme">#FFFFFF</color>
     <color name="dark_bg">#121212</color>
     <color name="check_success">#388E3C</color>
@@ -28,4 +31,4 @@
     <color name="input_border_valid">#4CAF50</color>
     <color name="input_border_invalid">#F44336</color>
 
-</resources> 
+</resources>

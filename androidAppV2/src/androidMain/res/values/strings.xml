@@ -79,4 +79,20 @@
     <string name="unbind_input_hint">请输入【注销账号】4个汉字</string>
     <string name="unbind_confirm_button">确认注销</string>
     <string name="unbind_cancel">取消</string>
+
+    <!-- 注册或绑定页面 -->
+    <string name="register_or_bind_title">选择创建账号方式</string>
+    <string name="register_or_bind_description">你还未注册，请绑定已有账号或者创建新账号</string>
+    <string name="register_or_bind_strongly_recommended">强烈推荐</string>
+    <string name="register_or_bind_not_recommended">不推荐</string>
+    <string name="register_or_bind_wechat_icon">微信图标</string>
+    <string name="register_or_bind_option_one_title">微信一键绑定</string>
+    <string name="register_or_bind_option_one_desc">绑定到本设备的微信，与原WxPusher公众号绑定，和微信公众号数据一致。\n新用户，也推荐和微信绑定，方便以后通过微信接收消息。</string>
+    <string name="register_or_bind_option_one_button">打开微信一键绑定</string>
+    <string name="register_or_bind_option_two_title">通过微信公众号绑定</string>
+    <string name="register_or_bind_option_two_desc">如果你要绑定的微信账号不是本设备登录的，你可以获取一个绑定码，发送给原WxPusher公众号进行绑定。</string>
+    <string name="register_or_bind_option_two_button">去通过公众号绑定</string>
+    <string name="register_or_bind_option_three_title">创建全新账号</string>
+    <string name="register_or_bind_option_three_desc">创建全新的空白账号，和原来微信公众号没有任何关系，数据完全隔离，如果你不添加订阅，不会收到任何消息。</string>
+    <string name="register_or_bind_option_three_button">创建新的空白账号</string>
 </resources>
