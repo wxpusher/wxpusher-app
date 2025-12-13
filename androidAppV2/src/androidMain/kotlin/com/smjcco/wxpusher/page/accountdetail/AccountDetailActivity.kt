@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.smjcco.wxpusher.R
@@ -117,8 +116,8 @@ class AccountDetailActivity : WxpBaseMvpActivity<WxpAccountDetailPresenter>(),
         setupData()
     }
 
+    //理论上android用不到
     override fun onAppleBindSuccess() {
-        // Not used on Android typically
         setupData()
     }
 
@@ -127,14 +126,7 @@ class AccountDetailActivity : WxpBaseMvpActivity<WxpAccountDetailPresenter>(),
     }
 
     private fun handleDeleteAccountTap() {
-        AlertDialog.Builder(this)
-            .setTitle("删除账号")
-            .setMessage("确定要删除当前账号吗？删除后所有数据将无法恢复。")
-            .setPositiveButton("确定") { _, _ ->
-                WxpAppDataService.removeAccount()
-            }
-            .setNegativeButton("取消", null)
-            .show()
+        WxpJumpPageUtils.jumpToRemoveAccount(this)
     }
 
     data class AccountMenuItem(
