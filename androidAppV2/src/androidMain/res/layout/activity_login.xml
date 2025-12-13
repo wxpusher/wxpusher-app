@@ -72,7 +72,7 @@
                     android:id="@+id/login_phone_container"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:visibility="visible">
+                    android:visibility="gone">
                     <!-- 手机号输入框 -->
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/phone_input_layout"
@@ -211,7 +211,7 @@
                     android:layout_height="44dp"
                     android:gravity="center"
                     android:insetTop="0dp"
-                    android:visibility="gone"
+                    android:visibility="visible"
                     android:insetBottom="0dp"
                     android:text="微信一键登录"
                     android:textColor="@color/white"

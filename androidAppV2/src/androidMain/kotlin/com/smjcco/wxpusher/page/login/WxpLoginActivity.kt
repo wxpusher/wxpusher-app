@@ -15,7 +15,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.smjcco.wxpusher.BuildConfig
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.WxpBaseMvpActivity
-import com.smjcco.wxpusher.base.common.WxpLogUtils
+import com.smjcco.wxpusher.base.common.WxpDialogParams
+import com.smjcco.wxpusher.base.common.WxpDialogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.common.WxpConstants
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
@@ -75,7 +76,11 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
 
         loginButton.setOnClickListener {
             if (!privacyCheckbox.isChecked) {
-                WxpToastUtils.showToast(getString(R.string.login_agree_privacy_first))
+                checkPrivacyAgree {
+                    val phone = phoneTextField.text?.toString()
+                    val code = codeTextField.text?.toString()
+                    presenter.verifyCodeLogin(phone = phone, verifyCode = code)
+                }
                 return@setOnClickListener
             }
 
@@ -101,9 +106,15 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
 
     private fun onWeixinLoginClick() {
         if (!privacyCheckbox.isChecked) {
-            WxpToastUtils.showToast(getString(R.string.login_agree_privacy_first))
+            checkPrivacyAgree {
+                handleWeixinLogin()
+            }
             return
         }
+        handleWeixinLogin()
+    }
+
+    private fun handleWeixinLogin() {
         WxpWeixinOpenManager.requestAuth { response, error ->
             if (error != null) {
                 WxpToastUtils.showToast(error.message)
@@ -148,6 +159,24 @@ class WxpLoginActivity : WxpBaseMvpActivity<IWxpLoginPresenter>(), IWxpLoginView
 
     private fun jumpToPrivacy() {
         WxpJumpPageUtils.jumpToWebUrl(WxpConstants.PrivacyUrl, this)
+    }
+
+    /**
+     * 检查隐私协议是否同意，如果未同意则显示对话框
+     * 参考iOS的实现：checkPrivacyAgree方法
+     * @param run 同意后执行的逻辑
+     */
+    private fun checkPrivacyAgree(run: () -> Unit) {
+        val params = WxpDialogParams()
+        params.title = "请同意用户和隐私协议"
+        params.message = "我已经阅读并且同意《用户和隐私协议》"
+        params.leftText = "取消"
+        params.rightText = "同意协议"
+        params.rightBlock = {
+            privacyCheckbox.isChecked = true
+            run()
+        }
+        WxpDialogUtils.showDialog(params)
     }
 
     override fun createPresenter(): IWxpLoginPresenter {
