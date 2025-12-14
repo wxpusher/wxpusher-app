@@ -5,6 +5,7 @@ import android.content.ClipboardManager
 import android.content.Context.CLIPBOARD_SERVICE
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.Bundle
 import android.os.Message
 import android.util.Log
@@ -26,6 +27,7 @@ import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.createBitmap
 import androidx.core.net.toUri
 import com.google.gson.JsonObject
 import com.smjcco.wxpusher.R
@@ -43,6 +45,7 @@ import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.smjcco.wxpusher.utils.ThreadUtils
 import com.smjcco.wxpusher.wxapi.WxpWeixinOpenManager
+import com.tencent.mm.opensdk.modelmsg.SendMessageToWX
 
 open class WxpWebViewFragment : WxpBaseFragment() {
     companion object Companion {
@@ -81,6 +84,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     private var targetUrl: String = ""
     private var showThirdPartyBanner = true
     private var lastLoadRequest: String? = null
+    private var webDescription: String? = null
 
     //图片长按菜单
     private var imageActionSheetDialogFragment: ActionSheetDialogFragment? = null
@@ -225,6 +229,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
 
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
+                webDescription = ""
                 progressBar.visibility = View.VISIBLE
                 progressBar.progress = 0
 
@@ -238,6 +243,22 @@ open class WxpWebViewFragment : WxpBaseFragment() {
             override fun onPageFinished(view: WebView?, url: String?) {
                 super.onPageFinished(view, url)
                 progressBar.visibility = View.GONE
+
+                // 获取网页描述，分享的时候可以用到
+                view?.evaluateJavascript(
+                    "(function() { var meta = document.querySelector('meta[name=\"description\"]'); return meta ? meta.content : ''; })();"
+                ) { value ->
+                    if (!value.isNullOrBlank() && value != "null") {
+                        var desc = value
+                        if (desc.startsWith("\"") && desc.endsWith("\"")) {
+                            desc = desc.substring(1, desc.length - 1)
+                        }
+                        desc = desc.replace("\\\"", "\"").replace("\\\\", "\\")
+                        if (desc.isNotBlank()) {
+                            webDescription = desc
+                        }
+                    }
+                }
 
                 // 设置网页标题
                 val webTitle = view?.title
@@ -435,6 +456,11 @@ open class WxpWebViewFragment : WxpBaseFragment() {
                 true
             }
 
+            R.id.action_weixin_share -> {
+                weixinShareURL()
+                true
+            }
+
             R.id.action_share -> {
                 shareURL()
                 true
@@ -455,6 +481,27 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         val clip = ClipData.newPlainText("网页链接", url)
         clipboard.setPrimaryClip(clip)
         WxpToastUtils.showToast("复制成功")
+    }
+
+    private fun weixinShareURL() {
+        val url = webView.url ?: targetUrl
+        //获取网页截图
+        val bitmap = createBitmap(webView.width, webView.height)
+        val canvas = Canvas(bitmap)
+        webView.draw(canvas)
+
+        WxpWeixinOpenManager.shareWebPage(
+            url = url,
+            title = webView.title ?: "网页内容",
+            description = if (webDescription.isNullOrEmpty()) "" else webDescription!!, // 使用获取到的描述,
+            thumbBitmap = bitmap,
+            scene = SendMessageToWX.Req.WXSceneSession
+        ) { response, error ->
+            if (error != null) {
+                WxpToastUtils.showToast("分享失败: ${error.message}")
+                return@shareWebPage
+            }
+        }
     }
 
     private fun shareURL() {

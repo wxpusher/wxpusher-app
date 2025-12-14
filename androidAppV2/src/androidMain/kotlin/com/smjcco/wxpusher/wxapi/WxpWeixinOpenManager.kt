@@ -212,7 +212,7 @@ object WxpWeixinOpenManager : IWXAPIEventHandler {
         url: String,
         title: String,
         description: String,
-        thumbBitmap: Bitmap,
+        thumbBitmap: Bitmap?,
         scene: Int,
         completion: ShareCompletion
     ) {
@@ -228,7 +228,7 @@ object WxpWeixinOpenManager : IWXAPIEventHandler {
             this.description = description
 
             // 设置缩略图
-            val thumbBmp = thumbBitmap.scale(150, 150)
+            val thumbBmp = thumbBitmap?.scale(150, 150)
             setThumbImage(thumbBmp)
         }
 
