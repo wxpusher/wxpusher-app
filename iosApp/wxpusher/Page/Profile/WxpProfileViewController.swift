@@ -93,7 +93,7 @@ class WxpProfileViewController: UIViewController {
                     WxpPermissionUtils.requestNotificationPermission { success in
                         if(success){
                             WxpToastUtils.shared.showToast(msg: "你已经打开通知权限")
-                            var params = WxpDialogParams()
+                            let params = WxpDialogParams()
                             params.title = "提醒方式设置"
                             params.message = "当前已经打开通知权限，你还可以设置锁屏显示、通知中心显示、横幅显示等，还可以设置通知的铃声。是否前往设置？"
                             params.leftText = "取消"
@@ -103,7 +103,7 @@ class WxpProfileViewController: UIViewController {
                             }
                             WxpDialogUtils.showDialog(params: params)
                         }else{
-                            var params = WxpDialogParams()
+                            let params = WxpDialogParams()
                             params.title = "异常提醒"
                             params.message = "WxPusher必须要推送权限才能正常工作，请在【设置-WxPusher消息推送平台-通知】打开相关开关"
                             params.leftText = "取消"
