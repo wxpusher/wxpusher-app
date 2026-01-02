@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1A039F712F08131000C1CA76 /* TestPanelViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A039F702F08130F00C1CA76 /* TestPanelViewController.swift */; };
 		1A447DF62DF53ECD005C402F /* StringConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A447DEE2DF53ECD005C402F /* StringConstants.swift */; };
 		1A447DF92DF53ECD005C402F /* MainTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A447DEF2DF53ECD005C402F /* MainTabBarController.swift */; };
 		1A447DFA2DF53ECD005C402F /* WxpWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A447DF32DF53ECD005C402F /* WxpWebViewController.swift */; };
@@ -52,6 +53,7 @@
 
 /* Begin PBXFileReference section */
 		04FA11B19AA79CDF8B53F24C /* Pods-wxpusher.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-wxpusher.debug.xcconfig"; path = "Target Support Files/Pods-wxpusher/Pods-wxpusher.debug.xcconfig"; sourceTree = "<group>"; };
+		1A039F702F08130F00C1CA76 /* TestPanelViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPanelViewController.swift; sourceTree = "<group>"; };
 		1A3C056A2ACDCDA1006F7007 /* WxPusher-iOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WxPusher-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1A447DEE2DF53ECD005C402F /* StringConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringConstants.swift; sourceTree = "<group>"; };
 		1A447DEF2DF53ECD005C402F /* MainTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabBarController.swift; sourceTree = "<group>"; };
@@ -131,9 +133,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1A039F6F2F0812F100C1CA76 /* TestPanel */ = {
+			isa = PBXGroup;
+			children = (
+				1A039F702F08130F00C1CA76 /* TestPanelViewController.swift */,
+			);
+			path = TestPanel;
+			sourceTree = "<group>";
+		};
 		1A447DF42DF53ECD005C402F /* Page */ = {
 			isa = PBXGroup;
 			children = (
+				1A039F6F2F0812F100C1CA76 /* TestPanel */,
 				1ABD142B2EDF44AC0019AA3A /* ChangePhone */,
 				1ABD14282EDDE3560019AA3A /* AccountDetail */,
 				1A9C3E7F2DF5ABFC00A25249 /* Login */,
@@ -572,6 +583,7 @@
 				1A447DF92DF53ECD005C402F /* MainTabBarController.swift in Sources */,
 				1A447DFA2DF53ECD005C402F /* WxpWebViewController.swift in Sources */,
 				1ABD14262EDBF9890019AA3A /* WxpLoadingService.swift in Sources */,
+				1A039F712F08131000C1CA76 /* TestPanelViewController.swift in Sources */,
 				1ABD142A2EDDE3720019AA3A /* AccountDetailViewController.swift in Sources */,
 				1A962E752E0B081300C966A3 /* WxpSaveKey.swift in Sources */,
 				1A9820732E96657E00758D7C /* WxpWeixinOpenManager.swift in Sources */,

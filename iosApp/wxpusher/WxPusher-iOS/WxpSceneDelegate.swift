@@ -1,4 +1,5 @@
 import UIKit
+import shared
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
@@ -6,11 +7,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
+        
+        #if DEBUG
+        let tempWin = ShakeWindow(windowScene: windowScene)
+        #else
         let tempWin = UIWindow(windowScene: windowScene)
+        #endif
         
         let mainTabBarController = MainTabBarController()
-        //        let mainTabBarController = WxpProfileViewController()
-        //        let navigationController = UINavigationController(rootViewController: mainTabBarController)
         tempWin.backgroundColor = .systemBackground
         tempWin.rootViewController = mainTabBarController
         tempWin.makeKeyAndVisible()
@@ -40,3 +44,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
 }
+
+#if DEBUG
+/// debug的时候，摇一摇，打开测试面板
+class ShakeWindow: UIWindow {
+    override func motionEnded(_ motion: UIEvent.EventSubtype, with event: UIEvent?) {
+        if motion == .motionShake {
+            WxpJumpPageUtils.jumpToTestPanel()
+        }
+        super.motionEnded(motion, with: event)
+    }
+}
+#endif

@@ -36,6 +36,18 @@ import shared
         }
         
     }
+#if DEBUG
+    /**
+     * 跳转到测试面板
+     */
+    public static func jumpToTestPanel(){
+        runWithRootVC { rootVC in
+            let vc = TestPanelViewController()
+            vc.hidesBottomBarWhenPushed = true
+            rootVC.pushViewController(vc, animated: true)
+        }
+    }
+#endif
     
     /**
      * 跳转到登录页面
