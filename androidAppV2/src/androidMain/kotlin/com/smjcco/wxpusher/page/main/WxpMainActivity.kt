@@ -25,6 +25,7 @@ import com.smjcco.wxpusher.page.main.fragment.ProfileFragment
 import com.smjcco.wxpusher.page.main.fragment.WxpProviderListFragment
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
+import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
@@ -66,8 +67,12 @@ class WxpMainActivity : WxpBaseActivity() {
 
         //检查是否有权限
         setUpPermissionRequester()
-        permissionRequester?.request {
 
+        //华为要求，在没有用户操作的时候，不能请求通知权限
+        if (!DeviceUtils.isHuawei()){
+            permissionRequester?.request {
+
+            }
         }
 
         //处理页面参数
