@@ -17,6 +17,7 @@ import com.smjcco.wxpusher.base.WxpBaseActivity
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
+import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.base.common.flush
 import com.smjcco.wxpusher.common.WxpSaveKey
 import com.smjcco.wxpusher.page.main.fragment.ITabMenuProvider
@@ -68,20 +69,22 @@ class WxpMainActivity : WxpBaseActivity() {
         //检查是否有权限
         setUpPermissionRequester()
 
-        //华为要求，在没有用户操作的时候，不能请求通知权限
-        if (!DeviceUtils.isHuawei()){
-            permissionRequester?.request {
-
-            }
-        }
 
         //处理页面参数
         onIntent(intent)
         addOnNewIntentListener { onIntent(it) }
     }
 
+    fun permissionRequest() {
+        permissionRequester?.request {
+            if (!it) {
+                WxpToastUtils.showToast("你拒绝了通知权限，将无法给你发送通知提醒")
+            }
+        }
+    }
+
     private fun setUpPermissionRequester() {
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             return
         }
 

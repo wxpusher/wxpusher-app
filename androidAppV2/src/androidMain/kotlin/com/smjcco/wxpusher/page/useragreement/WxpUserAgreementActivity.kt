@@ -152,13 +152,12 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
     }
 
     private fun setUpPermissionRequester() {
-        val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Manifest.permission.POST_NOTIFICATIONS
-        } else {
-            ""
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU){
+            return
         }
+
         permissionRequester = PermissionRequester(
-            this, permission,
+            this,  Manifest.permission.POST_NOTIFICATIONS,
             "需要发送通知权限",
             "WxPusher是一个消息推送平台，当有新消息到达的时候，我们会第一时间给你发送通知，因此需要你授予发送通知的权限，否则我们无法发送消息通知，你可能会因此遗漏消息，是否授予权限？",
             "缺少必须的通知权限",

@@ -13,8 +13,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.AppCompatTextView
-import androidx.core.content.res.ResourcesCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
@@ -29,6 +27,7 @@ import com.smjcco.wxpusher.base.common.WxpDateTimeUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.dialog.ActionSheetDialogFragment
 import com.smjcco.wxpusher.dialog.ActionSheetItem
+import com.smjcco.wxpusher.page.main.WxpMainActivity
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListView
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
@@ -38,6 +37,7 @@ import com.smjcco.wxpusher.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.push.IPushTokenChangedListener
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.utils.DeviceUtils
+import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
 
 /**
@@ -61,11 +61,13 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
 
     private lateinit var refreshHeader: ClassicsHeader
 
-    private lateinit var bannerCardView: View;
-    private lateinit var bannerICImg: AppCompatImageView;
-    private lateinit var bannerTextTv: AppCompatTextView;
-    private lateinit var bannerBtn: MaterialButton;
-    private lateinit var bannerCloseImg: AppCompatImageView;
+    private lateinit var batteryBanner: View
+    private lateinit var bannerBtn: MaterialButton
+    private lateinit var bannerCloseImg: AppCompatImageView
+
+    private lateinit var notePermissionBanner: View
+    private lateinit var notePermissionBtn: MaterialButton
+    private lateinit var notePermissionCloseImg: AppCompatImageView
 
 
     override fun onCreateView(
@@ -85,6 +87,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         //打开就刷新一次
         refreshLayout.autoRefresh()
         refreshBanner()
+        refreshNotePermissionBanner()
         //监听pushToken变化，刷新banner
         PushManager.addPushTokenChangedListener(this)
     }
@@ -98,6 +101,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     override fun onResume() {
         super.onResume()
         refreshBanner()
+        refreshNotePermissionBanner()
     }
 
     override fun onDestroy() {
@@ -113,12 +117,13 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         searchCancelBtn = view.findViewById(R.id.search_cancel_btn)
         searchBarContainer = view.findViewById(R.id.search_bar_container)
         //banner
-        bannerCardView = view.findViewById(R.id.main_banner_card)
-        bannerICImg = view.findViewById(R.id.main_banner_ic)
-        bannerTextTv = view.findViewById(R.id.main_banner_text)
+        batteryBanner = view.findViewById(R.id.battery_banner)
         bannerBtn = view.findViewById(R.id.main_banner_btn)
         bannerCloseImg = view.findViewById(R.id.main_banner_close)
 
+        notePermissionBanner = view.findViewById(R.id.note_permission_banner)
+        notePermissionBtn = view.findViewById(R.id.note_permission_banner_btn)
+        notePermissionCloseImg = view.findViewById(R.id.note_permission_banner_close)
         // 输入框获取焦点时显示取消按钮
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
@@ -159,31 +164,41 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         //如果是非厂商通道，并且没有忽略电池优化，就提醒用户关闭电池优化
         if (DeviceUtils.getPlatform() == DevicePlatform.Android) {
             if (!DeviceUtils.isIgnoringBatteryOptimizations()) {
-                bannerCardView.visibility = View.VISIBLE
-                //设置电池图标
-                bannerICImg.visibility = View.VISIBLE
-                bannerICImg.setImageDrawable(
-                    ResourcesCompat.getDrawable(
-                        resources,
-                        R.drawable.ic_battery_alert_red_24dp,
-                        null
-                    )
-                )
-                bannerTextTv.visibility = View.VISIBLE
-                bannerTextTv.text = resources.getString(R.string.main_banner_battery_text)
-                bannerBtn.visibility = View.VISIBLE
-                bannerBtn.text = resources.getString(R.string.main_banner_battery_button_fix_now)
+                batteryBanner.visibility = View.VISIBLE
                 bannerBtn.setOnClickListener {
                     WxpJumpPageUtils.jumpToSystemIgnoreBatteryOptimizationSettings(
                         requireActivity()
                     )
                 }
-                bannerCloseImg.visibility = View.GONE
+                bannerCloseImg.setOnClickListener {
+                    batteryBanner.visibility = View.GONE
+                }
             } else {
-                bannerCardView.visibility = View.GONE
+                batteryBanner.visibility = View.GONE
             }
         } else {
-            bannerCardView.visibility = View.GONE
+            batteryBanner.visibility = View.GONE
+        }
+    }
+
+    /**
+     * 刷新没有权限时候的消息banner提醒
+     */
+    private fun refreshNotePermissionBanner() {
+        val hasNotePermission = PermissionUtils.hasNotificationPermission(requireActivity())
+        if (hasNotePermission) {
+            notePermissionBanner.visibility = View.GONE
+        } else {
+            notePermissionBanner.visibility = View.VISIBLE
+            notePermissionBtn.setOnClickListener {
+                if (requireActivity() is WxpMainActivity) {
+                    val mainActivity = requireActivity() as WxpMainActivity
+                    mainActivity.permissionRequest()
+                }
+            }
+            notePermissionCloseImg.setOnClickListener {
+                notePermissionBanner.visibility = View.GONE
+            }
         }
     }
 
