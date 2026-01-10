@@ -149,7 +149,8 @@ object PushManager : Runnable {
         } else if (platform == DevicePlatform.Android_HONOR) {
             CommonUtils.showSettingGuide(activity)
         } else if (platform == DevicePlatform.Android_HUAWEI) {
-            CommonUtils.showSettingGuide(activity)
+            //华为打开app的时候，不让弹窗，因此先注释调
+//            CommonUtils.showSettingGuide(activity)
         } else if (platform == DevicePlatform.Android_OPPO) {
             CommonUtils.showSettingGuide(activity)
         } else if (platform == DevicePlatform.Android_MEIZU) {
