@@ -146,7 +146,10 @@ object PermissionUtils {
     /**
      * 是否有发送通知的权限
      */
-    fun hasNotificationPermission(activity: Activity): Boolean {
+    fun hasNotificationPermission(activity: Activity?): Boolean {
+        if (activity == null) {
+            return false
+        }
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ContextCompat.checkSelfPermission(
                 activity,

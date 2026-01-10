@@ -167,7 +167,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                 batteryBanner.visibility = View.VISIBLE
                 bannerBtn.setOnClickListener {
                     WxpJumpPageUtils.jumpToSystemIgnoreBatteryOptimizationSettings(
-                        requireActivity()
+                        activity
                     )
                 }
                 bannerCloseImg.setOnClickListener {
@@ -185,14 +185,14 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
      * 刷新没有权限时候的消息banner提醒
      */
     private fun refreshNotePermissionBanner() {
-        val hasNotePermission = PermissionUtils.hasNotificationPermission(requireActivity())
+        val hasNotePermission = PermissionUtils.hasNotificationPermission(activity)
         if (hasNotePermission) {
             notePermissionBanner.visibility = View.GONE
         } else {
             notePermissionBanner.visibility = View.VISIBLE
             notePermissionBtn.setOnClickListener {
-                if (requireActivity() is WxpMainActivity) {
-                    val mainActivity = requireActivity() as WxpMainActivity
+                if (activity is WxpMainActivity) {
+                    val mainActivity = activity as WxpMainActivity
                     mainActivity.permissionRequest()
                 }
             }
@@ -244,7 +244,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         // 点击消息项，打开网页
         val urlString = message.url.trim()
         if (urlString.isNotEmpty()) {
-            WxpJumpPageUtils.jumpToWebUrl(urlString, requireActivity())
+            WxpJumpPageUtils.jumpToWebUrl(urlString, activity)
             // 标记消息为已读
             message.read = true
             adapter.notifyDataSetChanged()
@@ -337,7 +337,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
 
                 if (showLink) {
                     linkIcon.setOnClickListener {
-                        WxpJumpPageUtils.jumpToWebUrl(sourceUrl, requireActivity())
+                        WxpJumpPageUtils.jumpToWebUrl(sourceUrl, activity)
                     }
                 }
 
@@ -361,11 +361,12 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                     val actionList = listOf(
                         listOf(readOpt, removeOpt)
                     )
-
-                    ActionSheetDialogFragment(actionList).show(
-                        requireActivity().supportFragmentManager,
-                        "${MessageListFragment::class.simpleName}_option"
-                    )
+                    activity?.let {
+                        ActionSheetDialogFragment(actionList).show(
+                            it.supportFragmentManager,
+                            "${MessageListFragment::class.simpleName}_option"
+                        )
+                    }
                     return@setOnLongClickListener true
                 }
             }
