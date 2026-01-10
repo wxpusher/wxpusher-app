@@ -54,10 +54,11 @@ object WxpJumpPageUtils {
                 Settings.EXTRA_APP_PACKAGE,
                 ApplicationUtils.getApplication().getPackageName()
             )
-            intent.putExtra(
-                Settings.EXTRA_CHANNEL_ID,
-                WxpNotificationManager.WxPusherSystemChannelId
-            )
+//            打开消息通道的设置，但是如果没有打开消息总开关，会无法打开，因此先把这个注释调。
+//            intent.putExtra(
+//                Settings.EXTRA_CHANNEL_ID,
+//                WxpNotificationManager.WxPusherSystemChannelId
+//            )
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             it.startActivity(intent)
         }
