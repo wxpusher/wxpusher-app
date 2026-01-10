@@ -15,6 +15,7 @@ object HuaweiPushUtils {
     private val TAG = "Huawei"
     fun init(application: Application) {
         HmsMessaging.getInstance(application).isAutoInitEnabled = true
+        HmsMessaging.getInstance(application).turnOnPush()
         WxpScopeUtils.getIoScopeScope().launch {
             try {
                 val token = HmsInstanceId.getInstance(application)
