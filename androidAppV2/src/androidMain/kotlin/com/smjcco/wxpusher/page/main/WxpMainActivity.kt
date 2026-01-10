@@ -26,7 +26,6 @@ import com.smjcco.wxpusher.page.main.fragment.ProfileFragment
 import com.smjcco.wxpusher.page.main.fragment.WxpProviderListFragment
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
-import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
@@ -76,9 +75,13 @@ class WxpMainActivity : WxpBaseActivity() {
     }
 
     fun permissionRequest() {
-        permissionRequester?.request {
-            if (!it) {
-                WxpToastUtils.showToast("你拒绝了通知权限，将无法给你发送通知提醒")
+        if (permissionRequester == null) {
+            PermissionUtils.gotoNotificationSettingPage()
+        } else {
+            permissionRequester?.request {
+                if (!it) {
+                    WxpToastUtils.showToast("你拒绝了通知权限，将无法给你发送通知提醒")
+                }
             }
         }
     }

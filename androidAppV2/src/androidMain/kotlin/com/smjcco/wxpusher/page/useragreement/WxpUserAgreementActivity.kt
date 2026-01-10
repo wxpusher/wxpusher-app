@@ -152,12 +152,12 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
     }
 
     private fun setUpPermissionRequester() {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             return
         }
 
         permissionRequester = PermissionRequester(
-            this,  Manifest.permission.POST_NOTIFICATIONS,
+            this, Manifest.permission.POST_NOTIFICATIONS,
             "需要发送通知权限",
             "WxPusher是一个消息推送平台，当有新消息到达的时候，我们会第一时间给你发送通知，因此需要你授予发送通知的权限，否则我们无法发送消息通知，你可能会因此遗漏消息，是否授予权限？",
             "缺少必须的通知权限",
@@ -186,16 +186,21 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
      * 没有权限的时候，请求权限
      */
     private fun requestPermission() {
-        // 请求通知权限
-        permissionRequester?.request {
-            if (it) {
-                jumpToMain()
-            } else {
-                WxpLogUtils.i(message = "用户拒绝了通知权限")
-                WxpToastUtils.showToast("你拒绝了通知权限，将无法给你发送通知提醒")
-                jumpToMain()
+        if (permissionRequester == null) {
+            PermissionUtils.gotoNotificationSettingPage()
+        } else {
+            // 请求通知权限
+            permissionRequester?.request {
+                if (it) {
+                    jumpToMain()
+                } else {
+                    WxpLogUtils.i(message = "用户拒绝了通知权限")
+                    WxpToastUtils.showToast("你拒绝了通知权限，将无法给你发送通知提醒")
+                    jumpToMain()
+                }
             }
         }
+
     }
 
     private fun onDisagreeClicked() {
