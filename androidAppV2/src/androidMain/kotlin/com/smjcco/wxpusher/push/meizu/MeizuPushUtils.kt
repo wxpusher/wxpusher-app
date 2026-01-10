@@ -4,14 +4,16 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.Application
 import com.meizu.cloud.pushsdk.PushManager
+import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.utils.PermissionUtils
-import com.smjcco.wxpusher.utils.WxpJumpPageUtils
 
 object MeizuPushUtils {
     private val SAVE_SHOW_KEY = "Meizu_alertTips"
+    private val appId = "155986"
+    private val appKey = "b8bd81b459d840779feea5b87d33714f"
     private var hasShow = false
 
     /**
@@ -19,7 +21,17 @@ object MeizuPushUtils {
      */
     fun init(application: Application) {
         WxpLogUtils.i("MEIZU", "魅族SDK version=" + PushManager.getSdkVersion())
-        PushManager.register(application, "155986", "b8bd81b459d840779feea5b87d33714f");
+        PushManager.register(application, appId, appKey);
+    }
+
+    fun openPushSwitch(token: String?) {
+        PushManager.switchPush(
+            ApplicationUtils.getApplication(),
+            appId,
+            appKey,
+            token,
+            true
+        )
     }
 
     fun showSettingGuide(activity: Activity) {
