@@ -1,5 +1,13 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import java.util.Properties
+
+// 读取local.properties
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
+}
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -85,6 +93,11 @@ android {
     compileSdk = 35
     defaultConfig {
         minSdk = 24
+        buildConfigField("String", "ALIYUN_SLS_ACCESS_KEY_ID", "\"${localProperties.getProperty("aliyun.sls.accessKeyId", "")}\"")
+        buildConfigField("String", "ALIYUN_SLS_ACCESS_KEY_SECRET", "\"${localProperties.getProperty("aliyun.sls.accessKeySecret", "")}\"")
+    }
+    buildFeatures {
+        buildConfig = true
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8

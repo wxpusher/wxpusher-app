@@ -5,6 +5,7 @@ import com.aliyun.sls.android.producer.LogProducerClient
 import com.aliyun.sls.android.producer.LogProducerConfig
 import com.aliyun.sls.android.producer.LogProducerResult
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
+import com.smjcco.wxpusher.kmp.BuildConfig
 import java.io.PrintWriter
 import java.io.StringWriter
 
@@ -31,8 +32,8 @@ private object AliyunLog {
         val endpoint = "https://cn-hangzhou.log.aliyuncs.com"
         val project = "wxpusher-app-log"
         val logstore = "wxpusher-android-app-log"
-        val accesskeyid = "LTAI5t7EqUYtLdPRFcN6Ppqq"
-        val accesskeysecret = "3p2opJ0jRNJkqjzZOUJM2hE8Uf4eTg"
+        val accesskeyid = BuildConfig.ALIYUN_SLS_ACCESS_KEY_ID
+        val accesskeysecret = BuildConfig.ALIYUN_SLS_ACCESS_KEY_SECRET
         val config = LogProducerConfig(
             ApplicationUtils.getApplication(),
             endpoint,
