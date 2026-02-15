@@ -2,7 +2,7 @@ name: Build Android Apk
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "release" ]
   pull_request:
     branches: [ "master", "release" ]
   workflow_dispatch:
