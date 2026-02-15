@@ -24,23 +24,23 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     #新建一个文件夹，用户保存签名密钥
-    - name: mkdir android sign dir
-      run: mkdir -p sign/android
+    - name: mkdir android secrets dir
+      run: mkdir -p secrets/android
     #从 Secrets 还原 keystore 文件
     - name: Restore keystore file
       env:
         KEYSTORE_BASE64: ${{ secrets.APK_SIGN_JKS }}
       run: |
         echo $KEYSTORE_BASE64 | base64 -d > sign_keystore.jks
-      working-directory: ./sign/android
+      working-directory: ./secrets/android
     #创建签名需要的信息
-    - name: Create sign.properties
+    - name: Create secrets.properties
       run: |
         echo "storeFile=sign_keystore.jks" > key.properties
         echo "storePassword=${{ secrets.APK_SIGN_KEYSTORE_PASSWORD }}" >> key.properties
         echo "keyAlias=${{ secrets.APK_SIGN_ALIAS }}" >> key.properties
         echo "keyPassword=${{ secrets.APK_SIGN_PASSWORD }}" >> key.properties
-      working-directory: ./sign/android
+      working-directory: ./secrets/android
     - name: Build Android APK
       run: ./gradlew clean :androidApp:assembleProdRelease
     # 读取安卓版本号，用于产物命名
