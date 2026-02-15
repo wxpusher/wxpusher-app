@@ -39,8 +39,15 @@ jobs:
       uses: ruby/setup-ruby@v1
       with:
         ruby-version: '3.2'
-        bundler-cache: true
+        bundler-cache: false
         working-directory: iosApp
+
+    # 安装 Bundler 依赖（自动添加当前平台，避免 Gemfile.lock 平台不匹配）
+    - name: Bundle install
+      run: |
+        bundle lock --add-platform ruby
+        bundle install --jobs 3
+      working-directory: iosApp
 
     # KMM CocoaPods 集成需要先生成 dummy framework，否则 pod install 会失败
     - name: Generate KMM dummy framework
