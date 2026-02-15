@@ -130,7 +130,7 @@ jobs:
           CODE_SIGN_STYLE=Manual \
           DEVELOPMENT_TEAM=8UU533BM7N \
           CODE_SIGN_IDENTITY="Apple Distribution" \
-          PROVISIONING_PROFILE_SPECIFIER="wxpusher-appstore-distribution-push-login"
+          PROVISIONING_PROFILE_SPECIFIER="Provisioning-WxPusher-Distribution"
       working-directory: iosApp
 
     # 创建导出配置文件
@@ -154,7 +154,7 @@ jobs:
             <key>provisioningProfiles</key>
             <dict>
                 <key>com.smjcco.wxpusher</key>
-                <string>wxpusher-appstore-distribution-push-login</string>
+                <string>Provisioning-WxPusher-Distribution</string>
             </dict>
         </dict>
         </plist>
