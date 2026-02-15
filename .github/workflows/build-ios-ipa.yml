@@ -20,7 +20,7 @@ jobs:
     outputs:
       app_version: ${{ steps.get_version.outputs.APP_VERSION }}
       bundle_version: ${{ steps.get_version.outputs.BUNDLE_VERSION }}
-      artifact_name: wxpusher-ios-v${{ steps.get_version.outputs.APP_VERSION }}-${{ github.run_id }}.ipa
+      artifact_name: wxpusher-ios-v${{ steps.get_version.outputs.APP_VERSION }}-${{ github.run_id }}-${{ steps.get_version.outputs.BUNDLE_VERSION }}.ipa
 
     steps:
     - uses: actions/checkout@v4
