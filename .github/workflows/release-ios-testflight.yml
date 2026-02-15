@@ -1,0 +1,54 @@
+name: Release iOS to TestFlight
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_notes:
+        description: '发布说明（可选）'
+        required: false
+        default: ''
+
+jobs:
+  # 复用 Build iOS IPA workflow
+  build:
+    uses: ./.github/workflows/build-ios-ipa.yml
+    secrets: inherit
+
+  # 上传到 TestFlight
+  upload:
+    needs: build
+    runs-on: macos-15
+
+    steps:
+      # 下载构建产物
+      - name: Download IPA artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.artifact_name }}
+          path: ./ipa-output
+
+      # 配置 App Store Connect API Key
+      - name: Set up App Store Connect API Key
+        env:
+          API_KEY_BASE64: ${{ secrets.IOS_APP_STORE_CONNECT_API_KEY_BASE64 }}
+          API_KEY_ID: ${{ secrets.IOS_APP_STORE_CONNECT_API_KEY_ID }}
+        run: |
+          # API Key 文件需要放在 ~/private_keys/ 目录下，命名格式为 AuthKey_{KEY_ID}.p8
+          mkdir -p ~/private_keys
+          echo "$API_KEY_BASE64" | base64 --decode > ~/private_keys/AuthKey_${API_KEY_ID}.p8
+          echo "API Key file created: ~/private_keys/AuthKey_${API_KEY_ID}.p8"
+
+      # 上传 IPA 到 App Store Connect（TestFlight）
+      - name: Upload to TestFlight
+        env:
+          API_KEY_ID: ${{ secrets.IOS_APP_STORE_CONNECT_API_KEY_ID }}
+          API_ISSUER_ID: ${{ secrets.IOS_APP_STORE_CONNECT_API_ISSUER_ID }}
+        run: |
+          IPA_FILE=$(ls ./ipa-output/*.ipa | head -1)
+          echo "Uploading IPA: $IPA_FILE"
+          xcrun altool --upload-app \
+            --type ios \
+            --file "$IPA_FILE" \
+            --apiKey "$API_KEY_ID" \
+            --apiIssuer "$API_ISSUER_ID"
+          echo "Upload to TestFlight completed successfully!"
