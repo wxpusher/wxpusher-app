@@ -19,8 +19,12 @@ jobs:
   upload:
     needs: build
     runs-on: macos-15
+    permissions:
+      contents: write
 
     steps:
+      - uses: actions/checkout@v4
+
       # 下载构建产物
       - name: Download IPA artifact
         uses: actions/download-artifact@v4
@@ -53,3 +57,33 @@ jobs:
             --apiKey "$API_KEY_ID" \
             --apiIssuer "$API_ISSUER_ID"
           echo "Upload to TestFlight completed successfully!"
+      # 重命名 IPA 文件为更简洁的名称
+      - name: Prepare IPA file
+        id: prepare
+        run: |
+          IPA_FILE=$(ls ./ipa-output/*.ipa | head -1)
+          RELEASE_IPA="./ipa-output/wxpusher-app-v${{ needs.build.outputs.app_version }}.ipa"
+          mv "$IPA_FILE" "$RELEASE_IPA"
+          echo "IPA_PATH=$RELEASE_IPA" >> $GITHUB_OUTPUT
+
+      # 创建 GitHub Release 并上传 IPA
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.build.outputs.app_version }}-iOS
+          name: WxPusher iOS v${{ needs.build.outputs.app_version }}
+          body: |
+            ## WxPusher iOS v${{ needs.build.outputs.app_version }}
+
+            ${{ github.event.inputs.release_notes || '新版本发布' }}
+
+            ---
+            构建信息
+            - 分支: `${{ github.ref_name }}`
+            - Commit: `${{ github.sha }}`
+            - Run ID: `${{ github.run_id }}`
+            - 构建时间: `${{ github.event.repository.updated_at }}`
+          draft: true
+          prerelease: false
+          files: ${{ steps.prepare.outputs.IPA_PATH }}
+          generate_release_notes: true

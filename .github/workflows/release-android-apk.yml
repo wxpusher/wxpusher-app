@@ -44,7 +44,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ needs.build.outputs.app_version }}
+          tag_name: v${{ needs.build.outputs.app_version }}-Android
           name: WxPusher Android v${{ needs.build.outputs.app_version }}
           body: |
             ## WxPusher Android v${{ needs.build.outputs.app_version }}
@@ -57,7 +57,7 @@ jobs:
             - Commit: `${{ github.sha }}`
             - Run ID: `${{ github.run_id }}`
             - 构建时间: `${{ github.event.repository.updated_at }}`
-          draft: false
+          draft: true
           prerelease: false
           files: ${{ steps.prepare.outputs.APK_PATH }}
           generate_release_notes: true
