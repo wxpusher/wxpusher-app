@@ -88,6 +88,20 @@ android {
             keyAlias = "smjcco"
             keyPassword = "smjcco"
         }
+        // Release 签名配置 - 从 sign/key.properties 读取
+        val signDir = rootProject.file("sign/android")
+        val keyPropertiesFile = File(signDir, "key.properties")
+        if (keyPropertiesFile.exists()) {
+            create("release") {
+                val keyProperties = java.util.Properties().apply {
+                    load(keyPropertiesFile.inputStream())
+                }
+                storeFile = File(signDir, keyProperties.getProperty("storeFile"))
+                storePassword = keyProperties.getProperty("storePassword")
+                keyAlias = keyProperties.getProperty("keyAlias")
+                keyPassword = keyProperties.getProperty("keyPassword")
+            }
+        }
     }
     
     buildTypes {
@@ -101,6 +115,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // 使用 release 签名配置（如果存在）
+            signingConfig = try {
+                signingConfigs.getByName("release")
+            } catch (_: UnknownDomainObjectException) {
+                null
+            }
         }
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")

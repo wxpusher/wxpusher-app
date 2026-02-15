@@ -23,6 +23,20 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+     #从 Secrets 还原 keystore 文件
+    - name: Restore keystore file
+      env:
+        KEYSTORE_BASE64: ${{ secrets.APK_SIGN_JKS }}
+      run: |
+        echo $KEYSTORE_BASE64 | base64 -d > sign_keystore.jks
+      working-directory: ./sign/android
+    - name: Create sign.properties
+      run: |
+        echo "storeFile=sign_keystore.jks" > key.properties
+        echo "storePassword=${{ secrets.APK_SIGN_KEYSTORE_PASSWORD }}" >> key.properties
+        echo "keyAlias=${{ secrets.APK_SIGN_ALIAS }}" >> key.properties
+        echo "keyPassword=${{ secrets.APK_SIGN_PASSWORD }}" >> key.properties
+      working-directory: ./sign/android
     - name: Build Android APK
       run: ./gradlew clean :androidApp:assembleProdRelease
     # 读取安卓版本号，用于产物命名
