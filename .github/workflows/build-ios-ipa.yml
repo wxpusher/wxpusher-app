@@ -200,7 +200,7 @@ jobs:
     - name: Upload IPA artifact
       uses: actions/upload-artifact@v4
       with:
-        name: wxpusher-ios-v${{ steps.get_version.outputs.APP_VERSION }}-${{ github.run_id }}-${{ jobs.build.outputs.bundle_version }}.ipa
+        name: wxpusher-ios-v${{ steps.get_version.outputs.APP_VERSION }}-${{ github.run_id }}-${{ steps.get_version.outputs.BUNDLE_VERSION }}.ipa
         path: ${{ runner.temp }}/ipa-output/*.ipa
 
     # ========== 清理 ==========
