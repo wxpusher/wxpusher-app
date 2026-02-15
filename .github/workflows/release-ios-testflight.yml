@@ -6,6 +6,7 @@ on:
       release_notes:
         description: '发布说明（可选）'
         required: false
+        type: string
         default: ''
 
 jobs:
