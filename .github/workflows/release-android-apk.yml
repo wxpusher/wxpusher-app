@@ -1,0 +1,62 @@
+name: Release Android Apk
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_notes:
+        description: '发布说明（可选）'
+        required: false
+        default: ''
+
+jobs:
+  # 复用 Build Android Apk workflow
+  build:
+    uses: ./.github/workflows/build-android-apk.yml
+    secrets: inherit
+
+  # 发布到 GitHub Release
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # 下载构建产物
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build.outputs.artifact_name }}
+          path: ./apk-output
+
+      # 重命名 APK 文件为更简洁的名称
+      - name: Prepare APK file
+        id: prepare
+        run: |
+          APK_FILE=$(ls ./apk-output/*.apk | head -1)
+          RELEASE_APK="./apk-output/wxpusher-app-v${{ needs.build.outputs.app_version }}.apk"
+          mv "$APK_FILE" "$RELEASE_APK"
+          echo "APK_PATH=$RELEASE_APK" >> $GITHUB_OUTPUT
+
+      # 创建 GitHub Release 并上传 APK
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.build.outputs.app_version }}
+          name: WxPusher App v${{ needs.build.outputs.app_version }}
+          body: |
+            ## WxPusher App v${{ needs.build.outputs.app_version }}
+
+            ${{ github.event.inputs.release_notes || '新版本发布' }}
+
+            ---
+            构建信息：
+            - 分支: `${{ github.ref_name }}`
+            - Commit: `${{ github.sha }}`
+            - 构建时间: `${{ github.event.repository.updated_at }}`
+          draft: false
+          prerelease: false
+          files: ${{ steps.prepare.outputs.APK_PATH }}
+          generate_release_notes: true

@@ -6,11 +6,21 @@ on:
   pull_request:
     branches: [ "master", "release" ]
   workflow_dispatch:
+  workflow_call:
+    outputs:
+      app_version:
+        description: "App version name"
+        value: ${{ jobs.build.outputs.app_version }}
+      artifact_name:
+        description: "Uploaded artifact name"
+        value: ${{ jobs.build.outputs.artifact_name }}
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
+    outputs:
+      app_version: ${{ steps.get_version.outputs.APP_VERSION }}
+      artifact_name: wxpusher-app-v${{ steps.get_version.outputs.APP_VERSION }}-prod-${{ github.run_id }}.apk
 
     steps:
     - uses: actions/checkout@v4
