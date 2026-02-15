@@ -130,8 +130,7 @@ jobs:
           CODE_SIGN_STYLE=Manual \
           DEVELOPMENT_TEAM=8UU533BM7N \
           CODE_SIGN_IDENTITY="iPhone Distribution" \
-          PROVISIONING_PROFILE_SPECIFIER="wxpusher-appstore-distribution-push-login" \
-          | xcpretty
+          PROVISIONING_PROFILE_SPECIFIER="wxpusher-appstore-distribution-push-login"
       working-directory: iosApp
 
     # 创建导出配置文件
@@ -167,8 +166,7 @@ jobs:
         xcodebuild -exportArchive \
           -archivePath $RUNNER_TEMP/WxPusher-iOS.xcarchive \
           -exportPath $RUNNER_TEMP/ipa-output \
-          -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist \
-          | xcpretty
+          -exportOptionsPlist $RUNNER_TEMP/ExportOptions.plist
 
     # 上传 IPA 产物
     - name: Upload IPA artifact
