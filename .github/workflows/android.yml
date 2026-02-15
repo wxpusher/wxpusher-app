@@ -27,5 +27,4 @@ jobs:
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: signed-apk
         path: androidApp/build/outputs/apk/prod/release/wxpusher-app-*.apk
