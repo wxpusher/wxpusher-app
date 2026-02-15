@@ -45,16 +45,17 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.build.outputs.app_version }}
-          name: WxPusher App v${{ needs.build.outputs.app_version }}
+          name: WxPusher Android v${{ needs.build.outputs.app_version }}
           body: |
-            ## WxPusher App v${{ needs.build.outputs.app_version }}
+            ## WxPusher Android v${{ needs.build.outputs.app_version }}
 
             ${{ github.event.inputs.release_notes || '新版本发布' }}
 
             ---
-            构建信息：
+            构建信息
             - 分支: `${{ github.ref_name }}`
             - Commit: `${{ github.sha }}`
+            - Run ID: `${{ github.run_id }}`
             - 构建时间: `${{ github.event.repository.updated_at }}`
           draft: false
           prerelease: false
