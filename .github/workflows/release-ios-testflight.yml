@@ -71,7 +71,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ needs.build.outputs.app_version }}-iOS
-          name: WxPusher iOS v${{ needs.build.outputs.app_version }}
+          name: WxPusher iOS v${{ needs.build.outputs.app_version }} - ${{ needs.build.outputs.bundle_version }}
           body: |
             ## WxPusher iOS v${{ needs.build.outputs.app_version }}
 
@@ -82,6 +82,7 @@ jobs:
             - 分支: `${{ github.ref_name }}`
             - Commit: `${{ github.sha }}`
             - Run ID: `${{ github.run_id }}`
+            - Bundle Version: `${{ needs.build.outputs.bundle_version }}`
             - 构建时间: `${{ github.event.repository.updated_at }}`
           draft: true
           prerelease: false

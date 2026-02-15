@@ -7,6 +7,9 @@ on:
       app_version:
         description: "App version name"
         value: ${{ jobs.build.outputs.app_version }}
+      bundle_version:
+        description: "App bundle version (CFBundleVersion)"
+        value: ${{ jobs.build.outputs.bundle_version }}
       artifact_name:
         description: "Uploaded artifact name"
         value: ${{ jobs.build.outputs.artifact_name }}
@@ -16,6 +19,7 @@ jobs:
     runs-on: macos-15
     outputs:
       app_version: ${{ steps.get_version.outputs.APP_VERSION }}
+      bundle_version: ${{ steps.get_version.outputs.BUNDLE_VERSION }}
       artifact_name: wxpusher-ios-v${{ steps.get_version.outputs.APP_VERSION }}-${{ github.run_id }}.ipa
 
     steps:
@@ -136,6 +140,11 @@ jobs:
         echo "APP_VERSION=$VERSION" >> $GITHUB_OUTPUT
         echo "App version: $VERSION"
 
+        # 使用 github.run_number + 11000 作为 bundle version，确保每次构建递增且不重复
+        BUNDLE_VERSION=$(( ${{ github.run_number }} + 11000 ))
+        echo "BUNDLE_VERSION=$BUNDLE_VERSION" >> $GITHUB_OUTPUT
+        echo "Bundle version (CFBundleVersion): $BUNDLE_VERSION"
+
     # 构建 Xcode Archive
     - name: Build archive
       run: |
@@ -148,7 +157,8 @@ jobs:
           CODE_SIGN_STYLE=Manual \
           DEVELOPMENT_TEAM=8UU533BM7N \
           CODE_SIGN_IDENTITY="Apple Distribution" \
-          PROVISIONING_PROFILE_SPECIFIER="Provisioning-WxPusher-Distribution"
+          PROVISIONING_PROFILE_SPECIFIER="Provisioning-WxPusher-Distribution" \
+          CURRENT_PROJECT_VERSION=${{ steps.get_version.outputs.BUNDLE_VERSION }}
       working-directory: iosApp
 
     # 创建导出配置文件
