@@ -25,7 +25,16 @@ jobs:
       run: chmod +x gradlew
     - name: Build Android APK
       run: ./gradlew clean :androidApp:assembleProdRelease
+    # 读取安卓版本号，用于产物命名
+    - name: Get app version
+      id: get_version
+      run: |
+        # 从build.gradle中提取versionName（适配大多数安卓项目）
+        VERSION=$(grep "versionName" androidApp/build.gradle.kts | head -1 | awk -F '"' '{print $2}')
+        echo "APP_VERSION=$VERSION" >> $GITHUB_OUTPUT
+    # 上传保存产物
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
+        name: wxpusher-app-v${{ steps.get_version.outputs.APP_VERSION }}-prod-${{ github.run_id }}.apk
         path: androidApp/build/outputs/apk/prod/release/wxpusher-app-*.apk
