@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_scan_subscribe"
+        android:title="@string/message_list_scan_add_sub"
+        app:showAsAction="never|withText" />
+
+    <item
+        android:id="@+id/menu_subscription_manager"
+        android:title="@string/message_list_sub_manager"
+        app:showAsAction="never|withText" />
+
+    <item
+        android:id="@+id/menu_mark_all_read"
+        android:title="@string/message_list_mark_all_read"
+        app:showAsAction="never|withText" />
+</menu>

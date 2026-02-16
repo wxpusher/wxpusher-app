@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:node="merge">
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_REMOTE_MESSAGING" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+
+    <!-- 声明需要相机特征 -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
+
+    <application
+        android:name=".app.WxPusherApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="false"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
+        tools:node="merge"
+        tools:remove="android:networkSecurityConfig">
+
+        <activity
+            android:name=".page.main.WxpMainActivity"
+            android:clearTaskOnLaunch="true"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="wxpusher.smjcco.com"
+                    android:path="/message"
+                    android:scheme="wxpusher" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".page.WebViewActivity"
+            android:exported="true"
+            android:launchMode="singleTask" />
+
+        <activity
+            android:name=".page.scan.WxpScanActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.Scan" />
+
+        <activity
+            android:name=".page.useragreement.WxpUserAgreementActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionTheme" />
+
+
+        <activity
+            android:name=".page.login.WxpLoginActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait"
+            android:theme="@style/NoActionTheme" />
+
+        <activity
+            android:name=".page.registerorbind.WxpRegisterOrBindActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".page.bind.WxpBindActivity"
+            android:exported="false"
+            android:launchMode="singleTask" />
+
+        <activity
+            android:name=".page.changephone.WxpChangePhoneActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".page.accountdetail.AccountDetailActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".page.accountdetail.WxpRemoveAccountActivity"
+            android:exported="false"
+            android:launchMode="singleTask"
+            android:screenOrientation="portrait" />
+
+        <activity
+            android:name=".page.web.WxpWebViewActivity"
+            android:exported="true" />
+
+        <!--微信回调Activity-->
+        <activity
+            android:name=".wxapi.WXEntryActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <activity
+            android:name=".wxapi.WXPayEntryActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:taskAffinity="${applicationId}"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+
+        <!--自建长连接推送-->
+
+
+        <service
+            android:name=".push.ws.keepalive.KeepWsAliveService"
+            android:enabled="true"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="用于在使用非系统推送通道的时候，保持到服务器的长链接以接收消息通知。" />
+        </service>
+
+
+        <receiver
+            android:name=".push.ws.keepalive.KeepWsAliveStartReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+            </intent-filter>
+        </receiver>
+        <!-- 华为推送-->
+        <service
+            android:name=".push.huawei.HuaweiHmsMessageService"
+            android:directBootAware="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.huawei.push.action.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <!--        小米推送-->
+        <receiver
+            android:name=".push.xiaomi.XiaomiPushMessageReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.RECEIVE_MESSAGE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.MESSAGE_ARRIVED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.xiaomi.mipush.ERROR" />
+            </intent-filter>
+        </receiver>
+
+        <service
+            android:name="com.xiaomi.push.service.XMJobService"
+            android:process=":mipush"
+            tools:replace="android:process" />
+        <service
+            android:name="com.xiaomi.push.service.XMPushService"
+            android:process=":mipush"
+            tools:replace="android:process" />
+
+        <receiver
+            android:name="com.xiaomi.push.service.receivers.PingReceiver"
+            android:process=":mipush"
+            tools:replace="android:process" />
+
+        <!--VIVO推送-->
+        <meta-data
+            android:name="api_key"
+            android:value="83968f0dbc644a8ad45a27167137f7a1" />
+        <meta-data
+            android:name="app_id"
+            android:value="105888294" />
+
+        <service
+            android:name="com.vivo.push.sdk.service.CommandClientService"
+            android:exported="true"
+            android:permission="com.push.permission.UPSTAGESERVICE" />
+        <receiver
+            android:name=".push.vivo.VIVOClientPushMessageReceiver"
+            android:exported="false">
+            <intent-filter>
+                <!--接收push消息-->
+                <action android:name="com.vivo.pushclient.action.RECEIVE" />
+            </intent-filter>
+        </receiver>
+        <!--        荣耀推送-->
+        <meta-data
+            android:name="com.hihonor.push.app_id"
+            android:value="104500087" />
+        <service
+            android:name=".push.honor.HonorPushMessageService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.hihonor.push.action.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- OPPO推送-->
+        <service
+            android:name=".push.oppo.OppoMessageService"
+            android:exported="true"
+            android:permission="com.heytap.mcs.permission.SEND_PUSH_MESSAGE">
+            <intent-filter>
+                <action android:name="com.heytap.mcs.action.RECEIVE_MCS_MESSAGE" />
+                <action android:name="com.heytap.msp.push.RECEIVE_MCS_MESSAGE" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".push.oppo.OppoCompatibleMessageService"
+            android:exported="true"
+            android:permission="com.coloros.mcs.permission.SEND_MCS_MESSAGE">
+            <intent-filter>
+                <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE" />
+            </intent-filter>
+        </service>
+        <!--魅族推送-->
+        <receiver
+            android:name=".push.meizu.MeizuPushMsgReceiver"
+            android:exported="true"
+            android:permission="com.meizu.cloud.push.permission.MESSAGE">
+            <intent-filter>
+                <action android:name="com.meizu.flyme.push.intent.MESSAGE" />
+                <action android:name="com.meizu.flyme.push.intent.REGISTER.FEEDBACK" />
+                <action android:name="com.meizu.flyme.push.intent.UNREGISTER.FEEDBACK" />
+
+                <category android:name="${applicationId}" />
+            </intent-filter>
+        </receiver>
+    </application>
+
+    <!--荣耀推送-->
+    <queries>
+        <intent>
+            <action android:name="com.hihonor.push.action.BIND_PUSH_SERVICE" />
+        </intent>
+        <!--微信包名，Android 11+需要-->
+        <package android:name="com.tencent.mm" />
+    </queries>
+</manifest>

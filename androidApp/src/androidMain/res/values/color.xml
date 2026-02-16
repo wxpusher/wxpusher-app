@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="AccentColor">#B300B3</color>
+    <!-- 用红色action bar的页面的状态栏颜色-->
+    <color name="AccentStatusBarColor">#B300B3</color>
+    <!-- 没有红色action bar的页面的状态栏颜色-->
+    <color name="LightStatusBarColor">#FFFFFF</color>
+    <color name="Divider">#EEEEEE</color>
+    <color name="PageBg1">#FFFFFF</color>
+    <color name="PageBg2">#F5F5F5</color>
+
+    <color name="BlackBtnBg">#333333</color>
+    <color name="GrayCardBorder">#C7C7CC</color>
+
+
+    <color name="accent">#B300B3</color>
+    <color name="text_fit_theme">#030303</color>
+    <color name="dark_bg">#1a1a1a</color>
+    <color name="check_success">#4CAF50</color>
+    <color name="check_error">#F44336</color>
+    <color name="check_item_bg">#FFFFFF</color>
+    <color name="check_text_color">#333333</color>
+    <color name="check_description_color">#757575</color>
+
+    <color name="text_fit_theme_first">#030303</color>
+    <color name="bg_fit_theme_first">#FFFFFF</color>
+
+    <!-- Material Design 颜色 -->
+    <color name="colorPrimary">#B300B3</color>
+    <color name="colorPrimaryDark">#430043</color>
+    <color name="colorAccent">#B300B3</color>
+    <color name="white">#FFFFFF</color>
+    <color name="wechat_green">#07C160</color>
+    <color name="wechat_green_alpha_10">#1A07C160</color>
+
+    <!-- 输入框背景颜色 -->
+    <color name="input_field_bg">#F5F5F5</color>
+
+    <!-- 解绑页面相关颜色 -->
+    <color name="danger_color">#F44336</color>
+    <color name="text_fit_theme_second">#757575</color>
+    <color name="card_bg_fit_theme">#F8F8F8</color>
+    <color name="input_border_color">#E0E0E0</color>
+    <color name="input_border_valid">#4CAF50</color>
+    <color name="input_border_invalid">#F44336</color>
+</resources>

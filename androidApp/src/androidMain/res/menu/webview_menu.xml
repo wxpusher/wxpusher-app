@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_copy_link"
+        android:icon="@drawable/ic_copy"
+        android:title="复制链接"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_weixin_share"
+        android:icon="@drawable/ic_weixin"
+        android:title="微信分享"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_share"
+        android:icon="@drawable/ic_share"
+        android:title="分享"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_open_browser"
+        android:icon="@drawable/ic_open_in_browser"
+        android:title="在浏览器中打开"
+        app:showAsAction="never" />
+
+</menu>

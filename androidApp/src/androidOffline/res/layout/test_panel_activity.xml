@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:gravity="center"
+            android:text="开发测试控制面板"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <!-- Host 设置 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="Host 设置"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/host_radio_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/host_prod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="正式环境 (https://wxpusher.zjiecode.com)" />
+
+            <RadioButton
+                android:id="@+id/host_test"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="测试环境 (http://wxpusher.test.zjiecode.com)" />
+
+            <RadioButton
+                android:id="@+id/host_custom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="自定义" />
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/host_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            android:hint="请输入自定义Host"
+            android:inputType="textUri"
+            android:visibility="gone" />
+        <!-- WsUrl 设置 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="WebSocket 设置"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/ws_url_radio_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/ws_url_prod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="正式环境 (wss://wxpusher.zjiecode.com)" />
+
+            <RadioButton
+                android:id="@+id/ws_url_test"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="测试环境 (ws://wxpusher.test.zjiecode.com)" />
+
+            <RadioButton
+                android:id="@+id/ws_url_custom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="自定义" />
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/ws_url_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            android:hint="请输入自定义WebSocket地址"
+            android:inputType="textUri"
+            android:visibility="gone" />
+        <!-- WebUrl 设置 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="8dp"
+            android:text="WebUrl 设置(暂时不用了)"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/web_url_radio_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RadioButton
+                android:id="@+id/web_url_prod"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="正式环境 (https://static.zjiecode.com/wxpusher/web-app)" />
+
+            <RadioButton
+                android:id="@+id/web_url_test"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="测试环境 (http://10.0.0.11:3000)" />
+
+            <RadioButton
+                android:id="@+id/web_url_custom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="自定义" />
+        </RadioGroup>
+
+        <EditText
+            android:id="@+id/web_url_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            android:hint="请输入自定义WebUrl"
+            android:inputType="textUri"
+            android:visibility="gone" />
+
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- 确认按钮 -->
+        <Button
+            android:id="@+id/confirm_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="16dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="确认" />
+
+    </LinearLayout>
+</ScrollView> 

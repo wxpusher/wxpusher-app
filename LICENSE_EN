@@ -1,0 +1,54 @@
+# Sichuan Siming Jinchuang Technology Co., Ltd. Client Open Source Agreement
+## Version 1.0 (2026)
+
+### 1. Scope of the Agreement
+This Agreement applies to all source code, binary files, documents and related derivative materials (collectively referred to as the "Project") of the client software (including but not limited to Android, iOS, and HarmonyOS versions, hereinafter referred to as the "Software") open-sourced by Sichuan Siming Jinchuang Technology Co., Ltd. (hereinafter referred to as the "Right Holder").
+Any individual or organization (hereinafter referred to as the "User") that obtains, uses, modifies, or contributes to the Project shall be deemed to have agreed to and complied with all terms of this Agreement.
+
+### 2. Granted Rights
+2.1 Right of Review: Users may freely obtain, view, and audit all source code of the Project to confirm the security of the Software.
+2.2 Right of Modification and Personal Use: Users may modify, compile, and package the source code of the Project solely for personal/internal non-commercial use, and shall not distribute or disseminate the modified version to any third party.
+2.3 Right of Contribution: Users may submit code contributions (including but not limited to patches, functional modules, bug fixes, hereinafter referred to as "Contributed Code") to the Project, and submission shall be deemed as agreement to the authorization terms in Article 5 of this Agreement.
+
+### 3. Prohibited Acts
+Users shall not engage in any of the following acts:
+3.1 Commercial Use: Using the Project (including modified versions) for any commercial profit-making activities, including but not limited to selling, leasing, licensing for fees, or profiting through advertising/value-added services.
+3.2 Distribution and Dissemination: Users shall not distribute, publish, or disseminate the **modified non-official versions** of the Project to any third party in any form (source code, binary packages, installation packages, etc.), including but not limited to open-source platforms, app stores, social platforms, and network disks; Users may normally distribute and disseminate the unmodified official versions released by the Right Holder.
+3.3 Derivative Competitive Products: Developing or producing products or services that are the same as or similar to the core business of the Right Holder based on the source code of the Project, forming direct or indirect commercial competition with the Right Holder.
+3.4 Sub-licensing: Sub-licensing any rights of the Project to a third party, or allowing a third party to engage in acts prohibited by this Agreement based on the Project.
+3.5 Circumventing Restrictions: Circumventing the prohibitive clauses of this Agreement by means of splitting, obfuscation, modifying the Agreement text, etc.
+
+### 4. Disclaimer
+4.1 The Project is provided "as is", and the Right Holder makes no warranties of any kind, including but not limited to warranties of merchantability, fitness for a particular purpose, and non-infringement.
+4.2 The Right Holder shall not be liable for any direct, indirect, incidental, special, or consequential damages arising from the use, modification, or distribution of the Project (even if the Right Holder has been advised of the possibility of such damages).
+4.3 Users shall bear all risks of using the Project, including but not limited to risks related to code security, compatibility, and compliance.
+
+### 5. Authorization of Contributed Code
+5.1 Any Contributed Code submitted by Users to the Project shall be deemed as an irrevocable, permanent, and free authorization to the Right Holder to:
+    (a) Use, copy, modify, compile, publish, and distribute the Contributed Code globally;
+    (b) Integrate the Contributed Code into the commercial products and open-source projects of the Right Holder without further notice or compensation;
+    (c) Conduct copyright registration, rights protection and other legal acts for the Contributed Code;
+    (d) Modify, abandon, or re-license the Contributed Code according to business needs (exercisable only by the Right Holder; Users shall still be bound by this Agreement).
+5.2 Users warrant that the submitted Contributed Code is original or has obtained complete authorization, and does not infringe on the intellectual property rights of any third party; if any infringement dispute arises from the Contributed Code, Users shall bear all legal liabilities and compensate the Right Holder for all losses.
+
+### 6. Intellectual Property Rights
+6.1 All intellectual property rights, including but not limited to copyright, trademark rights, and patent rights, of the original source code of the Project and all code integrated by the Right Holder (including Contributed Code) shall belong to the Right Holder.
+6.2 Users only obtain the limited right to use explicitly granted by this Agreement, and do not obtain ownership or exclusive authorization of any intellectual property rights.
+
+### 7. Termination of the Agreement
+7.1 If Users violate any clause of this Agreement, the Right Holder has the right to immediately terminate all rights granted by this Agreement.
+7.2 After the termination of the Agreement, Users shall immediately stop using and delete all source code and derivative files of the Project, and shall not retain any copies.
+7.3 The termination of this Agreement shall not affect the Right Holder's right to pursue Users' liability for breach of contract.
+
+### 8. Governing Law and Jurisdiction
+8.1 The conclusion, validity, interpretation, and performance of this Agreement shall be governed by the laws of the People's Republic of China (excluding the laws of Hong Kong, Macao, and Taiwan regions).
+8.2 Any dispute arising from this Agreement shall first be resolved through negotiation between the parties; if negotiation fails, either party has the right to file a lawsuit with the people's court having jurisdiction over the Right Holder's domicile (Sichuan Province).
+8.3 The terms of this Agreement shall have legal effect in both mainland China and internationally. Users shall comply with the laws of their country/region of residence; if local laws conflict with this Agreement, the core clauses of this Agreement (prohibition of commercial use, prohibition of distribution of modified versions, authorization of Contributed Code) shall remain effective.
+
+### 9. Other Provisions
+9.1 The Right Holder may modify this Agreement according to business needs; the modified Agreement shall be published in the root directory of the Project and shall take effect on the date of publication.
+9.2 All rights not explicitly granted by this Agreement are reserved by the Right Holder.
+9.3 The Chinese and English versions of this Agreement have the same legal effect; in case of any conflict in interpretation, the Chinese version shall prevail.
+
+Sichuan Siming Jinchuang Technology Co., Ltd.
+February 14, 2025

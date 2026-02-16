@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:node="merge">
+
+    <application tools:node="merge">
+        <activity
+            android:name="com.smjcco.wxpusher.page.TestPanelActivity"
+            android:exported="true"
+            android:label="开发测试控制面板"
+            tools:node="merge">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="wxpusher.smjcco.com"
+                    android:path="/test-panel"
+                    android:scheme="wxpusher" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>

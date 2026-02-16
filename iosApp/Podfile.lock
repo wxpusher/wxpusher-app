@@ -1,0 +1,32 @@
+PODS:
+  - MJRefresh (3.7.9)
+  - shared (1.0):
+    - Toaster (= 2.3.0)
+  - Toaster (2.3.0)
+  - WechatOpenSDK-XCFramework (2.0.5)
+
+DEPENDENCIES:
+  - MJRefresh (= 3.7.9)
+  - shared (from `../shared`)
+  - Toaster (= 2.3.0)
+  - WechatOpenSDK-XCFramework (= 2.0.5)
+
+SPEC REPOS:
+  trunk:
+    - MJRefresh
+    - Toaster
+    - WechatOpenSDK-XCFramework
+
+EXTERNAL SOURCES:
+  shared:
+    :path: "../shared"
+
+SPEC CHECKSUMS:
+  MJRefresh: ff9e531227924c84ce459338414550a05d2aea78
+  shared: f70abb4412b47a88dd39768078ea98270a675a5a
+  Toaster: c3473963c78e8cabbf6ea6f11ad0fdaae6f54987
+  WechatOpenSDK-XCFramework: b072030c9eeee91dfff1856a7846f70f7b9a88ed
+
+PODFILE CHECKSUM: ea36281b2064275ab519803ff43cd4ce608415f9
+
+COCOAPODS: 1.15.2

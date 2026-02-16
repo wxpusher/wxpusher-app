@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/PageBg1"
+    android:fillViewport="true"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="16dp"
+        android:paddingTop="24dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="24dp">
+
+        <!-- 描述文本 -->
+        <TextView
+            android:id="@+id/description_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:text="@string/register_or_bind_description"
+            android:textAlignment="center"
+            android:textColor="@color/check_description_color"
+            android:textSize="14sp" />
+
+        <!-- 选项1：微信一键绑定（强烈推荐） -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/option_one_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardBackgroundColor="@color/wechat_green_alpha_10"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/wechat_green"
+            app:strokeWidth="2dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <!-- 强烈推荐标签 -->
+                <TextView
+                    android:id="@+id/option_one_recommend_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:background="@drawable/label_recommended_background"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/register_or_bind_strongly_recommended"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/option_one_title_label"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/option_one_title_label" />
+
+                <!-- 微信图标 -->
+                <ImageView
+                    android:id="@+id/option_one_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:contentDescription="@string/register_or_bind_wechat_icon"
+                    android:src="@drawable/ic_weixin"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <!-- 标题 -->
+                <TextView
+                    android:id="@+id/option_one_title_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/register_or_bind_option_one_title"
+                    android:textColor="@color/text_fit_theme"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/option_one_recommend_label"
+                    app:layout_constraintStart_toEndOf="@+id/option_one_icon"
+                    app:layout_constraintTop_toTopOf="@+id/option_one_icon" />
+
+                <!-- 描述 -->
+                <TextView
+                    android:id="@+id/option_one_desc_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="@string/register_or_bind_option_one_desc"
+                    android:textColor="@color/check_description_color"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/option_one_title_label"
+                    app:layout_constraintTop_toBottomOf="@+id/option_one_title_label" />
+
+                <!-- 按钮 -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/option_one_button"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="16dp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    android:text="@string/register_or_bind_option_one_button"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="normal"
+                    app:backgroundTint="@color/wechat_green"
+                    app:cornerRadius="6dp"
+                    app:elevation="0dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/option_one_desc_label" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 选项2：通过微信公众号绑定（仅手机登录支持） -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/option_two_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:cardBackgroundColor="@color/PageBg1"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/AccentColor"
+            app:strokeWidth="1dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <!-- 图标 -->
+                <ImageView
+                    android:id="@+id/option_two_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_paperplane"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/AccentColor" />
+
+                <!-- 标题 -->
+                <TextView
+                    android:id="@+id/option_two_title_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:text="@string/register_or_bind_option_two_title"
+                    android:textColor="@color/text_fit_theme"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/option_two_icon"
+                    app:layout_constraintTop_toTopOf="@+id/option_two_icon" />
+
+                <!-- 描述 -->
+                <TextView
+                    android:id="@+id/option_two_desc_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="@string/register_or_bind_option_two_desc"
+                    android:textColor="@color/check_description_color"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/option_two_title_label"
+                    app:layout_constraintTop_toBottomOf="@+id/option_two_title_label" />
+
+                <!-- 按钮 -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/option_two_button"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="16dp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    android:text="@string/register_or_bind_option_two_button"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"
+                    android:textStyle="normal"
+                    app:backgroundTint="@color/AccentColor"
+                    app:cornerRadius="6dp"
+                    app:elevation="0dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/option_two_desc_label" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 选项3：创建全新账号（不推荐） -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/option_three_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            app:cardBackgroundColor="@color/PageBg1"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="0dp"
+            app:strokeColor="@color/GrayCardBorder"
+            app:strokeWidth="1dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp">
+
+                <!-- 不推荐标签 -->
+                <TextView
+                    android:id="@+id/option_three_warning_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="24dp"
+                    android:background="@drawable/label_warning_background"
+                    android:gravity="center"
+                    android:paddingStart="10dp"
+                    android:paddingEnd="10dp"
+                    android:text="@string/register_or_bind_not_recommended"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@+id/option_three_title_label"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/option_three_title_label" />
+
+                <!-- 图标 -->
+                <ImageView
+                    android:id="@+id/option_three_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_person"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:tint="@color/check_description_color" />
+
+                <!-- 标题 -->
+                <TextView
+                    android:id="@+id/option_three_title_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:text="@string/register_or_bind_option_three_title"
+                    android:textColor="@color/text_fit_theme"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@+id/option_three_warning_label"
+                    app:layout_constraintStart_toEndOf="@+id/option_three_icon"
+                    app:layout_constraintTop_toTopOf="@+id/option_three_icon" />
+
+                <!-- 描述 -->
+                <TextView
+                    android:id="@+id/option_three_desc_label"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="@string/register_or_bind_option_three_desc"
+                    android:textColor="@color/check_description_color"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="@+id/option_three_title_label"
+                    app:layout_constraintTop_toBottomOf="@+id/option_three_title_label" />
+
+                <!-- 按钮 -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/option_three_button"
+                    android:layout_width="0dp"
+                    android:layout_height="44dp"
+                    android:layout_marginTop="16dp"
+                    android:insetLeft="0dp"
+                    android:insetTop="0dp"
+                    android:insetRight="0dp"
+                    android:insetBottom="0dp"
+                    android:textColor="@color/white"
+                    android:text="@string/register_or_bind_option_three_button"
+                    android:textSize="16sp"
+                    android:textStyle="normal"
+                    app:backgroundTint="@color/BlackBtnBg"
+                    app:cornerRadius="6dp"
+                    app:elevation="0dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/option_three_desc_label" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</ScrollView>
+

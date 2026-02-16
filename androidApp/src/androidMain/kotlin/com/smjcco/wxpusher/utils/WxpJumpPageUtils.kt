@@ -1,0 +1,210 @@
+package com.smjcco.wxpusher.utils
+
+import android.annotation.SuppressLint
+import android.app.Activity
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
+import android.provider.Settings
+import android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+import androidx.core.net.toUri
+import com.smjcco.wxpusher.base.common.ApplicationUtils
+import com.smjcco.wxpusher.base.common.WxpLogUtils
+import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.common.withActivity
+import com.smjcco.wxpusher.page.accountdetail.AccountDetailActivity
+import com.smjcco.wxpusher.page.accountdetail.WxpRemoveAccountActivity
+import com.smjcco.wxpusher.page.bind.WxpBindActivity
+import com.smjcco.wxpusher.page.changephone.WxpChangePhoneActivity
+import com.smjcco.wxpusher.page.login.WxpBindPageData
+import com.smjcco.wxpusher.page.login.WxpLoginActivity
+import com.smjcco.wxpusher.page.login.WxpPhoneBind
+import com.smjcco.wxpusher.page.main.WxpMainActivity
+import com.smjcco.wxpusher.page.registerorbind.WxpRegisterOrBindActivity
+import com.smjcco.wxpusher.page.scan.WxpScanActivity
+import com.smjcco.wxpusher.page.useragreement.WxpUserAgreementActivity
+import com.smjcco.wxpusher.page.web.WxpWebViewActivity
+import com.smjcco.wxpusher.push.ws.WxpNotificationManager
+
+
+object WxpJumpPageUtils {
+
+    fun jumpToSystemAppSettings(activity: Activity? = null) {
+        withActivity(activity) {
+            try {
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                val uri = Uri.fromParts("package", it.packageName, null)
+                intent.data = uri
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                it.startActivity(intent)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+
+    /**
+     * 打开通知设置页面
+     */
+    fun jumpToSystemNotificationSettingPage(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent()
+            intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+            intent.putExtra(
+                Settings.EXTRA_APP_PACKAGE,
+                ApplicationUtils.getApplication().getPackageName()
+            )
+//            打开消息通道的设置，但是如果没有打开消息总开关，会无法打开，因此先把这个注释调。
+//            intent.putExtra(
+//                Settings.EXTRA_CHANNEL_ID,
+//                WxpNotificationManager.WxPusherSystemChannelId
+//            )
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            it.startActivity(intent)
+        }
+    }
+
+    /**
+     * 跳转到电池优化设置
+     */
+    @SuppressLint("BatteryLife")
+    fun jumpToSystemIgnoreBatteryOptimizationSettings(activity: Activity? = null) {
+        withActivity(activity) {
+//            val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+//            it.startActivity(intent)
+            //下面这个跳转更加精确，原生安卓可以直接弹出申请弹窗
+            val intent = Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+            intent.data = Uri.fromParts("package", it.packageName, null)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            it.startActivity(intent)
+        }
+    }
+
+    fun jumpToSystemAlarmSettings(activity: Activity? = null) {
+        //低版本不支持
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S) {
+            return
+        }
+        withActivity(activity) {
+            //下面这个跳转更加精确，原生安卓可以直接弹出申请弹窗
+            val intent = Intent(ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+            intent.data = Uri.fromParts("package", it.packageName, null)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            it.startActivity(intent)
+        }
+    }
+
+    fun jumpToWebUrl(url: String, activity: Activity? = null) {
+        withActivity(activity) {
+            try {
+                val uri = url.toUri()
+                val scheme = uri.scheme?.lowercase()
+                val webSchemes = listOf("http", "https", "about", "file")
+                if (webSchemes.contains(scheme)) {
+                    val intent = Intent(it, WxpWebViewActivity::class.java);
+                    intent.putExtra(WxpWebViewActivity.EXTRA_URL, url)
+                    it.startActivity(intent)
+                } else {
+                    //非标准webview能处理的链接， 使用系统打开
+                    val intent = Intent(Intent.ACTION_VIEW, uri)
+                    it.startActivity(intent)
+
+                }
+            } catch (e: Exception) {
+                WxpToastUtils.showToast("无法打开链接,url=$url")
+                WxpLogUtils.w(message = "打开连接失败,url=${url}", throwable = e)
+            }
+        }
+    }
+
+    fun jumpToMain(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent(it, WxpMainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            it.startActivity(intent)
+        }
+    }
+
+    fun jumpToLogin(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent(it, WxpLoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            it.startActivity(intent)
+        }
+    }
+
+    fun jumpToScan(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent(it, WxpScanActivity::class.java)
+            it.startActivity(intent)
+        }
+    }
+
+    fun jumpToUserAgreement(activity: Activity? = null) {
+        withActivity(activity) {
+            WxpUserAgreementActivity.start(it)
+        }
+    }
+
+    /**
+     * 跳转到测试面板，只有测试环境有效
+     */
+    fun jumpToTestPanel(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent(
+                Intent.ACTION_VIEW,
+                "wxpusher://wxpusher.smjcco.com/test-panel".toUri()
+            )
+            it.startActivity(intent)
+        }
+    }
+
+    /**
+     * 跳转到选择注册方式或者绑定的页面
+     */
+    fun jumpToRegisterOrBind(
+        bindPageData: WxpBindPageData,
+        activity: Activity? = null
+    ) {
+        withActivity(activity) {
+            WxpRegisterOrBindActivity.start(it, bindPageData)
+        }
+    }
+
+    /**
+     * 跳转到通过绑定码，通过微信公众号绑定的页面
+     */
+    fun jumpToMpBind(
+        wxpPhoneBind: WxpPhoneBind,
+        activity: Activity? = null
+    ) {
+        withActivity(activity) {
+            WxpBindActivity.start(it, wxpPhoneBind)
+        }
+    }
+
+    /**
+     * 跳转到修改手机号页面
+     */
+    fun jumpToChangePhone(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent(activity, WxpChangePhoneActivity::class.java)
+            it.startActivity(intent)
+        }
+    }
+
+    fun jumpToAccountDetail(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent(it, AccountDetailActivity::class.java)
+            it.startActivity(intent)
+        }
+    }
+
+    fun jumpToRemoveAccount(activity: Activity? = null) {
+        withActivity(activity) {
+            val intent = Intent(it, WxpRemoveAccountActivity::class.java)
+            it.startActivity(intent)
+        }
+    }
+
+}

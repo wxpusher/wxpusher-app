@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="AccentStatusBarColor">#121212</color>
+    <color name="LightStatusBarColor">#121212</color>
+    <color name="Divider">#333333</color>
+    <color name="PageBg1">#121212</color>
+    <color name="PageBg2">#333333</color>
+
+    <color name="BlackBtnBg">#999999</color>
+    <color name="GrayCardBorder">#48484A</color>
+
+    <color name="text_fit_theme">#FFFFFF</color>
+    <color name="dark_bg">#121212</color>
+    <color name="check_success">#388E3C</color>
+    <color name="check_error">#D32F2F</color>
+    <color name="check_item_bg">#1E1E1E</color>
+    <color name="check_text_color">#FFFFFF</color>
+    <color name="check_description_color">#B0B0B0</color>
+
+    <color name="text_fit_theme_first">#FFFFFF</color>
+    <color name="bg_fit_theme_first">#121212</color>
+
+    <!-- 输入框背景颜色 -->
+    <color name="input_field_bg">#2A2A2A</color>
+
+    <!-- 解绑页面相关颜色 -->
+    <color name="danger_color">#F44336</color>
+    <color name="text_fit_theme_second">#B0B0B0</color>
+    <color name="card_bg_fit_theme">#1E1E1E</color>
+    <color name="input_border_color">#424242</color>
+    <color name="input_border_valid">#4CAF50</color>
+    <color name="input_border_invalid">#F44336</color>
+
+</resources>

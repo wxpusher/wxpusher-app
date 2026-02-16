@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/AccentColor</item>
+        <item name="colorAccent">@color/AccentColor</item> <!-- checkboxes, text fields -->
+        <item name="android:colorBackground">@color/PageBg1</item> <!-- background -->
+        <item name="android:statusBarColor">@color/AccentStatusBarColor</item>
+    </style>
+
+    <style name="NoActionTheme" parent="AppTheme">
+        <item name="android:statusBarColor">@color/LightStatusBarColor</item>
+        <item name="android:windowLightStatusBar">@bool/lightMode</item>
+    </style>
+
+
+    <style name="AppTheme.Scan" parent="AppTheme">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="actionMenuTextColor">#ffffff</item>
+    </style>
+
+    <style name="DialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="LoadingDialogTheme" parent="Theme.AppCompat.Dialog">
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <style name="DialogAnimation">
+        <item name="android:windowEnterAnimation">@anim/slide_up</item>
+        <item name="android:windowExitAnimation">@anim/slide_down</item>
+    </style>
+</resources>
