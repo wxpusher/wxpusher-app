@@ -76,7 +76,7 @@ jobs:
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: wxpusher-app-v${{ steps.get_version.outputs.APP_VERSION }}-prod-${{ github.run_id }}-${{ github.run_number }}.apk
+        name: wxpusher-app-v${{ steps.get_version.outputs.APP_VERSION }}-prod-${{ github.run_number }}.apk
         path: ${{ steps.prepare.outputs.APK_PATH }}
 
     # 创建 GitHub Release 并上传 APK
