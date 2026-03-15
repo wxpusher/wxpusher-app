@@ -13,6 +13,7 @@ import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.base.common.init
 import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.web.AppFeVersionManager
 import com.smjcco.wxpusher.wxapi.WxpWeixinOpenManager
 import com.tencent.upgrade.bean.UpgradeConfig
 import com.tencent.upgrade.core.UpgradeManager
@@ -43,6 +44,8 @@ class WxPusherApplication : Application() {
         initTbs()
         //拉取一个简单的配置
         ConfigManager.init(this)
+        // 启动时执行一次 app_fe 版本刷新（内部有 1 小时间隔，失败无影响）
+        AppFeVersionManager.refreshOnAppLaunch()
         //初始化微信SDK
         WxpWeixinOpenManager.init(this)
     }

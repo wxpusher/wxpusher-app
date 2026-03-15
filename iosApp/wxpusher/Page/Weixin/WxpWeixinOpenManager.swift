@@ -190,6 +190,72 @@ extension WxpWeixinOpenManager {
         WXApi.send(req)
     }
     
+    /// 分享网页到微信
+    func shareWebPage(
+        url: URL,
+        title: String,
+        description: String,
+        thumbImage: UIImage?,
+        to scene: WXScene,
+        completion: @escaping (Result<Bool, WeChatError>) -> Void
+    ) {
+        guard isWeChatInstalled() else {
+            completion(.failure(.notInstalled))
+            return
+        }
+        
+        guard isWeChatSupport() else {
+            completion(.failure(.unsupportedVersion))
+            return
+        }
+        
+        let webPageObject = WXWebpageObject()
+        webPageObject.webpageUrl = url.absoluteString
+        
+        let message = WXMediaMessage()
+        message.mediaObject = webPageObject
+        message.title = title
+        message.description = description
+        if let thumbImage, let thumbData = compressedThumbData(from: thumbImage) {
+            message.thumbData = thumbData
+        }
+        
+        let req = SendMessageToWXReq()
+        req.bText = false
+        req.message = message
+        req.scene = Int32(scene.rawValue)
+        
+        shareCompletion = completion
+        WXApi.send(req) { success in
+            if !success {
+                DispatchQueue.main.async {
+                    self.shareCompletion = nil
+                    completion(.failure(.sendRequestFailed))
+                }
+            }
+        }
+    }
+    
+    private func compressedThumbData(from image: UIImage) -> Data? {
+        let thumbSize = CGSize(width: 150, height: 150)
+        UIGraphicsBeginImageContextWithOptions(thumbSize, false, 1.0)
+        image.draw(in: CGRect(origin: .zero, size: thumbSize))
+        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        guard let finalImage = resizedImage else {
+            return image.jpegData(compressionQuality: 0.7)
+        }
+        
+        let qualities: [CGFloat] = [0.9, 0.7, 0.5, 0.3]
+        for quality in qualities {
+            if let data = finalImage.jpegData(compressionQuality: quality), data.count <= 32 * 1024 {
+                return data
+            }
+        }
+        return finalImage.jpegData(compressionQuality: 0.2)
+    }
+    
     /// 处理分享响应
     private func handleShareResponse(_ response: SendMessageToWXResp) {
         let result: Result<Bool, WeChatError>

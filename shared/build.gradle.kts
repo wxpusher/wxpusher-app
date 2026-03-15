@@ -3,11 +3,10 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import java.util.Properties
 
 // 读取local.properties
-val keyProperties = Properties()
-val secretsDir = rootProject.file("secrets/android")
-val keyPropertiesFile = File(secretsDir, "key.properties")
-if (keyPropertiesFile.exists()) {
-    keyProperties.load(keyPropertiesFile.inputStream())
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
 }
 
 plugins {
@@ -94,8 +93,8 @@ android {
     compileSdk = 35
     defaultConfig {
         minSdk = 24
-        buildConfigField("String", "ALIYUN_SLS_ACCESS_KEY_ID", "\"${keyProperties.getProperty("aliyun.sls.accessKeyId", "")}\"")
-        buildConfigField("String", "ALIYUN_SLS_ACCESS_KEY_SECRET", "\"${keyProperties.getProperty("aliyun.sls.accessKeySecret", "")}\"")
+        buildConfigField("String", "ALIYUN_SLS_ACCESS_KEY_ID", "\"${localProperties.getProperty("aliyun.sls.accessKeyId", "")}\"")
+        buildConfigField("String", "ALIYUN_SLS_ACCESS_KEY_SECRET", "\"${localProperties.getProperty("aliyun.sls.accessKeySecret", "")}\"")
     }
     buildFeatures {
         buildConfig = true

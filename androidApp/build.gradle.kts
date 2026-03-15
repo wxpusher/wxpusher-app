@@ -1,6 +1,5 @@
 import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -65,11 +64,11 @@ android {
         applicationId = "com.smjcco.wxpusher"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 10602
-        versionName = "1.6.2"
+        versionCode = 10700
+        versionName = "1.7.0"
         //指定产物名称
         setProperty("archivesBaseName", "wxpusher-app-v$versionName")
-
+        
         ndk {
             // 只保留ARM架构，去掉x86和x86_64，减小包大小
             abiFilters.addAll(listOf("arm64-v8a"))
@@ -80,7 +79,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-
+    
     // 签名配置必须在buildTypes之前定义
     signingConfigs {
         getByName("debug") {
@@ -89,21 +88,8 @@ android {
             keyAlias = "smjcco"
             keyPassword = "smjcco"
         }
-        // Release 签名配置 - 从 secrets/android/key.properties 读取
-        val secretsDir = rootProject.file("secrets/android")
-        val keyPropertiesFile = File(secretsDir, "key.properties")
-        if (keyPropertiesFile.exists()) {
-            create("release") {
-                val keyProperties = Properties()
-                keyProperties.load(keyPropertiesFile.inputStream())
-                storeFile = File(secretsDir, keyProperties.getProperty("storeFile"))
-                storePassword = keyProperties.getProperty("storePassword")
-                keyAlias = keyProperties.getProperty("keyAlias")
-                keyPassword = keyProperties.getProperty("keyPassword")
-            }
-        }
     }
-
+    
     buildTypes {
         getByName("release") {
             // true - 打开混淆
@@ -115,18 +101,12 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            // 使用 release 签名配置（如果存在）
-            signingConfig = try {
-                signingConfigs.getByName("release")
-            } catch (_: UnknownDomainObjectException) {
-                null
-            }
         }
         getByName("debug") {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
-
+    
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11

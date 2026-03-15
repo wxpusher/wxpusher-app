@@ -17,11 +17,11 @@ class TestPanelActivity : ComponentActivity() {
 
     companion object {
         const val DEFAULT_HOST = "https://wxpusher.zjiecode.com"
-        const val DEFAULT_WEB_URL = "https://static.zjiecode.com/wxpusher/web-app"
+        const val DEFAULT_APP_FE_URL = "https://wxpusher.zjiecode.com"
         const val DEFAULT_WS_URL = "wss://wxpusher.zjiecode.com"
 
         const val TEST_HOST = "http://wxpusher.test.zjiecode.com"
-        const val TEST_WEB_URL = "http://10.0.0.11:3000"
+        const val TEST_APP_FE_URL = "http://wxpusher.test.zjiecode.com"
         const val TEST_WS_URL = "ws://wxpusher.test.zjiecode.com"
     }
 
@@ -78,10 +78,10 @@ class TestPanelActivity : ComponentActivity() {
         }
 
         // 加载保存的WebUrl设置
-        val savedWebUrl = ""
+        val savedWebUrl = WxpConfig.appFeUrl
         when (savedWebUrl) {
-            DEFAULT_WEB_URL -> findViewById<RadioButton>(R.id.web_url_prod).isChecked = true
-            TEST_WEB_URL -> findViewById<RadioButton>(R.id.web_url_test).isChecked = true
+            DEFAULT_APP_FE_URL -> findViewById<RadioButton>(R.id.web_url_prod).isChecked = true
+            TEST_APP_FE_URL -> findViewById<RadioButton>(R.id.web_url_test).isChecked = true
             else -> {
                 webUrlCustom.isChecked = true
                 webUrlEditText.setText(savedWebUrl)
@@ -145,11 +145,11 @@ class TestPanelActivity : ComponentActivity() {
         }
 
         // 保存WebUrl设置
-        val selectedWebUrl = when (webUrlRadioGroup.checkedRadioButtonId) {
-            R.id.web_url_prod -> DEFAULT_WEB_URL
-            R.id.web_url_test -> TEST_WEB_URL
+        val selectedAppFeUrl = when (webUrlRadioGroup.checkedRadioButtonId) {
+            R.id.web_url_prod -> DEFAULT_APP_FE_URL
+            R.id.web_url_test -> TEST_APP_FE_URL
             R.id.web_url_custom -> webUrlEditText.text.toString().trim()
-            else -> DEFAULT_WEB_URL
+            else -> DEFAULT_APP_FE_URL
         }
 
         // 保存WsUrl设置
@@ -172,6 +172,7 @@ class TestPanelActivity : ComponentActivity() {
         // 保存配置到SP
         WxpConfig.saveBaseUrl(selectedHost)
         WxpConfig.saveWsUrl(selectedWsUrl)
+        WxpConfig.saveAppFeUrl(selectedAppFeUrl)
 
         // 提示用户重启后生效
         Toast.makeText(this, "配置已保存，重启后生效", Toast.LENGTH_SHORT).show()

@@ -14,11 +14,11 @@ class TestPanelViewController: UIViewController {
     // MARK: - Constants
     struct Constants {
         static let defaultHost = "https://wxpusher.zjiecode.com"
-        static let defaultWebUrl = "https://static.zjiecode.com/wxpusher/web-app"
+        static let defaultWebUrl = "https://wxpusher.zjiecode.com"
         static let defaultWsUrl = "wss://wxpusher.zjiecode.com"
         
         static let testHost = "http://wxpusher.test.zjiecode.com"
-        static let testWebUrl = "http://10.0.0.11:3000"
+        static let testWebUrl = "http://wxpusher.test.zjiecode.com"
         static let testWsUrl = "ws://wxpusher.test.zjiecode.com"
     }
     
@@ -181,7 +181,15 @@ class TestPanelViewController: UIViewController {
         }
         
         // WebUrl
-        webUrlRadioGroup.selectedIndex = 0
+        let currentWebUrl = WxpConfig.shared.appFeUrl
+        if currentWebUrl == Constants.defaultWebUrl {
+            webUrlRadioGroup.selectedIndex = 0
+        } else if currentWebUrl == Constants.testWebUrl {
+            webUrlRadioGroup.selectedIndex = 1
+        } else {
+            webUrlRadioGroup.selectedIndex = 2
+            webUrlCustomTextField.text = currentWebUrl
+        }
         
         // WsUrl
         let currentWsUrl = WxpConfig.shared.wsUrl
@@ -196,6 +204,7 @@ class TestPanelViewController: UIViewController {
         
         // Trigger visibility update
         hostRadioGroup.onSelectionChanged?(hostRadioGroup.selectedIndex)
+        webUrlRadioGroup.onSelectionChanged?(webUrlRadioGroup.selectedIndex)
         wsUrlRadioGroup.onSelectionChanged?(wsUrlRadioGroup.selectedIndex)
     }
     
@@ -221,9 +230,22 @@ class TestPanelViewController: UIViewController {
         } else {
             selectedWsUrl = wsUrlCustomTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
         }
+
+        // WebUrl
+        let selectedWebUrlIndex = webUrlRadioGroup.selectedIndex
+        let selectedWebUrl: String
+        if selectedWebUrlIndex == 0 {
+            selectedWebUrl = Constants.defaultWebUrl
+        } else if selectedWebUrlIndex == 1 {
+            selectedWebUrl = Constants.testWebUrl
+        } else {
+            selectedWebUrl = webUrlCustomTextField.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        }
         
         // Validate
-        if (selectedHostIndex == 2 && selectedHost.isEmpty) || (selectedWsUrlIndex == 2 && selectedWsUrl.isEmpty) {
+        if (selectedHostIndex == 2 && selectedHost.isEmpty)
+            || (selectedWebUrlIndex == 2 && selectedWebUrl.isEmpty)
+            || (selectedWsUrlIndex == 2 && selectedWsUrl.isEmpty) {
             let alert = UIAlertController(title: "Error", message: "Custom URL cannot be empty", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             present(alert, animated: true)
@@ -232,6 +254,7 @@ class TestPanelViewController: UIViewController {
         
         // Save
         WxpConfig.shared.saveBaseUrl(baseUrl: selectedHost)
+        WxpConfig.shared.saveAppFeUrl(appFeUrl: selectedWebUrl)
         WxpConfig.shared.saveWsUrl(wsUrl: selectedWsUrl)
         
         // Restart
