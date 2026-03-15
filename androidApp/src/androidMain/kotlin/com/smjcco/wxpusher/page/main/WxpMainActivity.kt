@@ -35,7 +35,11 @@ import com.xiaomi.mipush.sdk.PushMessageHelper
 /**
  * app首页 - 使用ViewPager2 + TabLayout实现Tab切换
  */
-class WxpMainActivity : WxpBaseActivity() {
+class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
+
+    override fun isFragmentCurrentTab(fragment: Fragment): Boolean {
+        return pagerAdapter.getFragmentAt(viewPager.currentItem) == fragment
+    }
 
     private lateinit var viewPager: ViewPager2
     private lateinit var tabLayout: TabLayout

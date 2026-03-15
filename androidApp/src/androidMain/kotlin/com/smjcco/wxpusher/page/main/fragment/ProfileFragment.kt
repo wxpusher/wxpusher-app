@@ -169,11 +169,14 @@ class ProfileFragment : WxpBaseFragment() {
                         openUserAgreementUrl()
                     },
                     ProfileItem(
-                        title = "客服邮箱",
-                        subtitle = "kefu@wxpusher.com",
+                        title = "联系我们",
+                        subtitle = "咨询和反馈问题",
                         hasArrow = true
                     ) {
-                        copyToClipboard("kefu@wxpusher.com", "复制成功")
+                        WxpJumpPageUtils.jumpToWebUrl(
+                            "${WxpConfig.appFeUrl}/app/#/contact",
+                            activity
+                        )
                     },
                     ProfileItem(
                         title = "备案号",

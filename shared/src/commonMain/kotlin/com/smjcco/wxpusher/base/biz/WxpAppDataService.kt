@@ -178,7 +178,7 @@ object WxpAppDataService {
     /**
      * 返回string类型，方便给到容器
      */
-    private fun getLoginInfoStr(): String? {
+     fun getLoginInfoStr(): String? {
         return WxpSaveService.get(SaveLoginInfoKey, "")
     }
 

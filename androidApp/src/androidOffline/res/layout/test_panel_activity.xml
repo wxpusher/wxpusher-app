@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp"
-            android:text="Host 设置"
+            android:text="BE API(后端api环境)"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -115,7 +115,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:layout_marginBottom="8dp"
-            android:text="WebUrl 设置(暂时不用了)"
+            android:text="App FE(app内嵌H5页面)"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -129,13 +129,13 @@
                 android:id="@+id/web_url_prod"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="正式环境 (https://static.zjiecode.com/wxpusher/web-app)" />
+                android:text="正式环境 (https://wxpusher.zjiecode.com)" />
 
             <RadioButton
                 android:id="@+id/web_url_test"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="测试环境 (http://10.0.0.11:3000)" />
+                android:text="测试环境 (http://wxpusher.test.zjiecode.com)" />
 
             <RadioButton
                 android:id="@+id/web_url_custom"

@@ -29,7 +29,6 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.createBitmap
 import androidx.core.net.toUri
-import com.google.gson.JsonObject
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.WxpBaseFragment
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
@@ -41,9 +40,11 @@ import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.dialog.ActionSheetDialogFragment
 import com.smjcco.wxpusher.dialog.ActionSheetItem
+import com.smjcco.wxpusher.page.main.CurrentTabProvider
+import com.smjcco.wxpusher.page.web.bridge.BridgeContext
+import com.smjcco.wxpusher.page.web.bridge.WxpWebBridgeManager
 import com.smjcco.wxpusher.utils.DeviceUtils
-import com.smjcco.wxpusher.utils.GsonUtils
-import com.smjcco.wxpusher.utils.ThreadUtils
+import com.smjcco.wxpusher.web.AppFeVersionManager
 import com.smjcco.wxpusher.wxapi.WxpWeixinOpenManager
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX
 
@@ -75,6 +76,9 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
     private lateinit var thirdPartyBannerView: LinearLayout
+
+    //浏览器操作按钮
+    private lateinit var webOptBannerView: View
     private lateinit var backButton: ImageButton
     private lateinit var forwardButton: ImageButton
     private lateinit var refreshButton: ImageButton
@@ -85,6 +89,8 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     private var showThirdPartyBanner = true
     private var lastLoadRequest: String? = null
     private var webDescription: String? = null
+    private lateinit var bridgeContext: BridgeContext
+    private lateinit var webBridgeManager: WxpWebBridgeManager
 
     //图片长按菜单
     private var imageActionSheetDialogFragment: ActionSheetDialogFragment? = null
@@ -108,6 +114,19 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         return null
     }
 
+    /**
+     * 收口更新 Activity 标题：仅在允许更新时（当前为独立 Web 页或本 Fragment 为当前 Tab）才设置标题，
+     * 避免在 ViewPager 中非当前 Tab 的网页加载完成后覆盖当前 Tab 的标题。
+     */
+    protected fun updateActivityTitle(title: String) {
+        val act = activity ?: return
+        val provider = act as? CurrentTabProvider
+        if (provider != null && !provider.isFragmentCurrentTab(this)) {
+            return
+        }
+        act.title = title
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupUI(view)
@@ -116,18 +135,19 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         if (targetUrl.isEmpty()) {
             return
         }
-        loadWebContent(targetUrl)
+        loadWebContentWithVersionCheck(targetUrl)
     }
 
     open fun setupUI(view: View) {
         // 设置标题
-        activity?.title = ""
+        updateActivityTitle("")
         getActivityHost()?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         // 初始化视图
         webView = view.findViewById(R.id.webView)
         progressBar = view.findViewById(R.id.progressBar)
         thirdPartyBannerView = view.findViewById(R.id.thirdPartyBannerView)
+        webOptBannerView = view.findViewById(R.id.webOptionView)
         backButton = view.findViewById(R.id.backButton)
         forwardButton = view.findViewById(R.id.forwardButton)
         refreshButton = view.findViewById(R.id.refreshButton)
@@ -161,6 +181,8 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         // 添加JavaScript接口，兼容iOS的调用方式
         webView.addJavascriptInterface(WxpWebBridgeInterface(), "wxpusher")
 
+        initializeWebBridge()
+
         webView.webViewClient = createWebViewClient()
         webView.webChromeClient = createWebChromeClient()
 
@@ -168,6 +190,20 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         webView.setOnLongClickListener { view ->
             handleWebViewLongClick(view as WebView)
         }
+    }
+
+    private fun initializeWebBridge() {
+        webBridgeManager = WxpWebBridgeManager(
+            context = createBridgeContext()
+        )
+    }
+
+    private fun createBridgeContext(): BridgeContext {
+        bridgeContext = BridgeContext(
+            fragment = this,
+            webView = webView
+        )
+        return bridgeContext
     }
 
     /**
@@ -208,6 +244,9 @@ open class WxpWebViewFragment : WxpBaseFragment() {
                     if (isHostInWhitelist(uri.host)) {
                         val newRequest = createRequestWithTokenIfNeeded(url)
                         if (lastLoadRequest != url) {
+                            if (::bridgeContext.isInitialized) {
+                                bridgeContext.updateCurrentUrl(url)
+                            }
                             view?.loadUrl(url, newRequest)
                             lastLoadRequest = url
                             return true
@@ -229,6 +268,9 @@ open class WxpWebViewFragment : WxpBaseFragment() {
 
             override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
                 super.onPageStarted(view, url, favicon)
+                if (::bridgeContext.isInitialized) {
+                    bridgeContext.updateCurrentUrl(url)
+                }
                 webDescription = ""
                 progressBar.visibility = View.VISIBLE
                 progressBar.progress = 0
@@ -262,7 +304,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
 
                 // 设置网页标题
                 val webTitle = view?.title
-                activity?.title = if (!webTitle.isNullOrEmpty()) webTitle else "网页内容"
+                updateActivityTitle(if (!webTitle.isNullOrEmpty()) webTitle else "网页内容")
 
                 // 检查第三方内容banner
                 checkAndShowThirdPartyBanner(url)
@@ -280,7 +322,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
                 if (request?.isForMainFrame == true) {
                     Log.d("WxpWebViewActivity", "onReceivedError: " + error?.description)
                     progressBar.visibility = View.GONE
-                    activity?.title = "加载失败"
+                    updateActivityTitle("加载失败")
                     WxpToastUtils.showToast("加载失败")
                     updateWebOptionBtnStatus()
                 }
@@ -296,6 +338,11 @@ open class WxpWebViewFragment : WxpBaseFragment() {
                 if (newProgress >= 100) {
                     progressBar.visibility = View.GONE
                 }
+            }
+
+            override fun onReceivedTitle(view: WebView?, title: String?) {
+                super.onReceivedTitle(view, title)
+                updateActivityTitle(if (!title.isNullOrBlank()) title else "网页内容")
             }
 
             override fun onCreateWindow(
@@ -329,8 +376,45 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     }
 
     fun loadWebContent(targetUrl: String) {
+        if (::bridgeContext.isInitialized) {
+            bridgeContext.updateCurrentUrl(targetUrl)
+        }
         val headers = createRequestWithTokenIfNeeded(targetUrl)
         webView.loadUrl(targetUrl, headers)
+    }
+
+    private fun loadWebContentWithVersionCheck(url: String) {
+        if (!shouldCheckAppFeVersion(url)) {
+            loadWebContent(url)
+            return
+        }
+        val pendingVersion = AppFeVersionManager.consumePendingRefreshVersion(url)
+        val finalUrl = if (!pendingVersion.isNullOrBlank()) {
+            clearWebViewCacheForVersionUpdate(pendingVersion)
+            AppFeVersionManager.appendVersionParam(url, pendingVersion)
+        } else {
+            url
+        }
+        loadWebContent(finalUrl)
+    }
+
+    private fun clearWebViewCacheForVersionUpdate(remoteVersion: String) {
+        webView.clearCache(true)
+        webView.clearHistory()
+        WxpLogUtils.i(
+            "WxpWebViewFragment",
+            "app_fe版本更新触发缓存清理, remote=$remoteVersion"
+        )
+    }
+
+    private fun shouldCheckAppFeVersion(url: String): Boolean {
+        val uri = url.toUri()
+        val host = uri.host
+        val path = uri.path ?: return false
+        if (!isHostInWhitelist(host)) {
+            return false
+        }
+        return path.contains("/app")
     }
 
     private fun isHostInWhitelist(host: String?): Boolean {
@@ -380,10 +464,19 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         if (url == null) return
 
         val uri = url.toUri()
+        //浏览器左上角的按钮
         if (isHostInWhitelist(uri.host) && uri.path?.contains("wxuser") == true) {
             // 订阅管理页面，隐藏菜单
             activity?.invalidateOptionsMenu()
         }
+
+        //下面的导航按钮
+        if (isHostInWhitelist(uri.host) && uri.path?.contains("app") == true) {
+            webOptBannerView.visibility = View.GONE
+        } else {
+            webOptBannerView.visibility = View.VISIBLE
+        }
+
     }
 
     private fun updateWebOptionBtnStatus() {
@@ -447,7 +540,11 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     fun onActivityOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                activity?.finish()
+                if (webView.canGoBack()) {
+                    webView.goBack()
+                } else {
+                    activity?.finish()
+                }
                 true
             }
 
@@ -551,91 +648,14 @@ open class WxpWebViewFragment : WxpBaseFragment() {
          */
         @JavascriptInterface
         fun postMessage(messageJson: String) {
-            ThreadUtils.runOnMainThread {
-                handleWebBridgeMessage(messageJson)
-            }
-        }
-    }
-
-    /**
-     * 处理WebBridge消息
-     */
-    private fun handleWebBridgeMessage(messageJson: String) {
-        try {
-            // 解析JSON消息
-            val messageBody = GsonUtils.toObj(messageJson, JsonObject::class.java)
-            val action = messageBody?.get("action")?.asString ?: return
-            val dataElement = messageBody.get("data")
-
-            if (dataElement == null || !dataElement.isJsonObject) {
-                WxpLogUtils.w(message = "JS桥，消息格式错误: data字段不存在或不是对象")
+            if (!::webBridgeManager.isInitialized) {
                 return
             }
-
-            val data = dataElement.asJsonObject
-            val dataMap = GsonUtils.jsonToObj(data, Map::class.java) as? Map<String, Any?> ?: return
-            when (action) {
-                "payRequest" -> {
-                    // 检查是否为白名单域名
-                    val currentUrl = webView.url
-                    if (!isHostInWhitelist(currentUrl?.toUri()?.host)) {
-                        WxpLogUtils.w(message = "非白名单地址，不允许调用桥: $currentUrl")
-                        return
-                    }
-                    handlePayRequest(dataMap, messageBody)
-                }
-
-                else -> {
-                    WxpLogUtils.w(message = "未知的action: $action")
-                }
+            runCatching {
+                webBridgeManager.onMessage(messageJson)
+            }.onFailure {
+                WxpLogUtils.w(message = "处理WebBridge消息失败", throwable = it)
             }
-        } catch (e: Exception) {
-            WxpLogUtils.w(message = "处理WebBridge消息失败", throwable = e)
-        }
-    }
-
-    /**
-     * 处理支付请求
-     */
-    private fun handlePayRequest(data: Map<String, Any?>, messageBody: JsonObject) {
-        WxpLogUtils.i(message = "支付请求: $data")
-
-        WxpWeixinOpenManager.requestPayment(data) { resp, error ->
-            if (error != null) {
-                val msg = error.message ?: "支付失败"
-                sendMsgToWebView(
-                    action = "payResponse",
-                    data = mapOf("success" to false, "message" to msg)
-                )
-            } else {
-                sendMsgToWebView(
-                    action = "payResponse",
-                    data = mapOf("success" to true, "message" to "支付成功")
-                )
-            }
-        }
-    }
-
-    /**
-     * 向WebView发送消息
-     * 发送的消息会触发window上的CustomEvent: 'nativeEvent_{action}'
-     */
-    private fun sendMsgToWebView(action: String, data: Map<String, Any>) {
-        try {
-            val jsonData = GsonUtils.toJson(data)
-            WxpLogUtils.i(message = "发送数据给webview，action=$action,data=$jsonData")
-            // 使用单引号包裹JSON字符串，detail中存储的是JSON字符串
-            val js =
-                "window.dispatchEvent(new CustomEvent('nativeEvent_$action', { detail: '$jsonData' }));"
-            webView.evaluateJavascript(js) { result ->
-                if (result != null) {
-                    WxpLogUtils.d(message = "发送消息到WebView成功: action=$action")
-                } else {
-                    WxpLogUtils.d(message = "发送消息到WebView失败: action=$action,result=$result")
-                }
-            }
-        } catch (e: Exception) {
-            WxpLogUtils.w(message = "发送消息到WebView失败: action=$action", throwable = e)
         }
     }
 
