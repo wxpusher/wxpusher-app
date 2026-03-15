@@ -216,7 +216,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
             notePermissionTv.visibility = View.VISIBLE
             notePermissionTv.text = resources.getString(R.string.note_permission_banner_text)
             notePermissionBtn.text = "去打开"
-            notePermissionBtn.visibility = View.GONE
+            notePermissionBtn.visibility = View.VISIBLE
             notePermissionBtn.setOnClickListener {
                 if (activity is WxpMainActivity) {
                     val mainActivity = activity as WxpMainActivity
