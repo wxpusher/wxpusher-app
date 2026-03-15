@@ -169,13 +169,6 @@ class ProfileFragment : WxpBaseFragment() {
                         openUserAgreementUrl()
                     },
                     ProfileItem(
-                        title = "客服邮箱",
-                        subtitle = "kefu@wxpusher.com",
-                        hasArrow = true
-                    ) {
-                        copyToClipboard("kefu@wxpusher.com", "复制成功")
-                    },
-                    ProfileItem(
                         title = "备案号",
                         subtitle = "蜀ICP备14025423号-2A",
                         hasArrow = true
