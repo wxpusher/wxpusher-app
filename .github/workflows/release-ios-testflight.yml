@@ -2,7 +2,7 @@ name: Release iOS to TestFlight
 
 on:
   pull_request:
-    branches: [ release, unofficial_custom/* ]
+    branches: [ unofficial_custom/* ]
   workflow_dispatch:
     inputs:
       create_release:
