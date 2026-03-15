@@ -134,6 +134,10 @@ class WxpProfileViewController: UIViewController {
                     WxpJumpPageUtils.jumpToWebUrl(url: "https://wxpusher.zjiecode.com/admin/agreement/index-argeement.html")
                 }
                 ,
+                ProfileItem(title: "联系我们", subtitle: "咨询和反馈问题", accessoryType: .disclosureIndicator) {
+                    WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/contact")
+                }
+                ,
                 ProfileItem(title: "备案号", subtitle: "蜀ICP备14025423号-2A", accessoryType: .disclosureIndicator) {
                     WxpJumpPageUtils.jumpToWebUrl(url: "https://beian.miit.gov.cn/")
                 }

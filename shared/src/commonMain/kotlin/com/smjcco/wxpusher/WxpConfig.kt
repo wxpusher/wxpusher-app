@@ -13,9 +13,13 @@ object WxpConfig {
     //ws的地址，iOS用不上
     var wsUrl: String = "wss://wxpusher.zjiecode.com"
 
+    //app内嵌的H5页面的地址
+    var appFeUrl: String = "https://wxpusher.zjiecode.com"
+
     fun init() {
         baseUrl = WxpSaveService.get("baseUrl", baseUrl)
         wsUrl = WxpSaveService.get("wsUrl", wsUrl)
+        appFeUrl = WxpSaveService.get("appFeUrl", appFeUrl)
     }
 
     fun saveBaseUrl(baseUrl: String) {
@@ -25,4 +29,9 @@ object WxpConfig {
     fun saveWsUrl(wsUrl: String) {
         WxpSaveService.set("wsUrl", wsUrl)
     }
+
+    fun saveAppFeUrl(appFeUrl: String) {
+        WxpSaveService.set("appFeUrl", appFeUrl)
+    }
+
 }

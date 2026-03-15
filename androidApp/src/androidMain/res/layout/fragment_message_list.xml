@@ -19,9 +19,11 @@
             android:id="@+id/battery_banner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
             android:orientation="horizontal"
             android:visibility="gone"
             app:cardBackgroundColor="@color/card_bg_fit_theme"
+            app:cardElevation="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -97,10 +99,11 @@
             android:id="@+id/note_permission_banner"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
             android:orientation="horizontal"
             android:visibility="gone"
             app:cardBackgroundColor="@color/card_bg_fit_theme"
-            app:cardElevation="1px"
+            app:cardElevation="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -119,8 +122,8 @@
                 <androidx.appcompat.widget.AppCompatImageView
                     android:layout_width="28dp"
                     android:layout_height="28dp"
-                    android:padding="2dp"
                     android:layout_gravity="center_vertical"
+                    android:padding="2dp"
                     app:layout_constraintBottom_toBottomOf="@+id/main_banner_battery_text"
                     app:layout_constraintEnd_toStartOf="@id/main_banner_battery_text"
                     app:layout_constraintStart_toStartOf="parent"
@@ -128,21 +131,23 @@
                     app:srcCompat="@drawable/ic_bell" />
 
                 <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/note_permission_banner_text"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
                     android:layout_weight="1"
-                    android:autoSizeMinTextSize="8sp"
+                    android:autoSizeMinTextSize="10sp"
                     android:autoSizeTextType="uniform"
                     android:ellipsize="end"
                     android:gravity="center_vertical"
-                    android:maxLines="1"
+                    android:maxLines="2"
                     android:text="@string/note_permission_banner_text"
                     android:textAppearance="@style/TextAppearance.AppCompat.Small"
                     android:textColor="@color/text_fit_theme"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/main_banner_battery_image"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/note_permission_banner_btn"
@@ -167,6 +172,78 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="@+id/main_banner_battery_text"
                     app:srcCompat="@drawable/ic_close" />
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/list_banner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            app:cardBackgroundColor="@color/card_bg_fit_theme"
+            app:cardElevation="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:shapeAppearance="?shapeAppearanceLargeComponent"
+            tools:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center_vertical"
+                    android:padding="2dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/main_banner_battery_text"
+                    app:layout_constraintEnd_toStartOf="@id/main_banner_battery_text"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/main_banner_battery_text"
+                    app:srcCompat="@drawable/ic_info"
+                    app:tint="#F44336" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/list_banner_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:autoSizeMinTextSize="10sp"
+                    android:autoSizeTextType="uniform"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:maxLines="2"
+                    android:text="@string/note_permission_banner_text"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                    android:textColor="@color/text_fit_theme"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/main_banner_battery_image"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限无消息通知权限" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/list_banner_more"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="8dp"
+                    android:padding="4dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/main_banner_battery_text"
+                    app:layout_constraintEnd_toStartOf="@id/main_banner_battery_text"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/main_banner_battery_text"
+                    app:srcCompat="@drawable/ic_arrow_forward"
+                    app:tint="?attr/colorControlNormal" />
 
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>

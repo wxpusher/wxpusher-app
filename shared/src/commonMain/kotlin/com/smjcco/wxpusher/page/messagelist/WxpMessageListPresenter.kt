@@ -22,7 +22,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     private var messageListData: MutableList<WxpMessageListMessage> = mutableListOf()
 
     private val MessageRefreshTimeKey = "WxpMessageList_MessageRefreshTimeKey"
-
+    private val BannerHasCloseIdKey = "WxpMessageList_hasCloseBannerId"
 
     //前页面的最后一条消息id
     private var lastMessageId = Long.MAX_VALUE
@@ -33,6 +33,13 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     private var hasMore: Boolean = true
 
     private var loading: Boolean = false
+
+    //上次消息自建的时间
+    private var lastCheckNoMsgTime: Long = 0
+    private var checkNoMsgResp: WxpCheckAppMsgReasonResp? = null
+
+    //上次获取公告的时间
+    private var lastFetchNoTime: Long = 0
 
     override fun searchIfChanged(key: String?) {
         if (this.key != key) {
@@ -255,4 +262,39 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             view?.onOpenSubscribeManagerPage("${WxpConfig.baseUrl}/wxuser/?openId=${openId}#/")
         }
     }
+
+    override fun fetchCheckReason() {
+        //超过10分钟才进行一次检测，避免请求后端太频繁
+        if (WxpDateTimeUtils.getTimestamp() - lastCheckNoMsgTime < 10 * 60 * 1000) {
+            view?.onCheckReason(checkNoMsgResp)
+            return
+        }
+        runAtMainSuspend {
+            checkNoMsgResp = WxpApiService.checkReason()
+            lastCheckNoMsgTime = WxpDateTimeUtils.getTimestamp()
+            view?.onCheckReason(checkNoMsgResp)
+        }
+    }
+
+    override fun fetchListBanner() {
+        //超过10分钟才进行一次检测，避免请求后端太频繁
+        if (WxpDateTimeUtils.getTimestamp() - lastFetchNoTime < 10 * 60 * 1000) {
+            return
+        }
+        runAtMainSuspend {
+            val listBannerResp = WxpApiService.getListBanner()
+            lastFetchNoTime = WxpDateTimeUtils.getTimestamp()
+            if (listBannerResp?.id == WxpSaveService.get(BannerHasCloseIdKey, 0)) {
+                return@runAtMainSuspend
+            }
+            view?.onListBanner(listBannerResp)
+        }
+    }
+
+    override fun closeListBanner(bannerId: Int?) {
+        bannerId?.let { WxpSaveService.set(BannerHasCloseIdKey, it) }
+        view?.onListBanner(null)
+    }
+
+
 }

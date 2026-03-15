@@ -4,10 +4,9 @@ import shared
 
 @preconcurrency import WebKit
 class WxpWebViewController: UIViewController {
-    
     // 白名单域名列表
     // 在白名单的域名会携带token，可以调用桥，不会显示警告提醒
-    private let WhitelistHosts: Set<String> = [
+    private let whitelistHosts: Set<String> = [
         "wxpusher.zjiecode.com",
         "wxpusher.test.zjiecode.com",
         "10.0.0.11",
@@ -23,7 +22,11 @@ class WxpWebViewController: UIViewController {
     private let url: URL?
     private var loadingStartTime: Date?
     private var progressTimer: Timer?
+    private var webDescription: String = ""
     private var showThirdPartyBanner = true
+    private var bridgeManager: WxpWebBridgeManager?
+    private var bridgeMessageHandlerProxy: WxpWeakScriptMessageHandler?
+    private var titleObservation: NSKeyValueObservation?
     
     ///针对内部域名，需要添加token的header，但是添加以后，偶尔遇到再次反复加载的情况
     ///因此用一个变量记录下来，上次加载的同一个req不重复加载
@@ -217,13 +220,10 @@ class WxpWebViewController: UIViewController {
         setupWebview()
         setupUI()
         showOption()
-        loadWebContent()
+        loadWebContentWithVersionCheck()
     }
     
     private func setupWebview(){
-        
-        self.configuration.userContentController.add(self, name: "wxpusher")
-        
         self.webView = WKWebView(frame: .zero, configuration: self.configuration)
         self.webView?.translatesAutoresizingMaskIntoConstraints = false
         
@@ -235,6 +235,58 @@ class WxpWebViewController: UIViewController {
         let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
         longPress.delegate = self
         self.webView?.addGestureRecognizer(longPress)
+
+        setupBridge()
+    }
+    
+    private func setupBridge() {
+        guard webView != nil else {
+            return
+        }
+        let emitter = WxpBridgeEmitter { [weak self] js in
+            self?.webView?.evaluateJavaScript(js, completionHandler: nil)
+        }
+        let manager = WxpWebBridgeManager(
+            whitelistHosts: whitelistHosts,
+            parser: WxpBridgeMessageParser(),
+            emitter: emitter,
+            currentHostProvider: { [weak self] in
+                self?.webView?.url?.host
+            }
+        )
+        let payRequestHandler = WxpPayRequestBridgeHandler(
+            paymentRequester: { data, completion in
+                WxpWeixinOpenManager.shared.requestPayment(with: data, completion: completion)
+            },
+            resultConverter: { [weak self] result in
+                self?.convertPaymentResultToData(result) ?? [:]
+            },
+            eventSender: { [weak manager] action, data in
+                manager?.sendNativeEvent(action: action, data: data)
+            }
+        )
+        let openUrlHandler = WxpOpenUrlBridgeHandler()
+        let getLoginInfoHandler = WxpGetLoginInfoBridgeHandler(
+            loginInfoProvider: {
+                WxpAppDataService.shared.getLoginInfo()
+            },
+            dictionaryBuilder: { [weak self] object in
+                self?.buildDictionary(from: object) ?? [:]
+            }
+        )
+        manager.registerHandler(action: "payRequest", requiresWhitelist: true) { request, completion in
+            payRequestHandler.handle(request, completion: completion)
+        }
+        manager.registerHandler(action: "openUrl", requiresWhitelist: false) { request, completion in
+            openUrlHandler.handle(request, completion: completion)
+        }
+        manager.registerHandler(action: "getLoginInfo", requiresWhitelist: true) { _, completion in
+            getLoginInfoHandler.handle(completion: completion)
+        }
+        bridgeManager = manager
+        let proxy = WxpWeakScriptMessageHandler(target: self)
+        bridgeMessageHandlerProxy = proxy
+        configuration.userContentController.add(proxy, name: "wxpusher")
     }
     
     private func setupUI() {
@@ -243,6 +295,14 @@ class WxpWebViewController: UIViewController {
         view.backgroundColor = .systemBackground
         webView?.navigationDelegate = self
         webView?.uiDelegate = self
+        titleObservation = webView?.observe(\.title, options: [.new]) { [weak self] observedWebView, _ in
+            guard let self = self else { return }
+            guard let updatedTitle = observedWebView.title?.trimmingCharacters(in: .whitespacesAndNewlines),
+                  !updatedTitle.isEmpty else {
+                return
+            }
+            self.setPageTitle(title: updatedTitle)
+        }
         
         //进度条更新观察
         webView?.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), options: .new, context: nil)
@@ -294,6 +354,13 @@ class WxpWebViewController: UIViewController {
                 image: UIImage(systemName: "doc.on.doc"),
                 handler:{ [weak self]_ in
                     self?.copyLinkToClipboard()
+                }
+            ),
+            UIAction(
+                title: "微信分享",
+                image: UIImage(systemName: "message"),
+                handler:{ [weak self]_ in
+                    self?.shareToWeixin()
                 }
             ),
             UIAction(
@@ -416,7 +483,10 @@ class WxpWebViewController: UIViewController {
     
     deinit {
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
+        titleObservation?.invalidate()
+        titleObservation = nil
         progressTimer?.invalidate()
+        configuration.userContentController.removeScriptMessageHandler(forName: "wxpusher")
     }
     
     override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
@@ -431,13 +501,78 @@ class WxpWebViewController: UIViewController {
             webView!.load(request)
         }
     }
+
+    private func loadWebContentWithVersionCheck() {
+        guard let targetUrl = url else {
+            return
+        }
+        guard shouldCheckAppFeVersion(targetUrl) else {
+            loadWebContent()
+            return
+        }
+        let pendingVersion = AppFeVersionManager.shared.consumePendingRefreshVersion(url: targetUrl.absoluteString)
+        guard let pendingVersion, !pendingVersion.isEmpty else {
+            loadWebContent()
+            return
+        }
+        clearWebCacheForVersionUpdate(remoteVersion: pendingVersion) { [weak self] in
+            guard let self = self else {
+                return
+            }
+            let finalUrlString = AppFeVersionManager.shared.appendVersionParam(
+                url: targetUrl.absoluteString,
+                version: pendingVersion
+            )
+            guard let finalUrl = URL(string: finalUrlString) else {
+                self.loadWebContent()
+                return
+            }
+            let request = self.createRequestWithTokenIfNeeded(for: finalUrl)
+            self.webView?.load(request)
+        }
+    }
+
+    private func clearWebCacheForVersionUpdate(remoteVersion: String, completion: @escaping () -> Void) {
+        // 仅清理缓存相关数据，保留 cookies / localStorage 等会话数据
+        var dataTypes: Set<String> = [
+            WKWebsiteDataTypeMemoryCache,
+            WKWebsiteDataTypeDiskCache,
+            WKWebsiteDataTypeOfflineWebApplicationCache
+        ]
+        if #available(iOS 11.3, *) {
+            dataTypes.insert(WKWebsiteDataTypeFetchCache)
+        }
+        if #available(iOS 11.3, *) {
+            dataTypes.insert(WKWebsiteDataTypeServiceWorkerRegistrations)
+        }
+        let dataStore = WKWebsiteDataStore.default()
+        dataStore.fetchDataRecords(ofTypes: dataTypes) { records in
+            dataStore.removeData(ofTypes: dataTypes, for: records) {
+                WxpLogUtils.shared.d(
+                    tag: "WxpWebView",
+                    message: "app_fe版本更新触发缓存清理, remote=\(remoteVersion)",
+                    throwable: nil
+                )
+                DispatchQueue.main.async {
+                    completion()
+                }
+            }
+        }
+    }
     
     // MARK: - Helper Methods
     
     /// 检查主机是否在白名单内
     private func isHostInWhitelist(_ host: String?) -> Bool {
         guard let host = host else { return false }
-        return WhitelistHosts.contains(host)
+        return whitelistHosts.contains(host)
+    }
+
+    private func shouldCheckAppFeVersion(_ url: URL) -> Bool {
+        if !isHostInWhitelist(url.host) {
+            return false
+        }
+        return url.path.contains("/app")
     }
     
     /// 创建带 token header 的请求
@@ -530,7 +665,7 @@ class WxpWebViewController: UIViewController {
             WxpToastUtils.shared.showToast(msg: "保存成功，请打开相册查看")
         }
     }
-
+    
     // MARK: - Action Methods
     
     /// 复制链接到剪贴板
@@ -557,6 +692,46 @@ class WxpWebViewController: UIViewController {
         }
         
         present(activityViewController, animated: true, completion: nil)
+    }
+    
+    /// 分享当前网页到微信
+    private func shareToWeixin() {
+        guard let urlToShare = webView?.url ?? url else {
+            WxpToastUtils.shared.showToast(msg: "链接为空，无法分享")
+            return
+        }
+        
+        let titleText: String
+        if let webTitle = webView?.title, !webTitle.isEmpty {
+            titleText = webTitle
+        } else {
+            titleText = "网页内容"
+        }
+        let description = webDescription
+        let thumbImage = snapshotImageForShare()
+        
+        WxpWeixinOpenManager.shared.shareWebPage(
+            url: urlToShare,
+            title: titleText,
+            description: description,
+            thumbImage: thumbImage,
+            to: .session
+        ) { result in
+            if case .failure(let error) = result {
+                let message = error.localizedDescription
+                WxpToastUtils.shared.showToast(msg: "分享失败: \(message)")
+            }
+        }
+    }
+    
+    private func snapshotImageForShare() -> UIImage? {
+        guard let webView, webView.bounds.width > 0, webView.bounds.height > 0 else {
+            return nil
+        }
+        let renderer = UIGraphicsImageRenderer(size: webView.bounds.size)
+        return renderer.image { context in
+            webView.layer.render(in: context.cgContext)
+        }
     }
     
     /// 在系统浏览器中打开链接
@@ -626,6 +801,7 @@ extension WxpWebViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         // 记录开始加载时间
         loadingStartTime = Date()
+        webDescription = ""
         progressView.progress = 0.0
         
         // 检查是否需要显示第三方内容banner
@@ -640,12 +816,7 @@ extension WxpWebViewController: WKNavigationDelegate {
             }
         }
         
-        //如果打开的是订阅管理的页面，就隐藏右上角的按钮
-        if let url = webView.url, isHostInWhitelist(url.host) && url.path.contains("wxuser") {
-            hideOption()
-        } else {
-            showOption()
-        }
+        updateWebMenuVisibility(for: webView.url)
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -658,6 +829,18 @@ extension WxpWebViewController: WKNavigationDelegate {
         
         // 检查是否需要显示第三方内容banner
         checkAndShowThirdPartyBanner(for: webView.url)
+        
+        // 获取网页描述，分享时作为描述字段
+        webView.evaluateJavaScript(
+            "(function(){ var meta=document.querySelector('meta[name=\"description\"]'); return meta ? meta.content : ''; })();"
+        ) { [weak self] result, _ in
+            guard let self = self else { return }
+            if let desc = result as? String {
+                self.webDescription = desc.trimmingCharacters(in: .whitespacesAndNewlines)
+            } else {
+                self.webDescription = ""
+            }
+        }
         
         // 取消定时器并隐藏进度条
         progressTimer?.invalidate()
@@ -686,74 +869,132 @@ extension WxpWebViewController: WKNavigationDelegate {
         updateWebOptionBtnStatus()
     }
     
+    private func updateWebMenuVisibility(for url: URL?) {
+        guard let url else {
+            showOption()
+            webOptionView.isHidden = false
+            return
+        }
+        if isHostInWhitelist(url.host) && url.path.contains("wxuser") {
+            hideOption()
+        } else {
+            showOption()
+        }
+        webOptionView.isHidden = isHostInWhitelist(url.host) && url.path.contains("app")
+    }
+    
 }
 
-//处理支付结果
 extension WxpWebViewController: WKScriptMessageHandler {
-    //处理h5调用native
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if(message.name != "wxpusher"){
+        if message.name != "wxpusher" {
             return
         }
-        if(!isHostInWhitelist(self.webView?.url?.host)){
-            print("非白名单地址，不允许调用桥")
-            return
-        }
-        guard let messageBody = message.body as? [String: Any] else {
-            return
-        }
-        
-        guard let action = messageBody["action"] as? String,
-        let data = messageBody["data"] as? [String:Any] else {
-            return
-        }
-        if(action == "payRequest"){
-            WxpWeixinOpenManager.shared.requestPayment(with: data) { [weak self] result in
-                DispatchQueue.main.async {
-                    self?.handlePaymentResult(result, messageBody: messageBody)
-                }
-            }
-            return
-        }
+        bridgeManager?.onMessage(message.body)
     }
     
-    
-    /// 处理微信支付结果
-    private func handlePaymentResult(_ result: Result<Bool, WeChatError>, messageBody: [String: Any]) {
-        let isSuccess: Bool
-        let message: String
-        
+    private func convertPaymentResultToData(_ result: Result<Bool, WeChatError>) -> [String: Any] {
         switch result {
         case .success(let success):
-            isSuccess = success
-            message = success ? "支付成功" : "支付失败"
-            
+            return ["success": success, "message": success ? "支付成功" : "支付失败"]
         case .failure(let error):
-            isSuccess = false
-            message = error.localizedDescription
+            return ["success": false, "message": error.localizedDescription]
         }
-        // 向 H5 页面发送支付结果
-        sendMsgToWebview(action: "payResponse" ,data: ["success":isSuccess,"message":message])
     }
     
-    /// 向 WebView 发送支付结果
-    private func sendMsgToWebview(action:String,data: [String: Any]) {
-        guard let webView = webView else { return }
-        do {
-            let jsonData = try JSONSerialization.data(withJSONObject: data)
-            let jsonString = String(data: jsonData, encoding: .utf8)!
-            let js = "window.dispatchEvent(new CustomEvent('nativeEvent_\(action)', { detail: '\(jsonString)'}));"
-            
-            webView.evaluateJavaScript(js) { result, error in
-                if let error = error {
-                    print("发送消息到 WebView 失败: \(error)")
-                } else {
-                    print("发送到webview成功消息")
-                }
+    private func buildDictionary(from object: Any) -> [String: Any] {
+        if(isKmpModel(of: type(of: object))){
+            let jsonStr = WxpSerializationUtils.shared.toJson(value: object, serializer: WxpLoginInfo.companion.serializer())
+            guard let jsonData = jsonStr?.data(using: .utf8) else {
+                print("无法将字符串转换为Data")
+                return [:]
             }
-        } catch {
-            print("JSON序列化失败: \(error)")
+            
+            do {
+                let json = try JSONSerialization.jsonObject(with: jsonData, options: [])
+                return json as? [String: Any] ?? [:]
+            } catch {
+                print("JSON解析错误: \(error)")
+                return [:]
+            }
         }
+        guard let value = normalizeBridgeValue(object) else {
+            return [:]
+        }
+        return value as? [String: Any] ?? [:]
+    }
+    
+    private func isKmpModel(of type: Any.Type) -> Bool {
+        // 1) 模块名判断：shared.xxx
+        let fullTypeName = String(reflecting: type)   // 比 String(describing:) 更稳定
+        if fullTypeName.hasPrefix("Shared") {
+            return true;
+        }
+        
+        // 2) 是否继承 KotlinBase（KMP导出对象常见父类）
+        if let cls = type as? AnyClass,
+           let kotlinBaseClass = NSClassFromString("KotlinBase"),
+           cls.isSubclass(of: kotlinBaseClass) {
+            return true
+        }
+        
+        return false;
+    }
+    
+    private func normalizeBridgeValue(_ value: Any) -> Any? {
+        let mirror = Mirror(reflecting: value)
+        
+        // Optional 递归拆包
+        if mirror.displayStyle == .optional {
+            guard let (_, someValue) = mirror.children.first else {
+                return nil
+            }
+            return normalizeBridgeValue(someValue)
+        }
+        
+        if let displayStyle = mirror.displayStyle {
+            switch displayStyle {
+            case .collection, .set:
+                return mirror.children.compactMap { normalizeBridgeValue($0.value) }
+            case .dictionary:
+                var dict: [String: Any] = [:]
+                for child in mirror.children {
+                    let pairMirror = Mirror(reflecting: child.value)
+                    let pairValues = Array(pairMirror.children.map(\.value))
+                    if pairValues.count == 2,
+                       let key = normalizeBridgeValue(pairValues[0]),
+                       let val = normalizeBridgeValue(pairValues[1]) {
+                        dict[String(describing: key)] = val
+                    }
+                }
+                return dict
+            case .struct, .class:
+                var dict: [String: Any] = [:]
+                for child in mirror.children {
+                    guard let key = child.label,
+                          let val = normalizeBridgeValue(child.value) else {
+                        continue
+                    }
+                    dict[key] = val
+                }
+                return dict
+            case .enum:
+                return String(describing: value)
+            case .tuple:
+                return mirror.children.compactMap { normalizeBridgeValue($0.value) }
+            default:
+                break
+            }
+        }
+        
+        // 基础类型保持原样，复杂未知类型降级为字符串，避免 JSON 序列化失败
+        if value is NSString || value is NSNumber || value is NSNull || value is Date {
+            return value
+        }
+        if value is String || value is Int || value is Double || value is Float || value is Bool {
+            return value
+        }
+        return String(describing: value)
     }
 }
 
