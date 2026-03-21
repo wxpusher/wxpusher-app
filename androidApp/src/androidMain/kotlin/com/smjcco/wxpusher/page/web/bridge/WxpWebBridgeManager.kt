@@ -1,9 +1,11 @@
 package com.smjcco.wxpusher.page.web.bridge
 
 import com.smjcco.wxpusher.base.common.WxpLogUtils
+import com.smjcco.wxpusher.page.web.bridge.handlers.GetBaseApiUrlBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.GetLoginInfoBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.OpenUrlBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.PayRequestBridgeHandler
+import com.smjcco.wxpusher.page.web.bridge.handlers.ShowToastBridgeHandler
 
 class WxpWebBridgeManager(
     private val context: BridgeContext,
@@ -37,6 +39,8 @@ class WxpWebBridgeManager(
         registerHandler("payRequest", requiresWhitelist = true, handler = PayRequestBridgeHandler)
         registerHandler("openUrl", requiresWhitelist = false, handler = OpenUrlBridgeHandler)
         registerHandler("getLoginInfo", requiresWhitelist = true, handler = GetLoginInfoBridgeHandler)
+        registerHandler("getBaseApiUrl", requiresWhitelist = true, handler = GetBaseApiUrlBridgeHandler)
+        registerHandler("showToast", requiresWhitelist = true, handler = ShowToastBridgeHandler)
     }
 
     fun onMessage(messageJson: String) {

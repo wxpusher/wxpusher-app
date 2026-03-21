@@ -28,6 +28,8 @@
 		1A63A13F2F669047005FF070 /* WxpBridgeContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1342F669047005FF070 /* WxpBridgeContracts.swift */; };
 		1A63A1402F669047005FF070 /* WxpGetLoginInfoBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1302F669047005FF070 /* WxpGetLoginInfoBridgeHandler.swift */; };
 		1A63A1412F669047005FF070 /* WxpBridgeEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1352F669047005FF070 /* WxpBridgeEmitter.swift */; };
+		1A63A1422F669047005FF070 /* WxpGetBaseApiUrlBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1432F669047005FF070 /* WxpGetBaseApiUrlBridgeHandler.swift */; };
+		1A63A1442F669047005FF070 /* WxpShowToastBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1452F669047005FF070 /* WxpShowToastBridgeHandler.swift */; };
 		1A962E672E08610200C966A3 /* KtSwiftJumpPageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E662E08610200C966A3 /* KtSwiftJumpPageUtils.m */; };
 		1A962E6A2E08625700C966A3 /* WxpJumpPageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */; };
 		1A962E6F2E09B3D200C966A3 /* WxpBaseUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E6E2E09B3D200C966A3 /* WxpBaseUIViewController.swift */; };
@@ -79,6 +81,8 @@
 		1A63A1302F669047005FF070 /* WxpGetLoginInfoBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpGetLoginInfoBridgeHandler.swift; sourceTree = "<group>"; };
 		1A63A1312F669047005FF070 /* WxpOpenUrlBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpOpenUrlBridgeHandler.swift; sourceTree = "<group>"; };
 		1A63A1322F669047005FF070 /* WxpPayRequestBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpPayRequestBridgeHandler.swift; sourceTree = "<group>"; };
+		1A63A1432F669047005FF070 /* WxpGetBaseApiUrlBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpGetBaseApiUrlBridgeHandler.swift; sourceTree = "<group>"; };
+		1A63A1452F669047005FF070 /* WxpShowToastBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpShowToastBridgeHandler.swift; sourceTree = "<group>"; };
 		1A63A1342F669047005FF070 /* WxpBridgeContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBridgeContracts.swift; sourceTree = "<group>"; };
 		1A63A1352F669047005FF070 /* WxpBridgeEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBridgeEmitter.swift; sourceTree = "<group>"; };
 		1A63A1362F669047005FF070 /* WxpBridgeMessageParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBridgeMessageParser.swift; sourceTree = "<group>"; };
@@ -241,8 +245,10 @@
 			isa = PBXGroup;
 			children = (
 				1A63A1302F669047005FF070 /* WxpGetLoginInfoBridgeHandler.swift */,
+				1A63A1432F669047005FF070 /* WxpGetBaseApiUrlBridgeHandler.swift */,
 				1A63A1312F669047005FF070 /* WxpOpenUrlBridgeHandler.swift */,
 				1A63A1322F669047005FF070 /* WxpPayRequestBridgeHandler.swift */,
+				1A63A1452F669047005FF070 /* WxpShowToastBridgeHandler.swift */,
 			);
 			path = handlers;
 			sourceTree = "<group>";
@@ -630,6 +636,8 @@
 				1A63A13F2F669047005FF070 /* WxpBridgeContracts.swift in Sources */,
 				1A63A1402F669047005FF070 /* WxpGetLoginInfoBridgeHandler.swift in Sources */,
 				1A63A1412F669047005FF070 /* WxpBridgeEmitter.swift in Sources */,
+				1A63A1422F669047005FF070 /* WxpGetBaseApiUrlBridgeHandler.swift in Sources */,
+				1A63A1442F669047005FF070 /* WxpShowToastBridgeHandler.swift in Sources */,
 				1ABD14262EDBF9890019AA3A /* WxpLoadingService.swift in Sources */,
 				1A039F712F08131000C1CA76 /* TestPanelViewController.swift in Sources */,
 				1ABD142A2EDDE3720019AA3A /* AccountDetailViewController.swift in Sources */,
