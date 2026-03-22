@@ -6,12 +6,15 @@ import com.smjcco.wxpusher.page.web.bridge.BridgeContext
 import com.smjcco.wxpusher.page.web.bridge.BridgeRequest
 import com.smjcco.wxpusher.page.web.bridge.WxpBridgeEmitter
 
-object GetBaseApiUrlBridgeHandler : BridgeActionHandler {
+object WxpGetEnvBaseUrlBridgeHandler : BridgeActionHandler {
     override fun handle(request: BridgeRequest, context: BridgeContext, emitter: WxpBridgeEmitter) {
         emitter.sendBridgeCallback(
             callbackId = request.callbackId,
             success = true,
-            data = mapOf("apiUrl" to WxpConfig.baseUrl)
+            data = mapOf(
+                "apiBaseUrl" to WxpConfig.baseUrl,
+                "appFeBaseUrl" to WxpConfig.appFeUrl
+            )
         )
     }
 }

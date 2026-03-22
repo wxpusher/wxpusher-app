@@ -274,7 +274,7 @@ class WxpWebViewController: UIViewController {
                 self?.buildDictionary(from: object) ?? [:]
             }
         )
-        let getBaseApiUrlHandler = WxpGetBaseApiUrlBridgeHandler()
+        let getEnvBaseUrlHandler = WxpGetEnvBaseUrlBridgeHandler()
         let showToastHandler = WxpShowToastBridgeHandler()
         
         manager.registerHandler(action: "payRequest", requiresWhitelist: true) { request, completion in
@@ -286,8 +286,8 @@ class WxpWebViewController: UIViewController {
         manager.registerHandler(action: "getLoginInfo", requiresWhitelist: true) { _, completion in
             getLoginInfoHandler.handle(completion: completion)
         }
-        manager.registerHandler(action: "getBaseApiUrl", requiresWhitelist: true) { _, completion in
-            getBaseApiUrlHandler.handle(completion: completion)
+        manager.registerHandler(action: "getEnvBaseUrl", requiresWhitelist: true) { _, completion in
+            getEnvBaseUrlHandler.handle(completion: completion)
         }
         manager.registerHandler(action: "showToast", requiresWhitelist: true) { request, completion in
             showToastHandler.handle(request, completion: completion)

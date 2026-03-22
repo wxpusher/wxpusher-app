@@ -60,6 +60,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
             "wxpusher.zjiecode.com",
             "wxpusher.test.zjiecode.com",
             "10.0.0.11",
+            "10.0.2.2",
             "127.0.0.1"
         )
 
