@@ -20,6 +20,14 @@
 		1A4934712E25667D00EA1C71 /* WxpVersionUpdateChecker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934702E25667100EA1C71 /* WxpVersionUpdateChecker.swift */; };
 		1A4934732E2D0F0C00EA1C71 /* WxpCommonNotification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934722E2D0F0100EA1C71 /* WxpCommonNotification.swift */; };
 		1A4934782E32393A00EA1C71 /* WxpQRCodeScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934762E32393A00EA1C71 /* WxpQRCodeScanViewController.swift */; };
+		1A63A13A2F669047005FF070 /* WxpBridgeMessageParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1362F669047005FF070 /* WxpBridgeMessageParser.swift */; };
+		1A63A13B2F669047005FF070 /* WxpWebBridgeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1382F669047005FF070 /* WxpWebBridgeManager.swift */; };
+		1A63A13C2F669047005FF070 /* WxpOpenUrlBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1312F669047005FF070 /* WxpOpenUrlBridgeHandler.swift */; };
+		1A63A13D2F669047005FF070 /* WxpPayRequestBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1322F669047005FF070 /* WxpPayRequestBridgeHandler.swift */; };
+		1A63A13E2F669047005FF070 /* WxpWeakScriptMessageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1372F669047005FF070 /* WxpWeakScriptMessageHandler.swift */; };
+		1A63A13F2F669047005FF070 /* WxpBridgeContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1342F669047005FF070 /* WxpBridgeContracts.swift */; };
+		1A63A1402F669047005FF070 /* WxpGetLoginInfoBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1302F669047005FF070 /* WxpGetLoginInfoBridgeHandler.swift */; };
+		1A63A1412F669047005FF070 /* WxpBridgeEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1352F669047005FF070 /* WxpBridgeEmitter.swift */; };
 		1A962E672E08610200C966A3 /* KtSwiftJumpPageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E662E08610200C966A3 /* KtSwiftJumpPageUtils.m */; };
 		1A962E6A2E08625700C966A3 /* WxpJumpPageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */; };
 		1A962E6F2E09B3D200C966A3 /* WxpBaseUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E6E2E09B3D200C966A3 /* WxpBaseUIViewController.swift */; };
@@ -68,6 +76,14 @@
 		1A4934702E25667100EA1C71 /* WxpVersionUpdateChecker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpVersionUpdateChecker.swift; sourceTree = "<group>"; };
 		1A4934722E2D0F0100EA1C71 /* WxpCommonNotification.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpCommonNotification.swift; sourceTree = "<group>"; };
 		1A4934762E32393A00EA1C71 /* WxpQRCodeScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpQRCodeScanViewController.swift; sourceTree = "<group>"; };
+		1A63A1302F669047005FF070 /* WxpGetLoginInfoBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpGetLoginInfoBridgeHandler.swift; sourceTree = "<group>"; };
+		1A63A1312F669047005FF070 /* WxpOpenUrlBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpOpenUrlBridgeHandler.swift; sourceTree = "<group>"; };
+		1A63A1322F669047005FF070 /* WxpPayRequestBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpPayRequestBridgeHandler.swift; sourceTree = "<group>"; };
+		1A63A1342F669047005FF070 /* WxpBridgeContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBridgeContracts.swift; sourceTree = "<group>"; };
+		1A63A1352F669047005FF070 /* WxpBridgeEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBridgeEmitter.swift; sourceTree = "<group>"; };
+		1A63A1362F669047005FF070 /* WxpBridgeMessageParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBridgeMessageParser.swift; sourceTree = "<group>"; };
+		1A63A1372F669047005FF070 /* WxpWeakScriptMessageHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpWeakScriptMessageHandler.swift; sourceTree = "<group>"; };
+		1A63A1382F669047005FF070 /* WxpWebBridgeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpWebBridgeManager.swift; sourceTree = "<group>"; };
 		1A962E662E08610200C966A3 /* KtSwiftJumpPageUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KtSwiftJumpPageUtils.m; sourceTree = "<group>"; };
 		1A962E682E08611300C966A3 /* KtSwiftJumpPageUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KtSwiftJumpPageUtils.h; sourceTree = "<group>"; };
 		1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpJumpPageUtils.swift; sourceTree = "<group>"; };
@@ -174,6 +190,7 @@
 		1A49346D2E255EC500EA1C71 /* WebView */ = {
 			isa = PBXGroup;
 			children = (
+				1A63A1392F669047005FF070 /* bridge */,
 				1A49346E2E255ECC00EA1C71 /* WxpFSafariViewController.swift */,
 				1A447DF32DF53ECD005C402F /* WxpWebViewController.swift */,
 			);
@@ -218,6 +235,29 @@
 				C8D717C45952B498CBA9B9D7 /* Pods */,
 				AEC07F043CCAA53C25F8A3EA /* Frameworks */,
 			);
+			sourceTree = "<group>";
+		};
+		1A63A1332F669047005FF070 /* handlers */ = {
+			isa = PBXGroup;
+			children = (
+				1A63A1302F669047005FF070 /* WxpGetLoginInfoBridgeHandler.swift */,
+				1A63A1312F669047005FF070 /* WxpOpenUrlBridgeHandler.swift */,
+				1A63A1322F669047005FF070 /* WxpPayRequestBridgeHandler.swift */,
+			);
+			path = handlers;
+			sourceTree = "<group>";
+		};
+		1A63A1392F669047005FF070 /* bridge */ = {
+			isa = PBXGroup;
+			children = (
+				1A63A1332F669047005FF070 /* handlers */,
+				1A63A1342F669047005FF070 /* WxpBridgeContracts.swift */,
+				1A63A1352F669047005FF070 /* WxpBridgeEmitter.swift */,
+				1A63A1362F669047005FF070 /* WxpBridgeMessageParser.swift */,
+				1A63A1372F669047005FF070 /* WxpWeakScriptMessageHandler.swift */,
+				1A63A1382F669047005FF070 /* WxpWebBridgeManager.swift */,
+			);
+			path = bridge;
 			sourceTree = "<group>";
 		};
 		1A962E5D2E085C4800C966A3 /* KtSwiftBridge */ = {
@@ -582,6 +622,14 @@
 				1A962E6F2E09B3D200C966A3 /* WxpBaseUIViewController.swift in Sources */,
 				1A447DF92DF53ECD005C402F /* MainTabBarController.swift in Sources */,
 				1A447DFA2DF53ECD005C402F /* WxpWebViewController.swift in Sources */,
+				1A63A13A2F669047005FF070 /* WxpBridgeMessageParser.swift in Sources */,
+				1A63A13B2F669047005FF070 /* WxpWebBridgeManager.swift in Sources */,
+				1A63A13C2F669047005FF070 /* WxpOpenUrlBridgeHandler.swift in Sources */,
+				1A63A13D2F669047005FF070 /* WxpPayRequestBridgeHandler.swift in Sources */,
+				1A63A13E2F669047005FF070 /* WxpWeakScriptMessageHandler.swift in Sources */,
+				1A63A13F2F669047005FF070 /* WxpBridgeContracts.swift in Sources */,
+				1A63A1402F669047005FF070 /* WxpGetLoginInfoBridgeHandler.swift in Sources */,
+				1A63A1412F669047005FF070 /* WxpBridgeEmitter.swift in Sources */,
 				1ABD14262EDBF9890019AA3A /* WxpLoadingService.swift in Sources */,
 				1A039F712F08131000C1CA76 /* TestPanelViewController.swift in Sources */,
 				1ABD142A2EDDE3720019AA3A /* AccountDetailViewController.swift in Sources */,
@@ -734,7 +782,7 @@
 				CODE_SIGN_ENTITLEMENTS = "WxPusher-iOS/wxpusher.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10600;
+				CURRENT_PROJECT_VERSION = 10610;
 				DEVELOPMENT_TEAM = 8UU533BM7N;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -755,7 +803,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.6.1;
+				MARKETING_VERSION = 1.6.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.smjcco.wxpusher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -783,9 +831,9 @@
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = "WxPusher-iOS/wxpusher.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 10600;
+				CURRENT_PROJECT_VERSION = 10610;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 8UU533BM7N;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -806,11 +854,11 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.6.1;
+				MARKETING_VERSION = 1.6.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.smjcco.wxpusher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "Provisioning-WxPusher-Distribution";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "wxpusher-appstore-distribution-push-login";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

@@ -16,6 +16,8 @@ import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 import com.smjcco.wxpusher.page.login.WxpWeixinLoginReq
 import com.smjcco.wxpusher.page.login.WxpWeixinLoginResp
+import com.smjcco.wxpusher.page.messagelist.WxpCheckAppMsgReasonResp
+import com.smjcco.wxpusher.page.messagelist.WxpListBannerResp
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
 import com.smjcco.wxpusher.page.scan.WxpScanQrcodeResp
@@ -314,5 +316,28 @@ object WxpApiService {
                 .body()
         }
         )
+    }
+
+    /**
+     * 检查收不到消息的原因
+     */
+    suspend fun checkReason(): WxpCheckAppMsgReasonResp? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .get(WxpNetworkService.getUrl("/api/need-login/device/no-msg-check"))
+                .body()
+        })
+    }
+
+
+    /**
+     * 检查公告
+     */
+    suspend fun getListBanner(): WxpListBannerResp? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .get(WxpNetworkService.getUrl("/api/need-login/device/list-banner"))
+                .body()
+        })
     }
 }

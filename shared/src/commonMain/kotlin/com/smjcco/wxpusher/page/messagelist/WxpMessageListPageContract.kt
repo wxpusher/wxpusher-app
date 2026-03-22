@@ -32,6 +32,16 @@ interface IWxpMessageListView : IWxpBaseMvpView<IWxpMessageListPresenter> {
      */
     fun onOpenSubscribeManagerPage(url: String);
 
+    /**
+     * 当检查到不可接受消息原因的时候调用
+     */
+    fun onCheckReason(data: WxpCheckAppMsgReasonResp?);
+
+    /**
+     * 当检查到新公告的时候调用
+     */
+    fun onListBanner(data: WxpListBannerResp?);
+
 }
 
 interface IWxpMessageListPresenter :
@@ -75,6 +85,23 @@ interface IWxpMessageListPresenter :
      * 这个时候调用此接口，获取一次最新的消息，静默插入列表
      */
     fun fetchMessageResume()
+
+    /**
+     * 自检查收不到消息的原因
+     * 内部带有10分钟截流限制，避免频繁访问服务器
+     */
+    fun fetchCheckReason()
+
+    /**
+     * 获取公告内容
+     * 内部带有10分钟截流限制，避免频繁访问服务器
+     */
+    fun fetchListBanner()
+
+    /**
+     * 关闭banner，不再显示
+     */
+    fun closeListBanner(bannerId: Int?)
 
     /**
      * 标记消息已读状态

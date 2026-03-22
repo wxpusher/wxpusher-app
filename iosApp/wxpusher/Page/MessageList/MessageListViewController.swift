@@ -1,6 +1,7 @@
 import UIKit
 import shared
 import MJRefresh
+import UserNotifications
 
 
 class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPresenter>,IWxpMessageListView  {
@@ -17,6 +18,21 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     private let searchController = UISearchController(searchResultsController: nil)
     
     private let tableView = UITableView()
+    private let notificationPermissionBannerView = WxpMessageBannerView(
+        iconName: "bell",
+        iconTintColor: .secondaryLabel
+    )
+    private let topBannerStack = UIStackView()
+    private let checkReasonBannerView = WxpMessageBannerView(
+        iconName: "bell",
+        iconTintColor: .secondaryLabel
+    )
+    private let listBannerView = WxpMessageBannerView(
+        iconName: "info.circle.fill",
+        iconTintColor: .systemRed
+    )
+    private var currentCheckReasonCode: Int32?
+    private var currentListBanner: WxpListBannerResp?
     
     private var openAppFristRefresh = true
     
@@ -111,6 +127,11 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         }
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        refreshBannerStateOnVisible()
+    }
+    
     private func dealUserInfoMessage(userInfo:[AnyHashable : Any]?){
         guard let userInfo =  userInfo else {
             return
@@ -133,6 +154,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         if(!openAppFristRefresh){
             presenter.fetchMessageResume()
         }
+        // 从系统设置返回时，可能不会重新触发 viewDidAppear，这里主动刷新 banner 状态。
+        refreshBannerStateOnVisible()
     }
     /**
      * 从推送信息中，获取一条消息数据
@@ -168,13 +191,16 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     private func setupUI() {
         title = "消息列表"
         
+        setupTopBanners()
+        
         tableView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(tableView)
         
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.topAnchor.constraint(equalTo: topBannerStack.bottomAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            // 贴 safeArea 底部，避免列表内容与 TabBar 重叠
+            tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
         ])
         
@@ -214,7 +240,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         emptyView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(emptyView)
         NSLayoutConstraint.activate([
-            emptyView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            // 空态页从 banner 下方开始，避免遮挡顶部提醒
+            emptyView.topAnchor.constraint(equalTo: topBannerStack.bottomAnchor),
             emptyView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             emptyView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
             emptyView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
@@ -222,6 +249,33 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         
         emptyView.backgroundColor = .systemBackground
         emptyView.isHidden = true
+    }
+    
+    private func setupTopBanners() {
+        topBannerStack.axis = .vertical
+        topBannerStack.spacing = 2
+        topBannerStack.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(topBannerStack)
+        
+        NSLayoutConstraint.activate([
+            topBannerStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 2),
+            topBannerStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 2),
+            topBannerStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -2)
+        ])
+        
+        checkReasonBannerView.addTarget(self, action: #selector(checkReasonBannerTapped), for: .touchUpInside)
+        listBannerView.addTarget(self, action: #selector(listBannerTapped), for: .touchUpInside)
+        notificationPermissionBannerView.addTarget(self, action: #selector(notificationPermissionBannerTapped), for: .touchUpInside)
+        notificationPermissionBannerView.setAccessoryTitle("去打开")
+        
+        topBannerStack.addArrangedSubview(notificationPermissionBannerView)
+        topBannerStack.addArrangedSubview(checkReasonBannerView)
+        topBannerStack.addArrangedSubview(listBannerView)
+        
+        notificationPermissionBannerView.isHidden = true
+        checkReasonBannerView.isHidden = true
+        listBannerView.isHidden = true
+        topBannerStack.isHidden = true
     }
     
     func setupSearchAndNavication(){
@@ -384,6 +438,31 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         WxpJumpPageUtils.jumpToWebUrl(url: url)
     }
     
+    func onCheckReason(data: WxpCheckAppMsgReasonResp?) {
+        guard let data, data.code > 0 else {
+            currentCheckReasonCode = nil
+            checkReasonBannerView.isHidden = true
+            updateTopBannerVisibility()
+            return
+        }
+        currentCheckReasonCode = data.code
+        checkReasonBannerView.setText(data.reason)
+        checkReasonBannerView.isHidden = false
+        updateTopBannerVisibility()
+    }
+    
+    func onListBanner(data: WxpListBannerResp?) {
+        currentListBanner = data
+        guard let data else {
+            listBannerView.isHidden = true
+            updateTopBannerVisibility()
+            return
+        }
+        listBannerView.setText(data.title)
+        listBannerView.isHidden = false
+        updateTopBannerVisibility()
+    }
+    
     func onMessageList(data: [WxpMessageListMessage]) {
         WxpLogUtils.shared.d(tag: "WxPusher", message: "消息列表页面-onMessageList", throwable: nil)
         self.messageList = data
@@ -421,6 +500,76 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     override func createPresenter() -> Any? {
         WxpMessageListPresenter(view: self)
+    }
+    
+    private func refreshBannerStateOnVisible() {
+        presenter.fetchListBanner()
+        UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional {
+                    self.notificationPermissionBannerView.isHidden = true
+                    self.presenter.fetchCheckReason()
+                } else {
+                    self.notificationPermissionBannerView.setText("无消息通知权限，无法正常接收消息，请打开通知权限")
+                    self.notificationPermissionBannerView.isHidden = false
+                    self.onCheckReason(data: nil)
+                }
+                self.updateTopBannerVisibility()
+            }
+        }
+    }
+    
+    private func updateTopBannerVisibility() {
+        topBannerStack.isHidden = notificationPermissionBannerView.isHidden
+            && checkReasonBannerView.isHidden
+            && listBannerView.isHidden
+    }
+    
+    @objc private func notificationPermissionBannerTapped() {
+        WxpPermissionUtils.requestNotificationPermission { [weak self] granted in
+            DispatchQueue.main.async {
+                guard let self else { return }
+                if granted {
+                    self.notificationPermissionBannerView.isHidden = true
+                    self.presenter.fetchCheckReason()
+                    self.updateTopBannerVisibility()
+                    return
+                }
+                let alert = UIAlertController(
+                    title: "异常提醒",
+                    message: "WxPusher 必须要通知权限才能正常工作，请在系统设置中打开通知开关。",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "取消", style: .cancel))
+                alert.addAction(UIAlertAction(title: "去设置", style: .default, handler: { _ in
+                    WxpJumpPageUtils.openAppSettings()
+                }))
+                self.present(alert, animated: true)
+            }
+        }
+    }
+    
+    @objc private func checkReasonBannerTapped() {
+        guard let code = currentCheckReasonCode else { return }
+        let url = "\(WxpConfig.shared.appFeUrl)/app/?code=\(code)#/no-message"
+        WxpJumpPageUtils.jumpToWebUrl(url: url)
+    }
+    
+    @objc private func listBannerTapped() {
+        guard let banner = currentListBanner else { return }
+        let alert = UIAlertController(title: banner.title, message: banner.desc, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "不再显示", style: .destructive, handler: { [weak self] _ in
+            self?.presenter.closeListBanner(bannerId: banner.id)
+        }))
+        if let url = banner.url?.trimmingCharacters(in: .whitespaces), !url.isEmpty {
+            alert.addAction(UIAlertAction(title: "查看详情", style: .default, handler: { _ in
+                WxpJumpPageUtils.jumpToWebUrl(url: url)
+            }))
+        } else {
+            alert.addAction(UIAlertAction(title: "我知道了", style: .default))
+        }
+        present(alert, animated: true)
     }
 }
 
@@ -624,5 +773,96 @@ class MessageCell: UITableViewCell {
         }
         
         WxpJumpPageUtils.jumpToWebUrl(url: urlString)
+    }
+}
+
+private final class WxpMessageBannerView: UIControl {
+    private let iconView = UIImageView()
+    private let titleLabel = UILabel()
+    private let accessoryButton = UIButton(type: .system)
+    private let arrowView = UIImageView(image: UIImage(systemName: "chevron.right"))
+
+    init(iconName: String, iconTintColor: UIColor) {
+        super.init(frame: .zero)
+        setupUI(iconName: iconName, iconTintColor: iconTintColor)
+    }
+
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    func setText(_ text: String?) {
+        titleLabel.text = text
+    }
+    
+    func setAccessoryTitle(_ title: String?) {
+        let showButton = !(title?.isEmpty ?? true)
+        accessoryButton.setTitle(title, for: .normal)
+        accessoryButton.isHidden = !showButton
+        arrowView.isHidden = showButton
+    }
+
+    private func setupUI(iconName: String, iconTintColor: UIColor) {
+        backgroundColor = UIColor { trait in
+            trait.userInterfaceStyle == .dark
+                ? UIColor(red: 30/255.0, green: 30/255.0, blue: 30/255.0, alpha: 1.0)
+                : UIColor(red: 248/255.0, green: 248/255.0, blue: 248/255.0, alpha: 1.0)
+        }
+        layer.cornerRadius = 12
+        layer.masksToBounds = true
+        isUserInteractionEnabled = true
+
+        iconView.image = UIImage(systemName: iconName)
+        iconView.tintColor = iconTintColor
+        iconView.contentMode = .scaleAspectFit
+        iconView.translatesAutoresizingMaskIntoConstraints = false
+
+        titleLabel.textColor = .label
+        titleLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
+        titleLabel.numberOfLines = 2
+        titleLabel.lineBreakMode = .byTruncatingTail
+        // 小屏场景优先压缩文案区域，保证右侧操作文案可完整显示。
+        titleLabel.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        titleLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        arrowView.tintColor = .secondaryLabel
+        arrowView.contentMode = .scaleAspectFit
+        arrowView.translatesAutoresizingMaskIntoConstraints = false
+        
+        accessoryButton.setTitleColor(.systemPurple, for: .normal)
+        accessoryButton.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        accessoryButton.titleLabel?.lineBreakMode = .byClipping
+        accessoryButton.titleLabel?.adjustsFontSizeToFitWidth = true
+        accessoryButton.titleLabel?.minimumScaleFactor = 0.9
+        accessoryButton.contentEdgeInsets = UIEdgeInsets(top: 2, left: 2, bottom: 2, right: 2)
+        accessoryButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        accessoryButton.setContentHuggingPriority(.required, for: .horizontal)
+        accessoryButton.isUserInteractionEnabled = false
+        accessoryButton.isHidden = true
+        accessoryButton.translatesAutoresizingMaskIntoConstraints = false
+
+        let row = UIStackView(arrangedSubviews: [iconView, titleLabel, accessoryButton, arrowView])
+        row.axis = .horizontal
+        row.alignment = .center
+        row.spacing = 8
+        // 统一由外层 UIControl 处理点击，避免子视图参与命中导致点击不稳定。
+        row.isUserInteractionEnabled = false
+        row.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(row)
+
+        NSLayoutConstraint.activate([
+            row.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+            row.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 10),
+            row.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -10),
+            row.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
+
+            iconView.widthAnchor.constraint(equalToConstant: 18),
+            iconView.heightAnchor.constraint(equalToConstant: 18),
+            accessoryButton.heightAnchor.constraint(equalToConstant: 24),
+            arrowView.widthAnchor.constraint(equalToConstant: 14),
+            arrowView.heightAnchor.constraint(equalToConstant: 14),
+            heightAnchor.constraint(greaterThanOrEqualToConstant: 44),
+        ])
     }
 }

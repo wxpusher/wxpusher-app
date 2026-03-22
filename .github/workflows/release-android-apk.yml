@@ -2,7 +2,7 @@ name: Release Android Apk
 
 on:
   pull_request:
-    branches: [ release, unofficial_custom/* ]
+    branches: [ unofficial_custom/* ]
 
   workflow_dispatch:
     inputs:

@@ -33,6 +33,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         WxpSaveService.shared.doInit()
         //初始化配置url等
         WxpConfig.shared.doInit()
+        // 启动时触发一次 app_fe 版本刷新（内部节流与异常兜底）
+        AppFeVersionManager.shared.refreshOnAppLaunch()
         
         //初始化页面信息
         WxpAppPageService.shared.doInit(service: IWxpAppPageServiceImpl())
@@ -125,6 +127,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
         return WXApi.handleOpenUniversalLink(userActivity, delegate: WxpWeixinOpenManager.shared)
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        return WXApi.handleOpen(url, delegate: WxpWeixinOpenManager.shared)
     }
     
 }

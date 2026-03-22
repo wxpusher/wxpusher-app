@@ -1,5 +1,6 @@
 package com.smjcco.wxpusher.page.main.fragment
 
+import android.R.*
 import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -13,23 +14,30 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.widget.AppCompatImageView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.color.MaterialColors
 import com.scwang.smart.refresh.footer.ClassicsFooter
 import com.scwang.smart.refresh.header.ClassicsHeader
 import com.scwang.smart.refresh.layout.SmartRefreshLayout
 import com.scwang.smart.refresh.layout.api.RefreshLayout
 import com.scwang.smart.refresh.layout.listener.OnRefreshListener
 import com.smjcco.wxpusher.R
+import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.base.WxpBaseMvpFragment
 import com.smjcco.wxpusher.base.common.WxpDateTimeUtils
+import com.smjcco.wxpusher.base.common.WxpDialogParams
+import com.smjcco.wxpusher.base.common.WxpDialogUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.dialog.ActionSheetDialogFragment
 import com.smjcco.wxpusher.dialog.ActionSheetItem
 import com.smjcco.wxpusher.page.main.WxpMainActivity
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListView
+import com.smjcco.wxpusher.page.messagelist.WxpCheckAppMsgReasonResp
+import com.smjcco.wxpusher.page.messagelist.WxpListBannerResp
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
@@ -66,8 +74,14 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     private lateinit var bannerCloseImg: AppCompatImageView
 
     private lateinit var notePermissionBanner: View
+    private lateinit var notePermissionTv: TextView
     private lateinit var notePermissionBtn: MaterialButton
     private lateinit var notePermissionCloseImg: AppCompatImageView
+
+
+    private lateinit var listNoteBanner: View
+    private lateinit var listNoteBannerTv: TextView
+    private lateinit var listNoteBannerMore: View
 
 
     override fun onCreateView(
@@ -102,6 +116,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         super.onResume()
         refreshBanner()
         refreshNotePermissionBanner()
+        presenter.fetchListBanner()
     }
 
     override fun onDestroy() {
@@ -122,8 +137,13 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         bannerCloseImg = view.findViewById(R.id.main_banner_close)
 
         notePermissionBanner = view.findViewById(R.id.note_permission_banner)
+        notePermissionTv = view.findViewById(R.id.note_permission_banner_text)
         notePermissionBtn = view.findViewById(R.id.note_permission_banner_btn)
         notePermissionCloseImg = view.findViewById(R.id.note_permission_banner_close)
+
+        listNoteBanner = view.findViewById(R.id.list_banner)
+        listNoteBannerTv = view.findViewById(R.id.list_banner_text)
+        listNoteBannerMore = view.findViewById(R.id.list_banner_more)
         // 输入框获取焦点时显示取消按钮
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
@@ -187,17 +207,27 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     private fun refreshNotePermissionBanner() {
         val hasNotePermission = PermissionUtils.hasNotificationPermission(activity)
         if (hasNotePermission) {
+            //在消息权限正确的前提下，检查是否可以接收到消息
             notePermissionBanner.visibility = View.GONE
+            presenter.fetchCheckReason()
         } else {
+            notePermissionBanner.setOnClickListener(null)
             notePermissionBanner.visibility = View.VISIBLE
+            notePermissionTv.visibility = View.VISIBLE
+            notePermissionTv.text = resources.getString(R.string.note_permission_banner_text)
+            notePermissionBtn.text = "去打开"
+            notePermissionBtn.visibility = View.VISIBLE
             notePermissionBtn.setOnClickListener {
                 if (activity is WxpMainActivity) {
                     val mainActivity = activity as WxpMainActivity
                     mainActivity.permissionRequest()
                 }
             }
+            notePermissionCloseImg.setImageResource(R.drawable.ic_close)
             notePermissionCloseImg.setOnClickListener {
                 notePermissionBanner.visibility = View.GONE
+                //关闭banner，在坚持后端接收状态
+                presenter.fetchCheckReason()
             }
         }
     }
@@ -294,6 +324,58 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         refreshLayout.finishRefresh()
         // 显示/隐藏空状态
         emptyText.visibility = if (messageList.isEmpty()) View.VISIBLE else View.GONE
+    }
+
+    override fun onCheckReason(data: WxpCheckAppMsgReasonResp?) {
+        if (data == null || data.code <= 0) {
+            notePermissionBanner.visibility = View.GONE
+            return
+        }
+        notePermissionBanner.visibility = View.VISIBLE
+        notePermissionTv.visibility = View.VISIBLE
+        notePermissionTv.text = data.reason
+        notePermissionBtn.visibility = View.GONE
+
+        view?.let {
+            val drawable =
+                ContextCompat.getDrawable(requireContext(), R.drawable.ic_arrow_forward)
+            val colorControlNormal = MaterialColors.getColor(it, attr.colorControlNormal)
+            drawable?.setTint(colorControlNormal)
+            notePermissionCloseImg.setImageDrawable(drawable)
+        }
+        notePermissionBanner.setOnClickListener {
+            WxpJumpPageUtils.jumpToWebUrl(
+                url = WxpConfig.appFeUrl + "/app/?code=${data.code}#/no-message",
+                activity = activity
+            )
+        }
+
+    }
+
+    override fun onListBanner(data: WxpListBannerResp?) {
+        if (data == null) {
+            listNoteBanner.visibility = View.GONE
+            return
+        }
+        listNoteBanner.visibility = View.VISIBLE
+        listNoteBannerTv.text = data.title
+        listNoteBannerMore.visibility = View.VISIBLE
+        listNoteBanner.setOnClickListener {
+            val params = WxpDialogParams()
+            params.title = data.title
+            params.message = data.desc
+            params.leftText = "不再显示"
+            params.leftBlock = { presenter.closeListBanner(data.id) }
+            if (data.url.isNullOrEmpty()) {
+                params.rightText = "我知道了"
+            } else {
+                params.rightText = "查看详情"
+                params.rightBlock = {
+                    WxpJumpPageUtils.jumpToWebUrl(url = data.url!!, activity = activity)
+                }
+            }
+            WxpDialogUtils.showDialog(params)
+        }
     }
 
     /**

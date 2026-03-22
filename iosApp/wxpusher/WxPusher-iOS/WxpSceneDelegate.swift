@@ -43,6 +43,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         WXApi.handleOpenUniversalLink(userActivity, delegate:  WxpWeixinOpenManager.shared)
     }
     
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let url = URLContexts.first?.url else {
+            return
+        }
+        WXApi.handleOpen(url, delegate: WxpWeixinOpenManager.shared)
+    }
+    
 }
 
 #if DEBUG
