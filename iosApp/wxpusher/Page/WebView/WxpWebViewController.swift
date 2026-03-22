@@ -185,6 +185,9 @@ class WxpWebViewController: UIViewController {
     }
     
     private var bannerHeightConstraint: NSLayoutConstraint!
+    private var webOptionViewHeightConstraint: NSLayoutConstraint!
+    private var webOptionViewBottomToSafeArea: NSLayoutConstraint!
+    private var webOptionViewBottomToViewBottom: NSLayoutConstraint!
     
     
     init() {
@@ -283,6 +286,9 @@ class WxpWebViewController: UIViewController {
         
         // 先创建约束引用
         bannerHeightConstraint = thirdPartyBannerView.heightAnchor.constraint(equalToConstant: 0)
+        webOptionViewHeightConstraint = webOptionView.heightAnchor.constraint(equalToConstant: 44)
+        webOptionViewBottomToSafeArea = webOptionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        webOptionViewBottomToViewBottom = webOptionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         
         
         NSLayoutConstraint.activate([
@@ -301,10 +307,10 @@ class WxpWebViewController: UIViewController {
             progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             progressView.heightAnchor.constraint(equalToConstant: 1.0),
             
-            webOptionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            webOptionViewBottomToSafeArea,
             webOptionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webOptionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            webOptionView.heightAnchor.constraint(equalToConstant: 44)
+            webOptionViewHeightConstraint,
             
         ])
     }
@@ -405,7 +411,13 @@ class WxpWebViewController: UIViewController {
         } else {
             hideOption()
         }
-        webOptionView.isHidden = !resolveBottomBarVisible(for: effectiveUrl)
+        let bottomBarVisible = resolveBottomBarVisible(for: effectiveUrl)
+        webOptionView.isHidden = !bottomBarVisible
+        webOptionViewHeightConstraint.constant = bottomBarVisible ? 44 : 0
+        let hasVisibleTabBar = tabBarController != nil && !hidesBottomBarWhenPushed
+        let shouldExtendToViewBottom = !bottomBarVisible && !hasVisibleTabBar
+        webOptionViewBottomToSafeArea.isActive = !shouldExtendToViewBottom
+        webOptionViewBottomToViewBottom.isActive = shouldExtendToViewBottom
     }
 
     func setOptionMenuVisibleOverride(_ visible: Bool?) {
