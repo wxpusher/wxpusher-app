@@ -16,6 +16,10 @@ class WxpWebViewController: UIViewController {
     private var progressTimer: Timer?
     private var webDescription: String = ""
     private var showThirdPartyBanner = true
+    private let allWebOptionItems: [String] = ["copy_link", "weixin_share", "share", "open_browser"]
+    private var optionMenuVisibleOverride: Bool?
+    private var optionMenuItemsOverride: Set<String>?
+    private var bottomBarVisibleOverride: Bool?
     private var bridgeContext: WxpBridgeContext?
     private var bridgeManager: WxpWebBridgeManager?
     private var bridgeMessageHandlerProxy: WxpWeakScriptMessageHandler?
@@ -212,7 +216,7 @@ class WxpWebViewController: UIViewController {
         view.backgroundColor = .systemBackground
         setupWebview()
         setupUI()
-        showOption()
+        applyWebMenuVisibility(for: url)
         loadWebContentWithVersionCheck()
     }
     
@@ -306,38 +310,8 @@ class WxpWebViewController: UIViewController {
     }
     
     
-    private func showOption(){
-        let mainMenu = UIMenu(title: "", children: [
-            UIAction(
-                title: "复制链接",
-                image: UIImage(systemName: "doc.on.doc"),
-                handler:{ [weak self]_ in
-                    self?.copyLinkToClipboard()
-                }
-            ),
-            UIAction(
-                title: "微信分享",
-                image: UIImage(systemName: "message"),
-                handler:{ [weak self]_ in
-                    self?.shareToWeixin()
-                }
-            ),
-            UIAction(
-                title: "分享",
-                image: UIImage(systemName: "square.and.arrow.up"),
-                handler:{ [weak self]_ in
-                    self?.shareURL()
-                }
-            ),
-            UIAction(
-                title: "在浏览器中打开",
-                image: UIImage(systemName: "safari"),
-                handler:{ [weak self]_ in
-                    self?.openInBrowser()
-                }
-            )
-        ])
-        
+    private func showOption(options: [String]){
+        let mainMenu = UIMenu(title: "", children: buildOptionActions(options: options))
         let menuButton = UIBarButtonItem(
             title: "操作选项",
             image: UIImage(systemName: "ellipsis.circle"),
@@ -350,6 +324,112 @@ class WxpWebViewController: UIViewController {
     
     private func hideOption(){
         navigationItem.rightBarButtonItem = nil
+    }
+
+    private func buildOptionActions(options: [String]) -> [UIAction] {
+        var actions: [UIAction] = []
+        for option in options {
+            switch option {
+            case "copy_link":
+                actions.append(UIAction(
+                    title: "复制链接",
+                    image: UIImage(systemName: "doc.on.doc"),
+                    handler:{ [weak self]_ in
+                        self?.copyLinkToClipboard()
+                    }
+                ))
+            case "weixin_share":
+                actions.append(UIAction(
+                    title: "微信分享",
+                    image: UIImage(systemName: "message"),
+                    handler:{ [weak self]_ in
+                        self?.shareToWeixin()
+                    }
+                ))
+            case "share":
+                actions.append(UIAction(
+                    title: "分享",
+                    image: UIImage(systemName: "square.and.arrow.up"),
+                    handler:{ [weak self]_ in
+                        self?.shareURL()
+                    }
+                ))
+            case "open_browser":
+                actions.append(UIAction(
+                    title: "在浏览器中打开",
+                    image: UIImage(systemName: "safari"),
+                    handler:{ [weak self]_ in
+                        self?.openInBrowser()
+                    }
+                ))
+            default:
+                continue
+            }
+        }
+        return actions
+    }
+
+    private func resolveOptionMenuVisible(for url: URL?) -> Bool {
+        if let optionMenuVisibleOverride {
+            return optionMenuVisibleOverride
+        }
+        guard let url else {
+            return true
+        }
+        return !(isHostInWhitelist(url.host) && url.path.contains("wxuser"))
+    }
+
+    private func resolveOptionMenuItems() -> [String] {
+        if let overrideItems = optionMenuItemsOverride {
+            return allWebOptionItems.filter { overrideItems.contains($0) }
+        }
+        return allWebOptionItems
+    }
+
+    private func resolveBottomBarVisible(for url: URL?) -> Bool {
+        if let bottomBarVisibleOverride {
+            return bottomBarVisibleOverride
+        }
+        guard let url else {
+            return true
+        }
+        return !(isHostInWhitelist(url.host) && url.path.contains("app"))
+    }
+
+    private func applyWebMenuVisibility(for url: URL?) {
+        let effectiveUrl = url ?? webView?.url ?? self.url
+        let shouldShowMenu = resolveOptionMenuVisible(for: effectiveUrl)
+        let menuItems = resolveOptionMenuItems()
+        if shouldShowMenu && !menuItems.isEmpty {
+            showOption(options: menuItems)
+        } else {
+            hideOption()
+        }
+        webOptionView.isHidden = !resolveBottomBarVisible(for: effectiveUrl)
+    }
+
+    func setOptionMenuVisibleOverride(_ visible: Bool?) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.optionMenuVisibleOverride = visible
+            self.applyWebMenuVisibility(for: self.webView?.url ?? self.url)
+        }
+    }
+
+    func setOptionMenuItemsOverride(_ options: Set<String>?) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.optionMenuItemsOverride = options
+            self.applyWebMenuVisibility(for: self.webView?.url ?? self.url)
+        }
+    }
+
+    func setBottomBarVisibleOverride(_ visible: Bool?) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.bottomBarVisibleOverride = visible
+            self.applyWebMenuVisibility(for: self.webView?.url ?? self.url)
+        }
     }
     
     func updateWebOptionBtnStatus(){
@@ -834,17 +914,7 @@ extension WxpWebViewController: WKNavigationDelegate {
     }
     
     private func updateWebMenuVisibility(for url: URL?) {
-        guard let url else {
-            showOption()
-            webOptionView.isHidden = false
-            return
-        }
-        if isHostInWhitelist(url.host) && url.path.contains("wxuser") {
-            hideOption()
-        } else {
-            showOption()
-        }
-        webOptionView.isHidden = isHostInWhitelist(url.host) && url.path.contains("app")
+        applyWebMenuVisibility(for: url)
     }
     
 }

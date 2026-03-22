@@ -55,6 +55,16 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         private const val DEVICE_TOKEN_KEY = "deviceToken"
         private const val DEVICE_PLATFORM_KEY = "platform"
         private const val DEVICE_VERSION_NAME_KEY = "versionName"
+        const val OPTION_MENU_COPY_LINK = "copy_link"
+        const val OPTION_MENU_WEIXIN_SHARE = "weixin_share"
+        const val OPTION_MENU_SHARE = "share"
+        const val OPTION_MENU_OPEN_BROWSER = "open_browser"
+        val SUPPORTED_OPTION_MENU_KEYS = setOf(
+            OPTION_MENU_COPY_LINK,
+            OPTION_MENU_WEIXIN_SHARE,
+            OPTION_MENU_SHARE,
+            OPTION_MENU_OPEN_BROWSER
+        )
 
         fun newInstance(url: String): WxpWebViewFragment {
             val fragment = WxpWebViewFragment()
@@ -82,6 +92,9 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     private var showThirdPartyBanner = true
     private var lastLoadRequest: String? = null
     private var webDescription: String? = null
+    private var optionMenuVisibleOverride: Boolean? = null
+    private var optionMenuItemsOverride: Set<String>? = null
+    private var bottomBarVisibleOverride: Boolean? = null
     private lateinit var bridgeContext: BridgeContext
     private lateinit var webBridgeManager: WxpWebBridgeManager
 
@@ -454,22 +467,78 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     }
 
     private fun updateMenuVisibility(url: String?) {
-        if (url == null) return
+        applyWebChromeVisibility(url)
+    }
 
+    private fun applyWebChromeVisibility(url: String?) {
+        val resolvedUrl = url ?: (webView.url ?: targetUrl)
+        activity?.invalidateOptionsMenu()
+        webOptBannerView.visibility = if (resolveBottomBarVisible(resolvedUrl)) View.VISIBLE else View.GONE
+    }
+
+    private fun resolveOptionMenuVisible(url: String?): Boolean {
+        optionMenuVisibleOverride?.let {
+            return it
+        }
+        if (url.isNullOrBlank()) {
+            return true
+        }
         val uri = url.toUri()
-        //浏览器左上角的按钮
-        if (isHostInWhitelist(uri.host) && uri.path?.contains("wxuser") == true) {
-            // 订阅管理页面，隐藏菜单
-            activity?.invalidateOptionsMenu()
-        }
+        return !(isHostInWhitelist(uri.host) && uri.path?.contains("wxuser") == true)
+    }
 
-        //下面的导航按钮
-        if (isHostInWhitelist(uri.host) && uri.path?.contains("app") == true) {
-            webOptBannerView.visibility = View.GONE
+    private fun resolveBottomBarVisible(url: String?): Boolean {
+        bottomBarVisibleOverride?.let {
+            return it
+        }
+        if (url.isNullOrBlank()) {
+            return true
+        }
+        val uri = url.toUri()
+        return !(isHostInWhitelist(uri.host) && uri.path?.contains("app") == true)
+    }
+
+    private fun resolveEnabledOptionMenuItems(): Set<String> {
+        val overrideItems = optionMenuItemsOverride
+        return if (overrideItems == null) {
+            SUPPORTED_OPTION_MENU_KEYS
         } else {
-            webOptBannerView.visibility = View.VISIBLE
+            overrideItems.intersect(SUPPORTED_OPTION_MENU_KEYS)
         }
+    }
 
+    private fun optionMenuKeyToItemId(optionKey: String): Int? {
+        return when (optionKey) {
+            OPTION_MENU_COPY_LINK -> R.id.action_copy_link
+            OPTION_MENU_WEIXIN_SHARE -> R.id.action_weixin_share
+            OPTION_MENU_SHARE -> R.id.action_share
+            OPTION_MENU_OPEN_BROWSER -> R.id.action_open_browser
+            else -> null
+        }
+    }
+
+    fun setOptionMenuVisibleOverride(visible: Boolean?) {
+        activity?.runOnUiThread {
+            optionMenuVisibleOverride = visible
+            val currentUrl = if (::webView.isInitialized) webView.url ?: targetUrl else targetUrl
+            applyWebChromeVisibility(currentUrl)
+        }
+    }
+
+    fun setOptionMenuItemsOverride(options: Set<String>?) {
+        activity?.runOnUiThread {
+            optionMenuItemsOverride = options?.intersect(SUPPORTED_OPTION_MENU_KEYS)
+            val currentUrl = if (::webView.isInitialized) webView.url ?: targetUrl else targetUrl
+            applyWebChromeVisibility(currentUrl)
+        }
+    }
+
+    fun setBottomBarVisibleOverride(visible: Boolean?) {
+        activity?.runOnUiThread {
+            bottomBarVisibleOverride = visible
+            val currentUrl = if (::webView.isInitialized) webView.url ?: targetUrl else targetUrl
+            applyWebChromeVisibility(currentUrl)
+        }
     }
 
     private fun updateWebOptionBtnStatus() {
@@ -516,14 +585,22 @@ open class WxpWebViewFragment : WxpBaseFragment() {
      */
     fun onActivityCreateOptionsMenu(menu: Menu?, menuInflater: MenuInflater): Boolean {
         val url = webView.url ?: targetUrl
-        val uri = url.toUri()
-
-        // 如果是订阅管理页面，不显示菜单
-        if (isHostInWhitelist(uri.host) && uri.path?.contains("wxuser") == true) {
+        if (!resolveOptionMenuVisible(url)) {
+            return false
+        }
+        val enabledOptionKeys = resolveEnabledOptionMenuItems()
+        if (enabledOptionKeys.isEmpty()) {
             return false
         }
 
         menuInflater.inflate(R.menu.webview_menu, menu)
+        val enabledItemIds = enabledOptionKeys.mapNotNull { optionMenuKeyToItemId(it) }.toSet()
+        val allItemIds = SUPPORTED_OPTION_MENU_KEYS.mapNotNull { optionMenuKeyToItemId(it) }
+        allItemIds.forEach { itemId ->
+            if (!enabledItemIds.contains(itemId)) {
+                menu?.removeItem(itemId)
+            }
+        }
         return true
     }
 

@@ -31,6 +31,8 @@ final class WxpWebBridgeManager {
         registerHandler(action: "getLoginInfo", requiresWhitelist: true, handler: WxpGetLoginInfoBridgeHandler())
         registerHandler(action: "getEnvBaseUrl", requiresWhitelist: true, handler: WxpGetEnvBaseUrlBridgeHandler())
         registerHandler(action: "showToast", requiresWhitelist: true, handler: WxpShowToastBridgeHandler())
+        registerHandler(action: "setWebOptionMenu", requiresWhitelist: true, handler: WxpSetWebOptionMenuBridgeHandler())
+        registerHandler(action: "setWebBottomBar", requiresWhitelist: true, handler: WxpSetWebBottomBarBridgeHandler())
     }
 
     private func registerHandler(action: String, requiresWhitelist: Bool, handler: WxpBridgeActionHandler) {

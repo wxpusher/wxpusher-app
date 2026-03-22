@@ -4,6 +4,8 @@ import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.page.web.bridge.handlers.GetLoginInfoBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.OpenUrlBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.PayRequestBridgeHandler
+import com.smjcco.wxpusher.page.web.bridge.handlers.SetWebBottomBarBridgeHandler
+import com.smjcco.wxpusher.page.web.bridge.handlers.SetWebOptionMenuBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.ShowToastBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.WxpGetEnvBaseUrlBridgeHandler
 import com.smjcco.wxpusher.web.WxpWebHostPolicy
@@ -32,6 +34,8 @@ class WxpWebBridgeManager(
         registerHandler("getLoginInfo", requiresWhitelist = true, handler = GetLoginInfoBridgeHandler)
         registerHandler("getEnvBaseUrl", requiresWhitelist = true, handler = WxpGetEnvBaseUrlBridgeHandler)
         registerHandler("showToast", requiresWhitelist = true, handler = ShowToastBridgeHandler)
+        registerHandler("setWebOptionMenu", requiresWhitelist = true, handler = SetWebOptionMenuBridgeHandler)
+        registerHandler("setWebBottomBar", requiresWhitelist = true, handler = SetWebBottomBarBridgeHandler)
     }
 
     fun onMessage(messageJson: String) {
