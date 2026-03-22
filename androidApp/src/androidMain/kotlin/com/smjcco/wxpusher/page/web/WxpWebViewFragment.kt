@@ -45,6 +45,7 @@ import com.smjcco.wxpusher.page.web.bridge.BridgeContext
 import com.smjcco.wxpusher.page.web.bridge.WxpWebBridgeManager
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.web.AppFeVersionManager
+import com.smjcco.wxpusher.web.WxpWebHostPolicy
 import com.smjcco.wxpusher.wxapi.WxpWeixinOpenManager
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX
 
@@ -54,15 +55,6 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         private const val DEVICE_TOKEN_KEY = "deviceToken"
         private const val DEVICE_PLATFORM_KEY = "platform"
         private const val DEVICE_VERSION_NAME_KEY = "versionName"
-
-        // 白名单域名列表
-        private val WHITELIST_HOSTS = setOf(
-            "wxpusher.zjiecode.com",
-            "wxpusher.test.zjiecode.com",
-            "10.0.0.11",
-            "10.0.2.2",
-            "127.0.0.1"
-        )
 
         fun newInstance(url: String): WxpWebViewFragment {
             val fragment = WxpWebViewFragment()
@@ -419,7 +411,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     }
 
     private fun isHostInWhitelist(host: String?): Boolean {
-        return host != null && WHITELIST_HOSTS.contains(host)
+        return WxpWebHostPolicy.isHostInWhitelist(host)
     }
 
     private fun createRequestWithTokenIfNeeded(url: String): Map<String, String> {

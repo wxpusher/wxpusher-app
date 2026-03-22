@@ -1,31 +1,21 @@
 import Foundation
+import shared
 
 final class WxpWebBridgeManager {
-    private struct BridgeHandler {
-        let requiresWhitelist: Bool
-        let handler: WxpBridgeActionHandler
-    }
-
-    private let whitelistHosts: Set<String>
+    private let context: WxpBridgeContext
     private let parser: WxpBridgeMessageParser
     private let emitter: WxpBridgeEmitter
-    private let currentHostProvider: () -> String?
-    private var handlers: [String: BridgeHandler] = [:]
+    private var handlers: [String: WxpRegisteredBridgeHandler] = [:]
 
     init(
-        whitelistHosts: Set<String>,
-        parser: WxpBridgeMessageParser,
-        emitter: WxpBridgeEmitter,
-        currentHostProvider: @escaping () -> String?
+        context: WxpBridgeContext,
+        parser: WxpBridgeMessageParser = WxpBridgeMessageParser(),
+        emitter: WxpBridgeEmitter
     ) {
-        self.whitelistHosts = whitelistHosts
+        self.context = context
         self.parser = parser
         self.emitter = emitter
-        self.currentHostProvider = currentHostProvider
-    }
-
-    func registerHandler(action: String, requiresWhitelist: Bool, handler: @escaping WxpBridgeActionHandler) {
-        handlers[action] = BridgeHandler(requiresWhitelist: requiresWhitelist, handler: handler)
+        registerDefaultHandlers()
     }
 
     func onMessage(_ body: Any) {
@@ -35,8 +25,16 @@ final class WxpWebBridgeManager {
         dispatch(request)
     }
 
-    func sendNativeEvent(action: String, data: [String: Any]) {
-        emitter.sendNativeEvent(action: action, data: data)
+    private func registerDefaultHandlers() {
+        registerHandler(action: "payRequest", requiresWhitelist: true, handler: WxpPayRequestBridgeHandler())
+        registerHandler(action: "openUrl", requiresWhitelist: false, handler: WxpOpenUrlBridgeHandler())
+        registerHandler(action: "getLoginInfo", requiresWhitelist: true, handler: WxpGetLoginInfoBridgeHandler())
+        registerHandler(action: "getEnvBaseUrl", requiresWhitelist: true, handler: WxpGetEnvBaseUrlBridgeHandler())
+        registerHandler(action: "showToast", requiresWhitelist: true, handler: WxpShowToastBridgeHandler())
+    }
+
+    private func registerHandler(action: String, requiresWhitelist: Bool, handler: WxpBridgeActionHandler) {
+        handlers[action] = WxpRegisteredBridgeHandler(requiresWhitelist: requiresWhitelist, handler: handler)
     }
 
     private func dispatch(_ request: WxpBridgeRequest) {
@@ -47,21 +45,17 @@ final class WxpWebBridgeManager {
             )
             return
         }
-        if bridgeHandler.requiresWhitelist && !isHostInWhitelist(currentHostProvider()) {
+        if bridgeHandler.requiresWhitelist && !isHostInWhitelist(context.currentHost) {
             emitter.sendBridgeCallback(
                 callbackId: request.callbackId,
                 response: .fail("host is not allowed")
             )
             return
         }
-        bridgeHandler.handler(request) { [weak self] response in
-            self?.emitter.sendBridgeCallback(callbackId: request.callbackId, response: response)
-        }
+        bridgeHandler.handler.handle(request: request, context: context, emitter: emitter)
     }
 
     private func isHostInWhitelist(_ host: String?) -> Bool {
-        guard let host else { return false }
-        return whitelistHosts.contains(host)
+        return WxpWebHostPolicy.shared.isHostInWhitelist(host: host)
     }
 }
-

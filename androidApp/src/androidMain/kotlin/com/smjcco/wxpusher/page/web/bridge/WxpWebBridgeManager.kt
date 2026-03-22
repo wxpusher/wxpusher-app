@@ -6,22 +6,12 @@ import com.smjcco.wxpusher.page.web.bridge.handlers.OpenUrlBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.PayRequestBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.ShowToastBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.WxpGetEnvBaseUrlBridgeHandler
+import com.smjcco.wxpusher.web.WxpWebHostPolicy
 
 class WxpWebBridgeManager(
     private val context: BridgeContext,
-    private val whitelistHosts: Set<String> = DEFAULT_WHITELIST_HOSTS,
     private val parser: WxpBridgeMessageParser = WxpBridgeMessageParser()
 ) {
-    companion object {
-        val DEFAULT_WHITELIST_HOSTS = setOf(
-            "wxpusher.zjiecode.com",
-            "wxpusher.test.zjiecode.com",
-            "10.0.0.11",
-            "10.0.2.2",
-            "127.0.0.1"
-        )
-    }
-
     private val emitter = WxpBridgeEmitter(context)
     private val handlers = mutableMapOf<String, BridgeHandler>()
 
@@ -82,6 +72,6 @@ class WxpWebBridgeManager(
     }
 
     private fun isHostInWhitelist(host: String?): Boolean {
-        return host != null && whitelistHosts.contains(host)
+        return WxpWebHostPolicy.isHostInWhitelist(host)
     }
 }

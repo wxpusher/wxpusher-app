@@ -1,11 +1,14 @@
 import Foundation
 import shared
 
-final class WxpGetEnvBaseUrlBridgeHandler {
-    func handle(completion: @escaping WxpBridgeCompletion) {
-        completion(.ok([
-            "apiBaseUrl": WxpConfig.shared.baseUrl,
-            "appFeBaseUrl": WxpConfig.shared.appFeUrl
-        ]))
+final class WxpGetEnvBaseUrlBridgeHandler: WxpBridgeActionHandler {
+    func handle(request: WxpBridgeRequest, context: WxpBridgeContext, emitter: WxpBridgeEmitter) {
+        emitter.sendBridgeCallback(
+            callbackId: request.callbackId,
+            response: .ok([
+                "apiBaseUrl": WxpConfig.shared.baseUrl,
+                "appFeBaseUrl": WxpConfig.shared.appFeUrl
+            ])
+        )
     }
 }
