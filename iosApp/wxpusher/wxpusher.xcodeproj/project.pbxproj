@@ -31,8 +31,6 @@
 		1A63A1422F669047005FF070 /* WxpGetEnvBaseUrlBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1432F669047005FF070 /* WxpGetEnvBaseUrlBridgeHandler.swift */; };
 		1A63A1442F669047005FF070 /* WxpShowToastBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1452F669047005FF070 /* WxpShowToastBridgeHandler.swift */; };
 		1A63A1472F669047005FF070 /* WxpBridgeContext.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1462F669047005FF070 /* WxpBridgeContext.swift */; };
-		7B8A1D4E3F2C100100A1B2C3 /* WxpSetWebOptionMenuBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8A1D4E3F2C100200A1B2C3 /* WxpSetWebOptionMenuBridgeHandler.swift */; };
-		7B8A1D4E3F2C100300A1B2C3 /* WxpSetWebBottomBarBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8A1D4E3F2C100400A1B2C3 /* WxpSetWebBottomBarBridgeHandler.swift */; };
 		1A962E672E08610200C966A3 /* KtSwiftJumpPageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E662E08610200C966A3 /* KtSwiftJumpPageUtils.m */; };
 		1A962E6A2E08625700C966A3 /* WxpJumpPageUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */; };
 		1A962E6F2E09B3D200C966A3 /* WxpBaseUIViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A962E6E2E09B3D200C966A3 /* WxpBaseUIViewController.swift */; };
@@ -60,6 +58,8 @@
 		1ACFF6112E63190500608219 /* KtSwiftDialogUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 1ACFF6102E63190500608219 /* KtSwiftDialogUtils.m */; };
 		1ACFF6172E65E74600608219 /* WxpProviderListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ACFF6162E65E74600608219 /* WxpProviderListViewController.swift */; };
 		1ADEF6B02ACDC6D6002FEB57 /* WxPusher_MacApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1ADEF6AF2ACDC6D6002FEB57 /* WxPusher_MacApp.swift */; };
+		7B8A1D4E3F2C100100A1B2C3 /* WxpSetWebOptionMenuBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8A1D4E3F2C100200A1B2C3 /* WxpSetWebOptionMenuBridgeHandler.swift */; };
+		7B8A1D4E3F2C100300A1B2C3 /* WxpSetWebBottomBarBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8A1D4E3F2C100400A1B2C3 /* WxpSetWebBottomBarBridgeHandler.swift */; };
 		986EF3A412E72E2E14454E8B /* libPods-WxPusher-Mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C69846B4E017B608DEE27FE0 /* libPods-WxPusher-Mac.a */; };
 		E8F4FFB984C6ECD1DE28A901 /* libPods-WxPusher-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C6789F00DFBD4BD46990F9 /* libPods-WxPusher-iOS.a */; };
 /* End PBXBuildFile section */
@@ -84,16 +84,14 @@
 		1A63A1302F669047005FF070 /* WxpGetLoginInfoBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpGetLoginInfoBridgeHandler.swift; sourceTree = "<group>"; };
 		1A63A1312F669047005FF070 /* WxpOpenUrlBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpOpenUrlBridgeHandler.swift; sourceTree = "<group>"; };
 		1A63A1322F669047005FF070 /* WxpPayRequestBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpPayRequestBridgeHandler.swift; sourceTree = "<group>"; };
-		1A63A1432F669047005FF070 /* WxpGetEnvBaseUrlBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpGetEnvBaseUrlBridgeHandler.swift; sourceTree = "<group>"; };
-		1A63A1452F669047005FF070 /* WxpShowToastBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpShowToastBridgeHandler.swift; sourceTree = "<group>"; };
-		1A63A1462F669047005FF070 /* WxpBridgeContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBridgeContext.swift; sourceTree = "<group>"; };
 		1A63A1342F669047005FF070 /* WxpBridgeContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBridgeContracts.swift; sourceTree = "<group>"; };
 		1A63A1352F669047005FF070 /* WxpBridgeEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBridgeEmitter.swift; sourceTree = "<group>"; };
 		1A63A1362F669047005FF070 /* WxpBridgeMessageParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBridgeMessageParser.swift; sourceTree = "<group>"; };
 		1A63A1372F669047005FF070 /* WxpWeakScriptMessageHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpWeakScriptMessageHandler.swift; sourceTree = "<group>"; };
 		1A63A1382F669047005FF070 /* WxpWebBridgeManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpWebBridgeManager.swift; sourceTree = "<group>"; };
-		7B8A1D4E3F2C100200A1B2C3 /* WxpSetWebOptionMenuBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpSetWebOptionMenuBridgeHandler.swift; sourceTree = "<group>"; };
-		7B8A1D4E3F2C100400A1B2C3 /* WxpSetWebBottomBarBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpSetWebBottomBarBridgeHandler.swift; sourceTree = "<group>"; };
+		1A63A1432F669047005FF070 /* WxpGetEnvBaseUrlBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpGetEnvBaseUrlBridgeHandler.swift; sourceTree = "<group>"; };
+		1A63A1452F669047005FF070 /* WxpShowToastBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpShowToastBridgeHandler.swift; sourceTree = "<group>"; };
+		1A63A1462F669047005FF070 /* WxpBridgeContext.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBridgeContext.swift; sourceTree = "<group>"; };
 		1A962E662E08610200C966A3 /* KtSwiftJumpPageUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KtSwiftJumpPageUtils.m; sourceTree = "<group>"; };
 		1A962E682E08611300C966A3 /* KtSwiftJumpPageUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KtSwiftJumpPageUtils.h; sourceTree = "<group>"; };
 		1A962E692E08625700C966A3 /* WxpJumpPageUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpJumpPageUtils.swift; sourceTree = "<group>"; };
@@ -131,6 +129,8 @@
 		1ADEF6B82ACDC6D9002FEB57 /* WxPusher_Mac.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = WxPusher_Mac.entitlements; sourceTree = "<group>"; };
 		1ADEF6C72ACDCA13002FEB57 /* WxPusher-Mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "WxPusher-Mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		63C6789F00DFBD4BD46990F9 /* libPods-WxPusher-iOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WxPusher-iOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		7B8A1D4E3F2C100200A1B2C3 /* WxpSetWebOptionMenuBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpSetWebOptionMenuBridgeHandler.swift; sourceTree = "<group>"; };
+		7B8A1D4E3F2C100400A1B2C3 /* WxpSetWebBottomBarBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpSetWebBottomBarBridgeHandler.swift; sourceTree = "<group>"; };
 		8791CA31329B1B39D73E40C2 /* Pods-wxpusher.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-wxpusher.release.xcconfig"; path = "Target Support Files/Pods-wxpusher/Pods-wxpusher.release.xcconfig"; sourceTree = "<group>"; };
 		90E0FD6062BC805D458B9E8B /* Pods-WxPusher-iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WxPusher-iOS.debug.xcconfig"; path = "Target Support Files/Pods-WxPusher-iOS/Pods-WxPusher-iOS.debug.xcconfig"; sourceTree = "<group>"; };
 		B25772F3799991F9E1679618 /* Pods-WxPusher-iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WxPusher-iOS.release.xcconfig"; path = "Target Support Files/Pods-WxPusher-iOS/Pods-WxPusher-iOS.release.xcconfig"; sourceTree = "<group>"; };
@@ -802,7 +802,7 @@
 				CODE_SIGN_ENTITLEMENTS = "WxPusher-iOS/wxpusher.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10610;
+				CURRENT_PROJECT_VERSION = 10700;
 				DEVELOPMENT_TEAM = 8UU533BM7N;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
@@ -823,7 +823,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.6.10;
+				MARKETING_VERSION = 1.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.smjcco.wxpusher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -853,7 +853,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 10610;
+				CURRENT_PROJECT_VERSION = 10700;
 				DEVELOPMENT_TEAM = "";
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = 8UU533BM7N;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -874,7 +874,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.6.10;
+				MARKETING_VERSION = 1.7.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.smjcco.wxpusher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
