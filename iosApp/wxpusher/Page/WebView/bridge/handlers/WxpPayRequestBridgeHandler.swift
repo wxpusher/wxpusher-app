@@ -1,40 +1,34 @@
 import Foundation
 
-final class WxpPayRequestBridgeHandler {
-    typealias PaymentRequester = (_ data: [String: Any], _ completion: @escaping (Result<Bool, WeChatError>) -> Void) -> Void
-    typealias ResultConverter = (_ result: Result<Bool, WeChatError>) -> [String: Any]
-    typealias EventSender = (_ action: String, _ data: [String: Any]) -> Void
-
-    private let paymentRequester: PaymentRequester
-    private let resultConverter: ResultConverter
-    private let eventSender: EventSender
-
-    init(
-        paymentRequester: @escaping PaymentRequester,
-        resultConverter: @escaping ResultConverter,
-        eventSender: @escaping EventSender
-    ) {
-        self.paymentRequester = paymentRequester
-        self.resultConverter = resultConverter
-        self.eventSender = eventSender
-    }
-
-    func handle(_ request: WxpBridgeRequest, completion: @escaping WxpBridgeCompletion) {
-        paymentRequester(request.data) { [weak self] result in
-            guard let self else {
-                completion(.fail("controller released"))
-                return
-            }
+final class WxpPayRequestBridgeHandler: WxpBridgeActionHandler {
+    func handle(request: WxpBridgeRequest, context: WxpBridgeContext, emitter: WxpBridgeEmitter) {
+        WxpWeixinOpenManager.shared.requestPayment(with: request.data) { result in
             DispatchQueue.main.async {
-                let responseData = self.resultConverter(result)
-                self.eventSender("payResponse", responseData)
+                let responseData = Self.convertPaymentResultToData(result)
+                emitter.sendNativeEvent(action: "payResponse", data: responseData)
                 switch result {
                 case .success:
-                    completion(.ok(responseData))
+                    emitter.sendBridgeCallback(callbackId: request.callbackId, response: .ok(responseData))
                 case .failure(let error):
-                    completion(.fail(error.localizedDescription))
+                    emitter.sendBridgeCallback(
+                        callbackId: request.callbackId,
+                        response: WxpBridgeResponse(
+                            success: false,
+                            data: responseData,
+                            error: error.localizedDescription
+                        )
+                    )
                 }
             }
+        }
+    }
+
+    private static func convertPaymentResultToData(_ result: Result<Bool, WeChatError>) -> [String: Any] {
+        switch result {
+        case .success(let success):
+            return ["success": success, "message": success ? "支付成功" : "支付失败"]
+        case .failure(let error):
+            return ["success": false, "message": error.localizedDescription]
         }
     }
 }
