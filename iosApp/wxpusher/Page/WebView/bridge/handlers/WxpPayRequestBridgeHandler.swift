@@ -1,9 +1,6 @@
 import Foundation
 
-final class WxpPayRequestBridgeHandler {
-}
-
-extension WxpPayRequestBridgeHandler: WxpBridgeActionHandler {
+final class WxpPayRequestBridgeHandler: WxpBridgeActionHandler {
     func handle(request: WxpBridgeRequest, context: WxpBridgeContext, emitter: WxpBridgeEmitter) {
         WxpWeixinOpenManager.shared.requestPayment(with: request.data) { result in
             DispatchQueue.main.async {
