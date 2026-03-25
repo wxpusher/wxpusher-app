@@ -1,11 +1,11 @@
 package com.smjcco.wxpusher.common
 
+import com.smjcco.wxpusher.WxpConfig
+
 object WxpConstants {
     //协议目录
-    const val PrivacyUrl: String =
-        "https://wxpusher.zjiecode.com/admin/agreement/index-argeement.html"
+    var PrivacyUrl: String = WxpConfig.appFeUrl + "/admin/agreement/index-argeement.html"
 
     //隐私协议入口
-    const val PrivacyPolicyUrl =
-        "https://wxpusher.zjiecode.com/admin/agreement/privacy-agreement.html"
+    var PrivacyPolicyUrl = WxpConfig.appFeUrl + "/admin/agreement/privacy-agreement.html"
 }
