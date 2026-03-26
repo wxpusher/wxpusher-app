@@ -23,7 +23,7 @@ class WxpProviderListPresenter(view: IWxpProviderListView) :
                 WxpToastUtils.showToast("获取openId失败，请重试")
                 return@runAtMainSuspend
             }
-            view?.onLoadPage("${WxpConfig.baseUrl}/wxuser/?openId=${openId}#/product-list")
+            view?.onLoadPage("${WxpConfig.appFeUrl}/app#/market")
         }
     }
 }

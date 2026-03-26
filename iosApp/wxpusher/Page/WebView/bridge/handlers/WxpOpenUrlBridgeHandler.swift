@@ -1,12 +1,12 @@
 import Foundation
 
-final class WxpOpenUrlBridgeHandler {
-    func handle(_ request: WxpBridgeRequest, completion: @escaping WxpBridgeCompletion) {
+final class WxpOpenUrlBridgeHandler: WxpBridgeActionHandler {
+    func handle(request: WxpBridgeRequest, context: WxpBridgeContext, emitter: WxpBridgeEmitter) {
         guard let url = request.data["url"] as? String, !url.isEmpty else {
-            completion(.fail("url is empty"))
+            emitter.sendBridgeCallback(callbackId: request.callbackId, response: .fail("url is empty"))
             return
         }
         WxpJumpPageUtils.jumpToWebUrl(url: url)
-        completion(.ok(["opened": true]))
+        emitter.sendBridgeCallback(callbackId: request.callbackId, response: .ok(["opened": true]))
     }
 }
