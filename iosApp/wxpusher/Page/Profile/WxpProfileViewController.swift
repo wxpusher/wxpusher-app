@@ -86,6 +86,10 @@ class WxpProfileViewController: UIViewController {
                 ProfileItem(title: "账号信息", subtitle: "管理账号",
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToAccountDetail()
+                            },
+                ProfileItem(title: "推送渠道", subtitle: "管理消息接收渠道",
+                            accessoryType: .disclosureIndicator) {
+                                WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/push-channel")
                             }
             ]),
             ("通知提醒", [
