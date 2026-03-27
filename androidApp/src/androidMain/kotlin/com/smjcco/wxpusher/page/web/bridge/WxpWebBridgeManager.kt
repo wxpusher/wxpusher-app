@@ -4,21 +4,16 @@ import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.page.web.bridge.handlers.GetLoginInfoBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.OpenUrlBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.PayRequestBridgeHandler
+import com.smjcco.wxpusher.page.web.bridge.handlers.SetWebBottomBarBridgeHandler
+import com.smjcco.wxpusher.page.web.bridge.handlers.SetWebOptionMenuBridgeHandler
+import com.smjcco.wxpusher.page.web.bridge.handlers.ShowToastBridgeHandler
+import com.smjcco.wxpusher.page.web.bridge.handlers.WxpGetEnvBaseUrlBridgeHandler
+import com.smjcco.wxpusher.web.WxpWebHostPolicy
 
 class WxpWebBridgeManager(
     private val context: BridgeContext,
-    private val whitelistHosts: Set<String> = DEFAULT_WHITELIST_HOSTS,
     private val parser: WxpBridgeMessageParser = WxpBridgeMessageParser()
 ) {
-    companion object {
-        val DEFAULT_WHITELIST_HOSTS = setOf(
-            "wxpusher.zjiecode.com",
-            "wxpusher.test.zjiecode.com",
-            "10.0.0.11",
-            "127.0.0.1"
-        )
-    }
-
     private val emitter = WxpBridgeEmitter(context)
     private val handlers = mutableMapOf<String, BridgeHandler>()
 
@@ -37,6 +32,10 @@ class WxpWebBridgeManager(
         registerHandler("payRequest", requiresWhitelist = true, handler = PayRequestBridgeHandler)
         registerHandler("openUrl", requiresWhitelist = false, handler = OpenUrlBridgeHandler)
         registerHandler("getLoginInfo", requiresWhitelist = true, handler = GetLoginInfoBridgeHandler)
+        registerHandler("getEnvBaseUrl", requiresWhitelist = true, handler = WxpGetEnvBaseUrlBridgeHandler)
+        registerHandler("showToast", requiresWhitelist = true, handler = ShowToastBridgeHandler)
+        registerHandler("setWebOptionMenu", requiresWhitelist = true, handler = SetWebOptionMenuBridgeHandler)
+        registerHandler("setWebBottomBar", requiresWhitelist = true, handler = SetWebBottomBarBridgeHandler)
     }
 
     fun onMessage(messageJson: String) {
@@ -77,6 +76,6 @@ class WxpWebBridgeManager(
     }
 
     private fun isHostInWhitelist(host: String?): Boolean {
-        return host != null && whitelistHosts.contains(host)
+        return WxpWebHostPolicy.isHostInWhitelist(host)
     }
 }

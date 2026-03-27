@@ -4,14 +4,6 @@ import shared
 
 @preconcurrency import WebKit
 class WxpWebViewController: UIViewController {
-    // 白名单域名列表
-    // 在白名单的域名会携带token，可以调用桥，不会显示警告提醒
-    private let whitelistHosts: Set<String> = [
-        "wxpusher.zjiecode.com",
-        "wxpusher.test.zjiecode.com",
-        "10.0.0.11",
-        "127.0.0.1",
-    ]
     private let DeviceTokenKey = "deviceToken"
     private let DevicePlatformKey = "platform"
     private let DeviceVersionNameKey = "versionName"
@@ -24,6 +16,11 @@ class WxpWebViewController: UIViewController {
     private var progressTimer: Timer?
     private var webDescription: String = ""
     private var showThirdPartyBanner = true
+    private let allWebOptionItems: [String] = ["copy_link", "weixin_share", "share", "open_browser"]
+    private var optionMenuVisibleOverride: Bool?
+    private var optionMenuItemsOverride: Set<String>?
+    private var bottomBarVisibleOverride: Bool?
+    private var bridgeContext: WxpBridgeContext?
     private var bridgeManager: WxpWebBridgeManager?
     private var bridgeMessageHandlerProxy: WxpWeakScriptMessageHandler?
     private var titleObservation: NSKeyValueObservation?
@@ -188,6 +185,9 @@ class WxpWebViewController: UIViewController {
     }
     
     private var bannerHeightConstraint: NSLayoutConstraint!
+    private var webOptionViewHeightConstraint: NSLayoutConstraint!
+    private var webOptionViewBottomToSafeArea: NSLayoutConstraint!
+    private var webOptionViewBottomToViewBottom: NSLayoutConstraint!
     
     
     init() {
@@ -219,7 +219,7 @@ class WxpWebViewController: UIViewController {
         view.backgroundColor = .systemBackground
         setupWebview()
         setupUI()
-        showOption()
+        applyWebMenuVisibility(for: url)
         loadWebContentWithVersionCheck()
     }
     
@@ -240,50 +240,16 @@ class WxpWebViewController: UIViewController {
     }
     
     private func setupBridge() {
-        guard webView != nil else {
+        guard let webView else {
             return
         }
         let emitter = WxpBridgeEmitter { [weak self] js in
             self?.webView?.evaluateJavaScript(js, completionHandler: nil)
         }
-        let manager = WxpWebBridgeManager(
-            whitelistHosts: whitelistHosts,
-            parser: WxpBridgeMessageParser(),
-            emitter: emitter,
-            currentHostProvider: { [weak self] in
-                self?.webView?.url?.host
-            }
-        )
-        let payRequestHandler = WxpPayRequestBridgeHandler(
-            paymentRequester: { data, completion in
-                WxpWeixinOpenManager.shared.requestPayment(with: data, completion: completion)
-            },
-            resultConverter: { [weak self] result in
-                self?.convertPaymentResultToData(result) ?? [:]
-            },
-            eventSender: { [weak manager] action, data in
-                manager?.sendNativeEvent(action: action, data: data)
-            }
-        )
-        let openUrlHandler = WxpOpenUrlBridgeHandler()
-        let getLoginInfoHandler = WxpGetLoginInfoBridgeHandler(
-            loginInfoProvider: {
-                WxpAppDataService.shared.getLoginInfo()
-            },
-            dictionaryBuilder: { [weak self] object in
-                self?.buildDictionary(from: object) ?? [:]
-            }
-        )
-        manager.registerHandler(action: "payRequest", requiresWhitelist: true) { request, completion in
-            payRequestHandler.handle(request, completion: completion)
-        }
-        manager.registerHandler(action: "openUrl", requiresWhitelist: false) { request, completion in
-            openUrlHandler.handle(request, completion: completion)
-        }
-        manager.registerHandler(action: "getLoginInfo", requiresWhitelist: true) { _, completion in
-            getLoginInfoHandler.handle(completion: completion)
-        }
-        bridgeManager = manager
+        let context = WxpBridgeContext(webView: webView, viewController: self)
+        context.updateCurrentUrl(webView.url)
+        bridgeContext = context
+        bridgeManager = WxpWebBridgeManager(context: context, emitter: emitter)
         let proxy = WxpWeakScriptMessageHandler(target: self)
         bridgeMessageHandlerProxy = proxy
         configuration.userContentController.add(proxy, name: "wxpusher")
@@ -320,6 +286,9 @@ class WxpWebViewController: UIViewController {
         
         // 先创建约束引用
         bannerHeightConstraint = thirdPartyBannerView.heightAnchor.constraint(equalToConstant: 0)
+        webOptionViewHeightConstraint = webOptionView.heightAnchor.constraint(equalToConstant: 44)
+        webOptionViewBottomToSafeArea = webOptionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        webOptionViewBottomToViewBottom = webOptionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         
         
         NSLayoutConstraint.activate([
@@ -338,47 +307,17 @@ class WxpWebViewController: UIViewController {
             progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             progressView.heightAnchor.constraint(equalToConstant: 1.0),
             
-            webOptionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            webOptionViewBottomToSafeArea,
             webOptionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webOptionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            webOptionView.heightAnchor.constraint(equalToConstant: 44)
+            webOptionViewHeightConstraint,
             
         ])
     }
     
     
-    private func showOption(){
-        let mainMenu = UIMenu(title: "", children: [
-            UIAction(
-                title: "复制链接",
-                image: UIImage(systemName: "doc.on.doc"),
-                handler:{ [weak self]_ in
-                    self?.copyLinkToClipboard()
-                }
-            ),
-            UIAction(
-                title: "微信分享",
-                image: UIImage(systemName: "message"),
-                handler:{ [weak self]_ in
-                    self?.shareToWeixin()
-                }
-            ),
-            UIAction(
-                title: "分享",
-                image: UIImage(systemName: "square.and.arrow.up"),
-                handler:{ [weak self]_ in
-                    self?.shareURL()
-                }
-            ),
-            UIAction(
-                title: "在浏览器中打开",
-                image: UIImage(systemName: "safari"),
-                handler:{ [weak self]_ in
-                    self?.openInBrowser()
-                }
-            )
-        ])
-        
+    private func showOption(options: [String]){
+        let mainMenu = UIMenu(title: "", children: buildOptionActions(options: options))
         let menuButton = UIBarButtonItem(
             title: "操作选项",
             image: UIImage(systemName: "ellipsis.circle"),
@@ -391,6 +330,118 @@ class WxpWebViewController: UIViewController {
     
     private func hideOption(){
         navigationItem.rightBarButtonItem = nil
+    }
+
+    private func buildOptionActions(options: [String]) -> [UIAction] {
+        var actions: [UIAction] = []
+        for option in options {
+            switch option {
+            case "copy_link":
+                actions.append(UIAction(
+                    title: "复制链接",
+                    image: UIImage(systemName: "doc.on.doc"),
+                    handler:{ [weak self]_ in
+                        self?.copyLinkToClipboard()
+                    }
+                ))
+            case "weixin_share":
+                actions.append(UIAction(
+                    title: "微信分享",
+                    image: UIImage(systemName: "message"),
+                    handler:{ [weak self]_ in
+                        self?.shareToWeixin()
+                    }
+                ))
+            case "share":
+                actions.append(UIAction(
+                    title: "分享",
+                    image: UIImage(systemName: "square.and.arrow.up"),
+                    handler:{ [weak self]_ in
+                        self?.shareURL()
+                    }
+                ))
+            case "open_browser":
+                actions.append(UIAction(
+                    title: "在浏览器中打开",
+                    image: UIImage(systemName: "safari"),
+                    handler:{ [weak self]_ in
+                        self?.openInBrowser()
+                    }
+                ))
+            default:
+                continue
+            }
+        }
+        return actions
+    }
+
+    private func resolveOptionMenuVisible(for url: URL?) -> Bool {
+        if let optionMenuVisibleOverride {
+            return optionMenuVisibleOverride
+        }
+        guard let url else {
+            return true
+        }
+        return !(isHostInWhitelist(url.host) && url.path.contains("wxuser"))
+    }
+
+    private func resolveOptionMenuItems() -> [String] {
+        if let overrideItems = optionMenuItemsOverride {
+            return allWebOptionItems.filter { overrideItems.contains($0) }
+        }
+        return allWebOptionItems
+    }
+
+    private func resolveBottomBarVisible(for url: URL?) -> Bool {
+        if let bottomBarVisibleOverride {
+            return bottomBarVisibleOverride
+        }
+        guard let url else {
+            return true
+        }
+        return !(isHostInWhitelist(url.host) && url.path.contains("app"))
+    }
+
+    private func applyWebMenuVisibility(for url: URL?) {
+        let effectiveUrl = url ?? webView?.url ?? self.url
+        let shouldShowMenu = resolveOptionMenuVisible(for: effectiveUrl)
+        let menuItems = resolveOptionMenuItems()
+        if shouldShowMenu && !menuItems.isEmpty {
+            showOption(options: menuItems)
+        } else {
+            hideOption()
+        }
+        let bottomBarVisible = resolveBottomBarVisible(for: effectiveUrl)
+        webOptionView.isHidden = !bottomBarVisible
+        webOptionViewHeightConstraint.constant = bottomBarVisible ? 44 : 0
+        let hasVisibleTabBar = tabBarController != nil && !hidesBottomBarWhenPushed
+        let shouldExtendToViewBottom = !bottomBarVisible && !hasVisibleTabBar
+        webOptionViewBottomToSafeArea.isActive = !shouldExtendToViewBottom
+        webOptionViewBottomToViewBottom.isActive = shouldExtendToViewBottom
+    }
+
+    func setOptionMenuVisibleOverride(_ visible: Bool?) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.optionMenuVisibleOverride = visible
+            self.applyWebMenuVisibility(for: self.webView?.url ?? self.url)
+        }
+    }
+
+    func setOptionMenuItemsOverride(_ options: Set<String>?) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.optionMenuItemsOverride = options
+            self.applyWebMenuVisibility(for: self.webView?.url ?? self.url)
+        }
+    }
+
+    func setBottomBarVisibleOverride(_ visible: Bool?) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            self.bottomBarVisibleOverride = visible
+            self.applyWebMenuVisibility(for: self.webView?.url ?? self.url)
+        }
     }
     
     func updateWebOptionBtnStatus(){
@@ -498,6 +549,7 @@ class WxpWebViewController: UIViewController {
     private func loadWebContent() {
         if(url != nil){
             let request = createRequestWithTokenIfNeeded(for: url!)
+            bridgeContext?.updateCurrentUrl(request.url)
             webView!.load(request)
         }
     }
@@ -528,6 +580,7 @@ class WxpWebViewController: UIViewController {
                 return
             }
             let request = self.createRequestWithTokenIfNeeded(for: finalUrl)
+            self.bridgeContext?.updateCurrentUrl(request.url)
             self.webView?.load(request)
         }
     }
@@ -564,8 +617,7 @@ class WxpWebViewController: UIViewController {
     
     /// 检查主机是否在白名单内
     private func isHostInWhitelist(_ host: String?) -> Bool {
-        guard let host = host else { return false }
-        return whitelistHosts.contains(host)
+        return WxpWebHostPolicy.shared.isHostInWhitelist(host: host)
     }
 
     private func shouldCheckAppFeVersion(_ url: URL) -> Bool {
@@ -784,12 +836,14 @@ extension WxpWebViewController: WKNavigationDelegate {
                 let newRequest = createRequestWithTokenIfNeeded(for: url)
                 // 如果当前请求没有 token header，重新加载带 token 的请求
                 if newRequest != wxpLoadRequest && navigationAction.request.value(forHTTPHeaderField: DeviceTokenKey) == nil {
+                    bridgeContext?.updateCurrentUrl(newRequest.url)
                     webView.load(newRequest)
                     wxpLoadRequest = newRequest
                     decisionHandler(.cancel)
                     return
                 }
             }
+            bridgeContext?.updateCurrentUrl(url)
             decisionHandler(.allow)
             return
         }
@@ -801,6 +855,7 @@ extension WxpWebViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         // 记录开始加载时间
         loadingStartTime = Date()
+        bridgeContext?.updateCurrentUrl(webView.url)
         webDescription = ""
         progressView.progress = 0.0
         
@@ -821,6 +876,7 @@ extension WxpWebViewController: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         // 设置网页标题
+        bridgeContext?.updateCurrentUrl(webView.url)
         if let webTitle = webView.title, !webTitle.isEmpty {
             setPageTitle(title: webTitle)
         } else {
@@ -870,17 +926,7 @@ extension WxpWebViewController: WKNavigationDelegate {
     }
     
     private func updateWebMenuVisibility(for url: URL?) {
-        guard let url else {
-            showOption()
-            webOptionView.isHidden = false
-            return
-        }
-        if isHostInWhitelist(url.host) && url.path.contains("wxuser") {
-            hideOption()
-        } else {
-            showOption()
-        }
-        webOptionView.isHidden = isHostInWhitelist(url.host) && url.path.contains("app")
+        applyWebMenuVisibility(for: url)
     }
     
 }
@@ -891,110 +937,6 @@ extension WxpWebViewController: WKScriptMessageHandler {
             return
         }
         bridgeManager?.onMessage(message.body)
-    }
-    
-    private func convertPaymentResultToData(_ result: Result<Bool, WeChatError>) -> [String: Any] {
-        switch result {
-        case .success(let success):
-            return ["success": success, "message": success ? "支付成功" : "支付失败"]
-        case .failure(let error):
-            return ["success": false, "message": error.localizedDescription]
-        }
-    }
-    
-    private func buildDictionary(from object: Any) -> [String: Any] {
-        if(isKmpModel(of: type(of: object))){
-            let jsonStr = WxpSerializationUtils.shared.toJson(value: object, serializer: WxpLoginInfo.companion.serializer())
-            guard let jsonData = jsonStr?.data(using: .utf8) else {
-                print("无法将字符串转换为Data")
-                return [:]
-            }
-            
-            do {
-                let json = try JSONSerialization.jsonObject(with: jsonData, options: [])
-                return json as? [String: Any] ?? [:]
-            } catch {
-                print("JSON解析错误: \(error)")
-                return [:]
-            }
-        }
-        guard let value = normalizeBridgeValue(object) else {
-            return [:]
-        }
-        return value as? [String: Any] ?? [:]
-    }
-    
-    private func isKmpModel(of type: Any.Type) -> Bool {
-        // 1) 模块名判断：shared.xxx
-        let fullTypeName = String(reflecting: type)   // 比 String(describing:) 更稳定
-        if fullTypeName.hasPrefix("Shared") {
-            return true;
-        }
-        
-        // 2) 是否继承 KotlinBase（KMP导出对象常见父类）
-        if let cls = type as? AnyClass,
-           let kotlinBaseClass = NSClassFromString("KotlinBase"),
-           cls.isSubclass(of: kotlinBaseClass) {
-            return true
-        }
-        
-        return false;
-    }
-    
-    private func normalizeBridgeValue(_ value: Any) -> Any? {
-        let mirror = Mirror(reflecting: value)
-        
-        // Optional 递归拆包
-        if mirror.displayStyle == .optional {
-            guard let (_, someValue) = mirror.children.first else {
-                return nil
-            }
-            return normalizeBridgeValue(someValue)
-        }
-        
-        if let displayStyle = mirror.displayStyle {
-            switch displayStyle {
-            case .collection, .set:
-                return mirror.children.compactMap { normalizeBridgeValue($0.value) }
-            case .dictionary:
-                var dict: [String: Any] = [:]
-                for child in mirror.children {
-                    let pairMirror = Mirror(reflecting: child.value)
-                    let pairValues = Array(pairMirror.children.map(\.value))
-                    if pairValues.count == 2,
-                       let key = normalizeBridgeValue(pairValues[0]),
-                       let val = normalizeBridgeValue(pairValues[1]) {
-                        dict[String(describing: key)] = val
-                    }
-                }
-                return dict
-            case .struct, .class:
-                var dict: [String: Any] = [:]
-                for child in mirror.children {
-                    guard let key = child.label,
-                          let val = normalizeBridgeValue(child.value) else {
-                        continue
-                    }
-                    dict[key] = val
-                }
-                return dict
-            case .enum:
-                return String(describing: value)
-            case .tuple:
-                return mirror.children.compactMap { normalizeBridgeValue($0.value) }
-            default:
-                break
-            }
-        }
-        
-        // 基础类型保持原样，复杂未知类型降级为字符串，避免 JSON 序列化失败
-        if value is NSString || value is NSNumber || value is NSNull || value is Date {
-            return value
-        }
-        if value is String || value is Int || value is Double || value is Float || value is Bool {
-            return value
-        }
-        return String(describing: value)
     }
 }
 

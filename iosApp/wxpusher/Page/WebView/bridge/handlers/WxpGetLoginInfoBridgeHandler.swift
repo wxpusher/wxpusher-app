@@ -1,26 +1,15 @@
 import Foundation
 import shared
 
-final class WxpGetLoginInfoBridgeHandler {
-    typealias LoginInfoProvider = () -> Any?
-    typealias DictionaryBuilder = (_ object: Any) -> [String: Any]
-
-    private let loginInfoProvider: LoginInfoProvider
-    private let dictionaryBuilder: DictionaryBuilder
-
-    init(
-        loginInfoProvider: @escaping LoginInfoProvider,
-        dictionaryBuilder: @escaping DictionaryBuilder
-    ) {
-        self.loginInfoProvider = loginInfoProvider
-        self.dictionaryBuilder = dictionaryBuilder
-    }
-
-    func handle(completion: @escaping WxpBridgeCompletion) {
-        guard let loginInfo = loginInfoProvider() else {
-            completion(.ok([:]))
+final class WxpGetLoginInfoBridgeHandler: WxpBridgeActionHandler {
+    func handle(request: WxpBridgeRequest, context: WxpBridgeContext, emitter: WxpBridgeEmitter) {
+        guard let loginInfo = WxpAppDataService.shared.getLoginInfo() else {
+            emitter.sendBridgeCallback(callbackId: request.callbackId, response: .ok([:]))
             return
         }
-        completion(.ok(dictionaryBuilder(loginInfo)))
+        emitter.sendBridgeCallback(
+            callbackId: request.callbackId,
+            response: .ok(buildDictionary(from: loginInfo))
+        )
     }
 }
