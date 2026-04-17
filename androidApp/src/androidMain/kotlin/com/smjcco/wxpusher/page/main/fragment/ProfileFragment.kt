@@ -116,6 +116,16 @@ class ProfileFragment : WxpBaseFragment() {
                         hasArrow = true
                     ) {
                         WxpJumpPageUtils.jumpToAccountDetail(requireActivity())
+                    },
+                    ProfileItem(
+                        title = "推送渠道",
+                        subtitle = "管理消息接收渠道",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToWebUrl(
+                            "${WxpConfig.appFeUrl}/app/#/push-channel",
+                            activity
+                        )
                     }
                 )
             ))
