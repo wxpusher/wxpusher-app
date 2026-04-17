@@ -12,7 +12,17 @@
         app:showAsAction="never|withText" />
 
     <item
+        android:id="@+id/menu_batch_select"
+        android:title="@string/message_list_batch_select"
+        app:showAsAction="never|withText" />
+
+    <item
         android:id="@+id/menu_mark_all_read"
         android:title="@string/message_list_mark_all_read"
+        app:showAsAction="never|withText" />
+
+    <item
+        android:id="@+id/menu_delete_all"
+        android:title="@string/message_list_delete_all"
         app:showAsAction="never|withText" />
 </menu>

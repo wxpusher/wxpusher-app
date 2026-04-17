@@ -10,6 +10,20 @@
     android:paddingTop="12dp"
     android:paddingEnd="12dp">
 
+    <!-- 多选复选框（仅多选模式可见） -->
+    <CheckBox
+        android:id="@+id/select_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:clickable="false"
+        android:focusable="false"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/message_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/message_title"
+        tools:visibility="visible" />
+
     <!-- 未读状态小圆点 -->
     <View
         android:id="@+id/unread_dot"
@@ -19,7 +33,7 @@
         android:layout_marginStart="6dp"
         android:background="@drawable/unread_dot_background"
         android:visibility="visible"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/select_checkbox"
         app:layout_constraintTop_toTopOf="@+id/message_title"
         app:layout_constraintVertical_bias="0.3" />
 

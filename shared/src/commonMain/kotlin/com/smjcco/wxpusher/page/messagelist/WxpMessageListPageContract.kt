@@ -119,6 +119,24 @@ interface IWxpMessageListPresenter :
      */
     fun deleteById(id: Long)
 
+    /**
+     * 批量标记消息已读状态
+     * @param ids 要操作的消息 id 集合，调用方需保证长度 <= 200
+     * @param read 是否标记为已读状态
+     */
+    fun markMessageReadStatusBatch(ids: List<Long>, read: Boolean)
+
+    /**
+     * 批量删除消息（内部会弹二次确认对话框）
+     * @param ids 要删除的消息 id 集合，调用方需保证长度 <= 200
+     * @param onConfirmed 用户在确认弹窗点击了"删除"之后、实际请求发出之前触发，视图可借此退出多选态
+     */
+    fun deleteByIds(ids: List<Long>, onConfirmed: (() -> Unit)? = null)
+
+    /**
+     * 删除当前用户的全部消息（内部会弹二次确认对话框）
+     */
+    fun deleteAll()
 
     /**
      * 打开订阅管理页面

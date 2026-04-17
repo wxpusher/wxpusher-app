@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -17,6 +18,7 @@ import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.color.MaterialColors
 import com.scwang.smart.refresh.footer.ClassicsFooter
@@ -83,6 +85,25 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     private lateinit var listNoteBannerTv: TextView
     private lateinit var listNoteBannerMore: View
 
+    // 批量操作相关
+    private lateinit var batchActionBar: View
+    private lateinit var batchActionMarkRead: View
+    private lateinit var batchActionMarkUnread: View
+    private lateinit var batchActionDelete: View
+
+    // 多选顶部栏
+    private lateinit var batchTopBar: View
+    private lateinit var batchTopBarClose: View
+    private lateinit var batchTopBarTitle: TextView
+    private lateinit var batchTopBarSelectAll: TextView
+
+    private var selectionMode: Boolean = false
+    private val selectedIds: MutableSet<Long> = mutableSetOf()
+
+    companion object {
+        private const val MAX_BATCH_SELECT = 200
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -144,6 +165,21 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         listNoteBanner = view.findViewById(R.id.list_banner)
         listNoteBannerTv = view.findViewById(R.id.list_banner_text)
         listNoteBannerMore = view.findViewById(R.id.list_banner_more)
+
+        batchActionBar = view.findViewById(R.id.batch_action_bar)
+        batchActionMarkRead = view.findViewById(R.id.batch_action_mark_read)
+        batchActionMarkUnread = view.findViewById(R.id.batch_action_mark_unread)
+        batchActionDelete = view.findViewById(R.id.batch_action_delete)
+        batchActionMarkRead.setOnClickListener { onBatchMarkReadClicked(true) }
+        batchActionMarkUnread.setOnClickListener { onBatchMarkReadClicked(false) }
+        batchActionDelete.setOnClickListener { onBatchDeleteClicked() }
+
+        batchTopBar = view.findViewById(R.id.batch_top_bar)
+        batchTopBarClose = view.findViewById(R.id.batch_top_bar_close)
+        batchTopBarTitle = view.findViewById(R.id.batch_top_bar_title)
+        batchTopBarSelectAll = view.findViewById(R.id.batch_top_bar_select_all)
+        batchTopBarClose.setOnClickListener { exitSelectionMode() }
+        batchTopBarSelectAll.setOnClickListener { toggleSelectAll() }
         // 输入框获取焦点时显示取消按钮
         searchEditText.setOnFocusChangeListener { _, hasFocus ->
             if (hasFocus) {
@@ -398,6 +434,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         override fun getItemCount(): Int = messageList.size
 
         inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            private val selectCheckbox: CheckBox = itemView.findViewById(R.id.select_checkbox)
             private val unreadDot: View = itemView.findViewById(R.id.unread_dot)
             private val messageTitle: TextView = itemView.findViewById(R.id.message_title)
             private val linkIcon: View = itemView.findViewById(R.id.link_icon)
@@ -415,7 +452,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                 // 设置链接图标
                 val sourceUrl = message.sourceUrl?.trim() ?: ""
                 val showLink = sourceUrl.isNotEmpty()
-                linkIcon.visibility = if (showLink) View.VISIBLE else View.GONE
+                linkIcon.visibility = if (showLink && !selectionMode) View.VISIBLE else View.GONE
 
                 if (showLink) {
                     linkIcon.setOnClickListener {
@@ -423,12 +460,30 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                     }
                 }
 
+                // 多选模式下的复选框状态
+                if (selectionMode) {
+                    selectCheckbox.visibility = View.VISIBLE
+                    selectCheckbox.isChecked = message.messageId in selectedIds
+                } else {
+                    selectCheckbox.visibility = View.GONE
+                    selectCheckbox.isChecked = false
+                }
+
                 // 设置点击事件
                 itemView.setOnClickListener {
-                    onItemClick(message)
+                    if (selectionMode) {
+                        toggleItemSelection(message)
+                    } else {
+                        onItemClick(message)
+                    }
                 }
                 //长按事件
                 itemView.setOnLongClickListener {
+                    if (selectionMode) {
+                        // 多选模式下长按也切换选择
+                        toggleItemSelection(message)
+                        return@setOnLongClickListener true
+                    }
                     val readOptText = if (message.read) {
                         "标记未读"
                     } else {
@@ -440,8 +495,14 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                     val removeOpt = ActionSheetItem("删除", {
                         presenter.deleteById(message.messageId)
                     })
+                    val multiSelectOpt = ActionSheetItem(
+                        getString(R.string.message_list_batch_select),
+                        {
+                            enterSelectionMode(message.messageId)
+                        }
+                    )
                     val actionList = listOf(
-                        listOf(readOpt, removeOpt)
+                        listOf(readOpt, removeOpt, multiSelectOpt)
                     )
                     activity?.let {
                         ActionSheetDialogFragment(actionList).show(
@@ -480,7 +541,179 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                 true
             }
 
+            R.id.menu_batch_select -> {
+                enterSelectionMode(null)
+                true
+            }
+
+            R.id.menu_delete_all -> {
+                presenter.deleteAll()
+                true
+            }
+
             else -> false
+        }
+    }
+
+    // ---------- 多选模式 ----------
+
+    private fun enterSelectionMode(preselectId: Long?) {
+        if (selectionMode) {
+            if (preselectId != null) {
+                // 已经在多选模式，追加预选
+                toggleSelection(preselectId)
+            }
+            return
+        }
+        selectionMode = true
+        selectedIds.clear()
+        preselectId?.let { selectedIds.add(it) }
+        refreshLayout.isEnabled = false
+        batchTopBar.visibility = View.VISIBLE
+        // 多选态隐藏 banner 与搜索栏，让顶部工具栏完整呈现
+        view?.findViewById<View>(R.id.banner)?.visibility = View.GONE
+        searchBarContainer.visibility = View.GONE
+        batchActionBar.visibility = View.VISIBLE
+        updateSelectionTitle()
+        updateBatchActionBarState()
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun exitSelectionMode() {
+        if (!selectionMode) {
+            return
+        }
+        selectionMode = false
+        selectedIds.clear()
+        refreshLayout.isEnabled = true
+        batchTopBar.visibility = View.GONE
+        // 恢复 banner 与搜索栏，banner 的子卡片仍按自身 visibility 展示
+        view?.findViewById<View>(R.id.banner)?.visibility = View.VISIBLE
+        searchBarContainer.visibility = View.VISIBLE
+        batchActionBar.visibility = View.GONE
+        adapter.notifyDataSetChanged()
+    }
+
+    /**
+     * 切换单条消息的选中状态（由 itemView 点击触发）
+     */
+    private fun toggleItemSelection(message: WxpMessageListMessage) {
+        val messageId = message.messageId
+        if (messageId in selectedIds) {
+            selectedIds.remove(messageId)
+        } else {
+            if (selectedIds.size >= MAX_BATCH_SELECT) {
+                WxpToastUtils.showToast(getString(R.string.message_list_action_limit_toast))
+                return
+            }
+            selectedIds.add(messageId)
+        }
+        updateSelectionTitle()
+        updateBatchActionBarState()
+        adapter.notifyDataSetChanged()
+    }
+
+    /**
+     * 切换选中状态（按 id，用于 preselect 场景）
+     */
+    private fun toggleSelection(messageId: Long) {
+        if (messageId in selectedIds) {
+            selectedIds.remove(messageId)
+        } else {
+            if (selectedIds.size >= MAX_BATCH_SELECT) {
+                WxpToastUtils.showToast(getString(R.string.message_list_action_limit_toast))
+                return
+            }
+            selectedIds.add(messageId)
+        }
+        updateSelectionTitle()
+        updateBatchActionBarState()
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun updateSelectionTitle() {
+        batchTopBarTitle.text = getString(
+            R.string.message_list_action_selected_count,
+            selectedIds.size
+        )
+        val allSelected = messageList.isNotEmpty() &&
+            (selectedIds.size >= messageList.size || selectedIds.size >= MAX_BATCH_SELECT)
+        batchTopBarSelectAll.text = getString(
+            if (allSelected) R.string.message_list_action_deselect_all
+            else R.string.message_list_action_select_all
+        )
+    }
+
+    private fun updateBatchActionBarState() {
+        val enabled = selectedIds.isNotEmpty()
+        batchActionMarkRead.isEnabled = enabled
+        batchActionMarkUnread.isEnabled = enabled
+        batchActionDelete.isEnabled = enabled
+        val alpha = if (enabled) 1.0f else 0.4f
+        batchActionMarkRead.alpha = alpha
+        batchActionMarkUnread.alpha = alpha
+        batchActionDelete.alpha = alpha
+    }
+
+    /**
+     * 顶部栏"全选/取消全选"切换
+     */
+    private fun toggleSelectAll() {
+        val allSelected = messageList.isNotEmpty() &&
+            (selectedIds.size >= messageList.size || selectedIds.size >= MAX_BATCH_SELECT)
+        if (allSelected) {
+            deselectAll()
+        } else {
+            selectAll()
+        }
+    }
+
+    /**
+     * 全选 - 超过 200 只选前 200 条
+     */
+    private fun selectAll() {
+        selectedIds.clear()
+        val overLimit = messageList.size > MAX_BATCH_SELECT
+        val targets = if (overLimit) {
+            messageList.subList(0, MAX_BATCH_SELECT)
+        } else {
+            messageList
+        }
+        targets.forEach { selectedIds.add(it.messageId) }
+        if (overLimit) {
+            WxpToastUtils.showToast(getString(R.string.message_list_action_limit_toast))
+        }
+        updateSelectionTitle()
+        updateBatchActionBarState()
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun deselectAll() {
+        selectedIds.clear()
+        updateSelectionTitle()
+        updateBatchActionBarState()
+        adapter.notifyDataSetChanged()
+    }
+
+    private fun onBatchMarkReadClicked(read: Boolean) {
+        if (selectedIds.isEmpty()) {
+            WxpToastUtils.showToast(getString(R.string.message_list_action_none_selected))
+            return
+        }
+        val ids = selectedIds.toList()
+        presenter.markMessageReadStatusBatch(ids, read)
+        exitSelectionMode()
+    }
+
+    private fun onBatchDeleteClicked() {
+        if (selectedIds.isEmpty()) {
+            WxpToastUtils.showToast(getString(R.string.message_list_action_none_selected))
+            return
+        }
+        val ids = selectedIds.toList()
+        // 用户点击确认后再退出多选态，确认弹窗期间仍能看到已选条目
+        presenter.deleteByIds(ids) {
+            exitSelectionMode()
         }
     }
 
