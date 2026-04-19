@@ -1,0 +1,19 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_action_select_all"
+        android:title="@string/message_list_action_select_all"
+        app:showAsAction="never|withText" />
+
+    <item
+        android:id="@+id/menu_action_deselect_all"
+        android:title="@string/message_list_action_deselect_all"
+        android:visible="false"
+        app:showAsAction="never|withText" />
+
+    <item
+        android:id="@+id/menu_action_exit"
+        android:title="@string/message_list_action_exit"
+        app:showAsAction="never|withText" />
+</menu>

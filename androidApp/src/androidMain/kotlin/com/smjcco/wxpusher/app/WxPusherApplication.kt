@@ -11,8 +11,10 @@ import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpLoadingUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.base.common.init
+import com.smjcco.wxpusher.biz.version.WxpVersionCheckManager
 import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.utils.AppMarketNavigator
 import com.smjcco.wxpusher.web.AppFeVersionManager
 import com.smjcco.wxpusher.wxapi.WxpWeixinOpenManager
 import com.tencent.upgrade.bean.UpgradeConfig
@@ -42,6 +44,8 @@ class WxPusherApplication : Application() {
         //上报一次绑定关系，主要是为了更新设备活跃时间
         WxpAppDataService.updateDeviceInfo()
         initTbs()
+        //注册版本升级市场跳转能力（已适配厂商优先，其他走 TBS）
+        WxpVersionCheckManager.setNavigator(AppMarketNavigator)
         //拉取一个简单的配置
         ConfigManager.init(this)
         // 启动时执行一次 app_fe 版本刷新（内部有 1 小时间隔，失败无影响）

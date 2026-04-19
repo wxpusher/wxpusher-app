@@ -6,6 +6,7 @@ import com.smjcco.wxpusher.base.common.BaseResp
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpNetworkService
 import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.biz.version.AppVersionCheckResp
 import com.smjcco.wxpusher.page.accountdetail.WxpAppleBindReq
 import com.smjcco.wxpusher.page.accountdetail.WxpWeixinBindReq
 import com.smjcco.wxpusher.page.changephone.WxpPhoneBindReq
@@ -277,6 +278,63 @@ object WxpApiService {
     }
 
     /**
+     * 批量标记消息已读状态
+     * @param messageIds 非空的消息id集合，单次最多 200 条
+     * @param read 是否标记为已读状态
+     */
+    suspend fun markMessageReadStatusBatch(
+        messageIds: List<Long>,
+        read: Boolean,
+        successBlock: (() -> Unit)
+    ): Unit? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .put(WxpNetworkService.getUrl("/api/need-login/device/message/read-mark")) {
+                    parameter("messageIds", messageIds.joinToString(","))
+                    parameter("read", read)
+                }.body()
+        }, successBlock = {
+            successBlock.invoke()
+        }
+        )
+    }
+
+    /**
+     * 批量删除消息
+     * @param messageIds 非空的消息id集合，单次最多 200 条
+     */
+    suspend fun deleteMessagesByIds(
+        messageIds: List<Long>,
+        successBlock: (() -> Unit)
+    ): Unit? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .delete(WxpNetworkService.getUrl("/api/need-login/device/message/delete")) {
+                    parameter("messageIds", messageIds.joinToString(","))
+                }.body()
+        }, successBlock = {
+            successBlock.invoke()
+        }
+        )
+    }
+
+    /**
+     * 删除当前用户的全部消息（清空）
+     */
+    suspend fun deleteAllMessages(
+        successBlock: (() -> Unit)
+    ): Unit? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .delete(WxpNetworkService.getUrl("/api/need-login/device/message/delete-all"))
+                .body()
+        }, successBlock = {
+            successBlock.invoke()
+        }
+        )
+    }
+
+    /**
      * 在用户没有openid的时候，查询一下用户的openid
      */
     suspend fun getOpenId(): String? {
@@ -337,6 +395,17 @@ object WxpApiService {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .get(WxpNetworkService.getUrl("/api/need-login/device/list-banner"))
+                .body()
+        })
+    }
+
+    /**
+     * 检查是否有新版本。失败静默，不 Toast 打扰用户。
+     */
+    suspend fun checkAppVersion(): AppVersionCheckResp? {
+        return commonRespDeal(toastError = false, block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .get(WxpNetworkService.getUrl("/api/device/version-update"))
                 .body()
         })
     }

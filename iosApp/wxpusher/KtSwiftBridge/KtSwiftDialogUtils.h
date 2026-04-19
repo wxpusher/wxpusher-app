@@ -23,6 +23,7 @@ typedef void (^WxpBlockNoParamNoReturn)(void);
 @property (nonatomic, copy, nullable) WxpBlockNoParamNoReturn leftBlock;
 @property (nonatomic, copy, nullable) NSString *rightText;
 @property (nonatomic, copy, nullable) WxpBlockNoParamNoReturn rightBlock;
+@property (nonatomic, assign) BOOL cancelable;
 
 // 可选：便利初始化方法
 - (instancetype)initWithTitle:(nullable NSString *)title
@@ -30,7 +31,8 @@ typedef void (^WxpBlockNoParamNoReturn)(void);
                     leftText:(nullable NSString *)leftText
                    leftBlock:(nullable WxpBlockNoParamNoReturn)leftBlock
                    rightText:(nullable NSString *)rightText
-                  rightBlock:(nullable WxpBlockNoParamNoReturn)rightBlock;
+                  rightBlock:(nullable WxpBlockNoParamNoReturn)rightBlock
+                  cancelable:(BOOL)cancelable;
 
 //一般用于【我知道了】
 - (instancetype)initWithTitle:(nullable NSString *)title

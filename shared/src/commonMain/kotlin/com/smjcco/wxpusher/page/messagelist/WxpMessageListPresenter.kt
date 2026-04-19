@@ -248,6 +248,68 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         WxpDialogUtils.showDialog(params)
     }
 
+    override fun markMessageReadStatusBatch(ids: List<Long>, read: Boolean) {
+        if (ids.isEmpty()) {
+            return
+        }
+        runAtMainSuspend {
+            WxpApiService.markMessageReadStatusBatch(ids, read) {
+                val idSet = ids.toHashSet()
+                messageListData.forEach {
+                    if (it.messageId in idSet) {
+                        it.read = read
+                    }
+                }
+                view?.onMessageList(messageListData.toList())
+                saveRefreshListData()
+            }
+        }
+    }
+
+    override fun deleteByIds(ids: List<Long>, onConfirmed: (() -> Unit)?) {
+        if (ids.isEmpty()) {
+            return
+        }
+        val params = WxpDialogParams(
+            title = "确认删除消息",
+            message = "你确认删除选中的 ${ids.size} 条消息吗？删除后不可恢复。",
+            leftText = "取消",
+            rightText = "删除",
+            rightBlock = {
+                // 用户点击了确认再退出多选态，保证用户在确认弹窗上仍能看到已选条目数
+                onConfirmed?.invoke()
+                runAtMainSuspend {
+                    WxpApiService.deleteMessagesByIds(ids) {
+                        val idSet = ids.toHashSet()
+                        messageListData.removeAll { it.messageId in idSet }
+                        view?.onMessageList(messageListData.toList())
+                        saveRefreshListData()
+                    }
+                }
+            }
+        )
+        WxpDialogUtils.showDialog(params)
+    }
+
+    override fun deleteAll() {
+        val params = WxpDialogParams(
+            title = "确认删除全部消息",
+            message = "此操作会删除你的全部消息，删除后不可恢复，确认继续吗？",
+            leftText = "取消",
+            rightText = "全部删除",
+            rightBlock = {
+                runAtMainSuspend {
+                    WxpApiService.deleteAllMessages {
+                        messageListData.clear()
+                        view?.onMessageList(emptyList())
+                        saveRefreshListData()
+                    }
+                }
+            }
+        )
+        WxpDialogUtils.showDialog(params)
+    }
+
     override fun openSubscribeManagerPage() {
         runAtMainSuspend {
             var openId = WxpAppDataService.getLoginInfo()?.openId

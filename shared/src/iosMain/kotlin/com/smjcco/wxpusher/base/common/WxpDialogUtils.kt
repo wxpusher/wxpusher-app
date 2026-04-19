@@ -14,7 +14,8 @@ actual fun WxpDialogUtils_showDialog(params: WxpDialogParams) {
     val ocParams = platform.swift.com.smjcco.wxpusher.WxpDialogParams(
         params.title, params.message,
         params.leftText, params.leftBlock,
-        params.rightText, params.rightBlock
+        params.rightText, params.rightBlock,
+        params.cancelable
     )
     KtSwiftDialogUtils.showDialog(ocParams)
 }

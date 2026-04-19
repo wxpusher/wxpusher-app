@@ -19,6 +19,7 @@ import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.base.common.flush
+import com.smjcco.wxpusher.biz.version.WxpVersionCheckManager
 import com.smjcco.wxpusher.common.WxpSaveKey
 import com.smjcco.wxpusher.page.main.fragment.ITabMenuProvider
 import com.smjcco.wxpusher.page.main.fragment.MessageListFragment
@@ -272,6 +273,8 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
         PushManager.showOpenNoteRemindSettingDialog(this)
         //显示首页的时候，尝试启动一次保活服务
         KeepWsAliveServiceStarter.start(this)
+        //版本升级检测（内部有 3 小时节流；冷启、后台切前台都会触发）
+        WxpVersionCheckManager.onAppForeground()
     }
 
     override fun onPause() {

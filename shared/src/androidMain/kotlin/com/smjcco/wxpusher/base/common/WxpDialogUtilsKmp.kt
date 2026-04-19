@@ -31,8 +31,9 @@ actual fun WxpDialogUtils_showDialog(params: WxpDialogParams) {
                 }
             }
         }
-        builder.setCancelable(true)
+        builder.setCancelable(params.cancelable)
         val dialog = builder.create()
+        dialog.setCanceledOnTouchOutside(params.cancelable)
         dialog.show()
     } catch (e: Exception) {
         WxpLogUtils.w("dialog", "显示dialog出现错误", e)
