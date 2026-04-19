@@ -21,12 +21,12 @@ class WxpDialogUtils: NSObject{
             message: params.message,
             preferredStyle: .alert
         )
-        if(!( params.leftText ?? "").isEmpty){
+        if(params.cancelable && !( params.leftText ?? "").isEmpty){
             alert.addAction(UIAlertAction(title: params.leftText, style: .default, handler: { _ in
                 params.leftBlock?()
             }))
         }
-        
+
         if(!( params.rightText ?? "").isEmpty){
             alert.addAction(UIAlertAction(title: params.rightText, style: .default,handler: { _ in
                 params.rightBlock?()

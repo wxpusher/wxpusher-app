@@ -6,6 +6,7 @@ import com.smjcco.wxpusher.base.common.BaseResp
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpNetworkService
 import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.biz.version.AppVersionCheckResp
 import com.smjcco.wxpusher.page.accountdetail.WxpAppleBindReq
 import com.smjcco.wxpusher.page.accountdetail.WxpWeixinBindReq
 import com.smjcco.wxpusher.page.changephone.WxpPhoneBindReq
@@ -394,6 +395,17 @@ object WxpApiService {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .get(WxpNetworkService.getUrl("/api/need-login/device/list-banner"))
+                .body()
+        })
+    }
+
+    /**
+     * 检查是否有新版本。失败静默，不 Toast 打扰用户。
+     */
+    suspend fun checkAppVersion(): AppVersionCheckResp? {
+        return commonRespDeal(toastError = false, block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .get(WxpNetworkService.getUrl("/api/device/version-update"))
                 .body()
         })
     }

@@ -8,7 +8,8 @@ data class WxpDialogParams(
     var leftText: String? = null,
     var leftBlock: (() -> Unit)? = null,
     var rightText: String? = null,
-    var rightBlock: (() -> Unit)? = null
+    var rightBlock: (() -> Unit)? = null,
+    var cancelable: Boolean = true
 )
 
 object WxpDialogUtils {
