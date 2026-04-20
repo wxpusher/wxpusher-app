@@ -23,7 +23,7 @@ object WxpNetworkService {
         defaultRequest {
             contentType(ContentType.Application.Json)
             header("deviceToken", WxpAppDataService.getLoginInfo()?.deviceToken ?: "")
-            header("versionName", WxpBaseInfoService.getAppVersionName())
+            header("version", WxpBaseInfoService.getAppVersionName())
             header("platform", WxpBaseInfoService.getPlatform())
         }
         install(ContentNegotiation) {
@@ -31,6 +31,7 @@ object WxpNetworkService {
                 prettyPrint = true
                 ignoreUnknownKeys = true
                 explicitNulls = false
+                coerceInputValues = true
             })
         }
 

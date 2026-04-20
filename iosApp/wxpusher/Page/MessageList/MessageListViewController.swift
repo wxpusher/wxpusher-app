@@ -16,8 +16,20 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     //搜索
     private let searchController = UISearchController(searchResultsController: nil)
-    
+
     private let tableView = UITableView()
+
+    // MARK: - 批量操作状态
+    private static let maxBatchSelect = 200
+    private static let batchBottomBarHeight: CGFloat = 72
+    private var previousLeftBarButtonItem: UIBarButtonItem?
+    private var previousRightBarButtonItem: UIBarButtonItem?
+    private var previousTitle: String?
+    // 自定义底部批量操作栏（替代 UIToolbar，按钮区域更大更直观）
+    private let batchBottomBar = UIView()
+    private let batchMarkReadButton = UIButton(type: .system)
+    private let batchMarkUnreadButton = UIButton(type: .system)
+    private let batchDeleteButton = UIButton(type: .system)
     private let notificationPermissionBannerView = WxpMessageBannerView(
         iconName: "bell",
         iconTintColor: .secondaryLabel
@@ -99,7 +111,9 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         setupSearchAndNavication()
         setupRefreshControl()
         setupUI()
-        
+        tableView.allowsMultipleSelectionDuringEditing = true
+        setupBatchBottomBar()
+
         WxpLogUtils.shared.d(tag: "WxPusher", message: "消息列表页面-viewDidLoad", throwable: nil)
         //页面加载的时候初始化,先显示缓存数据
         presenter.doInit()
@@ -316,10 +330,25 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
             // 第二组：消息操作
             UIMenu(title: "消息操作", options: .displayInline, children: [
                 UIAction(
+                    title: "多选",
+                    image: UIImage(systemName: "checkmark.circle"),
+                    handler:{ [weak self]_ in
+                        self?.enterEditingMode(preselect: nil)
+                    }
+                ),
+                UIAction(
                     title: "已读全部消息",
                     image: UIImage(systemName: "checkmark.square"),
                     handler:{ [weak self]_ in
                         self?.presenter.markMessageReadStatus(id: nil, read: true)
+                    }
+                ),
+                UIAction(
+                    title: "删除全部消息",
+                    image: UIImage(systemName: "trash"),
+                    attributes: .destructive,
+                    handler:{ [weak self]_ in
+                        self?.presenter.deleteAll()
                     }
                 )
             ])
@@ -343,40 +372,46 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     @objc func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
         // 确保手势已经开始
         guard gestureRecognizer.state == .began else { return }
-        
+        // 编辑态下不响应长按菜单
+        if tableView.isEditing { return }
+
         // 获取长按位置对应的 indexPath
         let point = gestureRecognizer.location(in: tableView)
         guard let indexPath = tableView.indexPathForRow(at: point) else { return }
-        
+
         // 获取对应的数据项
         let item = messageList[indexPath.row]
-        
+
         let actionSheet = UIAlertController(title: nil,
                                             message: nil,
                                             preferredStyle: .actionSheet)
-        
+
         let readText = item.read ? "标记未读" : "标记已读"
         let option1 = UIAlertAction(title: readText, style: .default) { [weak self]_ in
             self?.presenter.markMessageReadStatus(id: KotlinLong.init(longLong: item.messageId), read: !item.read)
         }
-        
+
         let option2 = UIAlertAction(title: "删除", style: .destructive) { [weak self]_ in
             self?.showDeleteConfirmAlert(message: item)
         }
-        
-        
-        let cancel = UIAlertAction(title: "取消", style: .cancel) { _ in
-            
+
+        let option3 = UIAlertAction(title: "多选", style: .default) { [weak self]_ in
+            self?.enterEditingMode(preselect: indexPath)
         }
-        
+
+        let cancel = UIAlertAction(title: "取消", style: .cancel) { _ in
+
+        }
+
         actionSheet.addAction(option1)
         actionSheet.addAction(option2)
+        actionSheet.addAction(option3)
         actionSheet.addAction(cancel)
         //长按给予一个震动反馈
         onFeedback()
         // 显示 Action Sheet
         present(actionSheet, animated: true, completion: nil)
-        
+
     }
     /**
      * 删除消息确认
@@ -465,10 +500,28 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     func onMessageList(data: [WxpMessageListMessage]) {
         WxpLogUtils.shared.d(tag: "WxPusher", message: "消息列表页面-onMessageList", throwable: nil)
+        // 编辑态下 reloadData 会清空选中，这里保存一下并在新列表里恢复同 id 的选中项。
+        let previousSelectedIds: Set<Int64>
+        if tableView.isEditing {
+            previousSelectedIds = Set((tableView.indexPathsForSelectedRows ?? []).compactMap { idx -> Int64? in
+                guard idx.row < messageList.count else { return nil }
+                return messageList[idx.row].messageId
+            })
+        } else {
+            previousSelectedIds = []
+        }
         self.messageList = data
         tableView.isHidden = data.isEmpty
         emptyView.isHidden = !data.isEmpty
         self.tableView.reloadData()
+        if tableView.isEditing, !previousSelectedIds.isEmpty {
+            for (row, message) in data.enumerated() {
+                if previousSelectedIds.contains(message.messageId) {
+                    tableView.selectRow(at: IndexPath(row: row, section: 0), animated: false, scrollPosition: .none)
+                }
+            }
+            updateEditingTitleAndButtons()
+        }
     }
     
     func showMessageMoreLoading(loading: Bool, hasMore: Bool) {
@@ -571,6 +624,256 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         }
         present(alert, animated: true)
     }
+
+    // MARK: - 多选编辑模式
+
+    private func setupBatchBottomBar() {
+        batchBottomBar.translatesAutoresizingMaskIntoConstraints = false
+        batchBottomBar.backgroundColor = .systemBackground
+        batchBottomBar.isHidden = true
+        view.addSubview(batchBottomBar)
+
+        // 顶部分割线
+        let topSeparator = UIView()
+        topSeparator.translatesAutoresizingMaskIntoConstraints = false
+        topSeparator.backgroundColor = .separator
+        batchBottomBar.addSubview(topSeparator)
+
+        configureBatchActionButton(
+            batchMarkReadButton,
+            title: "标记已读",
+            iconName: "checkmark.circle",
+            tint: .label,
+            action: #selector(batchMarkRead)
+        )
+        configureBatchActionButton(
+            batchMarkUnreadButton,
+            title: "标记未读",
+            iconName: "envelope.badge",
+            tint: .label,
+            action: #selector(batchMarkUnread)
+        )
+        configureBatchActionButton(
+            batchDeleteButton,
+            title: "删除",
+            iconName: "trash",
+            tint: .systemRed,
+            action: #selector(batchDelete)
+        )
+
+        let stack = UIStackView(arrangedSubviews: [
+            batchMarkReadButton, batchMarkUnreadButton, batchDeleteButton
+        ])
+        stack.translatesAutoresizingMaskIntoConstraints = false
+        stack.axis = .horizontal
+        stack.alignment = .fill
+        stack.distribution = .fillEqually
+        stack.spacing = 0
+        batchBottomBar.addSubview(stack)
+
+        NSLayoutConstraint.activate([
+            // 批量底部栏贴在 safeArea 底部
+            batchBottomBar.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            batchBottomBar.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            batchBottomBar.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            batchBottomBar.heightAnchor.constraint(equalToConstant: MessageListViewController.batchBottomBarHeight),
+
+            topSeparator.leadingAnchor.constraint(equalTo: batchBottomBar.leadingAnchor),
+            topSeparator.trailingAnchor.constraint(equalTo: batchBottomBar.trailingAnchor),
+            topSeparator.topAnchor.constraint(equalTo: batchBottomBar.topAnchor),
+            topSeparator.heightAnchor.constraint(equalToConstant: 0.5),
+
+            stack.leadingAnchor.constraint(equalTo: batchBottomBar.leadingAnchor),
+            stack.trailingAnchor.constraint(equalTo: batchBottomBar.trailingAnchor),
+            stack.topAnchor.constraint(equalTo: batchBottomBar.topAnchor),
+            stack.bottomAnchor.constraint(equalTo: batchBottomBar.bottomAnchor)
+        ])
+    }
+
+    private func configureBatchActionButton(
+        _ button: UIButton,
+        title: String,
+        iconName: String,
+        tint: UIColor,
+        action: Selector
+    ) {
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.tintColor = tint
+        button.setTitleColor(tint, for: .normal)
+        button.setTitleColor(tint.withAlphaComponent(0.4), for: .disabled)
+        button.titleLabel?.font = .systemFont(ofSize: 12, weight: .regular)
+
+        let iconConfig = UIImage.SymbolConfiguration(pointSize: 22, weight: .regular)
+        let icon = UIImage(systemName: iconName, withConfiguration: iconConfig)
+        button.setImage(icon, for: .normal)
+        button.setTitle(title, for: .normal)
+
+        // 图标在上、文字在下：通过 imageEdgeInsets + titleEdgeInsets 实现
+        let spacing: CGFloat = 4
+        let imageSize: CGFloat = 24
+        let titleSize = (title as NSString).size(withAttributes: [
+            .font: button.titleLabel?.font ?? UIFont.systemFont(ofSize: 12)
+        ])
+        button.imageEdgeInsets = UIEdgeInsets(
+            top: -(titleSize.height + spacing),
+            left: 0,
+            bottom: 0,
+            right: -titleSize.width
+        )
+        button.titleEdgeInsets = UIEdgeInsets(
+            top: 0,
+            left: -imageSize,
+            bottom: -(imageSize + spacing),
+            right: 0
+        )
+        button.contentEdgeInsets = UIEdgeInsets(
+            top: (titleSize.height + spacing) / 2,
+            left: 0,
+            bottom: (titleSize.height + spacing) / 2,
+            right: 0
+        )
+
+        button.addTarget(self, action: action, for: .touchUpInside)
+    }
+
+    private func setBatchButtonsEnabled(_ enabled: Bool) {
+        batchMarkReadButton.isEnabled = enabled
+        batchMarkUnreadButton.isEnabled = enabled
+        batchDeleteButton.isEnabled = enabled
+        let alpha: CGFloat = enabled ? 1.0 : 0.4
+        batchMarkReadButton.alpha = alpha
+        batchMarkUnreadButton.alpha = alpha
+        batchDeleteButton.alpha = alpha
+    }
+
+    private func enterEditingMode(preselect: IndexPath?) {
+        if tableView.isEditing { return }
+        // 保存原有导航栏，退出时恢复
+        previousLeftBarButtonItem = navigationItem.leftBarButtonItem
+        previousRightBarButtonItem = navigationItem.rightBarButtonItem
+        previousTitle = title
+
+        tableView.setEditing(true, animated: true)
+
+        navigationItem.leftBarButtonItem = UIBarButtonItem(
+            title: "取消",
+            style: .plain,
+            target: self,
+            action: #selector(exitEditingModeTapped)
+        )
+        navigationItem.rightBarButtonItem = UIBarButtonItem(
+            title: "全选",
+            style: .plain,
+            target: self,
+            action: #selector(toggleSelectAll)
+        )
+
+        // 编辑态下不触发加载更多：把 footer 隐藏
+        tableView.tableFooterView = nil
+        // 编辑态禁用下拉刷新
+        tableView.mj_header?.isHidden = true
+
+        // 显示自定义底部批量操作栏，并给 tableView 添加底部内边距避免最后一行被挡
+        batchBottomBar.isHidden = false
+        view.bringSubviewToFront(batchBottomBar)
+        tableView.contentInset.bottom = MessageListViewController.batchBottomBarHeight
+        tableView.verticalScrollIndicatorInsets.bottom = MessageListViewController.batchBottomBarHeight
+
+        if let preselect {
+            tableView.selectRow(at: preselect, animated: false, scrollPosition: .none)
+        }
+        updateEditingTitleAndButtons()
+    }
+
+    @objc private func exitEditingModeTapped() {
+        exitEditingMode()
+    }
+
+    private func exitEditingMode() {
+        if !tableView.isEditing { return }
+        tableView.setEditing(false, animated: true)
+        navigationItem.leftBarButtonItem = previousLeftBarButtonItem
+        navigationItem.rightBarButtonItem = previousRightBarButtonItem
+        title = previousTitle
+
+        batchBottomBar.isHidden = true
+        tableView.contentInset.bottom = 0
+        tableView.verticalScrollIndicatorInsets.bottom = 0
+        tableView.tableFooterView = footerLoadingView
+        tableView.mj_header?.isHidden = false
+    }
+
+    @objc private func toggleSelectAll() {
+        if messageList.isEmpty { return }
+        let currentCount = tableView.indexPathsForSelectedRows?.count ?? 0
+        let limit = MessageListViewController.maxBatchSelect
+        let targetCount = min(messageList.count, limit)
+        if currentCount >= targetCount {
+            // 取消全选
+            for indexPath in (tableView.indexPathsForSelectedRows ?? []) {
+                tableView.deselectRow(at: indexPath, animated: false)
+            }
+        } else {
+            // 全选至多 200 条
+            for row in 0..<targetCount {
+                tableView.selectRow(at: IndexPath(row: row, section: 0), animated: false, scrollPosition: .none)
+            }
+            if messageList.count > limit {
+                WxpToastUtils.shared.showToast(msg: "一次最多选择 200 条消息")
+            }
+        }
+        updateEditingTitleAndButtons()
+    }
+
+    private func updateEditingTitleAndButtons() {
+        let selected = tableView.indexPathsForSelectedRows?.count ?? 0
+        title = "已选 \(selected)"
+        let limit = MessageListViewController.maxBatchSelect
+        let targetCount = min(messageList.count, limit)
+        let allSelected = selected >= targetCount && targetCount > 0
+        navigationItem.rightBarButtonItem?.title = allSelected ? "取消全选" : "全选"
+        setBatchButtonsEnabled(selected > 0)
+    }
+
+    private func selectedMessageIds() -> [KotlinLong] {
+        guard let indexPaths = tableView.indexPathsForSelectedRows else { return [] }
+        return indexPaths.compactMap { idx -> KotlinLong? in
+            guard idx.row < messageList.count else { return nil }
+            return KotlinLong(longLong: messageList[idx.row].messageId)
+        }
+    }
+
+    @objc private func batchMarkRead() {
+        let ids = selectedMessageIds()
+        if ids.isEmpty {
+            WxpToastUtils.shared.showToast(msg: "请先选择要操作的消息")
+            return
+        }
+        presenter.markMessageReadStatusBatch(ids: ids, read: true)
+        exitEditingMode()
+    }
+
+    @objc private func batchMarkUnread() {
+        let ids = selectedMessageIds()
+        if ids.isEmpty {
+            WxpToastUtils.shared.showToast(msg: "请先选择要操作的消息")
+            return
+        }
+        presenter.markMessageReadStatusBatch(ids: ids, read: false)
+        exitEditingMode()
+    }
+
+    @objc private func batchDelete() {
+        let ids = selectedMessageIds()
+        if ids.isEmpty {
+            WxpToastUtils.shared.showToast(msg: "请先选择要操作的消息")
+            return
+        }
+        // 在用户点击确认弹窗的"删除"之后再退出多选态，确认期间仍能看到已选条目
+        presenter.deleteByIds(ids: ids, onConfirmed: { [weak self] in
+            self?.exitEditingMode()
+        })
+    }
 }
 
 
@@ -602,6 +905,11 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if tableView.isEditing {
+            // 编辑态下只更新标题和按钮状态，不跳转
+            updateEditingTitleAndButtons()
+            return
+        }
         tableView.deselectRow(at: indexPath, animated: true)
         let message = messageList[indexPath.row]
         let urlString = message.url.trimmingCharacters(in: .whitespaces)
@@ -609,15 +917,35 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         message.read = true
         tableView.reloadData()
     }
-    
+
+    func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        if tableView.isEditing {
+            updateEditingTitleAndButtons()
+        }
+    }
+
+    func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        // 编辑态下限制最多选择 200 条
+        if tableView.isEditing {
+            let currentCount = tableView.indexPathsForSelectedRows?.count ?? 0
+            if currentCount >= MessageListViewController.maxBatchSelect {
+                WxpToastUtils.shared.showToast(msg: "一次最多选择 200 条消息")
+                return nil
+            }
+        }
+        return indexPath
+    }
+
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        // 编辑态下不触发加载更多，避免选中操作时莫名加载
+        if tableView.isEditing { return }
         //展示最后一个item的时候，加载更多
         if  indexPath.item == messageList.count - 1{
             presenter.loadMore()
         }
-        
+
     }
-    
+
 }
 
 

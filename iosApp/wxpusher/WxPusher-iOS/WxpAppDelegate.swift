@@ -64,14 +64,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         
         //注册微信open sdk
         WxpWeixinOpenManager.shared.doInit()
+        //注册版本升级市场跳转能力（iOS 打开 downloadUrl 即 App Store）
+        WxpVersionCheckManager.shared.setNavigator(navigator: WxpAppMarketNavigatorIOS())
         return true
     }
-    
-    func applicationDidBecomeActive(_ application: UIApplication) {
-        print("[DEBUG] AppDelegate - applicationDidBecomeActive")
-        
-    }
-    
+
     func applicationDidFinishLaunching(_ application: UIApplication) {
         print("[push]-applicationDidFinishLaunching")
     }

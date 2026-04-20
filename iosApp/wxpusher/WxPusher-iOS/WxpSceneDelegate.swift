@@ -26,6 +26,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     func sceneDidBecomeActive(_ scene: UIScene) {
+        print("[DEBUG] SceneDelegate - sceneDidBecomeActive")
+        //版本升级检测（内部有 3 小时节流；冷启、后台切前台都会触发）
+        WxpVersionCheckManager.shared.onAppForeground(force: false)
     }
     
     func sceneWillResignActive(_ scene: UIScene) {

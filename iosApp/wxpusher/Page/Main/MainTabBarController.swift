@@ -25,9 +25,6 @@ class MainTabBarController: UITabBarController {
         setupListenBackToRegisterAPNs()
           
 //        self.delegate = self
-        
-        //进行一次检查更新的提醒，iOS不主动检查更新
-//        WxpVersionUpdateChecker(force: false).checkForUpdate()
     }
     
     

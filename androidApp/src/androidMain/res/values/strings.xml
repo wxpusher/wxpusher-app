@@ -29,6 +29,17 @@
     <string name="message_list_scan_add_sub">扫码添加订阅</string>
     <string name="message_list_sub_manager">订阅管理</string>
     <string name="message_list_mark_all_read">已读全部消息</string>
+    <string name="message_list_batch_select">多选</string>
+    <string name="message_list_delete_all">删除全部消息</string>
+    <string name="message_list_action_mark_read">标记已读</string>
+    <string name="message_list_action_mark_unread">标记未读</string>
+    <string name="message_list_action_delete">删除</string>
+    <string name="message_list_action_select_all">全选</string>
+    <string name="message_list_action_deselect_all">取消全选</string>
+    <string name="message_list_action_selected_count">已选 %1$d</string>
+    <string name="message_list_action_exit">取消</string>
+    <string name="message_list_action_limit_toast">一次最多选择 200 条消息</string>
+    <string name="message_list_action_none_selected">请先选择要操作的消息</string>
 
 
     <!--    电量优化-->

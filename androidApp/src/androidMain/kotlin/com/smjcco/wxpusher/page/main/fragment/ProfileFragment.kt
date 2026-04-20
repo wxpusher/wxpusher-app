@@ -21,11 +21,10 @@ import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.base.common.WxpDialogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.base.common.runAtMainSuspend
+import com.smjcco.wxpusher.biz.version.WxpVersionCheckManager
 import com.smjcco.wxpusher.common.WxpConstants
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
-import com.tencent.upgrade.core.UpgradeManager
-import com.tencent.upgrade.core.UpgradeReqCallbackForUserManualCheck
 
 /**
  * 个人中心Fragment
@@ -116,6 +115,16 @@ class ProfileFragment : WxpBaseFragment() {
                         hasArrow = true
                     ) {
                         WxpJumpPageUtils.jumpToAccountDetail(requireActivity())
+                    },
+                    ProfileItem(
+                        title = "推送渠道",
+                        subtitle = "管理消息接收渠道",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToWebUrl(
+                            "${WxpConfig.appFeUrl}/app/#/push-channel",
+                            activity
+                        )
                     }
                 )
             ))
@@ -239,16 +248,7 @@ class ProfileFragment : WxpBaseFragment() {
     }
 
     private fun checkForUpdate() {
-        try {
-            UpgradeManager.getInstance()
-                .checkUpgrade(true, null, object : UpgradeReqCallbackForUserManualCheck() {
-                    override fun onReceivedNoStrategy() {
-                        WxpToastUtils.showToast("已经是最新版本")
-                    }
-                })
-        } catch (e: Exception) {
-            WxpToastUtils.showToast("检查更新失败")
-        }
+        WxpVersionCheckManager.onAppForeground(force = true)
     }
 
     private fun openUserAgreementUrl() {

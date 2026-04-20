@@ -86,6 +86,10 @@ class WxpProfileViewController: UIViewController {
                 ProfileItem(title: "账号信息", subtitle: "管理账号",
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToAccountDetail()
+                            },
+                ProfileItem(title: "推送渠道", subtitle: "管理消息接收渠道",
+                            accessoryType: .disclosureIndicator) {
+                                WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/push-channel")
                             }
             ]),
             ("通知提醒", [
@@ -128,7 +132,7 @@ class WxpProfileViewController: UIViewController {
                                 WxpJumpPageUtils.jumpToWebUrl(url: "https://wj.qq.com/s2/22198188/cc95/")
                             },
                 ProfileItem(title: "软件更新", subtitle: WxpCommonParams.appVersionName(), accessoryType: .disclosureIndicator) {
-                    WxpVersionUpdateChecker(force: true).checkForUpdate()
+                    WxpVersionCheckManager.shared.onAppForeground(force: true)
                 },
                 ProfileItem(title: "用户协议", subtitle: "查看用户和隐私协议", accessoryType: .disclosureIndicator) {
                     WxpJumpPageUtils.jumpToWebUrl(url: "https://wxpusher.zjiecode.com/admin/agreement/index-argeement.html")
