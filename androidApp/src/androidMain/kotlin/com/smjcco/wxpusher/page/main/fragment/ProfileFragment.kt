@@ -78,6 +78,16 @@ class ProfileFragment : WxpBaseFragment() {
                             hasArrow = true
                         ) {
                             WxpJumpPageUtils.jumpToTestPanel(requireActivity())
+                        },
+                        ProfileItem(
+                            title = "测试页面",
+                            subtitle = "打开app-fe测试页面",
+                            hasArrow = true
+                        ) {
+                            WxpJumpPageUtils.jumpToWebUrl(
+                                "${WxpConfig.appFeUrl}/app/#/subscribe-list",
+                                activity
+                            )
                         }
                     )
                 ))
