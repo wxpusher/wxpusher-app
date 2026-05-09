@@ -27,6 +27,20 @@ jobs:
 
     # ========== 环境配置 ==========
 
+    # 显式切到 Xcode 26（macos-15 runner 默认 Xcode 是 16.x，自带 iOS 18 SDK）
+    # App Store Connect 自 2026 起要求用 iOS 26+ SDK 构建
+    - name: Select Xcode 26
+      run: |
+        XCODE_26=$(ls -d /Applications/Xcode_26*.app 2>/dev/null | sort -V | tail -1)
+        if [ -z "$XCODE_26" ]; then
+          echo "::error::macos-15 runner 上没找到 Xcode 26，可用 Xcode 列表："
+          ls -d /Applications/Xcode*.app
+          exit 1
+        fi
+        sudo xcode-select -s "$XCODE_26/Contents/Developer"
+        xcodebuild -version
+        xcrun --show-sdk-version
+
     # KMM 项目需要 JDK 来编译 shared 模块
     - name: Set up JDK 17
       uses: actions/setup-java@v4
