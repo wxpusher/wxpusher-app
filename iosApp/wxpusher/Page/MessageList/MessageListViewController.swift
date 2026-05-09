@@ -321,8 +321,8 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
                 UIAction(
                     title: "订阅管理",
                     image: UIImage(systemName: "folder.badge.gearshape"),
-                    handler:{ [weak self]_ in
-                        self?.presenter.openSubscribeManagerPage()
+                    handler:{ _ in
+                        WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/subscribe-list")
                     }
                 )
             ]),

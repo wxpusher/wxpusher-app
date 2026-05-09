@@ -35,7 +35,7 @@ class WxpScanPresenter(view: IWxpScanView) :
                     WxpToastUtils.showToast("获取openId失败，请重试")
                     return@runAtMainSuspend
                 }
-                view?.onOpenWebPage("${WxpConfig.baseUrl}/wxuser/?openId=${openId}&subId=${followResult.subId}#/detail")
+                view?.onOpenWebPage("${WxpConfig.baseUrl}/app/?openId=${openId}&subId=${followResult.subId}#/subscribe-detail")
             }
         }
         WxpDialogUtils.showDialog(params)

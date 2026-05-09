@@ -78,6 +78,16 @@ class ProfileFragment : WxpBaseFragment() {
                             hasArrow = true
                         ) {
                             WxpJumpPageUtils.jumpToTestPanel(requireActivity())
+                        },
+                        ProfileItem(
+                            title = "测试页面",
+                            subtitle = "打开app-fe测试页面",
+                            hasArrow = true
+                        ) {
+                            WxpJumpPageUtils.jumpToWebUrl(
+                                "${WxpConfig.appFeUrl}/app/#/subscribe-list",
+                                activity
+                            )
                         }
                     )
                 ))
@@ -129,6 +139,41 @@ class ProfileFragment : WxpBaseFragment() {
                 )
             ))
 
+
+        // 消息管理
+        sectionData.add(
+            ProfileSection(
+                title = "消息管理",
+                items = listOf(
+                    ProfileItem(
+                        title = "我的订阅",
+                        subtitle = "订阅的消息内容",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToWebUrl(
+                            "${WxpConfig.appFeUrl}/app/#/subscribe-list",
+                            activity
+                        )
+                    },
+                    ProfileItem(
+                        title = "添加订阅",
+                        subtitle = "扫描添加订阅",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToScan(requireActivity())
+                    },
+                    ProfileItem(
+                        title = "代理赚钱",
+                        subtitle = "推广消息产品赚佣金",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToWebUrl(
+                            "${WxpConfig.appFeUrl}/app/#/agent-overview",
+                            activity
+                        )
+                    }
+                )
+            ))
         // 通知提醒
         sectionData.add(
             ProfileSection(

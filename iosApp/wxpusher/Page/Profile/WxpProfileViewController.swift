@@ -92,6 +92,21 @@ class WxpProfileViewController: UIViewController {
                                 WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/push-channel")
                             }
             ]),
+            ("消息管理", [
+                ProfileItem(title: "我的订阅", subtitle: "订阅的消息内容",
+                            accessoryType: .disclosureIndicator) {
+                                WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/subscribe-list")
+                            },
+                ProfileItem(title: "添加订阅", subtitle: "扫描添加订阅",
+                            accessoryType: .disclosureIndicator) {
+                                WxpJumpPageUtils.jumpToScan { _ in
+                                }
+                            },
+                ProfileItem(title: "代理赚钱", subtitle: "推广消息产品赚佣金",
+                            accessoryType: .disclosureIndicator) {
+                                WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/agent-overview")
+                            }
+            ]),
             ("通知提醒", [
                 ProfileItem(title: "通知设置", subtitle: "检查通知权限", accessoryType: .disclosureIndicator) {
                     WxpPermissionUtils.requestNotificationPermission { success in
