@@ -525,7 +525,10 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         return when (item.itemId) {
             R.id.menu_subscription_manager -> {
                 // 打开订阅管理页面
-                presenter.openSubscribeManagerPage()
+                WxpJumpPageUtils.jumpToWebUrl(
+                    "${WxpConfig.appFeUrl}/app/#/subscribe-list",
+                    requireActivity()
+                )
                 true
             }
 

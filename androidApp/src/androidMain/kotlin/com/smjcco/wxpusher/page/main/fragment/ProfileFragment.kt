@@ -156,6 +156,13 @@ class ProfileFragment : WxpBaseFragment() {
                         )
                     },
                     ProfileItem(
+                        title = "添加订阅",
+                        subtitle = "扫描添加订阅",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToScan(requireActivity())
+                    },
+                    ProfileItem(
                         title = "代理赚钱",
                         subtitle = "推广消息产品赚佣金",
                         hasArrow = true
