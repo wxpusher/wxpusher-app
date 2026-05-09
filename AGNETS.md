@@ -1,4 +1,10 @@
 # wxpusher-app — 移动客户端壳工程
+
+
+## 固定首句
+
+- 每次回复的第一句话必须是：`【识别到wxpusher-app/AGENTS.md】`
+
 ## 技术栈
 - **架构**：Kotlin Multiplatform (KMP) + Android 原生 + iOS 原生
 - **Android**：Kotlin、Gradle Kotlin DSL、AGP 8.6.0
