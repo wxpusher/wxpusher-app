@@ -6,6 +6,7 @@ import com.smjcco.wxpusher.base.common.BaseResp
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpNetworkService
 import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.biz.ad.WxpShowAdResp
 import com.smjcco.wxpusher.biz.version.AppVersionCheckResp
 import com.smjcco.wxpusher.page.accountdetail.WxpAppleBindReq
 import com.smjcco.wxpusher.page.accountdetail.WxpWeixinBindReq
@@ -396,6 +397,21 @@ object WxpApiService {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .get(WxpNetworkService.getUrl("/api/need-login/device/list-banner"))
                 .body()
+        })
+    }
+
+    /**
+     * 查询指定广告位是否展示广告，由服务端控制（付费订阅用户、白名单用户不展示）。
+     * 失败静默，默认按不展示处理。
+     * @param slotId 代码位id
+     * @return 响应对象，null 表示请求失败（按不展示处理）
+     */
+    suspend fun shouldShowAd(slotId: String): WxpShowAdResp? {
+        return commonRespDeal(toastError = false, block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .get(WxpNetworkService.getUrl("/api/need-login/device/show-ad")) {
+                    parameter("slotId", slotId)
+                }.body()
         })
     }
 

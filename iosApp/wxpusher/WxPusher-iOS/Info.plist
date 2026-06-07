@@ -25,6 +25,8 @@
 	<false/>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>需要您的许可才能保存图片到相册</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>用于向您展示更相关的广告内容，不会影响应用的正常使用</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
