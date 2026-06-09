@@ -105,6 +105,10 @@ class WxpProfileViewController: UIViewController {
                 ProfileItem(title: "代理赚钱", subtitle: "推广消息产品赚佣金",
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/agent-overview")
+                            },
+                ProfileItem(title: "消息开关", subtitle: "总开关，控制是否接收消息",
+                            accessoryType: .disclosureIndicator) {
+                                WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/user-enable")
                             }
             ]),
             ("通知提醒", [
