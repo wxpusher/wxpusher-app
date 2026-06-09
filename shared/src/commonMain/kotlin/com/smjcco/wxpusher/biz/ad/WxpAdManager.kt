@@ -15,18 +15,18 @@ object WxpAdManager {
     private const val TAG = "WxpAd"
 
     /**
-     * 查询指定广告位是否展示广告。结果通过 [callback] 回调（已切回主线程）。
-     * 接口失败/异常时按不展示（false）处理。
+     * 查询广告配置（是否展示 + 信息流插入位置）。结果对象通过 [callback] 回调（已切回主线程）。
+     * 接口失败/异常时回调 null（按不展示处理）。Banner 只需读 [WxpShowAdResp.showAd]。
      *
      * @param slotId   代码位id
-     * @param callback 回调，true=展示广告，false=不展示
+     * @param callback 回调，返回完整响应对象（含 showAd / position）
      */
-    fun shouldShowAd(slotId: String, callback: (Boolean) -> Unit) {
+    fun fetchAdConfig(slotId: String, callback: (WxpShowAdResp?) -> Unit) {
         runAtIOSuspend {
-            val show = WxpApiService.shouldShowAd(slotId)?.showAd ?: false
-            WxpLogUtils.d(TAG, "shouldShowAd slotId=$slotId result=$show")
+            val resp = WxpApiService.fetchAdConfig(slotId)
+            WxpLogUtils.d(TAG, "fetchAdConfig slotId=$slotId resp=$resp")
             runAtMainSuspend {
-                callback(show)
+                callback(resp)
             }
         }
     }

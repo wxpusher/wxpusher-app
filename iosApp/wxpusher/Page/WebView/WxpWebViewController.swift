@@ -250,8 +250,8 @@ class WxpWebViewController: UIViewController {
         adRequested = true
         // 适时请求 IDFA / ATT 授权（前台、有上下文时）
         WxpPangleAdManager.shared.requestTrackingAuthorizationIfNeeded()
-        WxpAdManager.shared.shouldShowAd(slotId: WxpBannerAdView.messageDetailSlotID) { [weak self] show in
-            guard let self = self, show.boolValue else { return }
+        WxpAdManager.shared.fetchAdConfig(slotId: WxpBannerAdView.messageDetailSlotID) { [weak self] resp in
+            guard let self = self, resp?.showAd == true else { return }
             self.loadBannerAd()
         }
     }
