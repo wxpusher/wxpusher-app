@@ -15,6 +15,11 @@ target 'WxPusher-iOS' do
   pod 'Toaster', '2.3.0'
   pod 'MJRefresh', '3.7.9'
   pod 'WechatOpenSDK-XCFramework', '2.0.5'
+  # 穿山甲（CSJ/Pangle）国内广告 SDK，用于消息详情页底部 Banner 广告
+  pod 'Ads-CN', '7.6.0.4'
+  # 穿山甲测量/预览工具（开发测试用）。调用代码全部包在 #if DEBUG 中，Release 不会触达。
+  # 注：CocoaPods 不支持同一 Pod 的 subspec 跨 build configuration，故此处不做 Debug-only 限制。
+  pod 'Ads-CN/BUAdTestMeasurement', '7.6.0.4'
   pod 'shared', :path => '../shared'
   
 end

@@ -61,6 +61,8 @@
 		7B8A1D4E3F2C100100A1B2C3 /* WxpSetWebOptionMenuBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8A1D4E3F2C100200A1B2C3 /* WxpSetWebOptionMenuBridgeHandler.swift */; };
 		7B8A1D4E3F2C100300A1B2C3 /* WxpSetWebBottomBarBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7B8A1D4E3F2C100400A1B2C3 /* WxpSetWebBottomBarBridgeHandler.swift */; };
 		986EF3A412E72E2E14454E8B /* libPods-WxPusher-Mac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C69846B4E017B608DEE27FE0 /* libPods-WxPusher-Mac.a */; };
+		ADADADAD0000000000000004 /* WxpPangleAdManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADADADAD0000000000000002 /* WxpPangleAdManager.swift */; };
+		ADADADAD0000000000000005 /* WxpBannerAdView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADADADAD0000000000000003 /* WxpBannerAdView.swift */; };
 		E8F4FFB984C6ECD1DE28A901 /* libPods-WxPusher-iOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 63C6789F00DFBD4BD46990F9 /* libPods-WxPusher-iOS.a */; };
 /* End PBXBuildFile section */
 
@@ -133,6 +135,8 @@
 		7B8A1D4E3F2C100400A1B2C3 /* WxpSetWebBottomBarBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpSetWebBottomBarBridgeHandler.swift; sourceTree = "<group>"; };
 		8791CA31329B1B39D73E40C2 /* Pods-wxpusher.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-wxpusher.release.xcconfig"; path = "Target Support Files/Pods-wxpusher/Pods-wxpusher.release.xcconfig"; sourceTree = "<group>"; };
 		90E0FD6062BC805D458B9E8B /* Pods-WxPusher-iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WxPusher-iOS.debug.xcconfig"; path = "Target Support Files/Pods-WxPusher-iOS/Pods-WxPusher-iOS.debug.xcconfig"; sourceTree = "<group>"; };
+		ADADADAD0000000000000002 /* WxpPangleAdManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpPangleAdManager.swift; sourceTree = "<group>"; };
+		ADADADAD0000000000000003 /* WxpBannerAdView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBannerAdView.swift; sourceTree = "<group>"; };
 		B25772F3799991F9E1679618 /* Pods-WxPusher-iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WxPusher-iOS.release.xcconfig"; path = "Target Support Files/Pods-WxPusher-iOS/Pods-WxPusher-iOS.release.xcconfig"; sourceTree = "<group>"; };
 		C69846B4E017B608DEE27FE0 /* libPods-WxPusher-Mac.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-WxPusher-Mac.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D8CE22FB73D8704F4EA0537D /* Pods-WxPusher-Mac.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-WxPusher-Mac.debug.xcconfig"; path = "Target Support Files/Pods-WxPusher-Mac/Pods-WxPusher-Mac.debug.xcconfig"; sourceTree = "<group>"; };
@@ -185,6 +189,7 @@
 				1A49346D2E255EC500EA1C71 /* WebView */,
 				1A4934772E32393A00EA1C71 /* QRCodeScan */,
 				1A9C3E772DF5A02E00A25249 /* MessageList */,
+				ADADADAD0000000000000001 /* Ad */,
 			);
 			path = Page;
 			sourceTree = "<group>";
@@ -431,6 +436,15 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		ADADADAD0000000000000001 /* Ad */ = {
+			isa = PBXGroup;
+			children = (
+				ADADADAD0000000000000002 /* WxpPangleAdManager.swift */,
+				ADADADAD0000000000000003 /* WxpBannerAdView.swift */,
+			);
+			path = Ad;
+			sourceTree = "<group>";
+		};
 		AEC07F043CCAA53C25F8A3EA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -466,6 +480,7 @@
 				1A56818E2A598A89003547E6 /* Frameworks */,
 				1A4715362AE801720089D7A7 /* Resources */,
 				D6BE32C233BE187DEE0CD685 /* [CP] Copy Pods Resources */,
+				3A761DEC3FE5A46A727C674E /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -545,6 +560,44 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		3A761DEC3FE5A46A727C674E /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-WxPusher-iOS/Pods-WxPusher-iOS-frameworks.sh",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/BUTTSDKFramework/Core/TTSDKCore.framework/TTSDKCore",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/BUTTSDKFramework/LiveBase/TTSDKLiveBase.framework/TTSDKLiveBase",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/BUTTSDKFramework/LivePlayer/Lite/TTSDKLivePlayerLite.framework/TTSDKLivePlayerLite",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/BUTTSDKFramework/LivePull-VolcLog/TTSDKLivePullVolcLog.framework/TTSDKLivePullVolcLog",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/BUTTSDKFramework/PlayerCore/LiveLite/TTSDKPlayerCoreLiveLite.framework/TTSDKPlayerCoreLiveLite",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/BUTTSDKFramework/Reachability/TTSDKReachability.framework/TTSDKReachability",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/BUTTSDKFramework/Strategy/Lite/TTSDKStrategyLite.framework/TTSDKStrategyLite",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/BUTTSDKFramework/TTFFmpeg/LiveLite/TTFFmpeg.framework/TTFFmpeg",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/BUTTSDKFramework/TTFFmpeg/LiveLite/TTSDKTTFFmpegLiveLite.framework/TTSDKTTFFmpegLiveLite",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/BUTTSDKFramework/VolcLog/TTSDKVolcLog.framework/TTSDKVolcLog",
+				"${PODS_XCFRAMEWORKS_BUILD_DIR}/BUTTSDKFramework/VolcLog/VolcBaseLog.framework/VolcBaseLog",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TTSDKCore.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TTSDKLiveBase.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TTSDKLivePlayerLite.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TTSDKLivePullVolcLog.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TTSDKPlayerCoreLiveLite.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TTSDKReachability.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TTSDKStrategyLite.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TTFFmpeg.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TTSDKTTFFmpegLiveLite.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/TTSDKVolcLog.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/VolcBaseLog.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-WxPusher-iOS/Pods-WxPusher-iOS-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		657B1024BF6BBA3C135960E4 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -596,11 +649,19 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-WxPusher-iOS/Pods-WxPusher-iOS-resources.sh",
+				"${PODS_ROOT}/Ads-CN/SDK/CSJAdSDK.bundle",
+				"${PODS_ROOT}/Ads-CN/SDK/BUAdTestMeasurement.bundle",
+				"${PODS_ROOT}/BUTTSDKFramework/TTSDKFramework/TTSDKLiveBase/Resources/VeLive.bundle",
+				"${PODS_ROOT}/BUTTSDKFramework/TTSDKFramework/TTSDKPlayerCoreLiveLite/Resources/ttplayer.metallib",
 				"${PODS_ROOT}/MJRefresh/MJRefresh/MJRefresh.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/MJRefresh/MJRefresh.Privacy.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/CSJAdSDK.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/BUAdTestMeasurement.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/VeLive.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/ttplayer.metallib",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MJRefresh.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/MJRefresh.Privacy.bundle",
 			);
@@ -655,6 +716,8 @@
 				1ABD142A2EDDE3720019AA3A /* AccountDetailViewController.swift in Sources */,
 				1A962E752E0B081300C966A3 /* WxpSaveKey.swift in Sources */,
 				1A9820732E96657E00758D7C /* WxpWeixinOpenManager.swift in Sources */,
+				ADADADAD0000000000000004 /* WxpPangleAdManager.swift in Sources */,
+				ADADADAD0000000000000005 /* WxpBannerAdView.swift in Sources */,
 				1ABD14242EDAE08D0019AA3A /* WxpRegisterOrBindViewController.swift in Sources */,
 				1A9C3E732DF5984900A25249 /* WxpAppDelegate.swift in Sources */,
 				1A9C3E742DF5984900A25249 /* WxpSceneDelegate.swift in Sources */,
@@ -823,7 +886,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.7.30;
+				MARKETING_VERSION = 1.7.40;
 				PRODUCT_BUNDLE_IDENTIFIER = com.smjcco.wxpusher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -874,7 +937,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.7.30;
+				MARKETING_VERSION = 1.7.40;
 				PRODUCT_BUNDLE_IDENTIFIER = com.smjcco.wxpusher;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";

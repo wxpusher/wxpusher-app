@@ -12,10 +12,12 @@ class WxpWebViewController: UIViewController {
     let configuration = WKWebViewConfiguration()
     
     private let url: URL?
+    private let showAd: Bool
     private var loadingStartTime: Date?
     private var progressTimer: Timer?
     private var webDescription: String = ""
     private var showThirdPartyBanner = true
+    private var adRequested = false
     private let allWebOptionItems: [String] = ["copy_link", "weixin_share", "share", "open_browser"]
     private var optionMenuVisibleOverride: Bool?
     private var optionMenuItemsOverride: Set<String>?
@@ -89,10 +91,21 @@ class WxpWebViewController: UIViewController {
             rightImageView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
         ])
         containerView.translatesAutoresizingMaskIntoConstraints = false
-        
+
         return containerView
     }()
-    
+
+    // 底部穿山甲 Banner 广告容器
+    private let adContainerView: UIView = {
+        let containerView = UIView()
+        containerView.backgroundColor = .clear
+        containerView.clipsToBounds = true
+        containerView.isHidden = true
+        containerView.translatesAutoresizingMaskIntoConstraints = false
+        return containerView
+    }()
+    private var adBannerView: WxpBannerAdView?
+
     private lazy var webBackButton: UIButton = {
         return createOptionButton(imageName: "chevron.left", action: #selector(backButtonTapped))
     }()
@@ -185,18 +198,21 @@ class WxpWebViewController: UIViewController {
     }
     
     private var bannerHeightConstraint: NSLayoutConstraint!
+    private var adContainerHeightConstraint: NSLayoutConstraint!
     private var webOptionViewHeightConstraint: NSLayoutConstraint!
     private var webOptionViewBottomToSafeArea: NSLayoutConstraint!
     private var webOptionViewBottomToViewBottom: NSLayoutConstraint!
-    
-    
+
+
     init() {
         self.url = nil
+        self.showAd = false
         super.init(nibName: nil, bundle: nil)
     }
-    
-    init(url: URL?) {
+
+    init(url: URL?, showAd: Bool = false) {
         self.url = url
+        self.showAd = showAd
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -221,6 +237,50 @@ class WxpWebViewController: UIViewController {
         setupUI()
         applyWebMenuVisibility(for: url)
         loadWebContentWithVersionCheck()
+        loadAdIfNeeded()
+    }
+
+    // MARK: - 底部 Banner 广告
+
+    /// 仅消息详情页（showAd=true）才请求广告：先问后端开关，放行后再加载穿山甲 Banner
+    private func loadAdIfNeeded() {
+        guard showAd, !adRequested else { return }
+        // 模拟器不支持穿山甲 SDK，直接跳过，避免 Rosetta 崩溃
+        guard WxpPangleAdManager.isSupported else { return }
+        adRequested = true
+        // 适时请求 IDFA / ATT 授权（前台、有上下文时）
+        WxpPangleAdManager.shared.requestTrackingAuthorizationIfNeeded()
+        WxpAdManager.shared.fetchAdConfig(slotId: WxpBannerAdView.messageDetailSlotID) { [weak self] resp in
+            guard let self = self, resp?.showAd == true else { return }
+            self.loadBannerAd()
+        }
+    }
+
+    private func loadBannerAd() {
+        guard adBannerView == nil else { return }
+        let banner = WxpBannerAdView(rootViewController: self)
+        banner.delegate = self
+        adContainerView.addSubview(banner)
+        NSLayoutConstraint.activate([
+            banner.leadingAnchor.constraint(equalTo: adContainerView.leadingAnchor),
+            banner.trailingAnchor.constraint(equalTo: adContainerView.trailingAnchor),
+            banner.topAnchor.constraint(equalTo: adContainerView.topAnchor),
+            banner.bottomAnchor.constraint(equalTo: adContainerView.bottomAnchor),
+        ])
+        adBannerView = banner
+        view.layoutIfNeeded()
+        banner.loadAd(slotID: WxpBannerAdView.messageDetailSlotID, width: view.bounds.width)
+    }
+
+    private func hideAdContainer() {
+        adContainerHeightConstraint.constant = 0
+        UIView.animate(withDuration: 0.3, animations: {
+            self.view.layoutIfNeeded()
+        }) { _ in
+            self.adContainerView.isHidden = true
+            self.adBannerView?.removeFromSuperview()
+            self.adBannerView = nil
+        }
     }
     
     private func setupWebview(){
@@ -282,36 +342,44 @@ class WxpWebViewController: UIViewController {
         view.addSubview(thirdPartyBannerView)
         view.addSubview(webView!)
         view.addSubview(progressView)
+        view.addSubview(adContainerView)
         view.addSubview(webOptionView)
-        
+
         // 先创建约束引用
         bannerHeightConstraint = thirdPartyBannerView.heightAnchor.constraint(equalToConstant: 0)
+        adContainerHeightConstraint = adContainerView.heightAnchor.constraint(equalToConstant: 0)
         webOptionViewHeightConstraint = webOptionView.heightAnchor.constraint(equalToConstant: 44)
         webOptionViewBottomToSafeArea = webOptionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
         webOptionViewBottomToViewBottom = webOptionView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
-        
-        
+
+
         NSLayoutConstraint.activate([
             thirdPartyBannerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             thirdPartyBannerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             thirdPartyBannerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             bannerHeightConstraint,
-            
+
             webView!.topAnchor.constraint(equalTo: thirdPartyBannerView.bottomAnchor, constant: 0),
             webView!.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webView!.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            webView!.bottomAnchor.constraint(equalTo: webOptionView.topAnchor),
-            
+            webView!.bottomAnchor.constraint(equalTo: adContainerView.topAnchor),
+
+            // 广告容器位于 webView 底部与底部工具栏之间
+            adContainerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            adContainerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            adContainerView.bottomAnchor.constraint(equalTo: webOptionView.topAnchor),
+            adContainerHeightConstraint,
+
             progressView.topAnchor.constraint(equalTo: webView!.topAnchor),
             progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             progressView.heightAnchor.constraint(equalToConstant: 1.0),
-            
+
             webOptionViewBottomToSafeArea,
             webOptionView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webOptionView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             webOptionViewHeightConstraint,
-            
+
         ])
     }
     
@@ -951,5 +1019,23 @@ extension WxpWebViewController: WKUIDelegate {
 extension WxpWebViewController: UIGestureRecognizerDelegate {
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
+    }
+}
+
+extension WxpWebViewController: WxpBannerAdViewDelegate {
+    func bannerAdDidRender(_ adView: WxpBannerAdView, height: CGFloat) {
+        adContainerView.isHidden = false
+        adContainerHeightConstraint.constant = height
+        UIView.animate(withDuration: 0.3) {
+            self.view.layoutIfNeeded()
+        }
+    }
+
+    func bannerAdDidFail(_ adView: WxpBannerAdView) {
+        hideAdContainer()
+    }
+
+    func bannerAdDidClose(_ adView: WxpBannerAdView) {
+        hideAdContainer()
     }
 }

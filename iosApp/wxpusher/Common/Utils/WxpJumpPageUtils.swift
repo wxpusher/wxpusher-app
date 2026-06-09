@@ -153,7 +153,7 @@ import shared
     /**
      * 跳转到web页面
      */
-    public static func jumpToWebUrl(url: String?) {
+    public static func jumpToWebUrl(url: String?, showAd: Bool = false) {
         runWithWindows(){ window in
             guard let urlString = url?.trimmingCharacters(in: .whitespaces),
                   !urlString.isEmpty
@@ -162,14 +162,14 @@ import shared
                 print("URL is empty or nil")
                 return
             }
-            
+
             guard let url = URL(string: urlString) else {
                 // 处理 URL 无效的情况
                 print("Invalid URL: \(urlString)")
                 return
             }
             let rootView = window.rootViewController
-            let webVC = WxpWebViewController(url: url)
+            let webVC = WxpWebViewController(url: url, showAd: showAd)
             //            let webVC =  WxpFSafariViewController(url: url)
             //            webVC.dismissButtonStyle = .close
             //如果根是navVC，那就压栈

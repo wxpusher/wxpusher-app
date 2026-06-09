@@ -5,7 +5,10 @@ import com.smjcco.wxpusher.base.biz.bean.WxpUpdateInfoReq
 import com.smjcco.wxpusher.base.common.BaseResp
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpNetworkService
+import com.smjcco.wxpusher.base.common.WxpSerializationUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.biz.ad.WxpShowAdResp
+import io.ktor.client.statement.bodyAsText
 import com.smjcco.wxpusher.biz.version.AppVersionCheckResp
 import com.smjcco.wxpusher.page.accountdetail.WxpAppleBindReq
 import com.smjcco.wxpusher.page.accountdetail.WxpWeixinBindReq
@@ -57,12 +60,15 @@ object WxpApiService {
                 WxpAppPageService.jumpToLogin()
                 return null
             }
+            WxpLogUtils.w("WxpApi", "接口业务失败 code=${resp.code} msg=${resp.msg}")
             if (toastError) {
                 WxpToastUtils.showToast(resp.msg)
             }
             errorBlock?.invoke(BizError(resp.code, resp.msg))
         } catch (e: Throwable) {
             e.printStackTrace()
+            // 打印完整异常信息（类型+消息+堆栈），方便排查反序列化/网络等问题
+            WxpLogUtils.e("WxpApi", "接口请求异常: ${e::class.simpleName}: ${e.message}", e)
             if (toastError) {
                 if (e is IOException) {
                     WxpToastUtils.showToast("请检查网络")
@@ -396,6 +402,21 @@ object WxpApiService {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .get(WxpNetworkService.getUrl("/api/need-login/device/list-banner"))
                 .body()
+        })
+    }
+
+    /**
+     * 查询指定广告位的广告配置（是否展示 + 信息流插入位置等），由服务端控制
+     * （付费订阅用户、白名单用户不展示）。失败静默，默认按不展示处理。
+     * @param slotId 代码位id
+     * @return 响应对象，null 表示请求失败（按不展示处理）
+     */
+    suspend fun fetchAdConfig(slotId: String): WxpShowAdResp? {
+        return commonRespDeal(toastError = false, block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .get(WxpNetworkService.getUrl("/api/need-login/device/show-ad")) {
+                    parameter("slotId", slotId)
+                }.body()
         })
     }
 

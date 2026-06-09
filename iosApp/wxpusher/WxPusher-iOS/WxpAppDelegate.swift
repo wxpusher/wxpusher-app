@@ -66,6 +66,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         WxpWeixinOpenManager.shared.doInit()
         //注册版本升级市场跳转能力（iOS 打开 downloadUrl 即 App Store）
         WxpVersionCheckManager.shared.setNavigator(navigator: WxpAppMarketNavigatorIOS())
+        //初始化穿山甲广告 SDK（已在用户同意隐私政策后进入主流程）
+        WxpPangleAdManager.shared.doInit()
         return true
     }
 

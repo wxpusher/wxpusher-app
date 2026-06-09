@@ -6,6 +6,8 @@
 //
 
 import shared
+import BUAdTestMeasurement
+import WebKit
 
 #if DEBUG
 
@@ -137,10 +139,76 @@ class TestPanelViewController: UIViewController {
             saveButton.heightAnchor.constraint(equalToConstant: 44)
         ])
         contentView.addArrangedSubview(buttonContainer)
-        
+
+        // 穿山甲测量/预览工具入口（仅 DEBUG）
+        let pangleTestButton = UIButton(type: .system)
+        pangleTestButton.setTitle("穿山甲测量工具", for: .normal)
+        pangleTestButton.backgroundColor = .systemGreen
+        pangleTestButton.setTitleColor(.white, for: .normal)
+        pangleTestButton.layer.cornerRadius = 8
+        pangleTestButton.addTarget(self, action: #selector(openPangleTestTool), for: .touchUpInside)
+
+        let pangleButtonContainer = UIView()
+        pangleButtonContainer.addSubview(pangleTestButton)
+        pangleTestButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            pangleTestButton.topAnchor.constraint(equalTo: pangleButtonContainer.topAnchor),
+            pangleTestButton.leadingAnchor.constraint(equalTo: pangleButtonContainer.leadingAnchor),
+            pangleTestButton.trailingAnchor.constraint(equalTo: pangleButtonContainer.trailingAnchor),
+            pangleTestButton.bottomAnchor.constraint(equalTo: pangleButtonContainer.bottomAnchor),
+            pangleTestButton.heightAnchor.constraint(equalToConstant: 44)
+        ])
+        contentView.addArrangedSubview(pangleButtonContainer)
+
+        // 清空 WebView 缓存（仅 DEBUG，调试 app-fe 时强制拉取最新页面）
+        let clearCacheButton = UIButton(type: .system)
+        clearCacheButton.setTitle("清空WebView缓存", for: .normal)
+        clearCacheButton.backgroundColor = .systemOrange
+        clearCacheButton.setTitleColor(.white, for: .normal)
+        clearCacheButton.layer.cornerRadius = 8
+        clearCacheButton.addTarget(self, action: #selector(clearWebViewCache), for: .touchUpInside)
+
+        let clearCacheContainer = UIView()
+        clearCacheContainer.addSubview(clearCacheButton)
+        clearCacheButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            clearCacheButton.topAnchor.constraint(equalTo: clearCacheContainer.topAnchor),
+            clearCacheButton.leadingAnchor.constraint(equalTo: clearCacheContainer.leadingAnchor),
+            clearCacheButton.trailingAnchor.constraint(equalTo: clearCacheContainer.trailingAnchor),
+            clearCacheButton.bottomAnchor.constraint(equalTo: clearCacheContainer.bottomAnchor),
+            clearCacheButton.heightAnchor.constraint(equalToConstant: 44)
+        ])
+        contentView.addArrangedSubview(clearCacheContainer)
+
         // Tap to dismiss keyboard
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
+    }
+
+    /// 清空 WKWebView 的所有网站数据（缓存/Cookie/localStorage/ServiceWorker 等），
+    /// 便于调试 app-fe 时强制拉取最新页面，避免命中旧缓存。
+    @objc private func clearWebViewCache() {
+        let dataStore = WKWebsiteDataStore.default()
+        let types = WKWebsiteDataStore.allWebsiteDataTypes()
+        dataStore.removeData(ofTypes: types, modifiedSince: Date(timeIntervalSince1970: 0)) {
+            DispatchQueue.main.async {
+                WxpToastUtils.shared.showToast(msg: "WebView 缓存已清空，重新打开页面即可拉取最新")
+            }
+        }
+    }
+
+    /// 打开穿山甲测量/预览工具
+    @objc private func openPangleTestTool() {
+        // 模拟器不支持穿山甲 SDK（Rosetta 会崩溃），提示去真机
+        guard WxpPangleAdManager.isSupported else {
+            let alert = UIAlertController(title: "提示", message: "穿山甲测量工具需在真机运行", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default))
+            present(alert, animated: true)
+            return
+        }
+        // 确保 SDK 已初始化（debugMode 已在初始化前开启）
+        WxpPangleAdManager.shared.doInit()
+        BUAdTestMeasurementManager.showTestMeasurement(with: self)
     }
     
     private func setupSection(title: String, label: UILabel, radioGroup: RadioGroup, textField: UITextField, options: [String], defaultValues: [String]) {

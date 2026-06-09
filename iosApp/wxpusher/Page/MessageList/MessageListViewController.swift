@@ -913,7 +913,8 @@ extension MessageListViewController: UITableViewDelegate, UITableViewDataSource 
         tableView.deselectRow(at: indexPath, animated: true)
         let message = messageList[indexPath.row]
         let urlString = message.url.trimmingCharacters(in: .whitespaces)
-        WxpJumpPageUtils.jumpToWebUrl(url: urlString)
+        // 仅消息详情页展示广告（由后端开关 + 穿山甲控制）
+        WxpJumpPageUtils.jumpToWebUrl(url: urlString, showAd: true)
         message.read = true
         tableView.reloadData()
     }
