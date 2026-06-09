@@ -7,6 +7,7 @@
 
 import shared
 import BUAdTestMeasurement
+import WebKit
 
 #if DEBUG
 
@@ -159,9 +160,41 @@ class TestPanelViewController: UIViewController {
         ])
         contentView.addArrangedSubview(pangleButtonContainer)
 
+        // 清空 WebView 缓存（仅 DEBUG，调试 app-fe 时强制拉取最新页面）
+        let clearCacheButton = UIButton(type: .system)
+        clearCacheButton.setTitle("清空WebView缓存", for: .normal)
+        clearCacheButton.backgroundColor = .systemOrange
+        clearCacheButton.setTitleColor(.white, for: .normal)
+        clearCacheButton.layer.cornerRadius = 8
+        clearCacheButton.addTarget(self, action: #selector(clearWebViewCache), for: .touchUpInside)
+
+        let clearCacheContainer = UIView()
+        clearCacheContainer.addSubview(clearCacheButton)
+        clearCacheButton.translatesAutoresizingMaskIntoConstraints = false
+        NSLayoutConstraint.activate([
+            clearCacheButton.topAnchor.constraint(equalTo: clearCacheContainer.topAnchor),
+            clearCacheButton.leadingAnchor.constraint(equalTo: clearCacheContainer.leadingAnchor),
+            clearCacheButton.trailingAnchor.constraint(equalTo: clearCacheContainer.trailingAnchor),
+            clearCacheButton.bottomAnchor.constraint(equalTo: clearCacheContainer.bottomAnchor),
+            clearCacheButton.heightAnchor.constraint(equalToConstant: 44)
+        ])
+        contentView.addArrangedSubview(clearCacheContainer)
+
         // Tap to dismiss keyboard
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
+    }
+
+    /// 清空 WKWebView 的所有网站数据（缓存/Cookie/localStorage/ServiceWorker 等），
+    /// 便于调试 app-fe 时强制拉取最新页面，避免命中旧缓存。
+    @objc private func clearWebViewCache() {
+        let dataStore = WKWebsiteDataStore.default()
+        let types = WKWebsiteDataStore.allWebsiteDataTypes()
+        dataStore.removeData(ofTypes: types, modifiedSince: Date(timeIntervalSince1970: 0)) {
+            DispatchQueue.main.async {
+                WxpToastUtils.shared.showToast(msg: "WebView 缓存已清空，重新打开页面即可拉取最新")
+            }
+        }
     }
 
     /// 打开穿山甲测量/预览工具
