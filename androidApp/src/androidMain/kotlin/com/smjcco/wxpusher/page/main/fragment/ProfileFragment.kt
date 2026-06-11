@@ -171,6 +171,16 @@ class ProfileFragment : WxpBaseFragment() {
                             "${WxpConfig.appFeUrl}/app/#/agent-overview",
                             activity
                         )
+                    },
+                    ProfileItem(
+                        title = "消息开关",
+                        subtitle = "总开关，控制是否接收消息",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToWebUrl(
+                            "${WxpConfig.appFeUrl}/app/#/user-enable",
+                            activity
+                        )
                     }
                 )
             ))
