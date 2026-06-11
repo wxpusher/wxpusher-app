@@ -15,7 +15,9 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <!-- 扫码相册选图改用系统 Photo Picker，无需任何存储/媒体读取权限 -->
+    <!-- 移除腾讯 Shiply 升级 SDK 带入的 WRITE 权限；移除后 merger 也不会再隐式添加 READ_EXTERNAL_STORAGE -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
 
     <!-- 声明需要相机特征 -->
     <uses-feature
