@@ -49,6 +49,8 @@ kotlin {
             implementation("io.github.scwang90:refresh-layout-kernel:2.1.0")
             implementation("io.github.scwang90:refresh-header-classics:2.1.0")
             implementation("io.github.scwang90:refresh-footer-classics:2.1.0")
+            //穿山甲（CSJ/Pangle）标准版广告 SDK，对应 iOS 的 Ads-CN（7.6 系列）。
+            implementation("com.pangle.cn:ads-sdk-pro:7.6.1.2")
         }
         commonMain.dependencies {
             implementation(libs.androidx.lifecycle.viewmodel)
@@ -159,7 +161,11 @@ dependencies {
     implementation(fileTree("libs") {
         include("*.jar")
         include("*.aar")
+        // 穿山甲测量工具仅 offline 包依赖（见下方 offlineImplementation），prod 不打入
+        exclude("csj_ad_test_tools-release.aar")
     })
+    // 穿山甲测量/预览工具（csj_ad_test_tools-release.aar，doc 5427），仅 offline flavor 打入 APK，正式包不依赖
+    add("offlineImplementation", files("libs/csj_ad_test_tools-release.aar"))
 //    implementation(libs.androidx.core)
     // AndroidX, The Basics
     implementation("androidx.appcompat:appcompat:1.6.1")

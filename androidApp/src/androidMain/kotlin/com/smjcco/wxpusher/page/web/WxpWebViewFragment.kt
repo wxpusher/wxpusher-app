@@ -30,7 +30,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.createBitmap
 import androidx.core.net.toUri
 import com.smjcco.wxpusher.R
+import com.smjcco.wxpusher.ad.WxpBannerAdView
+import com.smjcco.wxpusher.ad.WxpPangleAdManager
 import com.smjcco.wxpusher.base.WxpBaseFragment
+import com.smjcco.wxpusher.biz.ad.WxpAdManager
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpBaseInfoService
@@ -52,6 +55,7 @@ import com.tencent.mm.opensdk.modelmsg.SendMessageToWX
 open class WxpWebViewFragment : WxpBaseFragment() {
     companion object Companion {
         const val EXTRA_URL = "extra_url"
+        const val EXTRA_SHOW_AD = "extra_show_ad"
         private const val DEVICE_TOKEN_KEY = "deviceToken"
         private const val DEVICE_PLATFORM_KEY = "platform"
         private const val DEVICE_VERSION_NAME_KEY = "versionName"
@@ -66,10 +70,11 @@ open class WxpWebViewFragment : WxpBaseFragment() {
             OPTION_MENU_OPEN_BROWSER
         )
 
-        fun newInstance(url: String): WxpWebViewFragment {
+        fun newInstance(url: String, showAd: Boolean = false): WxpWebViewFragment {
             val fragment = WxpWebViewFragment()
             val args = Bundle()
             args.putString(EXTRA_URL, url)
+            args.putBoolean(EXTRA_SHOW_AD, showAd)
             fragment.arguments = args
             return fragment
         }
@@ -79,6 +84,12 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     private lateinit var webView: WebView
     private lateinit var progressBar: ProgressBar
     private lateinit var thirdPartyBannerView: LinearLayout
+
+    // 穿山甲底部 Banner 广告（仅消息详情页 showAd=true 时请求，最终是否展示由后端开关控制）
+    private lateinit var adContainerView: LinearLayout
+    private var adBannerView: WxpBannerAdView? = null
+    private var showAd = false
+    private var adRequested = false
 
     //浏览器操作按钮
     private lateinit var webOptBannerView: View
@@ -138,10 +149,12 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         setupUI(view)
         setupWebView()
         targetUrl = arguments?.getString(EXTRA_URL) ?: ""
+        showAd = arguments?.getBoolean(EXTRA_SHOW_AD, false) ?: false
         if (targetUrl.isEmpty()) {
             return
         }
         loadWebContentWithVersionCheck(targetUrl)
+        loadAdIfNeeded()
     }
 
     open fun setupUI(view: View) {
@@ -153,6 +166,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         webView = view.findViewById(R.id.webView)
         progressBar = view.findViewById(R.id.progressBar)
         thirdPartyBannerView = view.findViewById(R.id.thirdPartyBannerView)
+        adContainerView = view.findViewById(R.id.adContainerView)
         webOptBannerView = view.findViewById(R.id.webOptionView)
         backButton = view.findViewById(R.id.backButton)
         forwardButton = view.findViewById(R.id.forwardButton)
@@ -464,6 +478,60 @@ open class WxpWebViewFragment : WxpBaseFragment() {
 
     private fun hideBanner() {
         thirdPartyBannerView.visibility = View.GONE
+    }
+
+    /**
+     * 仅消息详情页（showAd=true）才请求广告：先问后端开关，放行后再加载穿山甲 Banner。
+     * 对照 iOS WxpWebViewController.loadAdIfNeeded。
+     */
+    private fun loadAdIfNeeded() {
+        if (!showAd || adRequested) return
+        if (!WxpPangleAdManager.isReady()) return
+        adRequested = true
+        WxpAdManager.fetchAdConfig(WxpBannerAdView.messageDetailSlotId) { resp ->
+            if (resp?.showAd == true) {
+                loadBannerAd()
+            }
+        }
+    }
+
+    private fun loadBannerAd() {
+        if (adBannerView != null) return
+        val host = getActivityHost() ?: return
+        val banner = WxpBannerAdView(host)
+        banner.callback = object : WxpBannerAdView.Callback {
+            override fun onAdRendered(adView: WxpBannerAdView, heightPx: Int) {
+                val lp = adContainerView.layoutParams
+                lp.height = heightPx
+                adContainerView.layoutParams = lp
+                adContainerView.visibility = View.VISIBLE
+            }
+
+            override fun onAdFailed(adView: WxpBannerAdView) {
+                hideAdContainer()
+            }
+
+            override fun onAdClosed(adView: WxpBannerAdView) {
+                hideAdContainer()
+            }
+        }
+        adContainerView.removeAllViews()
+        adContainerView.addView(
+            banner,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT
+            )
+        )
+        adBannerView = banner
+        banner.loadAd(WxpBannerAdView.messageDetailSlotId, webView.width)
+    }
+
+    private fun hideAdContainer() {
+        adContainerView.visibility = View.GONE
+        val lp = adContainerView.layoutParams
+        lp.height = 0
+        adContainerView.layoutParams = lp
     }
 
     private fun updateMenuVisibility(url: String?) {
@@ -784,6 +852,8 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     }
 
     override fun onDestroyView() {
+        adBannerView?.destroy()
+        adBannerView = null
         webView.stopLoading()
         webView.setWebChromeClient(null)
         webView.destroy()

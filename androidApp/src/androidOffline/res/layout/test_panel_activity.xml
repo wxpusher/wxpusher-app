@@ -160,6 +160,14 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
+        <!-- 穿山甲测量/预览工具入口（仅 offline 包含，对照 iOS TestPanel） -->
+        <Button
+            android:id="@+id/pangle_test_tool_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="穿山甲测量工具" />
+
         <!-- 确认按钮 -->
         <Button
             android:id="@+id/confirm_button"

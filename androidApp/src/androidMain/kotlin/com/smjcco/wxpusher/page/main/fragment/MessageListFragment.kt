@@ -310,7 +310,8 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         // 点击消息项，打开网页
         val urlString = message.url.trim()
         if (urlString.isNotEmpty()) {
-            WxpJumpPageUtils.jumpToWebUrl(urlString, activity)
+            // 消息详情页允许展示广告（最终是否展示由后端开关控制），对照 iOS showAd=true
+            WxpJumpPageUtils.jumpToWebUrl(urlString, activity, showAd = true)
             // 标记消息为已读
             message.read = true
             adapter.notifyDataSetChanged()

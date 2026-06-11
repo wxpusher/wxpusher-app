@@ -94,7 +94,7 @@ object WxpJumpPageUtils {
         }
     }
 
-    fun jumpToWebUrl(url: String, activity: Activity? = null) {
+    fun jumpToWebUrl(url: String, activity: Activity? = null, showAd: Boolean = false) {
         withActivity(activity) {
             try {
                 val uri = url.toUri()
@@ -103,6 +103,7 @@ object WxpJumpPageUtils {
                 if (webSchemes.contains(scheme)) {
                     val intent = Intent(it, WxpWebViewActivity::class.java);
                     intent.putExtra(WxpWebViewActivity.EXTRA_URL, url)
+                    intent.putExtra(WxpWebViewActivity.EXTRA_SHOW_AD, showAd)
                     it.startActivity(intent)
                 } else {
                     //非标准webview能处理的链接， 使用系统打开

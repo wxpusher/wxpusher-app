@@ -9,6 +9,7 @@ import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
+import com.bytedance.tools.util.ToolsUtil
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WxpConfig
 import com.smjcco.wxpusher.utils.ThreadUtils
@@ -38,6 +39,7 @@ class TestPanelActivity : ComponentActivity() {
     private lateinit var wsUrlEditText: EditText
 
     private lateinit var confirmButton: Button
+    private lateinit var pangleTestToolButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +65,7 @@ class TestPanelActivity : ComponentActivity() {
         wsUrlEditText = findViewById(R.id.ws_url_edit_text)
 
         confirmButton = findViewById(R.id.confirm_button)
+        pangleTestToolButton = findViewById(R.id.pangle_test_tool_button)
     }
 
     private fun loadSavedSettings() {
@@ -120,6 +123,22 @@ class TestPanelActivity : ComponentActivity() {
 
         confirmButton.setOnClickListener {
             saveSettings()
+        }
+
+        pangleTestToolButton.setOnClickListener {
+            openPangleTestTool()
+        }
+    }
+
+    /**
+     * 打开穿山甲测量/预览工具（对照 iOS TestPanel 的「穿山甲测量工具」按钮）。
+     * 工具由 tools-release.aar 提供，仅 offline 包打入，需 SDK 已初始化后调用。
+     */
+    private fun openPangleTestTool() {
+        try {
+            ToolsUtil.start(this)
+        } catch (e: Throwable) {
+            Toast.makeText(this, "测试工具不可用: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 

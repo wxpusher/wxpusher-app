@@ -15,6 +15,8 @@
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!-- 穿山甲（CSJ/Pangle）广告 SDK 推荐权限，提升填充率 -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!-- 扫码相册选图改用系统 Photo Picker，无需任何存储/媒体读取权限 -->
     <!-- 移除腾讯 Shiply 升级 SDK 带入的 WRITE 权限；移除后 merger 也不会再隐式添加 READ_EXTERNAL_STORAGE -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" tools:node="remove" />
@@ -37,7 +39,8 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:node="merge"
-        tools:remove="android:networkSecurityConfig">
+        tools:remove="android:networkSecurityConfig"
+        tools:replace="android:supportsRtl">
 
         <activity
             android:name=".page.main.WxpMainActivity"

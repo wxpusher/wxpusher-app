@@ -66,6 +66,16 @@
 
     </FrameLayout>
 
+    <!-- 穿山甲底部 Banner 广告容器（位于 WebView 与底部工具栏之间，对照 iOS） -->
+    <LinearLayout
+        android:id="@+id/adContainerView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone" />
+
     <!-- 底部工具栏 -->
     <LinearLayout
         android:id="@+id/webOptionView"
