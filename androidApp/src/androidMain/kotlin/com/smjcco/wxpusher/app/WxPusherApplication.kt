@@ -3,6 +3,7 @@ package com.smjcco.wxpusher.app
 import android.app.Application
 import android.os.Build
 import com.smjcco.wxpusher.WxpConfig
+import com.smjcco.wxpusher.ad.WxpPangleAdManager
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.biz.WxpAppPageService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
@@ -52,6 +53,8 @@ class WxPusherApplication : Application() {
         AppFeVersionManager.refreshOnAppLaunch()
         //初始化微信SDK
         WxpWeixinOpenManager.init(this)
+        //初始化穿山甲广告 SDK
+        WxpPangleAdManager.doInit(this)
     }
 
 

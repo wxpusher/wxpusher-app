@@ -7,20 +7,19 @@ import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.hardware.Camera
 import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import android.view.View
 import android.view.WindowManager
 import android.widget.FrameLayout
+import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -66,25 +65,12 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
         }
     }
 
-    // 存储权限请求
-    private val storagePermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            openImagePicker()
-        } else {
-            WxpToastUtils.showToast("需要存储权限才能选择图片")
-        }
-    }
-
-    // 图片选择器
-    private val imagePickerLauncher = registerForActivityResult(
-        ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        if (result.resultCode == Activity.RESULT_OK) {
-            result.data?.data?.let { uri ->
-                decodeImageFromUri(uri)
-            }
+    // 图片选择器（系统相册 Photo Picker，无需存储权限）
+    private val pickMediaLauncher = registerForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) {
+            decodeImageFromUri(uri)
         }
     }
 
@@ -122,7 +108,9 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
 
         // 相册按钮
         findViewById<View>(R.id.btn_photo_library).setOnClickListener {
-            checkStoragePermission()
+            pickMediaLauncher.launch(
+                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+            )
         }
     }
 
@@ -165,28 +153,6 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
         }
     }
 
-    private fun checkStoragePermission() {
-        val permission =
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
-                Manifest.permission.READ_MEDIA_IMAGES
-            } else {
-                Manifest.permission.READ_EXTERNAL_STORAGE
-            }
-
-        when {
-            ContextCompat.checkSelfPermission(
-                this,
-                permission
-            ) == PackageManager.PERMISSION_GRANTED -> {
-                openImagePicker()
-            }
-
-            else -> {
-                storagePermissionLauncher.launch(permission)
-            }
-        }
-    }
-
     private fun showPermissionDialog() {
         WxpToastUtils.showToast("需要相机权限才能扫描二维码，请前往设置开启")
         ThreadUtils.runOnMainThread({
@@ -194,10 +160,6 @@ class WxpScanActivity : WxpBaseMvpActivity<WxpScanPresenter>(), IWxpScanView,
         }, 1500)
     }
 
-    private fun openImagePicker() {
-        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-        imagePickerLauncher.launch(intent)
-    }
 
     private fun initCamera() {
         try {

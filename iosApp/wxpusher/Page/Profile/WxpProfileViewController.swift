@@ -109,6 +109,10 @@ class WxpProfileViewController: UIViewController {
                 ProfileItem(title: "消息开关", subtitle: "总开关，控制是否接收消息",
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/user-enable")
+                            },
+                ProfileItem(title: "发送测试消息", subtitle: "体验发送消息全流程",
+                            accessoryType: .disclosureIndicator) {
+                                WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/send-test-guide")
                             }
             ]),
             ("通知提醒", [
