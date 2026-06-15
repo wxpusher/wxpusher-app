@@ -541,6 +541,18 @@ class WxpWebViewController: UIViewController {
     @objc func closeButtonTapped() {
         navigationController?.popViewController(animated: true)
     }
+
+    /// 供桥调用：关闭当前 WebView 承载页
+    func closeWebPage() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            if let navigationController = self.navigationController {
+                navigationController.popViewController(animated: true)
+            } else {
+                self.dismiss(animated: true)
+            }
+        }
+    }
     
     private func showThirdPartyContentAlert() {
         let alert = UIAlertController(

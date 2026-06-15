@@ -638,6 +638,13 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         activity?.finish()
     }
 
+    /** 供桥调用：关闭当前 WebView 承载页 */
+    fun closeWebPage() {
+        activity?.runOnUiThread {
+            activity?.finish()
+        }
+    }
+
     private fun showThirdPartyContentAlert() {
         val params = WxpDialogParams(
             title = "第三方内容提示",
