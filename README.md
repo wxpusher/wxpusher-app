@@ -2,7 +2,7 @@
 
 WxPusher 是一个使用微信公众号作为通道的，实时信息推送平台。本仓库为 WxPusher 的移动客户端项目，使用 **Kotlin Multiplatform (KMP)** 共享业务逻辑，搭配 **Android (Kotlin)** 和 **iOS (Swift)** 原生 UI 实现。
 
-📖 完整的平台文档请参阅：[WxPusher 官方文档](https://wxpusher.zjiecode.com/docs/) | 📥 [下载最新版本 APP](https://wxpusher.zjiecode.com/docs/download.html)
+📖 完整的平台文档请参阅：[WxPusher 官方文档](https://wxpusher.zjiecode.com/docs/) | 📥 [下载最新版本 APP](https://wxpusher.zjiecode.com/download/)
 
 ---
 
@@ -375,7 +375,7 @@ git push origin feature/your-feature-name
 
 ## 下载安装
 
-前往 [WxPusher APP 下载页](https://wxpusher.zjiecode.com/docs/download.html) 获取最新版本：
+前往 [WxPusher APP 下载页](https://wxpusher.zjiecode.com/download/) 获取最新版本：
 
 - **Android**：直接下载 APK 安装
 - **iOS**：扫码下载或在 App Store 搜索「WxPusher消息推送平台」
@@ -386,4 +386,4 @@ git push origin feature/your-feature-name
 
 - [WxPusher 官方文档](https://wxpusher.zjiecode.com/docs/)
 - [WxPusher 官网](https://wxpusher.zjiecode.com)
-- [APP 下载](https://wxpusher.zjiecode.com/docs/download.html)
+- [APP 下载](https://wxpusher.zjiecode.com/download/)
