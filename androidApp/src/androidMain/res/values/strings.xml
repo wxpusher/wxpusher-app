@@ -31,6 +31,7 @@
     <string name="message_list_mark_all_read">已读全部消息</string>
     <string name="message_list_batch_select">多选</string>
     <string name="message_list_delete_all">删除全部消息</string>
+    <string name="message_list_send_test">发送测试消息</string>
     <string name="message_list_action_mark_read">标记已读</string>
     <string name="message_list_action_mark_unread">标记未读</string>
     <string name="message_list_action_delete">删除</string>

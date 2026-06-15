@@ -51,6 +51,11 @@ dependencyResolutionManagement {
         maven {
             setUrl("https://tencent-tds-maven.pkg.coding.net/repository/shiply/repo")
         }
+
+        //穿山甲（CSJ/Pangle）广告 SDK
+        maven {
+            setUrl("https://artifact.bytedance.com/repository/pangle")
+        }
     }
 }
 

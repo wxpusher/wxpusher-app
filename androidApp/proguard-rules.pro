@@ -138,3 +138,13 @@
 #oppo
 -keep public class * extends android.app.Service
 -keep class com.heytap.msp.** { *;}
+
+#穿山甲（CSJ/Pangle）广告 SDK
+-keep class com.bytedance.sdk.openadsdk.** { *; }
+-keep interface com.bytedance.sdk.openadsdk.** { *; }
+-keep class com.bytedance.sdk.component.** { *; }
+-keep class com.bykv.vk.** { *; }
+-keep class com.ss.android.** { *; }
+-keep class com.pgl.** { *; }
+-dontwarn com.bytedance.sdk.openadsdk.**
+-dontwarn com.bytedance.sdk.component.**

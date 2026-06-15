@@ -60,6 +60,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     private lateinit var refreshLayout: SmartRefreshLayout
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyText: TextView
+    private lateinit var emptyActionButton: MaterialButton
     private lateinit var adapter: MessageListAdapter
     private lateinit var searchEditText: EditText
     private lateinit var searchCancelBtn: TextView
@@ -149,6 +150,11 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         refreshLayout = view.findViewById(R.id.refresh_layout)
         recyclerView = view.findViewById(R.id.recycler_view)
         emptyText = view.findViewById(R.id.empty_text)
+        emptyActionButton = view.findViewById(R.id.empty_action_button)
+        emptyActionButton.setOnClickListener {
+            // 打开「去体验发送消息」引导页
+            WxpJumpPageUtils.jumpToWebUrl("${WxpConfig.appFeUrl}/app/#/send-test-guide", activity)
+        }
         searchEditText = view.findViewById(R.id.search_edit_text)
         searchCancelBtn = view.findViewById(R.id.search_cancel_btn)
         searchBarContainer = view.findViewById(R.id.search_bar_container)
@@ -310,7 +316,8 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         // 点击消息项，打开网页
         val urlString = message.url.trim()
         if (urlString.isNotEmpty()) {
-            WxpJumpPageUtils.jumpToWebUrl(urlString, activity)
+            // 消息详情页允许展示广告（最终是否展示由后端开关控制），对照 iOS showAd=true
+            WxpJumpPageUtils.jumpToWebUrl(urlString, activity, showAd = true)
             // 标记消息为已读
             message.read = true
             adapter.notifyDataSetChanged()
@@ -359,7 +366,9 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     private fun loadDataFinish() {
         refreshLayout.finishRefresh()
         // 显示/隐藏空状态
-        emptyText.visibility = if (messageList.isEmpty()) View.VISIBLE else View.GONE
+        val emptyVisibility = if (messageList.isEmpty()) View.VISIBLE else View.GONE
+        emptyText.visibility = emptyVisibility
+        emptyActionButton.visibility = emptyVisibility
     }
 
     override fun onCheckReason(data: WxpCheckAppMsgReasonResp?) {
@@ -551,6 +560,15 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
 
             R.id.menu_delete_all -> {
                 presenter.deleteAll()
+                true
+            }
+
+            R.id.menu_send_test -> {
+                // 打开体验发送消息页面
+                WxpJumpPageUtils.jumpToWebUrl(
+                    "${WxpConfig.appFeUrl}/app/#/send-test-guide",
+                    requireActivity()
+                )
                 true
             }
 

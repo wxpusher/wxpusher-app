@@ -14,9 +14,11 @@ class WxpWebViewActivity : WxpBaseActivity() {
 
     companion object Companion {
         const val EXTRA_URL = "extra_url"
-        fun start(context: Context, url: String) {
+        const val EXTRA_SHOW_AD = "extra_show_ad"
+        fun start(context: Context, url: String, showAd: Boolean = false) {
             val intent = Intent(context, WxpWebViewActivity::class.java)
             intent.putExtra(EXTRA_URL, url)
+            intent.putExtra(EXTRA_SHOW_AD, showAd)
             context.startActivity(intent)
         }
     }
@@ -33,7 +35,8 @@ class WxpWebViewActivity : WxpBaseActivity() {
             finish()
             return
         }
-        fragment = WxpWebViewFragment.newInstance(targetUrl)
+        val showAd = intent.getBooleanExtra(EXTRA_SHOW_AD, false)
+        fragment = WxpWebViewFragment.newInstance(targetUrl, showAd)
         supportFragmentManager.beginTransaction()
             .replace(R.id.webViewContainer, fragment!!)
             .commit()
