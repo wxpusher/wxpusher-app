@@ -23,6 +23,7 @@
 		1A63A13A2F669047005FF070 /* WxpBridgeMessageParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1362F669047005FF070 /* WxpBridgeMessageParser.swift */; };
 		1A63A13B2F669047005FF070 /* WxpWebBridgeManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1382F669047005FF070 /* WxpWebBridgeManager.swift */; };
 		1A63A13C2F669047005FF070 /* WxpOpenUrlBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1312F669047005FF070 /* WxpOpenUrlBridgeHandler.swift */; };
+		1A63A2022F669047005FF070 /* WxpOpenSystemBrowserBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A2012F669047005FF070 /* WxpOpenSystemBrowserBridgeHandler.swift */; };
 		1A63A13D2F669047005FF070 /* WxpPayRequestBridgeHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1322F669047005FF070 /* WxpPayRequestBridgeHandler.swift */; };
 		1A63A13E2F669047005FF070 /* WxpWeakScriptMessageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1372F669047005FF070 /* WxpWeakScriptMessageHandler.swift */; };
 		1A63A13F2F669047005FF070 /* WxpBridgeContracts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A63A1342F669047005FF070 /* WxpBridgeContracts.swift */; };
@@ -85,6 +86,7 @@
 		1A4934762E32393A00EA1C71 /* WxpQRCodeScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpQRCodeScanViewController.swift; sourceTree = "<group>"; };
 		1A63A1302F669047005FF070 /* WxpGetLoginInfoBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpGetLoginInfoBridgeHandler.swift; sourceTree = "<group>"; };
 		1A63A1312F669047005FF070 /* WxpOpenUrlBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpOpenUrlBridgeHandler.swift; sourceTree = "<group>"; };
+		1A63A2012F669047005FF070 /* WxpOpenSystemBrowserBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpOpenSystemBrowserBridgeHandler.swift; sourceTree = "<group>"; };
 		1A63A1322F669047005FF070 /* WxpPayRequestBridgeHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpPayRequestBridgeHandler.swift; sourceTree = "<group>"; };
 		1A63A1342F669047005FF070 /* WxpBridgeContracts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBridgeContracts.swift; sourceTree = "<group>"; };
 		1A63A1352F669047005FF070 /* WxpBridgeEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpBridgeEmitter.swift; sourceTree = "<group>"; };
@@ -258,6 +260,7 @@
 				1A63A1302F669047005FF070 /* WxpGetLoginInfoBridgeHandler.swift */,
 				1A63A1432F669047005FF070 /* WxpGetEnvBaseUrlBridgeHandler.swift */,
 				1A63A1312F669047005FF070 /* WxpOpenUrlBridgeHandler.swift */,
+				1A63A2012F669047005FF070 /* WxpOpenSystemBrowserBridgeHandler.swift */,
 				1A63A1322F669047005FF070 /* WxpPayRequestBridgeHandler.swift */,
 				1A63A1452F669047005FF070 /* WxpShowToastBridgeHandler.swift */,
 				7B8A1D4E3F2C100200A1B2C3 /* WxpSetWebOptionMenuBridgeHandler.swift */,
@@ -701,6 +704,7 @@
 				1A63A13A2F669047005FF070 /* WxpBridgeMessageParser.swift in Sources */,
 				1A63A13B2F669047005FF070 /* WxpWebBridgeManager.swift in Sources */,
 				1A63A13C2F669047005FF070 /* WxpOpenUrlBridgeHandler.swift in Sources */,
+				1A63A2022F669047005FF070 /* WxpOpenSystemBrowserBridgeHandler.swift in Sources */,
 				1A63A13D2F669047005FF070 /* WxpPayRequestBridgeHandler.swift in Sources */,
 				1A63A13E2F669047005FF070 /* WxpWeakScriptMessageHandler.swift in Sources */,
 				1A63A13F2F669047005FF070 /* WxpBridgeContracts.swift in Sources */,

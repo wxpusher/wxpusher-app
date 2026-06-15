@@ -59,28 +59,34 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         clickMessageUserInfo = message;
     }
     
+    //空态页操作按钮：去体验发送消息
+    private let emptyActionButton: UIButton = {
+        let tryButton = UIButton(type: .system)
+        tryButton.setTitle("去体验发送消息", for: .normal)
+        tryButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .headline)
+        // 主色底 + 白字（深浅模式一致）
+        tryButton.backgroundColor = .defAccentPrimaryColor
+        tryButton.setTitleColor(.white, for: .normal)
+        tryButton.layer.cornerRadius = 8
+        tryButton.clipsToBounds = true
+        return tryButton
+    }()
+
     //空态页
-    private let emptyView: UIView = {
+    private lazy var emptyView: UIView = {
         // 添加空状态视图
         let emptyView = UIView()
         let emptyImageView = UIImageView(image: UIImage(systemName: "tray"))
         emptyImageView.tintColor = .systemGray3
         emptyImageView.contentMode = .scaleAspectFit
-        
+
         let emptyLabel = UILabel()
         emptyLabel.text = "暂无消息"
         emptyLabel.textColor = .systemGray3
         emptyLabel.textAlignment = .center
-        
-        let tryButton = UIButton(type: .system)
-        tryButton.setTitle("去体验发送消息", for: .normal)
-        tryButton.titleLabel?.font = UIFont.preferredFont(forTextStyle: .headline)
-        tryButton.backgroundColor = .systemBlue
-        tryButton.setTitleColor(.white, for: .normal)
-        tryButton.layer.cornerRadius = 4
-        //暂时先不实现体验，后面来补充这个功能
-        tryButton.isHidden = true
-        
+
+        let tryButton = self.emptyActionButton
+
         emptyView.addSubview(emptyImageView)
         emptyView.addSubview(emptyLabel)
         emptyView.addSubview(tryButton)
@@ -111,6 +117,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         setupSearchAndNavication()
         setupRefreshControl()
         setupUI()
+        emptyActionButton.addTarget(self, action: #selector(onTapSendTestGuide), for: .touchUpInside)
         tableView.allowsMultipleSelectionDuringEditing = true
         setupBatchBottomBar()
 
@@ -146,6 +153,12 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         refreshBannerStateOnVisible()
     }
     
+    //点击空态按钮，打开「去体验发送消息」引导页
+    @objc private func onTapSendTestGuide() {
+        let url = "\(WxpConfig.shared.appFeUrl)/app/#/send-test-guide"
+        WxpJumpPageUtils.jumpToWebUrl(url: url)
+    }
+
     private func dealUserInfoMessage(userInfo:[AnyHashable : Any]?){
         guard let userInfo =  userInfo else {
             return
@@ -349,6 +362,17 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
                     attributes: .destructive,
                     handler:{ [weak self]_ in
                         self?.presenter.deleteAll()
+                    }
+                )
+            ]),
+
+            // 第三组：体验功能
+            UIMenu(title: "体验功能", options: .displayInline, children: [
+                UIAction(
+                    title: "发送测试消息",
+                    image: UIImage(systemName: "paperplane"),
+                    handler:{ _ in
+                        WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/send-test-guide")
                     }
                 )
             ])

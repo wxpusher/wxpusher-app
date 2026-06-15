@@ -28,6 +28,7 @@ final class WxpWebBridgeManager {
     private func registerDefaultHandlers() {
         registerHandler(action: "payRequest", requiresWhitelist: true, handler: WxpPayRequestBridgeHandler())
         registerHandler(action: "openUrl", requiresWhitelist: false, handler: WxpOpenUrlBridgeHandler())
+        registerHandler(action: "openSystemBrowser", requiresWhitelist: true, handler: WxpOpenSystemBrowserBridgeHandler())
         registerHandler(action: "getLoginInfo", requiresWhitelist: true, handler: WxpGetLoginInfoBridgeHandler())
         registerHandler(action: "getEnvBaseUrl", requiresWhitelist: true, handler: WxpGetEnvBaseUrlBridgeHandler())
         registerHandler(action: "showToast", requiresWhitelist: true, handler: WxpShowToastBridgeHandler())

@@ -85,7 +85,7 @@ class ProfileFragment : WxpBaseFragment() {
                             hasArrow = true
                         ) {
                             WxpJumpPageUtils.jumpToWebUrl(
-                                "${WxpConfig.appFeUrl}/app/#/subscribe-list",
+                                "${WxpConfig.appFeUrl}/app/#/app-upgrade",
                                 activity
                             )
                         }
@@ -179,6 +179,16 @@ class ProfileFragment : WxpBaseFragment() {
                     ) {
                         WxpJumpPageUtils.jumpToWebUrl(
                             "${WxpConfig.appFeUrl}/app/#/user-enable",
+                            activity
+                        )
+                    },
+                    ProfileItem(
+                        title = "发送测试消息",
+                        subtitle = "体验发送消息全流程",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToWebUrl(
+                            "${WxpConfig.appFeUrl}/app/#/send-test-guide",
                             activity
                         )
                     }
