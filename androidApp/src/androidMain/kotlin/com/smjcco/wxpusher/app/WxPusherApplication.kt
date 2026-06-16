@@ -12,6 +12,7 @@ import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpLoadingUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.base.common.init
+import com.smjcco.wxpusher.common.WxpSaveKey
 import com.smjcco.wxpusher.biz.version.WxpVersionCheckManager
 import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.push.PushManager
@@ -53,7 +54,23 @@ class WxPusherApplication : Application() {
         AppFeVersionManager.refreshOnAppLaunch()
         //初始化微信SDK
         WxpWeixinOpenManager.init(this)
-        //初始化穿山甲广告 SDK
+        // 仅当用户此前已同意隐私政策时，启动即初始化广告 SDK；首次未同意则等同意后再调
+        if (WxpSaveService.get(WxpSaveKey.UserHasAgreement, false)) {
+            initSdkAfterAgreement()
+        }
+    }
+
+    @Volatile
+    private var agreementSdkInitialized = false
+
+    /**
+     * 隐私合规：需在用户同意隐私政策后才能初始化的第三方 SDK 统一放这里。
+     * 幂等，重复调用无副作用。日后新增同类 SDK 时加到本方法，不要再放进 onCreate。
+     */
+    fun initSdkAfterAgreement() {
+        if (agreementSdkInitialized) return
+        agreementSdkInitialized = true
+        //初始化穿山甲广告 SDK（必须在用户同意隐私政策之后）
         WxpPangleAdManager.doInit(this)
     }
 
