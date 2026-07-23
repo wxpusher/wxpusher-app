@@ -20,6 +20,8 @@ class WxpProviderListFragment : WxpWebViewFragment(), IWxpProviderListView {
 
     override fun setupUI(view: View) {
         super.setupUI(view)
+        //默认隐藏底部操作栏：布局默认 VISIBLE，避免打开瞬间闪一下再隐藏（UI 线程调用会同步生效）
+        setBottomBarVisibleOverride(false)
         //隐藏左上角的返回按钮
         getActivityHost()?.supportActionBar?.setDisplayHomeAsUpEnabled(false)
         //覆盖webview默认的关闭按钮，改成home按钮
