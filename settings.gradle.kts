@@ -53,9 +53,7 @@ dependencyResolutionManagement {
         }
 
         //穿山甲（CSJ/Pangle）广告 SDK
-        maven {
-            setUrl("https://artifact.bytedance.com/repository/pangle")
-        }
+        
     }
 }
 
