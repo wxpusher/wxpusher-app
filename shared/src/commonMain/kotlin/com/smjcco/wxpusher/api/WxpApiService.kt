@@ -412,12 +412,7 @@ object WxpApiService {
      * @return 响应对象，null 表示请求失败（按不展示处理）
      */
     suspend fun fetchAdConfig(slotId: String): WxpShowAdResp? {
-        return commonRespDeal(toastError = false, block = {
-            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
-                .get(WxpNetworkService.getUrl("/api/need-login/device/show-ad")) {
-                    parameter("slotId", slotId)
-                }.body()
-        })
+        return null
     }
 
     /**
