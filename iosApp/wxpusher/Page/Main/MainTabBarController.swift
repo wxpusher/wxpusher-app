@@ -236,18 +236,7 @@ class MainTabBarController: UITabBarController {
 
 /// 扩展功能 tab —— 原生 WebView 容器加载 app-fe 的九宫格入口页。
 /// 与消息市场 tab（WxpProviderListViewController）结构一致。
-///
-/// 标题栏右侧固定齿轮(底部标签设置)。父类 WxpWebViewController 用同一个 rightBarButtonItem
-/// 槽位管理"网页操作菜单"，会在导航加载、以及 H5 调 setWebOptionMenu/setWebBottomBar 的异步 override 里
-/// 反复重设该槽位，从而清掉我们的按钮。因此在父类每个改动时机之后重新贴回齿轮。
 class WxpExtFuncViewController: WxpWebViewController {
-
-    private lazy var settingBarButton = UIBarButtonItem(
-        image: UIImage(systemName: "gearshape"),
-        style: .plain,
-        target: self,
-        action: #selector(openTabSetting)
-    )
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -256,7 +245,6 @@ class WxpExtFuncViewController: WxpWebViewController {
         // 默认隐藏底部 webview 操作栏：父类首次 applyWebMenuVisibility 时 url 还是 nil 会默认显示，
         // 直到网页加载/H5 异步 setWebBottomBarVisible(false) 才隐藏，造成打开瞬间闪烁。这里提前置为隐藏。
         setBottomBarVisibleOverride(false)
-        applyRightBarButtons()
         loadPage()
     }
 
@@ -264,47 +252,13 @@ class WxpExtFuncViewController: WxpWebViewController {
         return "\(WxpConfig.shared.appFeUrl)/app#/ext-func"
     }
 
-    // 贴回固定的右侧按钮（仅齿轮，与 Android 保持一致）
-    private func applyRightBarButtons() {
-        navigationItem.rightBarButtonItems = [settingBarButton]
-    }
-
-    @objc func openTabSetting() {
-        WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/tab-setting")
-    }
-
     //覆盖为空，避免网页标题改变影响 tab 标题
     override func setPageTitle(title: String) {
     }
 
-    // 导航加载完成后父类会重设右侧按钮，这里再贴回我们的按钮
     override func updateWebOptionBtnStatus() {
         super.updateWebOptionBtnStatus()
-        applyRightBarButtons()
         closeButton.isEnabled = webView?.canGoBack ?? false
-    }
-
-    // 以下三个 override：父类实现内部用 DispatchQueue.main.async 重设右侧按钮，
-    // 我们同样用 main.async 排在其后重新贴回（主线程 FIFO，保证晚于父类执行）。
-    override func setOptionMenuVisibleOverride(_ visible: Bool?) {
-        super.setOptionMenuVisibleOverride(visible)
-        DispatchQueue.main.async { [weak self] in
-            self?.applyRightBarButtons()
-        }
-    }
-
-    override func setOptionMenuItemsOverride(_ options: Set<String>?) {
-        super.setOptionMenuItemsOverride(options)
-        DispatchQueue.main.async { [weak self] in
-            self?.applyRightBarButtons()
-        }
-    }
-
-    override func setBottomBarVisibleOverride(_ visible: Bool?) {
-        super.setBottomBarVisibleOverride(visible)
-        DispatchQueue.main.async { [weak self] in
-            self?.applyRightBarButtons()
-        }
     }
 
     override func getLastBtnIcon() -> String {

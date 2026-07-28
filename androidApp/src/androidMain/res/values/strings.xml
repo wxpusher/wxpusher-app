@@ -104,5 +104,4 @@
     <string name="register_or_bind_option_three_title">创建全新账号</string>
     <string name="register_or_bind_option_three_desc">创建全新的空白账号，和原来微信公众号没有任何关系，数据完全隔离，如果你不添加订阅，不会收到任何消息。</string>
     <string name="register_or_bind_option_three_button">创建新的空白账号</string>
-    <string name="ext_func_tab_setting">底部标签设置</string>
 </resources>
