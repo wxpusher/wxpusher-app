@@ -249,7 +249,7 @@ class WxpExtFuncViewController: WxpWebViewController {
     }
 
     private var pageUrl: String {
-        return "\(WxpConfig.shared.appFeUrl)/app#/ext-func"
+        return "\(WxpConfig.shared.appFeUrl)/app/#/ext-func"
     }
 
     //覆盖为空，避免网页标题改变影响 tab 标题
