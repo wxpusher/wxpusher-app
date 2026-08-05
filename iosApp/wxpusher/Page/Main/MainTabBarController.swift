@@ -21,6 +21,7 @@ class MainTabBarController: UITabBarController {
 
         setupViewControllers()
 //        setupAppearance()
+        setupKvListener()
         notificationPermissionRemind()
         setupListenBackToRegisterAPNs()
           
@@ -28,35 +29,114 @@ class MainTabBarController: UITabBarController {
     }
     
     
+    //底部 tab 类型
+    private enum MainTab { case messageList, market, extFunc, profile }
+
+    //已应用的 tab 配置快照，用于 diff：仅变化才重建
+    private var appliedTabConfig: WxpTabConfig?
+    //tab 导航控制器缓存：重建时复用已存在实例，保留其导航栈与状态（关键：不打断压栈中的配置页）
+    private var tabControllerCache: [MainTab: UINavigationController] = [:]
+    //KV 变更监听 id（保存即广播机制）
+    private var kvListenerId: Int32 = -1
+
+    //按配置构建有序 tab：消息列表(必) → 消息市场(可配) → 扩展功能(可配) → 我的(必)
+    private func currentTabs(_ config: WxpTabConfig) -> [MainTab] {
+        var tabs: [MainTab] = [.messageList]
+        if config.market {
+            tabs.append(.market)
+        }
+        if config.extFunc {
+            tabs.append(.extFunc)
+        }
+        tabs.append(.profile)
+        return tabs
+    }
+
+    private func makeTabNavController(_ tab: MainTab) -> UINavigationController {
+        let vc: UIViewController
+        let item: UITabBarItem
+        switch tab {
+        case .messageList:
+            vc = MessageListViewController()
+            item = UITabBarItem(title: "消息列表",
+                                image: UIImage(systemName: "paperplane"),
+                                selectedImage: UIImage(systemName: "paperplane.fill"))
+        case .market:
+            vc = WxpProviderListViewController()
+            item = UITabBarItem(title: "消息市场",
+                                image: UIImage(systemName: "cloud"),
+                                selectedImage: UIImage(systemName: "cloud.fill"))
+        case .extFunc:
+            vc = WxpExtFuncViewController()
+            item = UITabBarItem(title: "扩展功能",
+                                image: UIImage(systemName: "square.grid.2x2"),
+                                selectedImage: UIImage(systemName: "square.grid.2x2.fill"))
+        case .profile:
+            vc = WxpProfileViewController()
+            item = UITabBarItem(title: "我的",
+                                image: UIImage(systemName: "person"),
+                                selectedImage: UIImage(systemName: "person.fill"))
+        }
+        vc.tabBarItem = item
+        return UINavigationController(rootViewController: vc)
+    }
+
+    //取缓存的导航控制器，没有则新建并缓存
+    private func navController(for tab: MainTab) -> UINavigationController {
+        if let cached = tabControllerCache[tab] {
+            return cached
+        }
+        let nav = makeTabNavController(tab)
+        tabControllerCache[tab] = nav
+        return nav
+    }
+
     private func setupViewControllers() {
-        let messageListVC = MessageListViewController()
-        let providerListVC = WxpProviderListViewController()
-        let profileVC = WxpProfileViewController()
-        // 创建导航控制器
-        messageListVC.tabBarItem = UITabBarItem(
-            title: "消息列表",
-            image: UIImage(systemName: "paperplane"),
-            selectedImage: UIImage(systemName: "paperplane.fill")
-        )
-        providerListVC.tabBarItem = UITabBarItem(
-            title: "消息市场",
-            image: UIImage(systemName: "cloud"),
-            selectedImage: UIImage(systemName: "cloud.fill")
-        )
-        profileVC.tabBarItem = UITabBarItem(
-            title: "我的",
-            image: UIImage(systemName: "person"),
-            selectedImage: UIImage(systemName: "person.fill")
-        )
-        
-        // 设置视图控制器数组
-        let controllers = [UINavigationController(rootViewController: messageListVC),
-                           UINavigationController(rootViewController: providerListVC),
-                           UINavigationController(rootViewController: profileVC)]
-        
-        self.viewControllers = controllers
-        self.title = controllers[self.selectedIndex].title
-        
+        applyTabs(WxpTabConfigStore.shared.read(), initial: true)
+    }
+
+    //增量重建：复用已存在的 tab 实例，只新增/移除变化的 tab，按 tab 身份保持选中项。
+    //复用当前 tab 的导航控制器 → 其已压栈的配置页得以保留，保存即重建时用户无感。
+    private func applyTabs(_ config: WxpTabConfig, initial: Bool) {
+        let oldTabs = appliedTabConfig.map { currentTabs($0) } ?? []
+        let selectedTab: MainTab? = (!initial && selectedIndex >= 0 && selectedIndex < oldTabs.count)
+            ? oldTabs[selectedIndex] : nil
+        appliedTabConfig = config
+        let newTabs = currentTabs(config)
+        //丢弃已移除 tab 的缓存实例
+        for tab in tabControllerCache.keys where !newTabs.contains(tab) {
+            tabControllerCache.removeValue(forKey: tab)
+        }
+        self.viewControllers = newTabs.map { navController(for: $0) }
+        //恢复到原来所在 tab；若该 tab 已被隐藏，回落到消息列表
+        if let sel = selectedTab, let idx = newTabs.firstIndex(of: sel) {
+            selectedIndex = idx
+        } else if !initial {
+            selectedIndex = 0
+        }
+        self.title = viewControllers?[selectedIndex].title
+    }
+
+    //注册 KV 变更监听（保存即广播）：tab_config 变化即增量重建，未变不动。
+    //回调已由共享层 runAtMainSuspend 切到主线程。
+    private func setupKvListener() {
+        kvListenerId = WxpSaveService.shared.addListener(listener: { [weak self] key in
+            guard let self = self, key == "tab_config" else {
+                return
+            }
+            self.refreshTabsIfConfigChanged()
+        })
+    }
+
+    private func refreshTabsIfConfigChanged() {
+        guard let applied = appliedTabConfig else {
+            return
+        }
+        let latest = WxpTabConfigStore.shared.read()
+        if applied.market == latest.market && applied.extFunc == latest.extFunc {
+            return
+        }
+        applyTabs(latest, initial: false)
     }
     
     //没有权限的异常提醒
@@ -107,6 +187,9 @@ class MainTabBarController: UITabBarController {
     
     deinit {
         NotificationCenter.default.removeObserver(self)
+        if kvListenerId >= 0 {
+            WxpSaveService.shared.removeListener(id: kvListenerId)
+        }
     }
     
 //    private func setupAppearance() {
@@ -149,4 +232,47 @@ class MainTabBarController: UITabBarController {
 //    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
 //        tabBarController.title = viewController.title
 //    }
-//} 
+//}
+
+/// 扩展功能 tab —— 原生 WebView 容器加载 app-fe 的九宫格入口页。
+/// 与消息市场 tab（WxpProviderListViewController）结构一致。
+class WxpExtFuncViewController: WxpWebViewController {
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        view.backgroundColor = .systemBackground
+        title = "扩展功能"
+        // 默认隐藏底部 webview 操作栏：父类首次 applyWebMenuVisibility 时 url 还是 nil 会默认显示，
+        // 直到网页加载/H5 异步 setWebBottomBarVisible(false) 才隐藏，造成打开瞬间闪烁。这里提前置为隐藏。
+        setBottomBarVisibleOverride(false)
+        loadPage()
+    }
+
+    private var pageUrl: String {
+        return "\(WxpConfig.shared.appFeUrl)/app/#/ext-func"
+    }
+
+    //覆盖为空，避免网页标题改变影响 tab 标题
+    override func setPageTitle(title: String) {
+    }
+
+    override func updateWebOptionBtnStatus() {
+        super.updateWebOptionBtnStatus()
+        closeButton.isEnabled = webView?.canGoBack ?? false
+    }
+
+    override func getLastBtnIcon() -> String {
+        return "house"
+    }
+
+    @objc func loadPage() {
+        guard let url = URL(string: pageUrl) else {
+            return
+        }
+        webView?.load(URLRequest(url: url))
+    }
+
+    @objc override func closeButtonTapped() {
+        loadPage()
+    }
+}

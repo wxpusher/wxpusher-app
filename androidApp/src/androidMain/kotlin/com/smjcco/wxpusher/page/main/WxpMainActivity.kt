@@ -19,11 +19,14 @@ import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.base.common.flush
+import com.smjcco.wxpusher.biz.tab.WxpTabConfig
+import com.smjcco.wxpusher.biz.tab.WxpTabConfigStore
 import com.smjcco.wxpusher.biz.version.WxpVersionCheckManager
 import com.smjcco.wxpusher.common.WxpSaveKey
 import com.smjcco.wxpusher.page.main.fragment.ITabMenuProvider
 import com.smjcco.wxpusher.page.main.fragment.MessageListFragment
 import com.smjcco.wxpusher.page.main.fragment.ProfileFragment
+import com.smjcco.wxpusher.page.main.fragment.WxpExtFuncFragment
 import com.smjcco.wxpusher.page.main.fragment.WxpProviderListFragment
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
@@ -48,6 +51,16 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
     private var currentMenuProvider: ITabMenuProvider? = null
     private var currentMenu: Menu? = null
 
+    //底部 tab 的枚举与当前有序列表（按配置动态构建）
+    private enum class MainTab { MESSAGE_LIST, MARKET, EXT_FUNC, PROFILE }
+
+    private var tabs: List<MainTab> = emptyList()
+    //已应用的 tab 配置快照，用于返回主界面时 diff，仅变化才重建
+    private var appliedTabConfig: WxpTabConfig? = null
+    private var tabMediator: TabLayoutMediator? = null
+    //KV 变更监听 id（保存即广播机制）
+    private var kvListenerId: Int = -1
+
     private var permissionRequester: PermissionRequester? = null
 
     companion object {
@@ -67,8 +80,11 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
             return
         }
         title = "消息列表"
-        // 设置ViewPager和TabLayout
-        setupViewPager()
+        // 设置ViewPager和TabLayout（按 tab 显隐配置动态构建）
+        setupTabListeners()
+        rebuildTabs(WxpTabConfigStore.read())
+        // 注册 KV 变更监听（保存即广播），tab 配置变化即重建
+        setupKvListener()
 
         //检查是否有权限
         setUpPermissionRequester()
@@ -165,38 +181,41 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
     }
 
 
-    private fun setupViewPager() {
-        pagerAdapter = MainPagerAdapter(this)
-        viewPager.adapter = pagerAdapter
+    //根据配置构建有序 tab 列表：消息列表(必) → 消息市场(可配) → 扩展功能(可配) → 我的(必)
+    private fun buildTabs(config: WxpTabConfig): List<MainTab> {
+        val list = mutableListOf(MainTab.MESSAGE_LIST)
+        if (config.market) {
+            list.add(MainTab.MARKET)
+        }
+        if (config.extFunc) {
+            list.add(MainTab.EXT_FUNC)
+        }
+        list.add(MainTab.PROFILE)
+        return list
+    }
+
+    //tab 的标题与图标
+    private fun tabTitle(tab: MainTab): String = when (tab) {
+        MainTab.MESSAGE_LIST -> "消息列表"
+        MainTab.MARKET -> "消息市场"
+        MainTab.EXT_FUNC -> "扩展功能"
+        MainTab.PROFILE -> "我的"
+    }
+
+    private fun tabIcon(tab: MainTab): Int = when (tab) {
+        MainTab.MESSAGE_LIST -> R.drawable.ic_paperplane
+        MainTab.MARKET -> R.drawable.ic_cloud
+        MainTab.EXT_FUNC -> R.drawable.ic_ext_func
+        MainTab.PROFILE -> R.drawable.ic_person
+    }
+
+    //监听只注册一次（tab 重建时不重复注册）
+    private fun setupTabListeners() {
         viewPager.isUserInputEnabled = false
-
-        // 连接TabLayout和ViewPager2
-        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
-            when (position) {
-                0 -> {
-                    tab.text = "消息列表"
-                    tab.setIcon(R.drawable.ic_paperplane)
-                }
-
-                1 -> {
-                    tab.text = "消息市场"
-                    tab.setIcon(R.drawable.ic_cloud)
-                }
-
-                2 -> {
-                    tab.text = "我的"
-                    tab.setIcon(R.drawable.ic_person)
-                }
-            }
-        }.attach()
-
-        // 监听Tab切换，更新Toolbar标题和菜单
-        tabLayout.addOnTabSelectedListener(object :
-            TabLayout.OnTabSelectedListener {
+        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab?) {
                 tab?.let {
                     title = it.text
-                    // 更新菜单
                     updateMenuForCurrentTab(tab.position)
                 }
             }
@@ -210,20 +229,34 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
             }
         })
 
-        // 监听ViewPager页面切换（处理手势滑动切换）
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 super.onPageSelected(position)
-                // 延迟更新菜单，确保Fragment已经加载完成
                 viewPager.post {
                     updateMenuForCurrentTab(position)
                 }
             }
         })
+    }
 
-        // 延迟初始化第一个tab的菜单，确保Fragment已创建
+    //（重新）按配置构建 tab 列表与 ViewPager
+    private fun rebuildTabs(config: WxpTabConfig) {
+        appliedTabConfig = config
+        tabs = buildTabs(config)
+        pagerAdapter = MainPagerAdapter(this)
+        viewPager.adapter = pagerAdapter
+
+        tabMediator?.detach()
+        tabMediator = TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            val mainTab = tabs[position]
+            tab.text = tabTitle(mainTab)
+            tab.setIcon(tabIcon(mainTab))
+        }
+        tabMediator?.attach()
+
+        // 延迟初始化当前tab的菜单，确保Fragment已创建
         viewPager.post {
-            updateMenuForCurrentTab(0)
+            updateMenuForCurrentTab(viewPager.currentItem)
         }
     }
 
@@ -277,9 +310,43 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
         WxpVersionCheckManager.onAppForeground()
     }
 
+    //注册 KV 变更监听（保存即广播）：tab_config 变化即重建，未变不动。
+    //回调已由共享层 runAtMainSuspend 切到主线程。
+    private fun setupKvListener() {
+        kvListenerId = WxpSaveService.addListener { key ->
+            if (key == WxpTabConfigStore.TAB_CONFIG_KEY) {
+                refreshTabsIfConfigChanged()
+            }
+        }
+    }
+
+    private fun refreshTabsIfConfigChanged() {
+        //未完成初始化（如未登录直接 finish）时跳过
+        val applied = appliedTabConfig ?: return
+        val latest = WxpTabConfigStore.read()
+        if (applied == latest) {
+            return
+        }
+        val currentTab = tabs.getOrNull(viewPager.currentItem)
+        rebuildTabs(latest)
+        //恢复到原来所在 tab；若该 tab 已被隐藏，回落到消息列表
+        val targetIndex = currentTab?.let { tabs.indexOf(it) }?.takeIf { it >= 0 } ?: 0
+        viewPager.setCurrentItem(targetIndex, false)
+        title = tabTitle(tabs[targetIndex])
+        viewPager.post { updateMenuForCurrentTab(targetIndex) }
+    }
+
     override fun onPause() {
         super.onPause()
         WxpLogUtils.flush()
+    }
+
+    override fun onDestroy() {
+        if (kvListenerId >= 0) {
+            WxpSaveService.removeListener(kvListenerId)
+            kvListenerId = -1
+        }
+        super.onDestroy()
     }
 
     /**
@@ -291,14 +358,14 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
     ) :
         FragmentStateAdapter(activity) {
 
-        override fun getItemCount(): Int = 3
+        override fun getItemCount(): Int = tabs.size
 
         override fun createFragment(position: Int): Fragment {
-            return when (position) {
-                0 -> MessageListFragment()
-                1 -> WxpProviderListFragment()
-                2 -> ProfileFragment()
-                else -> throw IllegalArgumentException("Invalid position: $position")
+            return when (tabs[position]) {
+                MainTab.MESSAGE_LIST -> MessageListFragment()
+                MainTab.MARKET -> WxpProviderListFragment()
+                MainTab.EXT_FUNC -> WxpExtFuncFragment()
+                MainTab.PROFILE -> ProfileFragment()
             }
         }
 

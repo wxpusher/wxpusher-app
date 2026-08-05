@@ -51,7 +51,7 @@ DEPENDENCIES:
   - MJRefresh (= 3.7.9)
   - shared (from `../shared`)
   - Toaster (= 2.3.0)
-  - WechatOpenSDK-XCFramework (= 2.0.5)
+  - WechatOpenSDK-XCFramework (from `Vendor/WechatOpenSDK-XCFramework/2.0.5`)
 
 SPEC REPOS:
   trunk:
@@ -59,11 +59,12 @@ SPEC REPOS:
     - BUTTSDKFramework
     - MJRefresh
     - Toaster
-    - WechatOpenSDK-XCFramework
 
 EXTERNAL SOURCES:
   shared:
     :path: "../shared"
+  WechatOpenSDK-XCFramework:
+    :path: Vendor/WechatOpenSDK-XCFramework/2.0.5
 
 SPEC CHECKSUMS:
   Ads-CN: 6bfc5a80f72a8fa723bb8d0941c84bcc03a5c088
@@ -71,8 +72,8 @@ SPEC CHECKSUMS:
   MJRefresh: ff9e531227924c84ce459338414550a05d2aea78
   shared: f70abb4412b47a88dd39768078ea98270a675a5a
   Toaster: c3473963c78e8cabbf6ea6f11ad0fdaae6f54987
-  WechatOpenSDK-XCFramework: b072030c9eeee91dfff1856a7846f70f7b9a88ed
+  WechatOpenSDK-XCFramework: 5b8db436b6541d4758d42571d5ac055d609e6fe2
 
-PODFILE CHECKSUM: 929af93f1ffdf631a5ab2669227b6f219e7a9fec
+PODFILE CHECKSUM: b5b439da9dc39a4c380e925b36b88eada66aa78e
 
 COCOAPODS: 1.15.2

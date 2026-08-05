@@ -150,6 +150,10 @@ class WxpProfileViewController: UIViewController {
             ]),
             
             ("通用", [
+                ProfileItem(title: "底部标签设置", subtitle: "自定义底部导航标签的显示",
+                            accessoryType: .disclosureIndicator) {
+                                WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/tab-setting")
+                            },
                 ProfileItem(title: "反馈建议", subtitle: "欢迎你指导我们进步",
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToWebUrl(url: "https://wj.qq.com/s2/22198188/cc95/")

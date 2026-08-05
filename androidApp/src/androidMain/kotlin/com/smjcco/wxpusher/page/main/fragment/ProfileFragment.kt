@@ -222,6 +222,16 @@ class ProfileFragment : WxpBaseFragment() {
                 title = "通用",
                 items = listOf(
                     ProfileItem(
+                        title = "底部标签设置",
+                        subtitle = "自定义底部导航标签的显示",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToWebUrl(
+                            "${WxpConfig.appFeUrl}/app/#/tab-setting",
+                            activity
+                        )
+                    },
+                    ProfileItem(
                         title = "反馈建议",
                         subtitle = "欢迎你指导我们进步",
                         hasArrow = true

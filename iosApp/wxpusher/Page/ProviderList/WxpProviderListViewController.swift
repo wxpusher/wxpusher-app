@@ -15,9 +15,12 @@ class WxpProviderListViewController: WxpWebViewController,IWxpProviderListView {
         view.backgroundColor = .systemBackground
         title = "消息市场"
         presenter = createPresenter() as? any IWxpProviderListPresenter
-       
+        // 默认隐藏底部 webview 操作栏：首次 applyWebMenuVisibility 时 url 为 nil 会默认显示，
+        // 直到网页加载/H5 异步 setWebBottomBarVisible(false) 才隐藏，造成打开瞬间闪烁。这里提前置为隐藏。
+        setBottomBarVisibleOverride(false)
+
         showOption()
-        
+
         presenter?.loadPage()
     }
     

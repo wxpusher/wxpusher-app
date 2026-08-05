@@ -2,10 +2,12 @@ package com.smjcco.wxpusher.page.web.bridge
 
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.page.web.bridge.handlers.CloseWebPageBridgeHandler
+import com.smjcco.wxpusher.page.web.bridge.handlers.GetByKeyBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.GetLoginInfoBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.OpenSystemBrowserBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.OpenUrlBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.PayRequestBridgeHandler
+import com.smjcco.wxpusher.page.web.bridge.handlers.SetKeyValueBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.SetWebBottomBarBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.SetWebOptionMenuBridgeHandler
 import com.smjcco.wxpusher.page.web.bridge.handlers.ShowToastBridgeHandler
@@ -40,6 +42,8 @@ class WxpWebBridgeManager(
         registerHandler("setWebOptionMenu", requiresWhitelist = true, handler = SetWebOptionMenuBridgeHandler)
         registerHandler("setWebBottomBar", requiresWhitelist = true, handler = SetWebBottomBarBridgeHandler)
         registerHandler("closeWebPage", requiresWhitelist = true, handler = CloseWebPageBridgeHandler)
+        registerHandler("getByKey", requiresWhitelist = true, handler = GetByKeyBridgeHandler)
+        registerHandler("setKeyValue", requiresWhitelist = true, handler = SetKeyValueBridgeHandler)
     }
 
     fun onMessage(messageJson: String) {

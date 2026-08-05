@@ -56,7 +56,7 @@ jobs:
     #创建签名需要的信息
     - name: Create secrets.properties
       run: |
-        echo "storeFile=sign_keystore.jks" > key.properties
+        echo "storeFile=sign_keystore.jks" >> key.properties
         echo "storePassword=${{ secrets.APK_SIGN_KEYSTORE_PASSWORD }}" >> key.properties
         echo "keyAlias=${{ secrets.APK_SIGN_ALIAS }}" >> key.properties
         echo "keyPassword=${{ secrets.APK_SIGN_PASSWORD }}" >> key.properties
