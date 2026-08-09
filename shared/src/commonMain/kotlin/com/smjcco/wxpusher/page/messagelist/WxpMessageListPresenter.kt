@@ -321,7 +321,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
                 }
                 WxpAppDataService.saveOpenId(openId)
             }
-            view?.onOpenSubscribeManagerPage("${WxpConfig.baseUrl}/wxuser/?openId=${openId}#/")
+            view?.onOpenSubscribeManagerPage("${WxpConfig.appFeUrl}/app/#/subscribe-list")
         }
     }
 
