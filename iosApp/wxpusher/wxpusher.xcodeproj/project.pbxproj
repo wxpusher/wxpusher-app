@@ -13,6 +13,17 @@
 		1A447DFA2DF53ECD005C402F /* WxpWebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A447DF32DF53ECD005C402F /* WxpWebViewController.swift */; };
 		1A4715372AE8017A0089D7A7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1AC210E12ACC584B008D86EA /* Assets.xcassets */; };
 		1A4934632E196C7900EA1C71 /* WxpProfileViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934622E196C7900EA1C71 /* WxpProfileViewController.swift */; };
+		1AF5C0022F0A000000000002 /* WxpNotificationSoundViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1AF5C0012F0A000000000001 /* WxpNotificationSoundViewController.swift */; };
+		1AF5C0202F0A000000000020 /* wxp_ding.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1AF5C0102F0A000000000010 /* wxp_ding.caf */; };
+		1AF5C0252F0A000000000025 /* wxp_long3.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1AF5C0152F0A000000000015 /* wxp_long3.caf */; };
+		1AF5C0262F0A000000000026 /* wxp_long5.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1AF5C0162F0A000000000016 /* wxp_long5.caf */; };
+		1AF5C0272F0A000000000027 /* wxp_long10.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1AF5C0172F0A000000000017 /* wxp_long10.caf */; };
+		1AF5C0282F0A000000000028 /* wxp_long15.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1AF5C0182F0A000000000018 /* wxp_long15.caf */; };
+		1AF5C0292F0A000000000029 /* wxp_long20.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1AF5C0192F0A000000000019 /* wxp_long20.caf */; };
+		1AF5C0212F0A000000000021 /* wxp_bell.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1AF5C0112F0A000000000011 /* wxp_bell.caf */; };
+		1AF5C0222F0A000000000022 /* wxp_chime.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1AF5C0122F0A000000000012 /* wxp_chime.caf */; };
+		1AF5C0232F0A000000000023 /* wxp_alarm.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1AF5C0132F0A000000000013 /* wxp_alarm.caf */; };
+		1AF5C0242F0A000000000024 /* wxp_drop.caf in Resources */ = {isa = PBXBuildFile; fileRef = 1AF5C0142F0A000000000014 /* wxp_drop.caf */; };
 		1A4934662E19714B00EA1C71 /* KtSwiftCommonParams.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934652E19703400EA1C71 /* KtSwiftCommonParams.m */; };
 		1A4934682E1971EA00EA1C71 /* WxpCommonParams.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934672E1971E400EA1C71 /* WxpCommonParams.swift */; };
 		1A49346A2E19FB8000EA1C71 /* WxpFooterLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A4934692E19FB7D00EA1C71 /* WxpFooterLoadingView.swift */; };
@@ -77,6 +88,17 @@
 		1A447DF32DF53ECD005C402F /* WxpWebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpWebViewController.swift; sourceTree = "<group>"; };
 		1A4715482AED3F500089D7A7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		1A4934622E196C7900EA1C71 /* WxpProfileViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpProfileViewController.swift; sourceTree = "<group>"; };
+		1AF5C0012F0A000000000001 /* WxpNotificationSoundViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpNotificationSoundViewController.swift; sourceTree = "<group>"; };
+		1AF5C0102F0A000000000010 /* wxp_ding.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wxp_ding.caf; sourceTree = "<group>"; };
+		1AF5C0152F0A000000000015 /* wxp_long3.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wxp_long3.caf; sourceTree = "<group>"; };
+		1AF5C0162F0A000000000016 /* wxp_long5.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wxp_long5.caf; sourceTree = "<group>"; };
+		1AF5C0172F0A000000000017 /* wxp_long10.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wxp_long10.caf; sourceTree = "<group>"; };
+		1AF5C0182F0A000000000018 /* wxp_long15.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wxp_long15.caf; sourceTree = "<group>"; };
+		1AF5C0192F0A000000000019 /* wxp_long20.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wxp_long20.caf; sourceTree = "<group>"; };
+		1AF5C0112F0A000000000011 /* wxp_bell.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wxp_bell.caf; sourceTree = "<group>"; };
+		1AF5C0122F0A000000000012 /* wxp_chime.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wxp_chime.caf; sourceTree = "<group>"; };
+		1AF5C0132F0A000000000013 /* wxp_alarm.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wxp_alarm.caf; sourceTree = "<group>"; };
+		1AF5C0142F0A000000000014 /* wxp_drop.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = wxp_drop.caf; sourceTree = "<group>"; };
 		1A4934642E19702300EA1C71 /* KtSwiftCommonParams.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = KtSwiftCommonParams.h; sourceTree = "<group>"; };
 		1A4934652E19703400EA1C71 /* KtSwiftCommonParams.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = KtSwiftCommonParams.m; sourceTree = "<group>"; };
 		1A4934672E1971E400EA1C71 /* WxpCommonParams.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WxpCommonParams.swift; sourceTree = "<group>"; };
@@ -202,6 +224,7 @@
 			isa = PBXGroup;
 			children = (
 				1A4934622E196C7900EA1C71 /* WxpProfileViewController.swift */,
+				1AF5C0012F0A000000000001 /* WxpNotificationSoundViewController.swift */,
 			);
 			path = Profile;
 			sourceTree = "<group>";
@@ -409,6 +432,23 @@
 			path = ProviderList;
 			sourceTree = "<group>";
 		};
+		1AF5C0032F0A000000000003 /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				1AF5C0102F0A000000000010 /* wxp_ding.caf */,
+				1AF5C0112F0A000000000011 /* wxp_bell.caf */,
+				1AF5C0122F0A000000000012 /* wxp_chime.caf */,
+				1AF5C0132F0A000000000013 /* wxp_alarm.caf */,
+				1AF5C0142F0A000000000014 /* wxp_drop.caf */,
+				1AF5C0152F0A000000000015 /* wxp_long3.caf */,
+				1AF5C0162F0A000000000016 /* wxp_long5.caf */,
+				1AF5C0172F0A000000000017 /* wxp_long10.caf */,
+				1AF5C0182F0A000000000018 /* wxp_long15.caf */,
+				1AF5C0192F0A000000000019 /* wxp_long20.caf */,
+			);
+			path = Sounds;
+			sourceTree = "<group>";
+		};
 		1AD0B1122AE7F9D500DABE06 /* WxPusher-iOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -419,6 +459,7 @@
 				1A9C3E6F2DF5963400A25249 /* Launch Screen.storyboard */,
 				1AC210E32ACC5883008D86EA /* wxpusher.entitlements */,
 				1AC210E12ACC584B008D86EA /* Assets.xcassets */,
+				1AF5C0032F0A000000000003 /* Sounds */,
 			);
 			path = "WxPusher-iOS";
 			sourceTree = "<group>";
@@ -560,6 +601,16 @@
 			files = (
 				1A9C3E702DF5963400A25249 /* Launch Screen.storyboard in Resources */,
 				1A4715372AE8017A0089D7A7 /* Assets.xcassets in Resources */,
+				1AF5C0202F0A000000000020 /* wxp_ding.caf in Resources */,
+				1AF5C0212F0A000000000021 /* wxp_bell.caf in Resources */,
+				1AF5C0222F0A000000000022 /* wxp_chime.caf in Resources */,
+				1AF5C0232F0A000000000023 /* wxp_alarm.caf in Resources */,
+				1AF5C0242F0A000000000024 /* wxp_drop.caf in Resources */,
+				1AF5C0252F0A000000000025 /* wxp_long3.caf in Resources */,
+				1AF5C0262F0A000000000026 /* wxp_long5.caf in Resources */,
+				1AF5C0272F0A000000000027 /* wxp_long10.caf in Resources */,
+				1AF5C0282F0A000000000028 /* wxp_long15.caf in Resources */,
+				1AF5C0292F0A000000000029 /* wxp_long20.caf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -685,6 +736,7 @@
 			files = (
 				1ACFF6112E63190500608219 /* KtSwiftDialogUtils.m in Sources */,
 				1A4934632E196C7900EA1C71 /* WxpProfileViewController.swift in Sources */,
+				1AF5C0022F0A000000000002 /* WxpNotificationSoundViewController.swift in Sources */,
 				1A49346A2E19FB8000EA1C71 /* WxpFooterLoadingView.swift in Sources */,
 				1A4934662E19714B00EA1C71 /* KtSwiftCommonParams.m in Sources */,
 				1A962E772E0B09AD00C966A3 /* WxpDialogUtils.swift in Sources */,

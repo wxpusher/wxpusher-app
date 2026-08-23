@@ -20,6 +20,8 @@ import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeReq
 import com.smjcco.wxpusher.page.login.WxpLoginSendVerifyCodeResp
 import com.smjcco.wxpusher.page.login.WxpWeixinLoginReq
 import com.smjcco.wxpusher.page.login.WxpWeixinLoginResp
+import com.smjcco.wxpusher.page.notificationsound.WxpNotificationSoundResp
+import com.smjcco.wxpusher.page.notificationsound.WxpUpdateNotificationSoundReq
 import com.smjcco.wxpusher.page.messagelist.WxpCheckAppMsgReasonResp
 import com.smjcco.wxpusher.page.messagelist.WxpListBannerResp
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
@@ -224,6 +226,30 @@ object WxpApiService {
                     setBody(req)
                 }.body()
         }, successBlock = { successBlock?.invoke() })
+    }
+
+    /**
+     * 查询当前设备的推送提醒铃声。
+     * 铃声是设备维度的，换设备或卸载重装后需要重新设置。
+     */
+    suspend fun fetchNotificationSound(): WxpNotificationSoundResp? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .get(WxpNetworkService.getUrl("/api/need-login/device/notification-sound"))
+                .body()
+        })
+    }
+
+    /**
+     * 修改当前设备的推送提醒铃声
+     */
+    suspend fun updateNotificationSound(sound: String): Boolean? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .put(WxpNetworkService.getUrl("/api/need-login/device/notification-sound")) {
+                    setBody(WxpUpdateNotificationSoundReq(sound))
+                }.body()
+        })
     }
 
     /**

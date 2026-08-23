@@ -122,7 +122,7 @@ class WxpProfileViewController: UIViewController {
                             WxpToastUtils.shared.showToast(msg: "你已经打开通知权限")
                             let params = WxpDialogParams()
                             params.title = "提醒方式设置"
-                            params.message = "当前已经打开通知权限，你还可以设置锁屏显示、通知中心显示、横幅显示等，还可以设置通知的铃声。是否前往设置？"
+                            params.message = "当前已经打开通知权限，你还可以设置锁屏显示、通知中心显示、横幅显示等。是否前往设置？"
                             params.leftText = "取消"
                             params.rightText = "去设置"
                             params.rightBlock = {
@@ -142,6 +142,10 @@ class WxpProfileViewController: UIViewController {
                         }
                     }
                 },
+                ProfileItem(title: "提醒铃声", subtitle: "自定义收到消息的提示音",
+                            accessoryType: .disclosureIndicator) {
+                                WxpJumpPageUtils.jumpToNotificationSound()
+                            },
                 ProfileItem(title: "推送检查", subtitle: "收不到消息的异常排查",
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToWebUrl(url: "https://wxpusher.zjiecode.com/docs/open-app-note/index.html?brand=iOS")
