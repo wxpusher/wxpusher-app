@@ -40,6 +40,7 @@ object VIVOPushUtils {
             }
         } catch (e: Throwable) {
             WxpLogUtils.w(TAG, "VIVO推送初始化错误", e)
+            PushManager.onGetPushTokenFail(DevicePlatform.Android_VIVO)
         }
     }
 

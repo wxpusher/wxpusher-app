@@ -20,9 +20,9 @@ import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.base.common.WxpDialogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
-import com.smjcco.wxpusher.base.common.runAtMainSuspend
 import com.smjcco.wxpusher.biz.version.WxpVersionCheckManager
 import com.smjcco.wxpusher.common.WxpConstants
+import com.smjcco.wxpusher.push.PushChannelCoordinator
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
 
@@ -48,6 +48,14 @@ class ProfileFragment : WxpBaseFragment() {
 
         setupUI(view)
         setupData()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 从通道设置页返回后刷新当前设备实际使用的通道名称。
+        if (::adapter.isInitialized) {
+            setupData()
+        }
     }
 
     private fun setupUI(view: View) {
@@ -199,6 +207,14 @@ class ProfileFragment : WxpBaseFragment() {
             ProfileSection(
                 title = "通知提醒",
                 items = listOf(
+                    // 该入口只管理当前设备，不影响同一账号下的其他设备。
+                    ProfileItem(
+                        title = "消息推送通道",
+                        subtitle = PushChannelCoordinator.getCurrentChannelName(),
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToPushChannelSetting(requireActivity())
+                    },
                     ProfileItem(
                         title = "通知设置",
                         subtitle = "检查通知权限",

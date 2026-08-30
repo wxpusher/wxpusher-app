@@ -14,7 +14,7 @@ fun Long.toDateTimeString(): String {
 
 object WxpDateTimeUtils {
     @OptIn(ExperimentalTime::class)
-    fun getRelativeDateTime(timeStamp: Double): String {
+    fun getRelativeDateTime(timeStamp: Long): String {
         val nowInSeconds = Clock.System.now().toEpochMilliseconds()
         val duration = (abs(nowInSeconds - timeStamp) / 1000).toInt()
         return when {

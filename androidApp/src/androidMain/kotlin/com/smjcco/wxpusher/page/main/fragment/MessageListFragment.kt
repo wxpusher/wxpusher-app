@@ -45,7 +45,9 @@ import com.smjcco.wxpusher.page.messagelist.WxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
 import com.smjcco.wxpusher.page.web.WxpWebViewActivity
 import com.smjcco.wxpusher.push.IPushTokenChangedListener
+import com.smjcco.wxpusher.push.PushChannel
 import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.push.PushPlatformState
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
@@ -224,7 +226,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
      */
     private fun refreshBanner() {
         //如果是非厂商通道，并且没有忽略电池优化，就提醒用户关闭电池优化
-        if (DeviceUtils.getPlatform() == DevicePlatform.Android) {
+        if (PushPlatformState.getEffectivePushChannel() == PushChannel.WEBSOCKET) {
             if (!DeviceUtils.isIgnoringBatteryOptimizations()) {
                 batteryBanner.visibility = View.VISIBLE
                 bannerBtn.setOnClickListener {
@@ -389,10 +391,18 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
             notePermissionCloseImg.setImageDrawable(drawable)
         }
         notePermissionBanner.setOnClickListener {
-            WxpJumpPageUtils.jumpToWebUrl(
-                url = WxpConfig.appFeUrl + "/app/?code=${data.code}#/no-message",
-                activity = activity
-            )
+            // 厂商通道异常时直接引导用户手动切换，其他异常继续使用原排查页面。
+            if (data.code == 20002
+                && PushPlatformState.getEffectivePushChannel() == PushChannel.VENDOR
+            ) {
+                WxpToastUtils.showToast("当前推送通道异常，请尝试切换推送通道")
+                WxpJumpPageUtils.jumpToPushChannelSetting(activity)
+            } else {
+                WxpJumpPageUtils.jumpToWebUrl(
+                    url = WxpConfig.appFeUrl + "/app/?code=${data.code}#/no-message",
+                    activity = activity
+                )
+            }
         }
 
     }

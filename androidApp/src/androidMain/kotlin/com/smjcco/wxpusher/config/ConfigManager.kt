@@ -29,6 +29,9 @@ object ConfigManager {
     // 应用上下文
     private lateinit var appContext: Context
 
+    // 云端配置发生实际变化时，通知推送通道等运行时组件立即响应。
+    private val listeners = mutableSetOf<(ConfigItem) -> Unit>()
+
     /**
      * 初始化配置管理器
      * @param context 应用上下文
@@ -122,6 +125,23 @@ object ConfigManager {
         return currentConfig
     }
 
+    /** 注册配置变化监听器。 */
+    fun addListener(listener: (ConfigItem) -> Unit) {
+        listeners.add(listener)
+    }
+
+    /** 移除配置变化监听器。 */
+    fun removeListener(listener: (ConfigItem) -> Unit) {
+        listeners.remove(listener)
+    }
+
+    private suspend fun notifyConfigChanged(config: ConfigItem) {
+        // 监听方可能更新页面或服务状态，因此统一在主线程回调。
+        withContext(Dispatchers.Main) {
+            listeners.toList().forEach { it(config) }
+        }
+    }
+
     /**
      * 强制从服务器刷新配置
      * @param callback 刷新结果回调
@@ -138,7 +158,12 @@ object ConfigManager {
                 // 更新当前配置
                 val compatibleConfig = configResponse?.configs?.let { findCompatibleConfig(it) }
                 if (compatibleConfig != null) {
+                    // 只有内容真正变化才触发热切换，避免每次刷新重复初始化通道。
+                    val changed = compatibleConfig != currentConfig
                     currentConfig = compatibleConfig
+                    if (changed) {
+                        notifyConfigChanged(compatibleConfig)
+                    }
                 } else {
                     WxpLogUtils.i(TAG, "没有可用配置")
                 }
@@ -158,4 +183,4 @@ object ConfigManager {
             }
         }
     }
-} 
+}

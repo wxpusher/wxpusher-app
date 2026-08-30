@@ -449,7 +449,8 @@ open class WxpWebViewFragment : WxpBaseFragment() {
             val loginInfo = WxpAppDataService.getLoginInfo()
             val deviceToken = loginInfo?.deviceToken ?: ""
             val versionName = WxpBaseInfoService.getAppVersionName()
-            val platform = WxpBaseInfoService.getPlatform()
+            // WebView 请求头描述的是 App FE 所处的客户端环境，不用于选择后端推送通道。
+            val platform = WxpBaseInfoService.getClientPlatform()
 
             headers[DEVICE_TOKEN_KEY] = deviceToken
             headers[DEVICE_VERSION_NAME_KEY] = versionName

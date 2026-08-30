@@ -169,7 +169,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         if (time <= 0.0) {
             return "更新于 无"
         }
-        return "更新于 " + WxpDateTimeUtils.getRelativeDateTime(time)
+        return "更新于 " + WxpDateTimeUtils.getRelativeDateTime(time.toLong())
     }
 
     /**

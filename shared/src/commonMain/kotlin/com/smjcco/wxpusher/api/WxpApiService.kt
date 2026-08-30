@@ -43,9 +43,15 @@ import kotlinx.io.IOException
 class BizError(val code: Int, val msg: String) : RuntimeException()
 object WxpApiService {
 
+    /**
+     * 统一处理业务响应。
+     *
+     * 后台任务可以关闭错误 Toast 和自动登录跳转，由调用方自行安排重试或状态提示。
+     */
     suspend fun <T> commonRespDeal(
         block: suspend () -> BaseResp<T>,
         toastError: Boolean = true,
+        handleUnauthorized: Boolean = true,
         successBlock: ((data: T) -> Unit)? = null,
         errorBlock: ((e: Throwable) -> Unit)? = null
     ): T? {
@@ -59,7 +65,11 @@ object WxpApiService {
             }
 
             if (resp.code == 1002) {
-                WxpAppPageService.jumpToLogin()
+                if (handleUnauthorized) {
+                    WxpAppPageService.jumpToLogin()
+                } else {
+                    errorBlock?.invoke(BizError(resp.code, resp.msg))
+                }
                 return null
             }
             WxpLogUtils.w("WxpApi", "接口业务失败 code=${resp.code} msg=${resp.msg}")
@@ -209,23 +219,27 @@ object WxpApiService {
         })
     }
 
-    /**
-     * 更新设备的pushToken信息
-     */
+    /** 更新设备推送平台和 token；后台自动同步时可通过 [silent] 关闭交互提示。 */
     suspend fun updateDeviceInfo(
         req: WxpUpdateInfoReq,
-        successBlock: (() -> Unit)? = null
+        silent: Boolean = false,
+        successBlock: (() -> Unit)? = null,
     ): Boolean? {
         if (req.deviceUuid.isNullOrEmpty() || req.pushToken.isNullOrEmpty()) {
             return false
         }
         WxpLogUtils.d(message = "上报设备信息-updateDeviceInfo")
-        return commonRespDeal(block = {
-            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
-                .put(WxpNetworkService.getUrl("/api/need-login/device/update-device-info")) {
-                    setBody(req)
-                }.body()
-        }, successBlock = { successBlock?.invoke() })
+        return commonRespDeal(
+            block = {
+                return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                    .put(WxpNetworkService.getUrl("/api/need-login/device/update-device-info")) {
+                        setBody(req)
+                    }.body()
+            },
+            toastError = !silent,
+            handleUnauthorized = !silent,
+            successBlock = { successBlock?.invoke() },
+        )
     }
 
     /**

@@ -25,4 +25,10 @@ enum class DevicePlatform(private val platform: String) {
     Wecom("Wecom");
 
     fun getPlatform() = platform
+
+    companion object {
+        /** 根据后端保存的平台字符串恢复枚举，无法识别时返回空。 */
+        fun find(platform: String?): DevicePlatform? =
+            entries.firstOrNull { it.platform == platform }
+    }
 }

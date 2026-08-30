@@ -20,6 +20,7 @@ import com.smjcco.wxpusher.page.login.WxpBindPageData
 import com.smjcco.wxpusher.page.login.WxpLoginActivity
 import com.smjcco.wxpusher.page.login.WxpPhoneBind
 import com.smjcco.wxpusher.page.main.WxpMainActivity
+import com.smjcco.wxpusher.page.pushchannel.PushChannelSettingActivity
 import com.smjcco.wxpusher.page.registerorbind.WxpRegisterOrBindActivity
 import com.smjcco.wxpusher.page.scan.WxpScanActivity
 import com.smjcco.wxpusher.page.useragreement.WxpUserAgreementActivity
@@ -198,6 +199,13 @@ object WxpJumpPageUtils {
         withActivity(activity) {
             val intent = Intent(it, AccountDetailActivity::class.java)
             it.startActivity(intent)
+        }
+    }
+
+    /** 打开仅作用于当前设备的推送通道设置页。 */
+    fun jumpToPushChannelSetting(activity: Activity? = null) {
+        withActivity(activity) {
+            PushChannelSettingActivity.start(it)
         }
     }
 
