@@ -19,6 +19,7 @@ import com.smjcco.wxpusher.push.PushChannel
 import com.smjcco.wxpusher.push.PushChannelCoordinator
 import com.smjcco.wxpusher.push.PushChannelSnapshot
 import com.smjcco.wxpusher.push.VendorAvailability
+import com.smjcco.wxpusher.push.ws.alert.WsAlertStore
 import com.smjcco.wxpusher.push.ws.connect.WsManager
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
@@ -38,6 +39,8 @@ class PushChannelSettingActivity : WxpBaseActivity() {
     private lateinit var wsCard: MaterialCardView
     private lateinit var wsState: TextView
     private lateinit var wsRadio: RadioButton
+    private lateinit var wsAlertSetting: View
+    private lateinit var wsAlertSummary: TextView
     private var lastErrorMessage: String? = null
     private var latestSnapshot: PushChannelSnapshot? = null
 
@@ -66,6 +69,12 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         WsManager.addConnectChangedListener(wsConnectListener)
     }
 
+    override fun onResume() {
+        super.onResume()
+        // 从提醒方式设置页返回后要刷新摘要
+        wsAlertSummary.text = WsAlertStore.summary()
+    }
+
     override fun onStop() {
         WsManager.removeConnectChangedListener(wsConnectListener)
         PushChannelCoordinator.removeListener(channelListener)
@@ -81,6 +90,8 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         wsCard = findViewById(R.id.card_ws_push)
         wsState = findViewById(R.id.tv_ws_state)
         wsRadio = findViewById(R.id.radio_ws)
+        wsAlertSetting = findViewById(R.id.layout_ws_alert_setting)
+        wsAlertSummary = findViewById(R.id.tv_ws_alert_summary)
     }
 
     private fun bindActions() {
@@ -94,6 +105,9 @@ class PushChannelSettingActivity : WxpBaseActivity() {
             }
         }
         retryVendor.setOnClickListener { PushChannelCoordinator.retryVendorRegistration() }
+        // 子 view 自己消费点击，不会连带触发卡片的「选中 WS 通道」；
+        // 也不随当前通道置灰，允许用户先配好再切过来。
+        wsAlertSetting.setOnClickListener { WxpJumpPageUtils.jumpToWsAlertSetting(this) }
     }
 
     /** 根据协调器快照完整刷新两个通道卡片。 */

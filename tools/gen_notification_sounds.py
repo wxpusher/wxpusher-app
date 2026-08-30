@@ -1,18 +1,26 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-生成 iOS 推送提醒铃声（.caf）。
+生成 App 的推送提醒铃声，iOS 与 Android 共用同一套合成音色。
 
 全部为程序合成，不含任何第三方素材，无版权问题。
-输出到 ../wxpusher/WxPusher-iOS/Sounds/，文件名与服务端 NotificationSound 枚举一一对应。
+
+    iOS     -> iosApp/wxpusher/WxPusher-iOS/Sounds/*.caf
+               10 个：5 个短音 + 5 个预渲染的「持续 N 秒」长音。
+               APNs 的 aps.sound 只认 Bundle 里的文件名，长度只能靠文件本身。
+    Android -> androidApp/src/androidMain/res/raw/*.wav
+               只要 5 个短音。Android 的提醒是 App 自己用 MediaPlayer 播的，
+               任意时长靠循环重播实现，不需要预渲染长音。
 
 用法：
-    python3 gen_notification_sounds.py          # 生成全部
-    python3 gen_notification_sounds.py ding     # 只生成指定的
+    python3 gen_notification_sounds.py                        # 两端全部生成
+    python3 gen_notification_sounds.py --platform android     # 只生成 Android
+    python3 gen_notification_sounds.py --platform ios ding    # 只生成 iOS 的 ding
 
 依赖：Python 标准库 + macOS 自带的 afconvert。
 """
 
+import argparse
 import math
 import os
 import struct
@@ -25,9 +33,14 @@ SAMPLE_RATE = 44100
 # 留够头部空间，多个分音叠加时不至于削顶
 PEAK = 0.82
 
-OUT_DIR = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    "..", "wxpusher", "WxPusher-iOS", "Sounds",
+#脚本已经从 iosApp/tools 挪到仓库根的 tools/，路径都相对仓库根算
+REPO_ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+
+IOS_OUT_DIR = os.path.join(
+    REPO_ROOT, "iosApp", "wxpusher", "WxPusher-iOS", "Sounds",
+)
+ANDROID_OUT_DIR = os.path.join(
+    REPO_ROOT, "androidApp", "src", "androidMain", "res", "raw",
 )
 
 
@@ -81,23 +94,28 @@ def fade_out(buf, seconds=0.12):
     return buf
 
 
-def write_caf(name, buf):
+def render_master_wav(buf, wav_path):
+    """把浮点缓冲写成 16bit PCM 母带 wav，两个平台的输出都从它转出来。"""
     buf = fade_out(normalize(buf))
     frames = b"".join(
         struct.pack("<h", max(-32768, min(32767, int(v * 32767)))) for v in buf
     )
+    with wave.open(wav_path, "wb") as w:
+        w.setnchannels(1)
+        w.setsampwidth(2)
+        w.setframerate(SAMPLE_RATE)
+        w.writeframes(frames)
+    return len(buf) / SAMPLE_RATE
 
+
+def write_caf(name, buf):
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
         wav_path = tmp.name
     try:
-        with wave.open(wav_path, "wb") as w:
-            w.setnchannels(1)
-            w.setsampwidth(2)
-            w.setframerate(SAMPLE_RATE)
-            w.writeframes(frames)
+        seconds = render_master_wav(buf, wav_path)
 
-        os.makedirs(OUT_DIR, exist_ok=True)
-        caf_path = os.path.normpath(os.path.join(OUT_DIR, name + ".caf"))
+        os.makedirs(IOS_OUT_DIR, exist_ok=True)
+        caf_path = os.path.normpath(os.path.join(IOS_OUT_DIR, name + ".caf"))
         # IMA4(ADPCM) 是 Apple 明确支持的通知音格式之一，相对 16bit PCM 是 4:1。
         # 长铃声按 PCM 存会有好几 MB，对 App 包体积不可接受。
         subprocess.run(
@@ -108,11 +126,24 @@ def write_caf(name, buf):
         size = os.path.getsize(caf_path)
         snr = measure_snr(wav_path, caf_path)
         print("  -> %s  (%.2fs, %d bytes, SNR %.1f dB)"
-              % (caf_path, len(buf) / SAMPLE_RATE, size, snr))
+              % (caf_path, seconds, size, snr))
         if snr < 30.0:
             print("     !! SNR 偏低，ADPCM 量化噪声可能可闻，考虑换回 PCM 或降采样")
     finally:
         os.unlink(wav_path)
+
+
+def write_android_wav(name, buf):
+    """
+    Android 直接用 16bit PCM wav。
+    没走 ogg/mp3 是因为 macOS 自带的 afconvert 编不出这两种格式，而只要 5 个
+    1 秒以内的短音，PCM 合计也就几百 KB，没必要为此引入 ffmpeg 依赖。
+    """
+    os.makedirs(ANDROID_OUT_DIR, exist_ok=True)
+    wav_path = os.path.normpath(os.path.join(ANDROID_OUT_DIR, name + ".wav"))
+    seconds = render_master_wav(buf, wav_path)
+    print("  -> %s  (%.2fs, %d bytes)"
+          % (wav_path, seconds, os.path.getsize(wav_path)))
 
 
 def read_pcm16_data(path):
@@ -295,7 +326,8 @@ LONG_SPECS = {
 }
 
 
-BUILDERS = {
+#短音：两端都要
+SHORT_BUILDERS = {
     "wxp_ding": make_ding,
     "wxp_bell": make_bell,
     "wxp_chime": make_chime,
@@ -303,25 +335,55 @@ BUILDERS = {
     "wxp_drop": make_drop,
 }
 
+BUILDERS = dict(SHORT_BUILDERS)
 for _name, _spec in LONG_SPECS.items():
     BUILDERS[_name] = (lambda spec: lambda: make_long(*spec))(_spec)
 
 
 def main():
-    wanted = sys.argv[1:]
-    names = list(BUILDERS)
-    if wanted:
+    parser = argparse.ArgumentParser(
+        description="生成 iOS/Android 的推送提醒铃声",
+    )
+    parser.add_argument(
+        "--platform", choices=("ios", "android", "all"), default="all",
+        help="生成哪个平台的音频，默认两端都生成",
+    )
+    parser.add_argument(
+        "names", nargs="*",
+        help="只生成指定的铃声（可省略 wxp_ 前缀），不传表示该平台的全部",
+    )
+    args = parser.parse_args()
+
+    do_ios = args.platform in ("ios", "all")
+    do_android = args.platform in ("android", "all")
+
+    if args.names:
         names = []
-        for w in wanted:
+        for w in args.names:
             key = w if w.startswith("wxp_") else "wxp_" + w
             if key not in BUILDERS:
                 print("未知铃声: %s，可选: %s" % (w, ", ".join(BUILDERS)))
                 return 1
             names.append(key)
+    else:
+        names = list(BUILDERS)
 
     for name in names:
+        #长音只有 iOS 需要：Android 的时长是 App 循环重播短音实现的
+        is_short = name in SHORT_BUILDERS
+        targets = []
+        if do_ios:
+            targets.append(write_caf)
+        if do_android and is_short:
+            targets.append(write_android_wav)
+        if not targets:
+            continue
+
         print("生成 %s ..." % name)
-        write_caf(name, BUILDERS[name]())
+        #合成一次，两个平台共用同一份缓冲，保证音色完全一致
+        buf = BUILDERS[name]()
+        for write in targets:
+            write(name, list(buf))
     return 0
 
 

@@ -21,6 +21,7 @@ import com.smjcco.wxpusher.page.login.WxpLoginActivity
 import com.smjcco.wxpusher.page.login.WxpPhoneBind
 import com.smjcco.wxpusher.page.main.WxpMainActivity
 import com.smjcco.wxpusher.page.pushchannel.PushChannelSettingActivity
+import com.smjcco.wxpusher.page.pushchannel.alert.WsAlertSettingActivity
 import com.smjcco.wxpusher.page.registerorbind.WxpRegisterOrBindActivity
 import com.smjcco.wxpusher.page.scan.WxpScanActivity
 import com.smjcco.wxpusher.page.useragreement.WxpUserAgreementActivity
@@ -206,6 +207,13 @@ object WxpJumpPageUtils {
     fun jumpToPushChannelSetting(activity: Activity? = null) {
         withActivity(activity) {
             PushChannelSettingActivity.start(it)
+        }
+    }
+
+    /** 打开 WS 通道收到消息时的提醒方式设置页。 */
+    fun jumpToWsAlertSetting(activity: Activity? = null) {
+        withActivity(activity) {
+            WsAlertSettingActivity.start(it)
         }
     }
 

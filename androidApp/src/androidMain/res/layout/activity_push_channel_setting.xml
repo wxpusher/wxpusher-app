@@ -207,7 +207,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="优点\n• 不依赖手机厂商推送服务\n• 所有 Android 手机都可以使用\n• 连接正常时消息实时性较好"
+                    android:text="优点\n• 不依赖手机厂商推送服务\n• 所有 Android 手机都可以使用\n• 连接正常时消息实时性较好\n• 可自定义丰富的提醒方式"
                     android:textColor="@color/check_description_color"
                     android:textSize="14sp"
                     android:lineSpacingExtra="3dp" />
@@ -220,6 +220,53 @@
                     android:textColor="@color/check_description_color"
                     android:textSize="14sp"
                     android:lineSpacingExtra="3dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@color/Divider" />
+
+                <!-- 自建链接的提醒方式由 App 自己执行，所以入口放在这张卡片里面。 -->
+                <LinearLayout
+                    android:id="@+id/layout_ws_alert_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="提醒方式设置"
+                        android:textColor="@color/text_fit_theme_first"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tv_ws_alert_summary"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:gravity="end"
+                        android:maxLines="1"
+                        android:textColor="@color/text_fit_theme_second"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="4dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_chevron_right_24" />
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
     </LinearLayout>

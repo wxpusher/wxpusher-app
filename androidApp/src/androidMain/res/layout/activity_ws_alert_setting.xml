@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/PageBg2"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="24dp">
+
+        <!-- 页面说明：设置只影响当前设备的自建链接通道。 -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="4dp"
+            android:text="使用WxPusher自建通道的提醒方式，仅对当前设备生效"
+            android:textColor="@color/text_fit_theme_second"
+            android:textSize="13sp" />
+
+        <TextView
+            style="@style/WsAlertSectionHeader"
+            android:text="单次提醒时长" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/check_item_bg"
+            android:orientation="vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="16dp">
+
+            <com.google.android.material.slider.Slider
+                android:id="@+id/slider_duration"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:contentDescription="提醒时长"
+                android:stepSize="1"
+                android:value="1"
+                android:valueFrom="0"
+                android:valueTo="60"
+                app:thumbColor="@color/colorPrimary"
+                app:tickVisible="false"
+                app:trackColorActive="@color/colorPrimary"
+                app:trackColorInactive="@color/input_border_color" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 秒"
+                    android:textColor="@color/text_fit_theme_second"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:text="60 秒"
+                    android:textColor="@color/text_fit_theme_second"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_duration_des"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/text_fit_theme_first"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_alert_section_header"
+            style="@style/WsAlertSectionHeader"
+            android:text="提醒方式" />
+
+        <LinearLayout
+            android:id="@+id/layout_alert_group"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/check_item_bg"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:id="@+id/layout_vibrate"
+                style="@style/WsAlertRow">
+
+                <TextView
+                    style="@style/WsAlertRowTitle"
+                    android:text="震动" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch_vibrate"
+                    style="@style/WsAlertRowSwitch" />
+            </LinearLayout>
+
+            <View style="@style/WsAlertDivider" />
+
+            <LinearLayout
+                android:id="@+id/layout_torch"
+                style="@style/WsAlertRow">
+
+                <TextView
+                    style="@style/WsAlertRowTitle"
+                    android:text="闪光灯" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch_torch"
+                    style="@style/WsAlertRowSwitch" />
+            </LinearLayout>
+
+            <View style="@style/WsAlertDivider" />
+
+            <LinearLayout
+                android:id="@+id/layout_sound"
+                style="@style/WsAlertRow">
+
+                <TextView
+                    style="@style/WsAlertRowTitle"
+                    android:text="响铃" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch_sound"
+                    style="@style/WsAlertRowSwitch" />
+            </LinearLayout>
+
+            <View style="@style/WsAlertDivider" />
+
+            <LinearLayout
+                android:id="@+id/layout_tone"
+                style="@style/WsAlertRow">
+
+                <TextView
+                    style="@style/WsAlertRowTitle"
+                    android:text="提示音" />
+
+                <TextView
+                    android:id="@+id/tv_tone_value"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:gravity="end"
+                    android:maxLines="1"
+                    android:textColor="@color/text_fit_theme_second"
+                    android:textSize="14sp" />
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_marginStart="8dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_chevron_right_24" />
+            </LinearLayout>
+
+            <View style="@style/WsAlertDivider" />
+
+            <LinearLayout
+                android:id="@+id/layout_force_loud"
+                style="@style/WsAlertRow">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="静音时也响铃"
+                        android:textColor="@color/text_fit_theme_first"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="按闹钟音量播放，静音和勿扰也进行提醒"
+                        android:textColor="@color/text_fit_theme_second"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switch_force_loud"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:clickable="false"
+                    android:focusable="false" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/btn_try"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="20dp"
+            android:background="?attr/selectableItemBackground"
+            android:paddingStart="24dp"
+            android:paddingTop="10dp"
+            android:paddingEnd="24dp"
+            android:paddingBottom="10dp"
+            android:text="试一试"
+            android:textColor="@color/colorPrimary"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:lineSpacingExtra="3dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:text="提醒方式仅对「WxPusher自建链接」通道生效，厂商系统推送的提醒由手机系统控制。"
+            android:textColor="@color/check_description_color"
+            android:textSize="13sp" />
+    </LinearLayout>
+</ScrollView>
