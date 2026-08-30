@@ -45,6 +45,7 @@ class WxpProfileViewController: UIViewController {
         tableView.register(ProfileTableViewCell.self, forCellReuseIdentifier: "ProfileCell")
         tableView.separatorStyle = .singleLine
         tableView.backgroundColor = .systemGroupedBackground
+        tableView.tableFooterView = buildFooterView()
         
         view.addSubview(tableView)
         tableView.translatesAutoresizingMaskIntoConstraints = false
@@ -60,7 +61,6 @@ class WxpProfileViewController: UIViewController {
         
         let uid = WxpAppDataService.shared.getLoginInfo()?.uid ?? ""
         let spt = WxpAppDataService.shared.getLoginInfo()?.spt ?? ""
-        let deviceId = WxpAppDataService.shared.getLoginInfo()?.deviceId ?? ""
         
         
         // 构建数据源
@@ -78,10 +78,6 @@ class WxpProfileViewController: UIViewController {
                                     UIPasteboard.general.string = spt
                                     WxpToastUtils.shared.showToast(msg: "SPT复制成功")
                                 }
-                            },
-                ProfileItem(title: "设备ID", subtitle: deviceId,
-                            accessoryType: .disclosureIndicator) {
-                                WxpToastUtils.shared.showToast(msg: "设备ID复制成功")
                             },
                 ProfileItem(title: "账号信息", subtitle: "管理账号",
                             accessoryType: .disclosureIndicator) {
@@ -165,19 +161,58 @@ class WxpProfileViewController: UIViewController {
                 ProfileItem(title: "软件更新", subtitle: WxpCommonParams.appVersionName(), accessoryType: .disclosureIndicator) {
                     WxpVersionCheckManager.shared.onAppForeground(force: true)
                 },
-                ProfileItem(title: "用户协议", subtitle: "查看用户和隐私协议", accessoryType: .disclosureIndicator) {
-                    WxpJumpPageUtils.jumpToWebUrl(url: "https://wxpusher.zjiecode.com/admin/agreement/index-argeement.html")
-                }
-                ,
                 ProfileItem(title: "联系我们", subtitle: "咨询和反馈问题", accessoryType: .disclosureIndicator) {
                     WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/contact")
                 }
-                ,
-                ProfileItem(title: "备案号", subtitle: "蜀ICP备14025423号-2A", accessoryType: .disclosureIndicator) {
-                    WxpJumpPageUtils.jumpToWebUrl(url: "https://beian.miit.gov.cn/")
-                }
             ])
         ]
+    }
+    
+    /// 页面底部的协议与备案号小字，跟随列表一起滚动
+    private func buildFooterView() -> UIView {
+        let container = UIView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 76))
+        
+        let agreementLabel = UILabel()
+        agreementLabel.text = "《用户和隐私协议》"
+        agreementLabel.font = .systemFont(ofSize: 12)
+        agreementLabel.textColor = .defFontSecondColor
+        agreementLabel.textAlignment = .center
+        agreementLabel.isUserInteractionEnabled = true
+        agreementLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onAgreementTap)))
+        
+        let recordLabel = UILabel()
+        recordLabel.text = "蜀ICP备14025423号-2A"
+        recordLabel.font = .systemFont(ofSize: 11)
+        recordLabel.textColor = .defFontSecondColor
+        recordLabel.textAlignment = .center
+        recordLabel.isUserInteractionEnabled = true
+        recordLabel.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(onRecordTap)))
+        
+        for label in [agreementLabel, recordLabel] {
+            label.translatesAutoresizingMaskIntoConstraints = false
+            container.addSubview(label)
+        }
+        
+        NSLayoutConstraint.activate([
+            // 高度略大于文字，撑出可点击区域
+            agreementLabel.topAnchor.constraint(equalTo: container.topAnchor, constant: 14),
+            agreementLabel.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            agreementLabel.heightAnchor.constraint(equalToConstant: 28),
+            
+            recordLabel.topAnchor.constraint(equalTo: agreementLabel.bottomAnchor, constant: 2),
+            recordLabel.centerXAnchor.constraint(equalTo: container.centerXAnchor),
+            recordLabel.heightAnchor.constraint(equalToConstant: 20)
+        ])
+        
+        return container
+    }
+    
+    @objc private func onAgreementTap() {
+        WxpJumpPageUtils.jumpToWebUrl(url: "https://wxpusher.zjiecode.com/admin/agreement/index-argeement.html")
+    }
+    
+    @objc private func onRecordTap() {
+        WxpJumpPageUtils.jumpToWebUrl(url: "https://beian.miit.gov.cn/")
     }
 }
 

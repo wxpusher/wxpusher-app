@@ -73,7 +73,6 @@ class ProfileFragment : WxpBaseFragment() {
         val loginInfo = WxpAppDataService.getLoginInfo()
         val uid = loginInfo?.uid ?: ""
         val spt = loginInfo?.spt ?: ""
-        val deviceId = loginInfo?.deviceId ?: ""
 
         if (!BuildConfig.online) {
             sectionData.add(
@@ -119,13 +118,6 @@ class ProfileFragment : WxpBaseFragment() {
                         hasArrow = true
                     ) {
                         copyToClipboard(spt, "SPT复制成功")
-                    },
-                    ProfileItem(
-                        title = "设备ID",
-                        subtitle = deviceId,
-                        hasArrow = true
-                    ) {
-                        copyToClipboard(deviceId, "设备ID复制成功")
                     },
                     ProfileItem(
                         title = "账号信息",
@@ -262,13 +254,6 @@ class ProfileFragment : WxpBaseFragment() {
                         checkForUpdate()
                     },
                     ProfileItem(
-                        title = "用户协议",
-                        subtitle = "查看用户和隐私协议",
-                        hasArrow = true
-                    ) {
-                        openUserAgreementUrl()
-                    },
-                    ProfileItem(
                         title = "联系我们",
                         subtitle = "咨询和反馈问题",
                         hasArrow = true
@@ -277,19 +262,22 @@ class ProfileFragment : WxpBaseFragment() {
                             "${WxpConfig.appFeUrl}/app/#/contact",
                             activity
                         )
-                    },
-                    ProfileItem(
-                        title = "备案号",
-                        subtitle = "蜀ICP备14025423号-2A",
-                        hasArrow = true
-                    ) {
-                        openRecordUrl()
                     }
                 )
             ))
 
-        adapter.setData(sectionData)
+        adapter.setData(sectionData, buildFooter())
         adapter.notifyDataSetChanged()
+    }
+
+    /** 页面底部的协议与备案号小字，跟随列表一起滚动 */
+    private fun buildFooter(): ProfileFooter {
+        return ProfileFooter(
+            agreementText = "《用户和隐私协议》",
+            recordText = "蜀ICP备14025423号-2A",
+            onAgreementClick = { openUserAgreementUrl() },
+            onRecordClick = { openRecordUrl() }
+        )
     }
 
     private fun copyToClipboard(text: String, successMessage: String) {
@@ -365,6 +353,13 @@ class ProfileFragment : WxpBaseFragment() {
         val action: (() -> Unit)? = null
     )
 
+    data class ProfileFooter(
+        val agreementText: String,
+        val recordText: String,
+        val onAgreementClick: () -> Unit,
+        val onRecordClick: () -> Unit
+    )
+
     // RecyclerView适配器
     private class ProfileAdapter(
         private val onItemClick: (ProfileItem) -> Unit
@@ -373,22 +368,25 @@ class ProfileFragment : WxpBaseFragment() {
         companion object {
             private const val TYPE_HEADER = 0
             private const val TYPE_ITEM = 1
+            private const val TYPE_FOOTER = 2
         }
 
         private val items = mutableListOf<Any>()
 
 
-        fun setData(sections: List<ProfileSection>) {
+        fun setData(sections: List<ProfileSection>, footer: ProfileFooter? = null) {
             items.clear()
             sections.forEach { section ->
                 items.add(section.title) // 添加section header
                 items.addAll(section.items) // 添加section items
             }
+            footer?.let { items.add(it) } // 底部协议和备案号
         }
 
         override fun getItemViewType(position: Int): Int {
             return when (items[position]) {
                 is String -> TYPE_HEADER
+                is ProfileFooter -> TYPE_FOOTER
                 is ProfileItem -> TYPE_ITEM
                 else -> TYPE_ITEM
             }
@@ -400,6 +398,11 @@ class ProfileFragment : WxpBaseFragment() {
                 TYPE_HEADER -> {
                     val view = inflater.inflate(R.layout.item_profile_section_header, parent, false)
                     SectionHeaderViewHolder(view)
+                }
+
+                TYPE_FOOTER -> {
+                    val view = inflater.inflate(R.layout.item_profile_footer, parent, false)
+                    FooterViewHolder(view)
                 }
 
                 else -> {
@@ -422,6 +425,10 @@ class ProfileFragment : WxpBaseFragment() {
                     val isLastInSection = isLastItemInSection(position)
                     holder.bind(item, onItemClick, isLastInSection)
                 }
+
+                is FooterViewHolder -> {
+                    holder.bind(items[position] as ProfileFooter)
+                }
             }
         }
 
@@ -429,8 +436,8 @@ class ProfileFragment : WxpBaseFragment() {
             // 如果是最后一个item，肯定是section的最后一个
             if (position == items.size - 1) return true
 
-            // 如果下一个item是String类型（section header），说明当前item是section的最后一个
-            if (position + 1 < items.size && items[position + 1] is String) return true
+            // 如果下一个item不是普通item（section header 或底部小字），说明当前item是section的最后一个
+            if (position + 1 < items.size && items[position + 1] !is ProfileItem) return true
 
             return false
         }
@@ -443,6 +450,19 @@ class ProfileFragment : WxpBaseFragment() {
 
             fun bind(title: String) {
                 titleTextView.text = title
+            }
+        }
+
+        // Footer ViewHolder：底部协议和备案号
+        private class FooterViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+            private val agreementTextView: TextView = itemView.findViewById(R.id.tv_footer_agreement)
+            private val recordTextView: TextView = itemView.findViewById(R.id.tv_footer_record)
+
+            fun bind(footer: ProfileFooter) {
+                agreementTextView.text = footer.agreementText
+                agreementTextView.setOnClickListener { footer.onAgreementClick() }
+                recordTextView.text = footer.recordText
+                recordTextView.setOnClickListener { footer.onRecordClick() }
             }
         }
 

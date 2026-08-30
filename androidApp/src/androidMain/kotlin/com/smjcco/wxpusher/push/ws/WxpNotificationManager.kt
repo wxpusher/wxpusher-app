@@ -36,7 +36,7 @@ object WxpNotificationManager {
         createNotificationChannel(
             WxPusherSystemChannelId,
             ChannelGroup.WxPusherSystem,
-            "WxPusher系统公告和通知", "WxPusher的公告、升级通知、异常提醒、订阅通知等",
+            "WxPusher自建链接通知", "通过WxPusher自建链接发送订阅通知提醒",
         )
     }
 

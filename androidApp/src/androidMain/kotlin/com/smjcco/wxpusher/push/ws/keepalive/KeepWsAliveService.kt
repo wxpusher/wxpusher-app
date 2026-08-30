@@ -226,10 +226,10 @@ class KeepWsAliveService : Service() {
         if (notificationManager.getNotificationChannel(notificationChannelId) == null) {
             val channel = NotificationChannel(
                 notificationChannelId,
-                "WxPusher监听消息通知",
+                "WxPusher保活通知",
                 NotificationManager.IMPORTANCE_HIGH
             ).apply {
-                description = "用于让WxPusher持续监听消息"
+                description = "让WxPusher持续在后台运行，避免遗漏消息"
                 enableLights(true)
                 lightColor = Color.GREEN
                 enableVibration(true)
