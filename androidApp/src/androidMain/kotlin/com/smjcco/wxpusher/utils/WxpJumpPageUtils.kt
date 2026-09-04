@@ -2,6 +2,7 @@ package com.smjcco.wxpusher.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.NotificationChannel
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -21,6 +22,7 @@ import com.smjcco.wxpusher.page.login.WxpLoginActivity
 import com.smjcco.wxpusher.page.login.WxpPhoneBind
 import com.smjcco.wxpusher.page.main.WxpMainActivity
 import com.smjcco.wxpusher.page.pushchannel.PushChannelSettingActivity
+import com.smjcco.wxpusher.page.pushchannel.alert.SystemPushSoundGuideActivity
 import com.smjcco.wxpusher.page.pushchannel.alert.WsAlertSettingActivity
 import com.smjcco.wxpusher.page.registerorbind.WxpRegisterOrBindActivity
 import com.smjcco.wxpusher.page.scan.WxpScanActivity
@@ -63,6 +65,42 @@ object WxpJumpPageUtils {
 //            )
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             it.startActivity(intent)
+        }
+    }
+
+    /**
+     * 打开某个已存在通知类别的系统设置页。
+     *
+     * 铃声属于通知类别的用户设置，App 不能直接写入。Android 12 及以后会请求系统
+     * 只显示声音相关设置；厂商系统可以选择忽略该筛选，因此仍需保留完整类别页的兼容性。
+     */
+    fun jumpToSystemNotificationChannelSettings(
+        channelId: String,
+        activity: Activity? = null,
+    ) {
+        withActivity(activity) { currentActivity ->
+            val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
+                putExtra(Settings.EXTRA_APP_PACKAGE, currentActivity.packageName)
+                putExtra(Settings.EXTRA_CHANNEL_ID, channelId)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    putStringArrayListExtra(
+                        Settings.EXTRA_CHANNEL_FILTER_LIST,
+                        arrayListOf(NotificationChannel.EDIT_SOUND),
+                    )
+                }
+            }
+            try {
+                if (intent.resolveActivity(currentActivity.packageManager) == null) {
+                    WxpToastUtils.showToast("无法直达通知类别设置，已打开通知设置")
+                    jumpToSystemNotificationSettingPage(currentActivity)
+                    return@withActivity
+                }
+                currentActivity.startActivity(intent)
+            } catch (e: Exception) {
+                WxpLogUtils.w(message = "打开通知类别设置失败，channelId=$channelId", throwable = e)
+                WxpToastUtils.showToast("无法直达通知类别设置，已打开通知设置")
+                jumpToSystemNotificationSettingPage(currentActivity)
+            }
         }
     }
 
@@ -214,6 +252,13 @@ object WxpJumpPageUtils {
     fun jumpToWsAlertSetting(activity: Activity? = null) {
         withActivity(activity) {
             WsAlertSettingActivity.start(it)
+        }
+    }
+
+    /** 打开厂商系统推送的铃声设置引导页。 */
+    fun jumpToSystemPushSoundGuide(activity: Activity? = null) {
+        withActivity(activity) {
+            SystemPushSoundGuideActivity.start(it)
         }
     }
 

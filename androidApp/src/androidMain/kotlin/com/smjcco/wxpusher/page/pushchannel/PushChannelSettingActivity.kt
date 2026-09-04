@@ -36,6 +36,8 @@ class PushChannelSettingActivity : WxpBaseActivity() {
     private lateinit var vendorState: TextView
     private lateinit var vendorRadio: RadioButton
     private lateinit var retryVendor: TextView
+    private lateinit var vendorAlertSetting: View
+    private lateinit var vendorAlertSummary: TextView
     private lateinit var wsCard: MaterialCardView
     private lateinit var wsState: TextView
     private lateinit var wsRadio: RadioButton
@@ -71,8 +73,8 @@ class PushChannelSettingActivity : WxpBaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        // 从提醒方式设置页返回后要刷新摘要
-        wsAlertSummary.text = WsAlertStore.summary()
+        // 从提醒方式设置页返回后刷新摘要，同时维持“当前实际通道”决定入口可用性的规则。
+        renderWsAlertSetting(latestSnapshot ?: PushChannelCoordinator.getSnapshot())
     }
 
     override fun onStop() {
@@ -87,6 +89,8 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         vendorState = findViewById(R.id.tv_vendor_state)
         vendorRadio = findViewById(R.id.radio_vendor)
         retryVendor = findViewById(R.id.btn_retry_vendor)
+        vendorAlertSetting = findViewById(R.id.layout_vendor_alert_setting)
+        vendorAlertSummary = findViewById(R.id.tv_vendor_alert_summary)
         wsCard = findViewById(R.id.card_ws_push)
         wsState = findViewById(R.id.tv_ws_state)
         wsRadio = findViewById(R.id.radio_ws)
@@ -105,9 +109,20 @@ class PushChannelSettingActivity : WxpBaseActivity() {
             }
         }
         retryVendor.setOnClickListener { PushChannelCoordinator.retryVendorRegistration() }
-        // 子 view 自己消费点击，不会连带触发卡片的「选中 WS 通道」；
-        // 也不随当前通道置灰，允许用户先配好再切过来。
-        wsAlertSetting.setOnClickListener { WxpJumpPageUtils.jumpToWsAlertSetting(this) }
+        // 系统推送铃声只能由系统通知设置修改。入口是否可用由当前“实际生效”的
+        // 通道决定，不能用用户偏好判断，否则厂商通道还未切换成功时会误导用户。
+        vendorAlertSetting.setOnClickListener {
+            if (vendorAlertSetting.isEnabled) {
+                WxpJumpPageUtils.jumpToSystemPushSoundGuide(this)
+            }
+        }
+        // 子 view 自己消费点击，不会连带触发卡片的「选中 WS 通道」。
+        // 仅在 WS 已实际生效时允许打开，避免用户误以为它能影响厂商系统推送。
+        wsAlertSetting.setOnClickListener {
+            if (wsAlertSetting.isEnabled) {
+                WxpJumpPageUtils.jumpToWsAlertSetting(this)
+            }
+        }
     }
 
     /** 根据协调器快照完整刷新两个通道卡片。 */
@@ -140,6 +155,8 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         } else {
             View.GONE
         }
+        renderVendorAlertSetting(snapshot)
+        renderWsAlertSetting(snapshot)
 
         val selectedColor = ContextCompat.getColor(this, R.color.colorPrimary)
         val normalColor = ContextCompat.getColor(this, R.color.input_border_color)
@@ -174,6 +191,38 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         }
         if (snapshot.errorMessage == null) {
             lastErrorMessage = null
+        }
+    }
+
+    /**
+     * 与 WS 的本地提醒设置不同，厂商推送的声音归系统通知类别所有。
+     * 只有厂商推送已经真正生效时才允许进入，避免用户把它误认为 WS 提醒设置。
+     */
+    private fun renderVendorAlertSetting(snapshot: PushChannelSnapshot) {
+        val vendorEffective = snapshot.effectiveChannel == PushChannel.VENDOR
+        vendorAlertSetting.isEnabled = vendorEffective
+        vendorAlertSetting.alpha = if (vendorEffective) 1f else 0.45f
+        vendorAlertSummary.text = if (vendorEffective) {
+            "去系统设置铃声"
+        } else if (snapshot.preference == com.smjcco.wxpusher.push.PushChannelPreference.VENDOR) {
+            "系统推送生效后可设置"
+        } else {
+            "切换至系统推送后可设置"
+        }
+    }
+
+    /**
+     * WS 提醒由 App 本地执行，只在自建链接已经实际生效时才允许修改。
+     * 这与厂商系统推送铃声入口使用相同的可用性判断，均以实际通道而非用户偏好为准。
+     */
+    private fun renderWsAlertSetting(snapshot: PushChannelSnapshot) {
+        val wsEffective = snapshot.effectiveChannel == PushChannel.WEBSOCKET
+        wsAlertSetting.isEnabled = wsEffective
+        wsAlertSetting.alpha = if (wsEffective) 1f else 0.45f
+        wsAlertSummary.text = if (wsEffective) {
+            WsAlertStore.summary()
+        } else {
+            "切换至自建链接可设置"
         }
     }
 

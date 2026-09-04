@@ -113,8 +113,8 @@
                     android:layout_marginTop="16dp"
                     android:text="优点\n• 系统级推送，App 被关闭后仍能接收\n• 更稳定、更省电\n• 不需要显示常驻通知"
                     android:textColor="@color/check_description_color"
-                    android:textSize="14sp"
-                    android:lineSpacingExtra="3dp" />
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="2dp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -122,8 +122,55 @@
                     android:layout_marginTop="12dp"
                     android:text="缺点\n• 依赖手机厂商推送服务\n• 可能受到厂商限额和系统通知设置影响"
                     android:textColor="@color/check_description_color"
-                    android:textSize="14sp"
-                    android:lineSpacingExtra="3dp" />
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="2dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="0.5dp"
+                    android:layout_marginTop="12dp"
+                    android:background="@color/Divider" />
+
+                <!-- 厂商系统推送的铃声由系统通知类别控制，不能由 App 直接修改。 -->
+                <LinearLayout
+                    android:id="@+id/layout_vendor_alert_setting"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="系统推送铃声设置"
+                        android:textColor="@color/text_fit_theme_first"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tv_vendor_alert_summary"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:gravity="end"
+                        android:maxLines="1"
+                        android:textColor="@color/text_fit_theme_second"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="4dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_chevron_right_24" />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/btn_retry_vendor"
@@ -209,8 +256,8 @@
                     android:layout_marginTop="16dp"
                     android:text="优点\n• 不依赖手机厂商推送服务\n• 所有 Android 手机都可以使用\n• 连接正常时消息实时性较好\n• 可自定义丰富的提醒方式"
                     android:textColor="@color/check_description_color"
-                    android:textSize="14sp"
-                    android:lineSpacingExtra="3dp" />
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="2dp" />
 
                 <TextView
                     android:layout_width="match_parent"
@@ -218,8 +265,8 @@
                     android:layout_marginTop="12dp"
                     android:text="缺点\n• 需要在通知栏显示常驻通知\n• 耗电量相对较高\n• APP在后台被杀死会收不到消息"
                     android:textColor="@color/check_description_color"
-                    android:textSize="14sp"
-                    android:lineSpacingExtra="3dp" />
+                    android:textSize="13sp"
+                    android:lineSpacingExtra="2dp" />
 
                 <View
                     android:layout_width="match_parent"
@@ -227,7 +274,7 @@
                     android:layout_marginTop="12dp"
                     android:background="@color/Divider" />
 
-                <!-- 自建链接的提醒方式由 App 自己执行，所以入口放在这张卡片里面。 -->
+                <!-- 自建链接的提醒方式由 App 自己执行，仅在该通道实际生效时可设置。 -->
                 <LinearLayout
                     android:id="@+id/layout_ws_alert_setting"
                     android:layout_width="match_parent"

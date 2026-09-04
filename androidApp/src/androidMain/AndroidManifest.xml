@@ -132,6 +132,11 @@
             android:screenOrientation="portrait" />
 
         <activity
+            android:name=".page.pushchannel.alert.SystemPushSoundGuideActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <activity
             android:name=".page.web.WxpWebViewActivity"
             android:exported="true" />
 
