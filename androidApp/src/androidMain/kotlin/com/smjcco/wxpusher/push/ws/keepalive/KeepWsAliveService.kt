@@ -49,7 +49,8 @@ class KeepWsAliveService : Service() {
     }
 
     companion object {
-        val KeepWsAliveServiceNotificationId = 1
+        const val KeepWsAliveServiceNotificationId = 1
+        const val KeepWsAliveNotificationChannelId = "WxPusherKeepAliveNotificationChannelId"
 
         fun start(context: Context = ApplicationUtils.getApplication()) {
             Intent(context, KeepWsAliveService::class.java).also {
@@ -218,7 +219,7 @@ class KeepWsAliveService : Service() {
         //初始化一下通知服务，避免通知分组没有创建
         WxpNotificationManager.init()
 
-        val notificationChannelId = "WxPusherKeepAliveNotificationChannelId"
+        val notificationChannelId = KeepWsAliveNotificationChannelId
 
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 

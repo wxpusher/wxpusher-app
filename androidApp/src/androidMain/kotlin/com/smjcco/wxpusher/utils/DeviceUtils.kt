@@ -1,5 +1,6 @@
 package com.smjcco.wxpusher.utils
 
+import android.app.ActivityManager
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -49,6 +50,21 @@ object DeviceUtils {
         val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
         val appName = context.packageName
         return powerManager.isIgnoringBatteryOptimizations(appName)
+    }
+
+    /** 用户是否在系统电池设置中明确限制了本应用后台运行。 */
+    fun isBackgroundRestricted(): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.P) {
+            return false
+        }
+        val context = ApplicationUtils.getApplication()
+        val activityManager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        return activityManager.isBackgroundRestricted
+    }
+
+    /** WS 长连接是否同时避开了系统后台限制和电池优化。 */
+    fun canRunInBackgroundWithoutBatteryRestrictions(): Boolean {
+        return !isBackgroundRestricted() && isIgnoringBatteryOptimizations()
     }
 
     /**

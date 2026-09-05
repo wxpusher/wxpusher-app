@@ -3,6 +3,7 @@ package com.smjcco.wxpusher.utils
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.NotificationChannel
+import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -77,12 +78,13 @@ object WxpJumpPageUtils {
     fun jumpToSystemNotificationChannelSettings(
         channelId: String,
         activity: Activity? = null,
+        soundOnly: Boolean = true,
     ) {
         withActivity(activity) { currentActivity ->
             val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
                 putExtra(Settings.EXTRA_APP_PACKAGE, currentActivity.packageName)
                 putExtra(Settings.EXTRA_CHANNEL_ID, channelId)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                if (soundOnly && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                     putStringArrayListExtra(
                         Settings.EXTRA_CHANNEL_FILTER_LIST,
                         arrayListOf(NotificationChannel.EDIT_SOUND),
@@ -102,6 +104,67 @@ object WxpJumpPageUtils {
                 jumpToSystemNotificationSettingPage(currentActivity)
             }
         }
+    }
+
+    /**
+     * 尝试打开各厂商的自启动管理页。
+     * Android 没有统一的自启动设置 Intent，因此这里只负责尝试直达，不推断授权结果；
+     * 返回 false 时由调用页面展示手动路径说明。
+     */
+    fun jumpToSystemAutoStartSettings(activity: Activity? = null): Boolean {
+        var opened = false
+        withActivity(activity) { currentActivity ->
+            val manufacturer = Build.MANUFACTURER.lowercase()
+            val targets = when {
+                manufacturer.contains("xiaomi") -> listOf(
+                    "com.miui.securitycenter/com.miui.permcenter.autostart.AutoStartManagementActivity",
+                    "com.miui.securitycenter/com.miui.powercenter.PowerSettings",
+                )
+
+                manufacturer.contains("huawei") -> listOf(
+                    "com.huawei.systemmanager/com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity",
+                    "com.huawei.systemmanager/com.huawei.systemmanager.optimize.process.ProtectActivity",
+                )
+
+                manufacturer.contains("honor") -> listOf(
+                    "com.hihonor.systemmanager/com.hihonor.systemmanager.startupmgr.ui.StartupNormalAppListActivity",
+                    "com.huawei.systemmanager/com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity",
+                )
+
+                manufacturer.contains("oppo")
+                    || manufacturer.contains("oneplus")
+                    || manufacturer.contains("realme") -> listOf(
+                    "com.oplus.safecenter/com.oplus.safecenter.startupapp.StartupAppListActivity",
+                    "com.coloros.safecenter/com.coloros.safecenter.startupapp.StartupAppListActivity",
+                    "com.coloros.oppoguardelf/com.coloros.powermanager.fuelgaue.PowerUsageModelActivity",
+                )
+
+                manufacturer.contains("vivo") || manufacturer.contains("iqoo") -> listOf(
+                    "com.vivo.permissionmanager/com.vivo.permissionmanager.activity.BgStartUpManagerActivity",
+                    "com.iqoo.secure/com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity",
+                )
+
+                manufacturer.contains("meizu") -> listOf(
+                    "com.meizu.safe/com.meizu.safe.permission.SmartBGActivity",
+                    "com.meizu.safe/com.meizu.safe.security.SHOW_APPSEC",
+                )
+
+                else -> emptyList()
+            }
+
+            for (target in targets) {
+                val component = ComponentName.unflattenFromString(target) ?: continue
+                val success = runCatching {
+                    currentActivity.startActivity(Intent().setComponent(component))
+                }.isSuccess
+                if (success) {
+                    opened = true
+                    return@withActivity
+                }
+            }
+
+        }
+        return opened
     }
 
     /**
