@@ -4,7 +4,13 @@ import Toaster
 import shared
 
 private class WxpBaseInfoServiceListenerImpl:IWxpBaseInfoServiceListener{
-    func getPlatform() -> String {
+    /// 获取客户端操作系统平台，供跨平台业务判断运行环境。
+    func getClientPlatform() -> String {
+        return "iOS"
+    }
+
+    /// iOS 仅使用 APNs，因此后端推送路由平台固定为 iOS。
+    func getEffectivePushPlatform() -> String {
         return "iOS"
     }
 }
@@ -121,7 +127,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         let token = deviceToken.map { String(format: "%02.2hhx", $0) }.joined()
         print("[push]-apple push token: \(token)")
         WxpAppDataService.shared.savePushToken(pushToken: token)
-        WxpAppDataService.shared.updateDeviceInfo(platform: nil)
+        // APNs 回调属于后台自动上报，失败不打扰用户，因此传 silent。
+        // Kotlin 默认参数不会导出到 Objective-C，这里必须显式传入。
+        WxpAppDataService.shared.updateDeviceInfo(platform: nil, silent: true)
     }
     
     func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {

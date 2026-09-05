@@ -40,7 +40,6 @@ class WxpBindPresenter(view: IWxpBindView) :
                 if (it.phoneHasRegister == true) {
                     val loginInfo = WxpLoginInfo(it)
                     WxpAppDataService.saveLoginInfo(loginInfo)
-                    WxpAppDataService.updateDeviceInfo()
                     view?.onGoMain()
                 } else {
                     WxpToastUtils.showToast("绑定未完成，请先按步骤绑定 ")

@@ -2,7 +2,7 @@ package com.smjcco.wxpusher.biz.version
 
 /**
  * 跳转应用市场的能力抽象，由两端各自注入实现。
- * Android：按 DeviceUtils.getPlatform() 分流到厂商应用商店；downgradeToTbs=true 或厂商失败 → TBS。
+ * Android：按设备厂商识别结果分流到对应应用商店；downgradeToTbs=true 或厂商失败 → TBS。
  * iOS：忽略 downgradeToTbs，直接打开 downloadUrl（通常是 itms-apps 链接）。
  */
 interface WxpAppMarketNavigator {

@@ -29,6 +29,7 @@ import com.smjcco.wxpusher.page.main.fragment.ProfileFragment
 import com.smjcco.wxpusher.page.main.fragment.WxpExtFuncFragment
 import com.smjcco.wxpusher.page.main.fragment.WxpProviderListFragment
 import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.push.ws.alert.WsAlertPlayer
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
@@ -303,6 +304,8 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
 
     override fun onResume() {
         super.onResume()
+        //用户已经看到消息了，WS 的持续提醒（最长 60 秒）就该停下来
+        WsAlertPlayer.stopAll()
         PushManager.showOpenNoteRemindSettingDialog(this)
         //显示首页的时候，尝试启动一次保活服务
         KeepWsAliveServiceStarter.start(this)

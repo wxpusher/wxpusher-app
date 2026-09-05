@@ -8,6 +8,7 @@ import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.biz.version.WxpAppMarketNavigator
+import com.smjcco.wxpusher.push.PushPlatformResolver
 import com.tencent.upgrade.core.UpgradeManager
 import com.tencent.upgrade.core.UpgradeReqCallbackForUserManualCheck
 
@@ -26,8 +27,11 @@ object AppMarketNavigator : WxpAppMarketNavigator {
 
     override fun willShowInternalDialog(downgradeToTbs: Boolean): Boolean {
         // 服务端下发降级 或 未识别厂商 → 走 TBS，TBS 自己会弹升级窗
-        if (downgradeToTbs) return true
-        return vendorMarketPkg(DeviceUtils.getPlatform()) == null
+        if (downgradeToTbs) {
+            return true
+        }
+        // 应用市场只取决于设备厂商，不能随用户选择的推送通道变化。
+        return vendorMarketPkg(PushPlatformResolver.detectVendorPushPlatform()) == null
     }
 
     override fun jumpToMarket(downloadUrl: String, downgradeToTbs: Boolean) {
@@ -39,7 +43,8 @@ object AppMarketNavigator : WxpAppMarketNavigator {
             return
         }
 
-        val platform = DeviceUtils.getPlatform()
+        // 即使当前使用 WS，也应继续打开当前手机对应的厂商应用市场。
+        val platform = PushPlatformResolver.detectVendorPushPlatform()
         val marketPkg = vendorMarketPkg(platform)
         if (marketPkg != null) {
             if (tryOpenVendorMarket(ctx, marketPkg)) {

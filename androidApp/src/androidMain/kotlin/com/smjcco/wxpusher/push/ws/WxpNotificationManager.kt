@@ -8,13 +8,13 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.page.WebViewActivity
 import com.smjcco.wxpusher.page.main.WxpMainActivity
+import com.smjcco.wxpusher.push.ws.alert.WsAlertPlayer
 import com.smjcco.wxpusher.push.ws.connect.PushMsgDeviceMsg
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
@@ -23,7 +23,22 @@ import java.util.concurrent.atomic.AtomicInteger
 object WxpNotificationManager {
 
     private var messageId = AtomicInteger(10000)
-    const val WxPusherSystemChannelId = "WxPusherSystemChannelId"
+
+    /**
+     * 旧的业务消息渠道，声音和震动写死在渠道属性里，用户改不了。
+     * 只保留 id 用于升级时删除，不要再往这个渠道发通知。
+     */
+    private const val LegacyBizChannelId = "WxPusherSystemChannelId"
+
+    /**
+     * 业务消息渠道。
+     *
+     * 渠道本身是静音无震动的，提醒全部交给 [WsAlertPlayer] 按用户设置执行——
+     * NotificationChannel 创建之后声音和震动就无法用代码修改，想让用户自定义只能这么做。
+     * 换了新 id 是因为删掉再用同名 id 重建，系统会把旧属性一起恢复回来。
+     */
+    const val WxPusherWsMessageChannelId = "WxPusherWsMessageChannelIdV2"
+
     private var sysNotificationManager: NotificationManager? = null
     private var init = AtomicBoolean(false)
 
@@ -33,18 +48,20 @@ object WxpNotificationManager {
         }
         init.set(true)
         initNotificationChannelGroup()
-        createNotificationChannel(
-            WxPusherSystemChannelId,
+        createBizNotificationChannel(
+            WxPusherWsMessageChannelId,
             ChannelGroup.WxPusherSystem,
-            "WxPusher系统公告和通知", "WxPusher的公告、升级通知、异常提醒、订阅通知等",
+            "WxPusher自建链接通知", "通过WxPusher自建链接发送订阅通知提醒，提醒方式在App内设置",
         )
+        // 旧渠道自带声音和震动，留着会和 App 自己的提醒双响。
+        runCatching { getSysNotificationManager().deleteNotificationChannel(LegacyBizChannelId) }
     }
 
     /**
      * 发送业务消息推送通知
      */
     fun sendBizMessageNotification(message: PushMsgDeviceMsg) {
-        val channel: String = WxPusherSystemChannelId
+        val channel: String = WxPusherWsMessageChannelId
         // 创建Intent，用于在点击通知时启动Activity
         val intent = Intent(ApplicationUtils.getApplication(), WxpMainActivity::class.java)
         intent.putExtra(
@@ -68,13 +85,16 @@ object WxpNotificationManager {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .setGroup("bizMsg")
-                .setDefaults(Notification.DEFAULT_ALL)
+                // 不设 DEFAULT_ALL，也不能用 setSilent：前者会重新引入渠道之外的声音和震动，
+                // 后者会连悬浮通知一起压掉。悬浮通知只取决于渠道的 importance。
                 .setPriority(NotificationManager.IMPORTANCE_HIGH)
                 //显示更多文本，长按可以展开
                 .setStyle(NotificationCompat.BigTextStyle().bigText(message.summary))
                 .build()
 
         sendNotification(notification)
+        // 渠道是静音的，震动、闪光灯、响铃由 App 按用户设置执行。
+        WsAlertPlayer.alert()
     }
 
     private fun sendNotification(notification: Notification) {
@@ -83,9 +103,12 @@ object WxpNotificationManager {
     }
 
     /**
-     * 创建业务消息的通知渠道
+     * 创建业务消息的通知渠道。
+     *
+     * 刻意不设声音和震动：这两项一旦写进渠道就再也改不了，而提醒方式是要让用户自定义的，
+     * 所以统一交给 [WsAlertPlayer]。importance 仍然是 HIGH，悬浮通知不受影响。
      */
-    private fun createNotificationChannel(
+    private fun createBizNotificationChannel(
         id: String,
         group: ChannelGroup,
         name: String,
@@ -94,13 +117,9 @@ object WxpNotificationManager {
         val channel = NotificationChannel(id, name, NotificationManager.IMPORTANCE_HIGH)
         channel.description = des
         channel.enableLights(true)
-        channel.enableVibration(true)
-        channel.vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
+        channel.enableVibration(false)
         channel.setShowBadge(true)
-        channel.setSound(
-            Settings.System.DEFAULT_NOTIFICATION_URI,
-            Notification.AUDIO_ATTRIBUTES_DEFAULT
-        )
+        channel.setSound(null, null)
         channel.group = group.id
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             channel.setAllowBubbles(true)

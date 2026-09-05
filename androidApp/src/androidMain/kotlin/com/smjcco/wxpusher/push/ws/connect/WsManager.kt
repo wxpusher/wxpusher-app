@@ -7,12 +7,12 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.os.Build
 import com.smjcco.wxpusher.WxpConfig
-import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpBaseInfoService
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpScopeUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.push.PushChannelStore
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager.sendBizMessageNotification
 import com.smjcco.wxpusher.utils.DeviceUtils
@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
 
-
+/** WebSocket 连接、重连、消息分发及连接状态通知的统一管理器。 */
 object WsManager {
     const val TAG = "WsManager"
     private val msgListenerMap: MutableMap<Int, MutableList<IWsMessageListener<out BaseWsMsg>>> =
@@ -44,10 +44,10 @@ object WsManager {
         .readTimeout(10, TimeUnit.SECONDS)    // 设置读取超时时间
         .build()
 
-    //是否已经链接
+    // 当前连接状态。
     private var connectStatus = AtomicReference(WsConnectStatus.NotConnect)
 
-    //不同的重试次数，延迟不一样
+    // 连续失败次数越多，重连等待时间越长。
     private val RETRY_SECONDS = listOf(5, 10, 15, 20, 30, 45, 60, 120)
 
     //持续重试次数
@@ -57,12 +57,19 @@ object WsManager {
 
     private var init = AtomicBoolean(false)
 
-    //拒绝链接
+    // 服务端要求停止连接或通道被关闭时阻止继续连接。
     private var disableConnect = false
+
+    // 当前是否允许建立和重连 WS，支持用户在同一进程内反复切换通道。
+    @Volatile
+    private var enabled = false
 
     private var alarmManager: AlarmManager? = null
 
+    private val reconnectRunnable = Runnable { tryConnect() }
+    private val reconnectAlarmListener = AlarmManager.OnAlarmListener { tryConnect() }
 
+    /** 只初始化一次消息监听和网络监听，不代表当前一定启用 WS。 */
     fun init() {
         if (init.get()) {
             return
@@ -70,10 +77,18 @@ object WsManager {
         alarmManager =
             ApplicationUtils.getApplication().getSystemService(ALARM_SERVICE) as AlarmManager
         init.set(true)
-        //初始化监听器
+        // 初始化消息监听器。
         initMsgListener()
-        //监听网络变化，尝试建立连接
+        // 监听网络变化，网络恢复后按需重新连接。
         listenNetworkAvailable()
+    }
+
+    /** 启用 WS 通道并立即尝试连接。 */
+    fun start() {
+        enabled = true
+        disableConnect = false
+        init()
+        tryConnect()
     }
 
     /**
@@ -118,8 +133,9 @@ object WsManager {
         sb.append("/ws?")
         sb.append("version=${WxpBaseInfoService.getAppVersionName()}")
         sb.append("&")
-        sb.append("platform=${DeviceUtils.getPlatform().getPlatform()}")
-        val pushToken = WxpAppDataService.getPushToken()
+        sb.append("platform=${DevicePlatform.Android.getPlatform()}")
+        // WS token 与厂商 token 分开保存，避免切换通道时覆盖彼此。
+        val pushToken = PushChannelStore.getWsToken()
         if (!pushToken.isNullOrEmpty() && pushToken.startsWith("PT_")) {
             sb.append("&")
             sb.append("pushToken=${pushToken}")
@@ -132,6 +148,10 @@ object WsManager {
      */
     fun tryConnect() {
         synchronized(this) {
+            if (!enabled) {
+                WxpLogUtils.d(TAG, "connect: WS通道未启用")
+                return
+            }
             if (connectStatus.get() == WsConnectStatus.Connected) {
 //                连接状态不打印日志，否则日志太多了
                 WxpLogUtils.d(TAG, "connect: 已经链接，不重建连接")
@@ -150,7 +170,7 @@ object WsManager {
                 return
             }
             if (disableConnect) {
-                WxpLogUtils.i(TAG, "connect:客户端版本低，不进行链接")
+                WxpLogUtils.i(TAG, "connect: WS连接已禁用")
                 return
             }
             webSocket?.close(1000, "重新建立连接前，关闭原来的WS连接")
@@ -172,6 +192,9 @@ object WsManager {
      * 当连接断开后，延迟一点时间，重新建立连接
      */
     private fun tryConnectDelay() {
+        if (!enabled) {
+            return
+        }
         val retrySeconds = RETRY_SECONDS.getOrNull(reTryCount) ?: RETRY_SECONDS.last()
         WxpLogUtils.d(message = "延迟${retrySeconds}重新尝试WS连接")
         val reconnectTime = Calendar.getInstance()
@@ -182,19 +205,20 @@ object WsManager {
                     AlarmManager.RTC_WAKEUP,
                     reconnectTime.timeInMillis,
                     "WS-RECONNECT",
-                    { tryConnect() },
+                    reconnectAlarmListener,
                     null
                 )
             } else {
                 WxpLogUtils.d(message = "不能调用alarmManager，通过post delay来重启WS")
-                ThreadUtils.runOnMainThread({ tryConnect() }, retrySeconds.toLong())
+                ThreadUtils.getMainThreadHandler().removeCallbacks(reconnectRunnable)
+                ThreadUtils.runOnMainThread(reconnectRunnable, retrySeconds * 1000L)
             }
         } else {
             alarmManager?.setExact(
                 AlarmManager.RTC_WAKEUP,
                 reconnectTime.timeInMillis,
                 "WS-RECONNECT",
-                { tryConnect() },
+                reconnectAlarmListener,
                 null
             )
         }
@@ -218,40 +242,46 @@ object WsManager {
     }
 
     private fun setConnectStatus(status: WsConnectStatus) {
-        notifyConnectedChanged(status)
-        connectStatus.set(status)
+        // 状态未变化时不重复通知页面，减少无效刷新。
+        if (connectStatus.getAndSet(status) != status) {
+            notifyConnectStatusChanged(status)
+        }
     }
 
     fun getConnectStatus(): WsConnectStatus = connectStatus.get()
 
-    /**
-     * 关闭链接
-     */
+    /** 兼容原有调用入口，语义等同于完全停止 WS 通道。 */
     fun disconnect() {
-        WxpLogUtils.i(TAG, "disconnect() called,主动断开ws链接")
-        disableConnect = true
-        webSocket?.close(1000, null)
+        stop()
     }
 
     /**
-     * 通知链接变化
+     * 停止当前连接，并取消已经安排的所有重连任务。
+     * 切换到厂商通道后必须调用，避免旧 WS 通道继续耗电或接收消息。
      */
-    private fun notifyConnectedChanged(status: WsConnectStatus) {
-        //链接状态变成已经链接或者未链接，才进行通知
-        if (connectStatus.get() != status &&
-            (status == WsConnectStatus.Connected || status == WsConnectStatus.NotConnect)
-        ) {
-            WxpScopeUtils.getMainScope().launch {
-                connectListenerList.forEach {
-                    it.onChanged(status == WsConnectStatus.Connected)
-                }
+    fun stop() {
+        WxpLogUtils.i(TAG, "stop() called,停止WS通道")
+        enabled = false
+        disableConnect = true
+        ThreadUtils.getMainThreadHandler().removeCallbacks(reconnectRunnable)
+        alarmManager?.cancel(reconnectAlarmListener)
+        val socket = webSocket
+        webSocket = null
+        socket?.close(1000, "切换推送通道")
+        setConnectStatus(WsConnectStatus.NotConnect)
+    }
+
+
+    /** 在主线程通知页面完整的 WS 连接状态。 */
+    private fun notifyConnectStatusChanged(status: WsConnectStatus) {
+        WxpScopeUtils.getMainScope().launch {
+            connectListenerList.toList().forEach {
+                it.onChanged(status)
             }
         }
     }
 
-    /**
-     * 网络链接状态
-     */
+    /** WebSocket 网络连接状态。 */
     enum class WsConnectStatus(val code: Int, val des: String) {
         NotConnect(1, "无链接"),
         Connecting(2, "链接中"),
@@ -260,25 +290,37 @@ object WsManager {
     }
 
     interface IWsConnectChangedListener {
-        fun onChanged(connectStatus: Boolean)
+        fun onChanged(connectStatus: WsConnectStatus)
     }
 
     class WsListener() : WebSocketListener() {
         private val TAG = "WsManager"
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
+            // 热切换时旧连接可能晚到回调，必须忽略，避免覆盖新连接状态。
+            if (WsManager.webSocket !== webSocket) {
+                return
+            }
+            WsManager.webSocket = null
             WxpLogUtils.i(TAG, "onClosed: 链接关闭，code=${code},reason=${reason}")
             setConnectStatus(WsConnectStatus.NotConnect)
             tryConnectDelay()
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
+            if (WsManager.webSocket !== webSocket) {
+                return
+            }
             WxpLogUtils.i(TAG, "onClosing: code=${code},reason=${reason}")
             setConnectStatus(WsConnectStatus.NotConnect)
             tryConnectDelay()
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
+            if (WsManager.webSocket !== webSocket) {
+                return
+            }
+            WsManager.webSocket = null
             WxpLogUtils.i(TAG, "onFailure: error=${t.message}")
             t.printStackTrace()
             setConnectStatus(WsConnectStatus.NotConnect)
@@ -286,6 +328,9 @@ object WsManager {
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
+            if (!enabled || WsManager.webSocket !== webSocket) {
+                return
+            }
             setConnectStatus(WsConnectStatus.Connected)
             reTryCount = 0
             WxpLogUtils.i(TAG, "onMessage() called with: webSocket = $webSocket, text = $text")
@@ -322,11 +367,18 @@ object WsManager {
         }
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
+            if (!enabled || WsManager.webSocket !== webSocket) {
+                return
+            }
             WxpLogUtils.i(TAG, "onMessage: 收到二进制数据")
             setConnectStatus(WsConnectStatus.Connected)
         }
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
+            if (!enabled || WsManager.webSocket !== webSocket) {
+                webSocket.close(1000, "WS通道已关闭")
+                return
+            }
             WxpLogUtils.i(TAG, "onOpen: WS链接打开")
             setConnectStatus(WsConnectStatus.Connected)
             reTryCount = 0

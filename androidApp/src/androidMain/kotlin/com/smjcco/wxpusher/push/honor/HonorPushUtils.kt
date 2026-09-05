@@ -21,6 +21,7 @@ object HonorPushUtils {
                     override fun onSuccess(pushToken: String?) {
                         if (pushToken.isNullOrEmpty()) {
                             WxpLogUtils.w(TAG, "荣耀推送-init-onNewToken=null")
+                            PushManager.onGetPushTokenFail(DevicePlatform.Android_HONOR)
                             return
                         }
                         PushManager.onGetPushToken(pushToken, DevicePlatform.Android_HONOR)
@@ -46,12 +47,13 @@ object HonorPushUtils {
                             TAG,
                             "荣耀推送-init-失败，errorCode=$errorCode,errorString=$errorString"
                         )
+                        PushManager.onGetPushTokenFail(DevicePlatform.Android_HONOR)
                     }
                 })
 
             } catch (e: ApiException) {
                 WxpLogUtils.e(TAG, "荣耀推送-init- 获取token失败", e)
-                PushManager.onGetPushTokenFail(DevicePlatform.Android_HUAWEI)
+                PushManager.onGetPushTokenFail(DevicePlatform.Android_HONOR)
             }
         }
     }

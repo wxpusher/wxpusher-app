@@ -11,22 +11,19 @@ import com.smjcco.wxpusher.push.huawei.HuaweiPushUtils
 import com.smjcco.wxpusher.push.meizu.MeizuPushUtils
 import com.smjcco.wxpusher.push.oppo.OppoPushUtils
 import com.smjcco.wxpusher.push.vivo.VIVOPushUtils
-import com.smjcco.wxpusher.push.ws.WxpNotificationManager
-import com.smjcco.wxpusher.push.ws.connect.WsManager
-import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
 import com.smjcco.wxpusher.push.xiaomi.XiaomiUtils
-import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionUtils
-import com.smjcco.wxpusher.utils.ThreadUtils
 
 interface IPushTokenChangedListener {
     fun onPushToken(platform: DevicePlatform, pushToken: String)
 }
 
 /**
- * 管理push的一堆事儿，对厂商和通道做抽象
+ * 各厂商推送 SDK 的统一适配入口。
+ *
+ * 通道决策由 [PushChannelCoordinator] 负责，本类只发起厂商注册并转发 token 回调。
  */
-object PushManager : Runnable {
+object PushManager {
     private val TAG = "PushManager"
 
     private val pushTokenChangedListenerList: MutableList<IPushTokenChangedListener> =
@@ -41,7 +38,12 @@ object PushManager : Runnable {
             return
         }
 
-        val platform = DeviceUtils.getPlatform()
+        PushChannelCoordinator.init(application)
+        PushActiveReportLifecycle.init(application)
+    }
+
+    /** 由协调器调用，只负责发起当前设备对应厂商 SDK 的注册。 */
+    internal fun startVendorRegistration(application: Application, platform: DevicePlatform) {
         if (platform == DevicePlatform.Android_XIAOMI) {
             WxpLogUtils.i(TAG, "初始化小米推送")
             XiaomiUtils.init(application)
@@ -61,59 +63,29 @@ object PushManager : Runnable {
             WxpLogUtils.i(TAG, "初始化魅族推送")
             MeizuPushUtils.init(application)
         } else {
-            WxpLogUtils.i(TAG, "初始化自建长链接")
-            WxpNotificationManager.init()
-            WsManager.init()
-            //启动保活，必须在最后
-            KeepWsAliveServiceStarter.start(application)
-        }
-
-        //如果不是安卓，厂商通道设置token注册超时，10秒超时以后，走自建ws推送通道
-        if (platform != DevicePlatform.Android) {
-            ThreadUtils.runOnMainThread(this, 10 * 1000)
+            WxpLogUtils.i(TAG, "当前设备没有可注册的厂商推送，platform=$platform")
         }
     }
 
-
-    override fun run() {
-        val platform = DeviceUtils.getPlatform()
-        WxpLogUtils.i(
-            TAG,
-            "获取厂商pushToken超时，platform=【" + platform.getPlatform() + "】，初始化自建长链接"
-        )
-        onGetPushTokenFail(platform)
-    }
-
-    /**
-     * 当获取pushtoken失败的时候回调
-     */
+    /** 将厂商 token 获取失败事件交给通道协调器处理。 */
     fun onGetPushTokenFail(platform: DevicePlatform) {
-        if (platform != DevicePlatform.Android) {
-            WxpLogUtils.i(
-                TAG,
-                "获取厂商pushToken失败【" + platform.getPlatform() + "】，初始化自建长链接"
-            )
-            ThreadUtils.getMainThreadHandler().removeCallbacks(this)
-            //厂商推送注册失败了，设备为安卓，默认走ws通道
-            DeviceUtils.setPlatform(DevicePlatform.Android)
-            init()
-        }
+        PushChannelCoordinator.onVendorTokenFailed(platform)
     }
 
-    /**
-     * 当获取到推动token的时候，管理token的上报，更新
-     */
+    /** 根据 token 来源分发给厂商通道或 WebSocket 通道。 */
     fun onGetPushToken(token: String, platform: DevicePlatform) {
         WxpLogUtils.i(TAG, "收到设备token，platform=${platform}, token=${token}")
-        ThreadUtils.getMainThreadHandler().removeCallbacks(this)
-        WxpAppDataService.savePushToken(token)
-        WxpAppDataService.updateDeviceInfo(platform.getPlatform())
+        if (platform == DevicePlatform.Android) {
+            PushChannelCoordinator.onWsToken(token)
+        } else {
+            PushChannelCoordinator.onVendorToken(token, platform)
+        }
+    }
 
-        // 发送pushToken变更的通知
-        ThreadUtils.runOnMainThread {
-            for (listener in pushTokenChangedListenerList) {
-                listener.onPushToken(platform, token)
-            }
+    /** 仅在新通道真正生效后通知旧有业务监听器。 */
+    internal fun notifyEffectiveTokenChanged(platform: DevicePlatform, token: String) {
+        for (listener in pushTokenChangedListenerList.toList()) {
+            listener.onPushToken(platform, token)
         }
     }
 
@@ -141,7 +113,7 @@ object PushManager : Runnable {
         if (!PermissionUtils.hasNotificationPermission(activity)) {
             return
         }
-        val platform = DeviceUtils.getPlatform()
+        val platform = PushPlatformState.getEffectivePushPlatform()
         if (platform == DevicePlatform.Android_XIAOMI) {
             XiaomiUtils.showSettingGuide(activity)
         } else if (platform == DevicePlatform.Android_VIVO) {
@@ -159,7 +131,7 @@ object PushManager : Runnable {
     }
 
     fun getGuidePageUrl(): String {
-        val platform = DeviceUtils.getPlatform()
+        val platform = PushPlatformResolver.detectVendorPushPlatform()
         return "https://wxpusher.zjiecode.com/docs/open-app-note/index.html?brand=%s".format(
             platform.getPlatform()
         )

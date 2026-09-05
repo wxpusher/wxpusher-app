@@ -714,7 +714,8 @@ class WxpWebViewController: UIViewController {
         if isHostInWhitelist(url.host) {
             let deviceToken = WxpAppDataService.shared.getLoginInfo()?.deviceToken ?? ""
             let versionName = WxpBaseInfoService.shared.getAppVersionName()
-            let platform = WxpBaseInfoService.shared.getPlatform()
+            // WebView 请求头描述的是 App FE 所处的客户端环境，不用于选择后端推送通道。
+            let platform = WxpBaseInfoService.shared.getClientPlatform()
             
             request.setValue(deviceToken, forHTTPHeaderField: DeviceTokenKey)
             request.setValue(versionName, forHTTPHeaderField: DeviceVersionNameKey)

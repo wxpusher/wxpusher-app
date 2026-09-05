@@ -2,6 +2,10 @@ package com.smjcco.wxpusher.page
 
 import android.os.Bundle
 import android.view.View
+import android.webkit.CookieManager
+import android.webkit.WebStorage
+import android.webkit.WebView
+import android.webkit.WebViewDatabase
 import android.widget.Button
 import android.widget.EditText
 import android.widget.RadioButton
@@ -40,6 +44,7 @@ class TestPanelActivity : ComponentActivity() {
 
     private lateinit var confirmButton: Button
     private lateinit var pangleTestToolButton: Button
+    private lateinit var clearWebViewCacheButton: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +71,7 @@ class TestPanelActivity : ComponentActivity() {
 
         confirmButton = findViewById(R.id.confirm_button)
         pangleTestToolButton = findViewById(R.id.pangle_test_tool_button)
+        clearWebViewCacheButton = findViewById(R.id.clear_webview_cache_button)
     }
 
     private fun loadSavedSettings() {
@@ -127,6 +133,38 @@ class TestPanelActivity : ComponentActivity() {
 
         pangleTestToolButton.setOnClickListener {
             openPangleTestTool()
+        }
+
+        clearWebViewCacheButton.setOnClickListener {
+            clearWebViewCache()
+        }
+    }
+
+    /**
+     * 清空 WebView 的所有网站数据（HTTP 缓存/Cookie/localStorage/IndexedDB 等），
+     * 便于调试 app-fe 时强制拉取最新页面，避免命中旧缓存。
+     */
+    private fun clearWebViewCache() {
+        try {
+            // clearCache/clearFormData 作用于整个进程的 WebView 存储，这里用临时实例触发即可
+            val webView = WebView(this)
+            webView.clearCache(true)
+            webView.clearHistory()
+            webView.clearFormData()
+            webView.destroy()
+
+            WebStorage.getInstance().deleteAllData()
+
+            WebViewDatabase.getInstance(this).clearHttpAuthUsernamePassword()
+
+            CookieManager.getInstance().apply {
+                removeAllCookies(null)
+                flush()
+            }
+
+            Toast.makeText(this, "WebView 缓存已清空，重新打开页面即可拉取最新", Toast.LENGTH_SHORT).show()
+        } catch (e: Throwable) {
+            Toast.makeText(this, "清空缓存失败: ${e.message}", Toast.LENGTH_SHORT).show()
         }
     }
 

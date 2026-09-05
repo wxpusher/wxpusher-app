@@ -21,7 +21,7 @@ class WxpLoginPresenter(view: IWxpLoginView) :
         view?.onSendButtonText("发送验证码", false)
 
         //在iOS上，打开登录页面的时候，发送一个网络请求，触发网络访问授权弹出，避免登录的时候再弹出，打断登录流程
-        if (WxpBaseInfoService.getPlatform() == "iOS") {
+        if (WxpBaseInfoService.getClientPlatform() == "iOS") {
             runAtIOSuspend {
                 WxpApiService.sendLoginPing()
             }
@@ -102,7 +102,6 @@ class WxpLoginPresenter(view: IWxpLoginView) :
                 if (it.phoneHasRegister == true) {
                     val loginInfo = WxpLoginInfo(it)
                     WxpAppDataService.saveLoginInfo(loginInfo)
-                    WxpAppDataService.updateDeviceInfo()
                     view?.onGoMain()
                 } else {
                     WxpLogUtils.i(message = "手机登录，用户未注册")
@@ -141,7 +140,6 @@ class WxpLoginPresenter(view: IWxpLoginView) :
             loginData?.let {
                 val loginInfo = WxpLoginInfo(it)
                 WxpAppDataService.saveLoginInfo(loginInfo)
-                WxpAppDataService.updateDeviceInfo()
                 view?.onGoMain()
             }
         }
@@ -171,7 +169,6 @@ class WxpLoginPresenter(view: IWxpLoginView) :
                     WxpLogUtils.i(message = "苹果登录，用户已经注册")
                     val loginInfo = WxpLoginInfo(it)
                     WxpAppDataService.saveLoginInfo(loginInfo)
-                    WxpAppDataService.updateDeviceInfo()
                     view?.onGoMain()
                 } else {
                     WxpLogUtils.i(message = "苹果登录，用户未注册")

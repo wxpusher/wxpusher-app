@@ -27,6 +27,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func sceneDidBecomeActive(_ scene: UIScene) {
         print("[DEBUG] SceneDelegate - sceneDidBecomeActive")
+        // APNs 异常状态依赖客户端重新上报恢复；每次进入前台检查，内部按一小时节流。
+        WxpAppDataService.shared.reportIOSActiveIfNeeded()
         //版本升级检测（内部有 3 小时节流；冷启、后台切前台都会触发）
         WxpVersionCheckManager.shared.onAppForeground(force: false)
     }

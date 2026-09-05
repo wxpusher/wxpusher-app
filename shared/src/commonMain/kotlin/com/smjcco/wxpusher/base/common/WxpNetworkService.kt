@@ -24,7 +24,8 @@ object WxpNetworkService {
             contentType(ContentType.Application.Json)
             header("deviceToken", WxpAppDataService.getLoginInfo()?.deviceToken ?: "")
             header("version", WxpBaseInfoService.getAppVersionName())
-            header("platform", WxpBaseInfoService.getPlatform())
+            // 后端使用 platform 决定设备消息应进入厂商推送还是 WS 通道。
+            header("platform", WxpBaseInfoService.getEffectivePushPlatform())
         }
         install(ContentNegotiation) {
             json(Json {
@@ -60,4 +61,3 @@ object WxpNetworkService {
  */
 @Serializable
 data class BaseResp<T>(val code: Int, val msg: String, val data: T)
-

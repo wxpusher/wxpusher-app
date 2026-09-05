@@ -2,6 +2,8 @@ package com.smjcco.wxpusher.utils
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.NotificationChannel
+import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
@@ -20,6 +22,9 @@ import com.smjcco.wxpusher.page.login.WxpBindPageData
 import com.smjcco.wxpusher.page.login.WxpLoginActivity
 import com.smjcco.wxpusher.page.login.WxpPhoneBind
 import com.smjcco.wxpusher.page.main.WxpMainActivity
+import com.smjcco.wxpusher.page.pushchannel.PushChannelSettingActivity
+import com.smjcco.wxpusher.page.pushchannel.alert.SystemPushSoundGuideActivity
+import com.smjcco.wxpusher.page.pushchannel.alert.WsAlertSettingActivity
 import com.smjcco.wxpusher.page.registerorbind.WxpRegisterOrBindActivity
 import com.smjcco.wxpusher.page.scan.WxpScanActivity
 import com.smjcco.wxpusher.page.useragreement.WxpUserAgreementActivity
@@ -62,6 +67,104 @@ object WxpJumpPageUtils {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             it.startActivity(intent)
         }
+    }
+
+    /**
+     * 打开某个已存在通知类别的系统设置页。
+     *
+     * 铃声属于通知类别的用户设置，App 不能直接写入。Android 12 及以后会请求系统
+     * 只显示声音相关设置；厂商系统可以选择忽略该筛选，因此仍需保留完整类别页的兼容性。
+     */
+    fun jumpToSystemNotificationChannelSettings(
+        channelId: String,
+        activity: Activity? = null,
+        soundOnly: Boolean = true,
+    ) {
+        withActivity(activity) { currentActivity ->
+            val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS).apply {
+                putExtra(Settings.EXTRA_APP_PACKAGE, currentActivity.packageName)
+                putExtra(Settings.EXTRA_CHANNEL_ID, channelId)
+                if (soundOnly && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    putStringArrayListExtra(
+                        Settings.EXTRA_CHANNEL_FILTER_LIST,
+                        arrayListOf(NotificationChannel.EDIT_SOUND),
+                    )
+                }
+            }
+            try {
+                if (intent.resolveActivity(currentActivity.packageManager) == null) {
+                    WxpToastUtils.showToast("无法直达通知类别设置，已打开通知设置")
+                    jumpToSystemNotificationSettingPage(currentActivity)
+                    return@withActivity
+                }
+                currentActivity.startActivity(intent)
+            } catch (e: Exception) {
+                WxpLogUtils.w(message = "打开通知类别设置失败，channelId=$channelId", throwable = e)
+                WxpToastUtils.showToast("无法直达通知类别设置，已打开通知设置")
+                jumpToSystemNotificationSettingPage(currentActivity)
+            }
+        }
+    }
+
+    /**
+     * 尝试打开各厂商的自启动管理页。
+     * Android 没有统一的自启动设置 Intent，因此这里只负责尝试直达，不推断授权结果；
+     * 返回 false 时由调用页面展示手动路径说明。
+     */
+    fun jumpToSystemAutoStartSettings(activity: Activity? = null): Boolean {
+        var opened = false
+        withActivity(activity) { currentActivity ->
+            val manufacturer = Build.MANUFACTURER.lowercase()
+            val targets = when {
+                manufacturer.contains("xiaomi") -> listOf(
+                    "com.miui.securitycenter/com.miui.permcenter.autostart.AutoStartManagementActivity",
+                    "com.miui.securitycenter/com.miui.powercenter.PowerSettings",
+                )
+
+                manufacturer.contains("huawei") -> listOf(
+                    "com.huawei.systemmanager/com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity",
+                    "com.huawei.systemmanager/com.huawei.systemmanager.optimize.process.ProtectActivity",
+                )
+
+                manufacturer.contains("honor") -> listOf(
+                    "com.hihonor.systemmanager/com.hihonor.systemmanager.startupmgr.ui.StartupNormalAppListActivity",
+                    "com.huawei.systemmanager/com.huawei.systemmanager.startupmgr.ui.StartupNormalAppListActivity",
+                )
+
+                manufacturer.contains("oppo")
+                    || manufacturer.contains("oneplus")
+                    || manufacturer.contains("realme") -> listOf(
+                    "com.oplus.safecenter/com.oplus.safecenter.startupapp.StartupAppListActivity",
+                    "com.coloros.safecenter/com.coloros.safecenter.startupapp.StartupAppListActivity",
+                    "com.coloros.oppoguardelf/com.coloros.powermanager.fuelgaue.PowerUsageModelActivity",
+                )
+
+                manufacturer.contains("vivo") || manufacturer.contains("iqoo") -> listOf(
+                    "com.vivo.permissionmanager/com.vivo.permissionmanager.activity.BgStartUpManagerActivity",
+                    "com.iqoo.secure/com.iqoo.secure.ui.phoneoptimize.AddWhiteListActivity",
+                )
+
+                manufacturer.contains("meizu") -> listOf(
+                    "com.meizu.safe/com.meizu.safe.permission.SmartBGActivity",
+                    "com.meizu.safe/com.meizu.safe.security.SHOW_APPSEC",
+                )
+
+                else -> emptyList()
+            }
+
+            for (target in targets) {
+                val component = ComponentName.unflattenFromString(target) ?: continue
+                val success = runCatching {
+                    currentActivity.startActivity(Intent().setComponent(component))
+                }.isSuccess
+                if (success) {
+                    opened = true
+                    return@withActivity
+                }
+            }
+
+        }
+        return opened
     }
 
     /**
@@ -198,6 +301,27 @@ object WxpJumpPageUtils {
         withActivity(activity) {
             val intent = Intent(it, AccountDetailActivity::class.java)
             it.startActivity(intent)
+        }
+    }
+
+    /** 打开仅作用于当前设备的推送通道设置页。 */
+    fun jumpToPushChannelSetting(activity: Activity? = null) {
+        withActivity(activity) {
+            PushChannelSettingActivity.start(it)
+        }
+    }
+
+    /** 打开 WS 通道收到消息时的提醒方式设置页。 */
+    fun jumpToWsAlertSetting(activity: Activity? = null) {
+        withActivity(activity) {
+            WsAlertSettingActivity.start(it)
+        }
+    }
+
+    /** 打开厂商系统推送的铃声设置引导页。 */
+    fun jumpToSystemPushSoundGuide(activity: Activity? = null) {
+        withActivity(activity) {
+            SystemPushSoundGuideActivity.start(it)
         }
     }
 

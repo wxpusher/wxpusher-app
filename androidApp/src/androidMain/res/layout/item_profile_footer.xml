@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/PageBg2"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingStart="16dp"
+    android:paddingTop="14dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="16dp">
+
+    <!-- 用户协议：底部小字入口，保持可点击 -->
+    <TextView
+        android:id="@+id/tv_footer_agreement"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:paddingStart="12dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="8dp"
+        android:text="《用户和隐私协议》"
+        android:textColor="@color/text_fit_theme_second"
+        android:textSize="12sp" />
+
+    <!-- 备案号：底部小字入口，点击跳转工信部备案查询 -->
+    <TextView
+        android:id="@+id/tv_footer_record"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?android:attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:paddingStart="12dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="12dp"
+        android:paddingBottom="6dp"
+        android:text="蜀ICP备14025423号-2A"
+        android:textColor="@color/text_fit_theme_second"
+        android:textSize="11sp" />
+
+</LinearLayout>

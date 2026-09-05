@@ -42,7 +42,6 @@ class WxpRegisterOrBindPresenter(view: IWxpRegisterOrBindView) :
             loginData?.let {
                 val loginInfo = WxpLoginInfo(it)
                 WxpAppDataService.saveLoginInfo(loginInfo)
-                WxpAppDataService.updateDeviceInfo()
                 view?.onGoMain()
             }
         }
@@ -73,7 +72,6 @@ class WxpRegisterOrBindPresenter(view: IWxpRegisterOrBindView) :
                 loginData?.let {
                     val loginInfo = WxpLoginInfo(it)
                     WxpAppDataService.saveLoginInfo(loginInfo)
-                    WxpAppDataService.updateDeviceInfo()
                     view?.onGoMain()
                 }
             }
@@ -103,7 +101,6 @@ class WxpRegisterOrBindPresenter(view: IWxpRegisterOrBindView) :
                     WxpLogUtils.i(message = "登录直接注册苹果账号成功")
                     val loginInfo = WxpLoginInfo(it)
                     WxpAppDataService.saveLoginInfo(loginInfo)
-                    WxpAppDataService.updateDeviceInfo()
                     view?.onGoMain()
                 }
             }

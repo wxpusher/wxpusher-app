@@ -79,6 +79,17 @@ import shared
     }
     
     /**
+     * 跳转到提醒铃声设置页面
+     */
+    public static func jumpToNotificationSound(){
+        runWithRootVC { rootVC in
+            let vc = WxpNotificationSoundViewController()
+            vc.hidesBottomBarWhenPushed = true
+            rootVC.pushViewController(vc, animated: true)
+        }
+    }
+
+    /**
      * 跳转到修改手机号页面
      */
     public static func jumpToChangePhone(){
