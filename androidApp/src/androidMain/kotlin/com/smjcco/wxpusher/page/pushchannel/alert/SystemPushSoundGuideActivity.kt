@@ -169,6 +169,9 @@ class SystemPushSoundGuideActivity : WxpBaseActivity() {
         DevicePlatform.Android_XIAOMI ->
             "暂未找到“订阅消息”类别。请先接收一条系统推送消息（可以点击右上角的测试发送一个消息），再返回此页设置铃声。"
 
+        DevicePlatform.Android_MEIZU ->
+            "魅族系统推送无法修改通知提醒铃声，如需修改提醒铃声，可切换成WxPusher自建通道。"
+
         else -> "当前手机品牌未识别到可直达系统的消息类别，请通过系统通知设置或视频教程修改铃声。"
     }
 
