@@ -117,7 +117,7 @@ class SystemPushSoundGuideActivity : WxpBaseActivity() {
             directHint.text = getDirectUnavailableHint(snapshot.vendorPlatform)
             setDirectHintSecondary(false)
         }
-        manualGuide.text = "打开手机系统设置，选择应用，找到“WxPusher”，选择 WxPusher 的“订阅消息”或“消息通知”，再选择“声音”或者“铃声”。"
+        manualGuide.text = "打开手机系统设置，选择应用，找到“WxPusher”，选择 WxPusher 的“订阅消息”或“消息通知”，然后可调整提醒声音、震动、悬浮弹窗等（不同品牌手机功能不一样）。"
         videoGuideButton.visibility = if (hasGuideVideo(snapshot.vendorPlatform)) {
             View.VISIBLE
         } else {
@@ -171,6 +171,12 @@ class SystemPushSoundGuideActivity : WxpBaseActivity() {
 
         DevicePlatform.Android_MEIZU ->
             "魅族系统推送无法修改通知提醒铃声，如需修改提醒铃声，可切换成WxPusher自建通道。"
+        DevicePlatform.Android_HUAWEI ->
+            "华为系统推送无法修改通知提醒铃声，如需修改提醒铃声，可切换成WxPusher自建通道。"
+        DevicePlatform.Android_HONOR ->
+            "荣耀系统推送无法修改通知提醒铃声，如需修改提醒铃声，可切换成WxPusher自建通道。"
+        DevicePlatform.Android_VIVO ->
+            "VIVO系统推送无法修改通知提醒铃声，如需修改提醒铃声，可切换成WxPusher自建通道。"
 
         else -> "当前手机品牌未识别到可直达系统的消息类别，请通过系统通知设置或视频教程修改铃声。"
     }

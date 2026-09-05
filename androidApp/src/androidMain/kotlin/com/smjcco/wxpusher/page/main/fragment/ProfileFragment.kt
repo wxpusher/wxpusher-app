@@ -201,7 +201,7 @@ class ProfileFragment : WxpBaseFragment() {
                 items = listOf(
                     // 该入口只管理当前设备，不影响同一账号下的其他设备。
                     ProfileItem(
-                        title = "消息推送通道",
+                        title = "推送通道和铃声",
                         subtitle = PushChannelCoordinator.getCurrentChannelName(),
                         hasArrow = true
                     ) {
