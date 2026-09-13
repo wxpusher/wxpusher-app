@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WxPusher</string>
+    <string name="app_name">自建消息推送管理</string>
     <string name="loading">加载中…</string>
 
     <!-- 检查项标题 -->

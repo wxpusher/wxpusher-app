@@ -140,30 +140,8 @@
             android:taskAffinity="${applicationId}"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
 
-        <!--自建长连接推送-->
+        <!-- 厂商推送服务 -->
 
-
-        <service
-            android:name=".push.ws.keepalive.KeepWsAliveService"
-            android:enabled="true"
-            android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="用于在使用非系统推送通道的时候，保持到服务器的长链接以接收消息通知。" />
-        </service>
-
-
-        <receiver
-            android:name=".push.ws.keepalive.KeepWsAliveStartReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
-            </intent-filter>
-        </receiver>
-        <!-- 华为推送-->
         <service
             android:name=".push.huawei.HuaweiHmsMessageService"
             android:directBootAware="true"

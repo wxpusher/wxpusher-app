@@ -29,7 +29,6 @@ import com.smjcco.wxpusher.page.main.fragment.ProfileFragment
 import com.smjcco.wxpusher.page.main.fragment.WxpExtFuncFragment
 import com.smjcco.wxpusher.page.main.fragment.WxpProviderListFragment
 import com.smjcco.wxpusher.push.PushManager
-import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
@@ -304,8 +303,7 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
     override fun onResume() {
         super.onResume()
         PushManager.showOpenNoteRemindSettingDialog(this)
-        //显示首页的时候，尝试启动一次保活服务
-        KeepWsAliveServiceStarter.start(this)
+        // 本应用只接收厂商系统推送，不在手机端维持长连接或常驻服务。
         //版本升级检测（内部有 3 小时节流；冷启、后台切前台都会触发）
         WxpVersionCheckManager.onAppForeground()
     }
