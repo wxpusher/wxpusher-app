@@ -11,9 +11,6 @@ import com.smjcco.wxpusher.push.huawei.HuaweiPushUtils
 import com.smjcco.wxpusher.push.meizu.MeizuPushUtils
 import com.smjcco.wxpusher.push.oppo.OppoPushUtils
 import com.smjcco.wxpusher.push.vivo.VIVOPushUtils
-import com.smjcco.wxpusher.push.ws.WxpNotificationManager
-import com.smjcco.wxpusher.push.ws.connect.WsManager
-import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
 import com.smjcco.wxpusher.push.xiaomi.XiaomiUtils
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionUtils
@@ -61,14 +58,10 @@ object PushManager : Runnable {
             WxpLogUtils.i(TAG, "初始化魅族推送")
             MeizuPushUtils.init(application)
         } else {
-            WxpLogUtils.i(TAG, "初始化自建长链接")
-            WxpNotificationManager.init()
-            WsManager.init()
-            //启动保活，必须在最后
-            KeepWsAliveServiceStarter.start(application)
+            WxpLogUtils.i(TAG, "当前设备无厂商推送，不启用自建长链接")
         }
 
-        //如果不是安卓，厂商通道设置token注册超时，10秒超时以后，走自建ws推送通道
+        // 厂商推送注册失败时不再回退到手机端长连接
         if (platform != DevicePlatform.Android) {
             ThreadUtils.runOnMainThread(this, 10 * 1000)
         }
@@ -76,28 +69,16 @@ object PushManager : Runnable {
 
 
     override fun run() {
-        val platform = DeviceUtils.getPlatform()
-        WxpLogUtils.i(
-            TAG,
-            "获取厂商pushToken超时，platform=【" + platform.getPlatform() + "】，初始化自建长链接"
-        )
-        onGetPushTokenFail(platform)
+        // 厂商推送注册超时也不回退到手机端长连接。
+        WxpLogUtils.i(TAG, "厂商 pushToken 注册超时，不启用手机端长连接")
     }
 
     /**
-     * 当获取pushtoken失败的时候回调
+     * 当获取 pushToken 失败时，仅记录失败，不启动备用长连接。
      */
     fun onGetPushTokenFail(platform: DevicePlatform) {
-        if (platform != DevicePlatform.Android) {
-            WxpLogUtils.i(
-                TAG,
-                "获取厂商pushToken失败【" + platform.getPlatform() + "】，初始化自建长链接"
-            )
-            ThreadUtils.getMainThreadHandler().removeCallbacks(this)
-            //厂商推送注册失败了，设备为安卓，默认走ws通道
-            DeviceUtils.setPlatform(DevicePlatform.Android)
-            init()
-        }
+        WxpLogUtils.w(TAG, "获取厂商 pushToken 失败，platform=${platform.getPlatform()}，不启用手机端长连接")
+        ThreadUtils.getMainThreadHandler().removeCallbacks(this)
     }
 
     /**
