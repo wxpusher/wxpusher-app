@@ -127,6 +127,16 @@ class ProfileFragment : WxpBaseFragment() {
                         WxpJumpPageUtils.jumpToAccountDetail(requireActivity())
                     },
                     ProfileItem(
+                        title = "开发者管理后台",
+                        subtitle = "发送消息",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToWebUrl(
+                            "${WxpConfig.appFeUrl}/app/#/manage",
+                            activity
+                        )
+                    },
+                    ProfileItem(
                         title = "推送渠道",
                         subtitle = "管理消息接收渠道",
                         hasArrow = true

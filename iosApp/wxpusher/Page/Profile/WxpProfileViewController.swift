@@ -83,6 +83,10 @@ class WxpProfileViewController: UIViewController {
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToAccountDetail()
                             },
+                ProfileItem(title: "开发者管理后台", subtitle: "发送消息",
+                            accessoryType: .disclosureIndicator) {
+                                WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/manage")
+                            },
                 ProfileItem(title: "推送渠道", subtitle: "管理消息接收渠道",
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/push-channel")
