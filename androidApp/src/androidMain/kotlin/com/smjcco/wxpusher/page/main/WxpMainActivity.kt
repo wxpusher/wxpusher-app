@@ -19,6 +19,7 @@ import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.base.common.flush
+import com.smjcco.wxpusher.biz.notify.WxpNotifyClickResolver
 import com.smjcco.wxpusher.biz.tab.WxpTabConfig
 import com.smjcco.wxpusher.biz.tab.WxpTabConfigStore
 import com.smjcco.wxpusher.biz.version.WxpVersionCheckManager
@@ -66,6 +67,8 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
 
     companion object {
         const val INTENT_KEY_URL = "url"
+        //开发者传入的原文链接，服务端各推送通道都用这个名字下发
+        const val INTENT_KEY_SOURCE_URL = "sourceUrl"
     }
 
 
@@ -131,28 +134,47 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
         if (intent == null) {
             return
         }
-        val url = intent.getStringExtra(INTENT_KEY_URL)
-        if (!url.isNullOrEmpty()) {
-            WxpJumpPageUtils.jumpToWebUrl(url, this)
+        val url = getNotifyClickParam(intent, INTENT_KEY_URL)
+        if (url.isNullOrEmpty()) {
             return
         }
+        openNotifyClickUrl(url, getNotifyClickParam(intent, INTENT_KEY_SOURCE_URL))
+    }
 
-        //检查deeplink 里面是否有url，目前魅族系统推送会使用这种方式
-        val data = intent.data
-        if (data != null) {
-            val queryUrl = data.getQueryParameter(INTENT_KEY_URL)
-            if (queryUrl != null && !queryUrl.isEmpty()) {
-                WxpJumpPageUtils.jumpToWebUrl(queryUrl, this)
-                return
-            }
+    /**
+     * 从通知点击的 intent 里取参数（详情页地址、原文链接），各推送通道放的位置不一样
+     */
+    private fun getNotifyClickParam(intent: Intent, key: String): String? {
+        //WS、华为、荣耀、VIVO 的通知，以及 OPPO 经 WebViewActivity 转过来的
+        val extraValue = intent.getStringExtra(key)
+        if (!extraValue.isNullOrEmpty()) {
+            return extraValue
         }
 
-        //小米推送的消息，如果有 url，直接打开地址
+        //检查deeplink 里面是否有参数，目前魅族系统推送会使用这种方式
+        val queryValue = intent.data?.getQueryParameter(key)
+        if (!queryValue.isNullOrEmpty()) {
+            return queryValue
+        }
+
+        //小米推送的消息
         val miPushMessage =
             intent.getSerializableExtra(PushMessageHelper.KEY_MESSAGE) as MiPushMessage?
-        val miPushUrl = miPushMessage?.extra?.get(INTENT_KEY_URL)
-        if (!miPushUrl.isNullOrEmpty()) {
-            WxpJumpPageUtils.jumpToWebUrl(miPushUrl, this)
+        return miPushMessage?.extra?.get(key)
+    }
+
+    /**
+     * 按「点击通知直接打开原文链接」开关，打开详情页或者原文链接
+     */
+    private fun openNotifyClickUrl(url: String, sourceUrl: String?) {
+        val target = WxpNotifyClickResolver.resolve(url, sourceUrl) ?: return
+        if (!target.openExternal) {
+            WxpJumpPageUtils.jumpToWebUrl(target.url, this)
+            return
+        }
+        //没有能打开的 App，改为打开详情页
+        if (!WxpJumpPageUtils.openExternalUri(target.url, this)) {
+            target.fallbackUrl?.let { WxpJumpPageUtils.jumpToWebUrl(it, this) }
         }
     }
 

@@ -221,6 +221,25 @@ object WxpJumpPageUtils {
         }
     }
 
+    /**
+     * 交给系统打开非 http 链接（如 weixin://、alipays://），可能拉起外部 App。
+     * 不加 CATEGORY_BROWSABLE：部分 App 的 scheme 没有声明 BROWSABLE，加了会打不开。
+     *
+     * @return 是否成功交给系统打开，没有能打开的 App 时返回 false
+     */
+    fun openExternalUri(url: String, activity: Activity): Boolean {
+        return try {
+            val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            activity.startActivity(intent)
+            true
+        } catch (e: Exception) {
+            //没有能打开的 App 时是 ActivityNotFoundException
+            WxpLogUtils.w(message = "系统打开链接失败,url=${url}", throwable = e)
+            false
+        }
+    }
+
     fun jumpToMain(activity: Activity? = null) {
         withActivity(activity) {
             val intent = Intent(it, WxpMainActivity::class.java)

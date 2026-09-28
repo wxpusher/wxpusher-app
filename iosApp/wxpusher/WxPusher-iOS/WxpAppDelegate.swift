@@ -114,13 +114,41 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         print("[push]-应用存活-点击通知，userInfo=\(userInfo)")
         let url = userInfo["url"] as!  String?
         guard let url = url else { return }
-        WxpJumpPageUtils.jumpToWebUrl(url: url)
-        //打开的消息 ，标记为已读状态
-        userInfo["read"] = true
+        let sourceUrl = userInfo["sourceUrl"] as? String
+        let openedSourceUrl = openNotifyClickUrl(detailUrl: url, sourceUrl: sourceUrl)
+        //打开详情页时服务端会标记已读；打开原文链接不会，本地也保持未读，否则刷新列表后又会变回未读
+        userInfo["read"] = !openedSourceUrl
         WxpLogUtils.shared.d(tag: "WxPusher", message: "发送消息点击事件", throwable: nil)
         MessageListViewController.setClickMessage(message: userInfo)
         NotificationCenter.default.post(name: WxpCommonNotification.ClickMessageNotification, object: nil, userInfo: userInfo)
         completionHandler()
+    }
+
+    /// 按「点击通知直接打开原文链接」开关，打开详情页或者原文链接。
+    /// - Returns: 打开的是否是原文链接
+    private func openNotifyClickUrl(detailUrl: String, sourceUrl: String?) -> Bool {
+        let detail = detailUrl.trimmingCharacters(in: .whitespaces)
+        guard let target = WxpNotifyClickResolver.shared.resolve(detailUrl: detailUrl, sourceUrl: sourceUrl),
+              target.url != detail else {
+            WxpJumpPageUtils.jumpToWebUrl(url: detail)
+            return false
+        }
+        //iOS 17 以下遇到未编码的中文等字符会解析失败，改为打开详情页
+        guard let url = URL(string: target.url) else {
+            WxpJumpPageUtils.jumpToWebUrl(url: detail)
+            return false
+        }
+        if !target.openExternal {
+            WxpJumpPageUtils.jumpToWebUrl(url: target.url)
+            return true
+        }
+        //交给系统打开，可能拉起外部 App；没有能打开的 App 时改为打开详情页
+        UIApplication.shared.open(url, options: [:]) { success in
+            if !success {
+                WxpJumpPageUtils.jumpToWebUrl(url: target.fallbackUrl)
+            }
+        }
+        return true
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
