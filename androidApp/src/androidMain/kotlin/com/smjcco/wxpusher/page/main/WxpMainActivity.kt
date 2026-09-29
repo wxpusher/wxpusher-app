@@ -168,14 +168,8 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
      */
     private fun openNotifyClickUrl(url: String, sourceUrl: String?) {
         val target = WxpNotifyClickResolver.resolve(url, sourceUrl) ?: return
-        if (!target.openExternal) {
-            WxpJumpPageUtils.jumpToWebUrl(target.url, this)
-            return
-        }
-        //没有能打开的 App，改为打开详情页
-        if (!WxpJumpPageUtils.openExternalUri(target.url, this)) {
-            target.fallbackUrl?.let { WxpJumpPageUtils.jumpToWebUrl(it, this) }
-        }
+        //原文链接交给系统打开失败（没有能打开的 App）时，改为打开详情页
+        WxpJumpPageUtils.jumpToWebUrl(target.url, this, fallbackUrl = target.fallbackUrl)
     }
 
     /**

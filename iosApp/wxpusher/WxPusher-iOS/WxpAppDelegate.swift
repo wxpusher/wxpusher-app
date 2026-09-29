@@ -127,28 +127,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     /// 按「点击通知直接打开原文链接」开关，打开详情页或者原文链接。
     /// - Returns: 打开的是否是原文链接
     private func openNotifyClickUrl(detailUrl: String, sourceUrl: String?) -> Bool {
-        let detail = detailUrl.trimmingCharacters(in: .whitespaces)
-        guard let target = WxpNotifyClickResolver.shared.resolve(detailUrl: detailUrl, sourceUrl: sourceUrl),
-              target.url != detail else {
-            WxpJumpPageUtils.jumpToWebUrl(url: detail)
+        guard let target = WxpNotifyClickResolver.shared.resolve(detailUrl: detailUrl, sourceUrl: sourceUrl) else {
             return false
         }
-        //iOS 17 以下遇到未编码的中文等字符会解析失败，改为打开详情页
-        guard let url = URL(string: target.url) else {
-            WxpJumpPageUtils.jumpToWebUrl(url: detail)
-            return false
-        }
-        if !target.openExternal {
-            WxpJumpPageUtils.jumpToWebUrl(url: target.url)
-            return true
-        }
-        //交给系统打开，可能拉起外部 App；没有能打开的 App 时改为打开详情页
-        UIApplication.shared.open(url, options: [:]) { success in
-            if !success {
-                WxpJumpPageUtils.jumpToWebUrl(url: target.fallbackUrl)
-            }
-        }
-        return true
+        //原文链接交给系统打开失败（没有能打开的 App）或解析失败时，改为打开详情页
+        WxpJumpPageUtils.jumpToWebUrl(url: target.url, fallbackUrl: target.fallbackUrl)
+        return target.url != detailUrl.trimmingCharacters(in: .whitespaces)
     }
     
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {

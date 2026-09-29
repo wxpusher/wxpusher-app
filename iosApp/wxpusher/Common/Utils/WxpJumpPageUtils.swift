@@ -162,9 +162,12 @@ import shared
     }
     
     /**
-     * 跳转到web页面
+     * 打开链接的统一入口，按 scheme 决定打开方式（见 WxpLinkClassifier）：
+     * http/https 在 App 内 WebView 打开；其他 App 的链接直接交给系统打开，不经过 WebView；危险或格式不对的链接不打开。
+     *
+     * - Parameter fallbackUrl: 交给系统打开失败（没有能打开的 App）或链接解析失败时改为打开的地址，为空则只提示
      */
-    public static func jumpToWebUrl(url: String?, showAd: Bool = false) {
+    public static func jumpToWebUrl(url: String?, showAd: Bool = false, fallbackUrl: String? = nil) {
         runWithWindows(){ window in
             guard let urlString = url?.trimmingCharacters(in: .whitespaces),
                   !urlString.isEmpty
@@ -174,11 +177,37 @@ import shared
                 return
             }
 
-            guard let url = URL(string: urlString) else {
-                // 处理 URL 无效的情况
-                print("Invalid URL: \(urlString)")
+            let linkType = WxpLinkClassifier.shared.classify(url: urlString)
+            if linkType == WxpLinkType.invalid {
+                WxpToastUtils.shared.showToast(msg: "不支持打开该链接")
+                WxpLogUtils.shared.w(tag: "WxPusher", message: "不支持打开的链接,url=\(urlString)", throwable: nil)
                 return
             }
+
+            guard let url = URL(string: urlString) else {
+                // iOS 17 以下遇到未编码的中文等字符会解析失败
+                print("Invalid URL: \(urlString)")
+                if let fallbackUrl = fallbackUrl, !fallbackUrl.isEmpty {
+                    jumpToWebUrl(url: fallbackUrl, showAd: showAd)
+                }
+                return
+            }
+
+            if linkType == WxpLinkType.external {
+                //交给系统打开，可能拉起外部 App，不经过 WebView
+                UIApplication.shared.open(url, options: [:]) { success in
+                    if success {
+                        return
+                    }
+                    if let fallbackUrl = fallbackUrl, !fallbackUrl.isEmpty {
+                        jumpToWebUrl(url: fallbackUrl, showAd: showAd)
+                    } else {
+                        WxpToastUtils.shared.showToast(msg: "没有可以打开该链接的应用")
+                    }
+                }
+                return
+            }
+
             let rootView = window.rootViewController
             let webVC = WxpWebViewController(url: url, showAd: showAd)
             //            let webVC =  WxpFSafariViewController(url: url)

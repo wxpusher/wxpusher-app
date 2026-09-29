@@ -13,6 +13,8 @@ import androidx.core.net.toUri
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
+import com.smjcco.wxpusher.biz.link.WxpLinkClassifier
+import com.smjcco.wxpusher.biz.link.WxpLinkType
 import com.smjcco.wxpusher.common.withActivity
 import com.smjcco.wxpusher.page.accountdetail.AccountDetailActivity
 import com.smjcco.wxpusher.page.accountdetail.WxpRemoveAccountActivity
@@ -197,26 +199,48 @@ object WxpJumpPageUtils {
         }
     }
 
-    fun jumpToWebUrl(url: String, activity: Activity? = null, showAd: Boolean = false) {
+    /**
+     * 打开链接的统一入口，按 scheme 决定打开方式（见 WxpLinkClassifier）：
+     * http/https 在 App 内 WebView 打开；其他 App 的链接直接交给系统打开，不经过 WebView；危险或格式不对的链接不打开。
+     *
+     * @param fallbackUrl 交给系统打开失败（没有能打开的 App）时改为打开的地址，为空则只提示
+     */
+    fun jumpToWebUrl(
+        url: String,
+        activity: Activity? = null,
+        showAd: Boolean = false,
+        fallbackUrl: String? = null
+    ) {
         withActivity(activity) {
-            try {
-                val uri = url.toUri()
-                val scheme = uri.scheme?.lowercase()
-                val webSchemes = listOf("http", "https", "about", "file")
-                if (webSchemes.contains(scheme)) {
-                    val intent = Intent(it, WxpWebViewActivity::class.java);
-                    intent.putExtra(WxpWebViewActivity.EXTRA_URL, url)
-                    intent.putExtra(WxpWebViewActivity.EXTRA_SHOW_AD, showAd)
-                    it.startActivity(intent)
-                } else {
-                    //非标准webview能处理的链接， 使用系统打开
-                    val intent = Intent(Intent.ACTION_VIEW, uri)
-                    it.startActivity(intent)
-
+            val link = url.trim()
+            when (WxpLinkClassifier.classify(link)) {
+                WxpLinkType.WEB -> {
+                    try {
+                        val intent = Intent(it, WxpWebViewActivity::class.java)
+                        intent.putExtra(WxpWebViewActivity.EXTRA_URL, link)
+                        intent.putExtra(WxpWebViewActivity.EXTRA_SHOW_AD, showAd)
+                        it.startActivity(intent)
+                    } catch (e: Exception) {
+                        WxpToastUtils.showToast("无法打开链接,url=$link")
+                        WxpLogUtils.w(message = "打开连接失败,url=${link}", throwable = e)
+                    }
                 }
-            } catch (e: Exception) {
-                WxpToastUtils.showToast("无法打开链接,url=$url")
-                WxpLogUtils.w(message = "打开连接失败,url=${url}", throwable = e)
+
+                WxpLinkType.EXTERNAL -> {
+                    if (openExternalUri(link, it)) {
+                        return@withActivity
+                    }
+                    if (!fallbackUrl.isNullOrBlank()) {
+                        jumpToWebUrl(fallbackUrl, it, showAd)
+                    } else {
+                        WxpToastUtils.showToast("没有可以打开该链接的应用")
+                    }
+                }
+
+                WxpLinkType.INVALID -> {
+                    WxpToastUtils.showToast("不支持打开该链接")
+                    WxpLogUtils.w(message = "不支持打开的链接,url=${link}")
+                }
             }
         }
     }
@@ -227,7 +251,7 @@ object WxpJumpPageUtils {
      *
      * @return 是否成功交给系统打开，没有能打开的 App 时返回 false
      */
-    fun openExternalUri(url: String, activity: Activity): Boolean {
+    private fun openExternalUri(url: String, activity: Activity): Boolean {
         return try {
             val intent = Intent(Intent.ACTION_VIEW, url.toUri())
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
