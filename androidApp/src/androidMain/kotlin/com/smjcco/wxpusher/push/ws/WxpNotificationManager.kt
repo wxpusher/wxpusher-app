@@ -76,6 +76,7 @@ object WxpNotificationManager {
             WebViewActivity.INTENT_KEY_URL,
             message.url
         )
+        intent.putExtra(WxpMainActivity.INTENT_KEY_SOURCE_URL, message.sourceUrl)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         val pendingIntent = PendingIntent.getActivity(
             ApplicationUtils.getApplication(),

@@ -250,6 +250,16 @@ class ProfileFragment : WxpBaseFragment() {
                         )
                     },
                     ProfileItem(
+                        title = "通知点击设置",
+                        subtitle = "点击通知时直接打开原文链接",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToWebUrl(
+                            "${WxpConfig.appFeUrl}/app/#/notify-click-setting",
+                            activity
+                        )
+                    },
+                    ProfileItem(
                         title = "反馈建议",
                         subtitle = "欢迎你指导我们进步",
                         hasArrow = true
