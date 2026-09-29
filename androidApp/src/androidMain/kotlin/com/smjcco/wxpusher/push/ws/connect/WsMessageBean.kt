@@ -34,7 +34,10 @@ open class PushMsgDeviceMsg(
     var url: String,//链接
     msgType: Int, createTime: Long
 ) :
-    BaseWsMsg(msgType, createTime)
+    BaseWsMsg(msgType, createTime) {
+    //开发者传入的原文链接，可能为空，开启「点击通知直接打开原文链接」后使用
+    var sourceUrl: String? = null
+}
 
 //升级的消息推送
 @Keep

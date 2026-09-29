@@ -83,6 +83,10 @@ class WxpProfileViewController: UIViewController {
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToAccountDetail()
                             },
+                ProfileItem(title: "开发者管理后台", subtitle: "发送消息",
+                            accessoryType: .disclosureIndicator) {
+                                WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/manage")
+                            },
                 ProfileItem(title: "推送渠道", subtitle: "管理消息接收渠道",
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/push-channel")
@@ -153,6 +157,10 @@ class WxpProfileViewController: UIViewController {
                 ProfileItem(title: "底部标签设置", subtitle: "自定义底部导航标签的显示",
                             accessoryType: .disclosureIndicator) {
                                 WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/tab-setting")
+                            },
+                ProfileItem(title: "通知点击设置", subtitle: "点击通知时直接打开原文链接",
+                            accessoryType: .disclosureIndicator) {
+                                WxpJumpPageUtils.jumpToWebUrl(url: "\(WxpConfig.shared.appFeUrl)/app/#/notify-click-setting")
                             },
                 ProfileItem(title: "反馈建议", subtitle: "欢迎你指导我们进步",
                             accessoryType: .disclosureIndicator) {

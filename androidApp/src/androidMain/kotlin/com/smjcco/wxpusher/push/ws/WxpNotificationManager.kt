@@ -23,6 +23,11 @@ import java.util.concurrent.atomic.AtomicInteger
 object WxpNotificationManager {
 
     private var messageId = AtomicInteger(10000)
+    private const val DedupPreferenceName = "ws_message_dedup"
+    private const val DedupPreferenceKey = "recent_message_ids"
+    private const val DedupMaxSize = 256
+    private val recentMessageIds = LinkedHashSet<Long>()
+    private var dedupLoaded = false
 
     /**
      * 旧的业务消息渠道，声音和震动写死在渠道属性里，用户改不了。
@@ -61,6 +66,9 @@ object WxpNotificationManager {
      * 发送业务消息推送通知
      */
     fun sendBizMessageNotification(message: PushMsgDeviceMsg) {
+        if (!shouldDeliver(message.mid)) {
+            return
+        }
         val channel: String = WxPusherWsMessageChannelId
         // 创建Intent，用于在点击通知时启动Activity
         val intent = Intent(ApplicationUtils.getApplication(), WxpMainActivity::class.java)
@@ -68,6 +76,7 @@ object WxpNotificationManager {
             WebViewActivity.INTENT_KEY_URL,
             message.url
         )
+        intent.putExtra(WxpMainActivity.INTENT_KEY_SOURCE_URL, message.sourceUrl)
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         val pendingIntent = PendingIntent.getActivity(
             ApplicationUtils.getApplication(),
@@ -95,6 +104,39 @@ object WxpNotificationManager {
         sendNotification(notification)
         // 渠道是静音的，震动、闪光灯、响铃由 App 按用户设置执行。
         WsAlertPlayer.alert()
+    }
+
+    /**
+     * 离线消息采用至少一次重放，客户端必须先按 mid 去重再展示和提醒。
+     * 最近 256 个 mid 会持久化，覆盖应用进程被系统回收后的短期重放。
+     */
+    @Synchronized
+    private fun shouldDeliver(mid: Long): Boolean {
+        if (mid <= 0) return true
+        val preferences = ApplicationUtils.getApplication()
+            .getSharedPreferences(DedupPreferenceName, Context.MODE_PRIVATE)
+        if (!dedupLoaded) {
+            preferences.getString(DedupPreferenceKey, "")
+                .orEmpty()
+                .split(',')
+                .mapNotNull { it.toLongOrNull() }
+                .forEach { recentMessageIds.add(it) }
+            dedupLoaded = true
+        }
+        if (!recentMessageIds.add(mid)) {
+            return false
+        }
+        while (recentMessageIds.size > DedupMaxSize) {
+            val iterator = recentMessageIds.iterator()
+            if (iterator.hasNext()) {
+                iterator.next()
+                iterator.remove()
+            }
+        }
+        preferences.edit()
+            .putString(DedupPreferenceKey, recentMessageIds.joinToString(","))
+            .apply()
+        return true
     }
 
     private fun sendNotification(notification: Notification) {

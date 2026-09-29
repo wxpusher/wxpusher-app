@@ -127,6 +127,16 @@ class ProfileFragment : WxpBaseFragment() {
                         WxpJumpPageUtils.jumpToAccountDetail(requireActivity())
                     },
                     ProfileItem(
+                        title = "开发者管理后台",
+                        subtitle = "发送消息",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToWebUrl(
+                            "${WxpConfig.appFeUrl}/app/#/manage",
+                            activity
+                        )
+                    },
+                    ProfileItem(
                         title = "推送渠道",
                         subtitle = "管理消息接收渠道",
                         hasArrow = true
@@ -236,6 +246,16 @@ class ProfileFragment : WxpBaseFragment() {
                     ) {
                         WxpJumpPageUtils.jumpToWebUrl(
                             "${WxpConfig.appFeUrl}/app/#/tab-setting",
+                            activity
+                        )
+                    },
+                    ProfileItem(
+                        title = "通知点击设置",
+                        subtitle = "点击通知时直接打开原文链接",
+                        hasArrow = true
+                    ) {
+                        WxpJumpPageUtils.jumpToWebUrl(
+                            "${WxpConfig.appFeUrl}/app/#/notify-click-setting",
                             activity
                         )
                     },
