@@ -482,16 +482,19 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     }
 
     /**
-     * 仅消息详情页（showAd=true）才请求广告：先问后端开关，放行后再加载穿山甲 Banner。
-     * 对照 iOS WxpWebViewController.loadAdIfNeeded。
+     * 仅消息详情页（showAd=true）才请求广告：先问后端开关，放行后才初始化穿山甲 SDK 并加载 Banner，
+     * 不展示广告的用户全程不会初始化 SDK。对照 iOS WxpWebViewController.loadAdIfNeeded。
      */
     private fun loadAdIfNeeded() {
         if (!showAd || adRequested) return
-        if (!WxpPangleAdManager.isReady()) return
         adRequested = true
         WxpAdManager.fetchAdConfig(WxpBannerAdView.messageDetailSlotId) { resp ->
-            if (resp?.showAd == true) {
-                loadBannerAd()
+            if (resp?.showAd != true || view == null) return@fetchAdConfig
+            WxpPangleAdManager.ensureStarted { ready ->
+                // 初始化期间页面可能已关闭
+                if (ready && view != null) {
+                    loadBannerAd()
+                }
             }
         }
     }

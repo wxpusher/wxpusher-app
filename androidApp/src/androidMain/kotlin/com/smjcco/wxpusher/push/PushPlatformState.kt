@@ -1,6 +1,8 @@
 package com.smjcco.wxpusher.push
 
+import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.bean.DevicePlatform
+import com.smjcco.wxpusher.common.WxpSaveKey
 
 /**
  * Android 推送平台运行时状态。
@@ -19,6 +21,9 @@ object PushPlatformState {
      *
      * 读取顺序保持原有逻辑不变：运行时状态、带有效 token 的持久化状态、
      * ConfigManager 当前允许的默认厂商平台，最后由识别器兜底为 Android WS。
+     *
+     * 未同意隐私政策时不做厂商识别（会查询各厂商推送服务/包信息，被应用市场判定为读取应用列表），
+     * 直接返回 Android。此时只有配置、版本检查等匿名请求会读取本值，服务端对各 Android 平台处理一致。
      */
     fun getEffectivePushPlatform(): DevicePlatform {
         val runtimePlatform = runtimeEffectivePushPlatform
@@ -29,6 +34,10 @@ object PushPlatformState {
         val persistedTarget = PushChannelStore.getEffectivePushTarget()
         if (persistedTarget != null && persistedTarget.token.isNotEmpty()) {
             return persistedTarget.platform
+        }
+
+        if (!WxpSaveService.get(WxpSaveKey.UserHasAgreement, false)) {
+            return DevicePlatform.Android
         }
 
         return PushPlatformResolver.resolveConfigAllowedVendorPushPlatform()
