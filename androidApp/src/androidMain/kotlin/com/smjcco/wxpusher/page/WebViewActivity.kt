@@ -25,8 +25,11 @@ class WebViewActivity : ComponentActivity() {
         if (url.isNullOrEmpty()) {
             return
         }
+        //OPPO 推送的 action_parameters 会作为 extra 传进来，原文链接一起转给首页
+        val sourceUrl = intent?.getStringExtra(WxpMainActivity.INTENT_KEY_SOURCE_URL)
         val intent = Intent(this, WxpMainActivity::class.java)
         intent.putExtra(WxpMainActivity.INTENT_KEY_URL, url)
+        intent.putExtra(WxpMainActivity.INTENT_KEY_SOURCE_URL, sourceUrl)
         startActivity(intent)
         finish()
     }

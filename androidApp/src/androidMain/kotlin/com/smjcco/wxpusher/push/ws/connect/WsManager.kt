@@ -29,6 +29,8 @@ import java.util.Calendar
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import kotlin.math.roundToLong
+import kotlin.random.Random
 
 /** WebSocket 连接、重连、消息分发及连接状态通知的统一管理器。 */
 object WsManager {
@@ -49,6 +51,7 @@ object WsManager {
 
     // 连续失败次数越多，重连等待时间越长。
     private val RETRY_SECONDS = listOf(5, 10, 15, 20, 30, 45, 60, 120)
+    private const val STABLE_CONNECTION_MILLIS = 60_000L
 
     //持续重试次数
     private var reTryCount = 0
@@ -68,6 +71,14 @@ object WsManager {
 
     private val reconnectRunnable = Runnable { tryConnect() }
     private val reconnectAlarmListener = AlarmManager.OnAlarmListener { tryConnect() }
+    private val stableConnectionRunnable = Runnable {
+        synchronized(this) {
+            if (enabled && connectStatus.get() == WsConnectStatus.Connected && webSocket != null) {
+                reTryCount = 0
+                WxpLogUtils.d(TAG, "WS稳定连接满60秒，重置退避次数")
+            }
+        }
+    }
 
     /** 只初始化一次消息监听和网络监听，不代表当前一定启用 WS。 */
     fun init() {
@@ -173,9 +184,9 @@ object WsManager {
                 WxpLogUtils.i(TAG, "connect: WS连接已禁用")
                 return
             }
+            cancelReconnectTask()
             webSocket?.close(1000, "重新建立连接前，关闭原来的WS连接")
 
-            reTryCount++
             WxpLogUtils.i(TAG, "connect: 开始WS长链接")
             setConnectStatus(WsConnectStatus.Connecting)
             val wsUrl = getWsUrl()
@@ -191,37 +202,56 @@ object WsManager {
     /**
      * 当连接断开后，延迟一点时间，重新建立连接
      */
+    @Synchronized
     private fun tryConnectDelay() {
         if (!enabled) {
             return
         }
-        val retrySeconds = RETRY_SECONDS.getOrNull(reTryCount) ?: RETRY_SECONDS.last()
-        WxpLogUtils.d(message = "延迟${retrySeconds}重新尝试WS连接")
+        cancelReconnectTask()
+        val baseRetrySeconds = RETRY_SECONDS.getOrNull(reTryCount) ?: RETRY_SECONDS.last()
+        reTryCount++
+        val retryMillis = (baseRetrySeconds * 1000L * Random.nextDouble(0.8, 1.2)).roundToLong()
+        WxpLogUtils.d(message = "延迟${retryMillis}ms重新尝试WS连接，连续失败${reTryCount}次")
         val reconnectTime = Calendar.getInstance()
-        reconnectTime.add(Calendar.SECOND, retrySeconds)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (alarmManager?.canScheduleExactAlarms() == true) {
+        reconnectTime.timeInMillis += retryMillis
+        val scheduleWithHandler = {
+            WxpLogUtils.d(message = "不能调用精确alarmManager，通过post delay来重启WS")
+            ThreadUtils.runOnMainThread(reconnectRunnable, retryMillis)
+        }
+        try {
+            // 精确闹钟权限从 Android 12(API 31)开始可被用户撤销。
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
+                alarmManager?.canScheduleExactAlarms() != true
+            ) {
+                scheduleWithHandler()
+            } else {
                 alarmManager?.setExact(
                     AlarmManager.RTC_WAKEUP,
                     reconnectTime.timeInMillis,
                     "WS-RECONNECT",
                     reconnectAlarmListener,
                     null
-                )
-            } else {
-                WxpLogUtils.d(message = "不能调用alarmManager，通过post delay来重启WS")
-                ThreadUtils.getMainThreadHandler().removeCallbacks(reconnectRunnable)
-                ThreadUtils.runOnMainThread(reconnectRunnable, retrySeconds * 1000L)
+                ) ?: scheduleWithHandler()
             }
-        } else {
-            alarmManager?.setExact(
-                AlarmManager.RTC_WAKEUP,
-                reconnectTime.timeInMillis,
-                "WS-RECONNECT",
-                reconnectAlarmListener,
-                null
-            )
+        } catch (e: SecurityException) {
+            // 部分 OEM 即使权限查询返回 true 仍可能拒绝，保证至少有 Handler 兜底。
+            WxpLogUtils.i(TAG, "精确闹钟调度被拒绝，降级到Handler: ${e.message}")
+            scheduleWithHandler()
         }
+    }
+
+    private fun cancelReconnectTask() {
+        ThreadUtils.getMainThreadHandler().removeCallbacks(reconnectRunnable)
+        alarmManager?.cancel(reconnectAlarmListener)
+    }
+
+    private fun cancelStableConnectionReset() {
+        ThreadUtils.getMainThreadHandler().removeCallbacks(stableConnectionRunnable)
+    }
+
+    private fun scheduleStableConnectionReset() {
+        cancelStableConnectionReset()
+        ThreadUtils.runOnMainThread(stableConnectionRunnable, STABLE_CONNECTION_MILLIS)
     }
 
     fun addMsgListener(msgType: Int, listener: IWsMessageListener<out BaseWsMsg>) {
@@ -259,12 +289,13 @@ object WsManager {
      * 停止当前连接，并取消已经安排的所有重连任务。
      * 切换到厂商通道后必须调用，避免旧 WS 通道继续耗电或接收消息。
      */
+    @Synchronized
     fun stop() {
         WxpLogUtils.i(TAG, "stop() called,停止WS通道")
         enabled = false
         disableConnect = true
-        ThreadUtils.getMainThreadHandler().removeCallbacks(reconnectRunnable)
-        alarmManager?.cancel(reconnectAlarmListener)
+        cancelReconnectTask()
+        cancelStableConnectionReset()
         val socket = webSocket
         webSocket = null
         socket?.close(1000, "切换推送通道")
@@ -302,6 +333,7 @@ object WsManager {
                 return
             }
             WsManager.webSocket = null
+            cancelStableConnectionReset()
             WxpLogUtils.i(TAG, "onClosed: 链接关闭，code=${code},reason=${reason}")
             setConnectStatus(WsConnectStatus.NotConnect)
             tryConnectDelay()
@@ -312,8 +344,8 @@ object WsManager {
                 return
             }
             WxpLogUtils.i(TAG, "onClosing: code=${code},reason=${reason}")
-            setConnectStatus(WsConnectStatus.NotConnect)
-            tryConnectDelay()
+            setConnectStatus(WsConnectStatus.Closing)
+            webSocket.close(code, reason)
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
@@ -321,6 +353,7 @@ object WsManager {
                 return
             }
             WsManager.webSocket = null
+            cancelStableConnectionReset()
             WxpLogUtils.i(TAG, "onFailure: error=${t.message}")
             t.printStackTrace()
             setConnectStatus(WsConnectStatus.NotConnect)
@@ -332,7 +365,6 @@ object WsManager {
                 return
             }
             setConnectStatus(WsConnectStatus.Connected)
-            reTryCount = 0
             WxpLogUtils.i(TAG, "onMessage() called with: webSocket = $webSocket, text = $text")
             val baseWsMsg = GsonUtils.toObj(text, BaseWsMsg::class.java)
             if (baseWsMsg == null) {
@@ -381,7 +413,7 @@ object WsManager {
             }
             WxpLogUtils.i(TAG, "onOpen: WS链接打开")
             setConnectStatus(WsConnectStatus.Connected)
-            reTryCount = 0
+            scheduleStableConnectionReset()
         }
     }
 }
