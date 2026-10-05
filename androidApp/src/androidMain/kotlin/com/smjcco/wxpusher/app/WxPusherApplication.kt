@@ -3,7 +3,6 @@ package com.smjcco.wxpusher.app
 import android.app.Application
 import android.os.Build
 import com.smjcco.wxpusher.WxpConfig
-import com.smjcco.wxpusher.ad.WxpPangleAdManager
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.biz.WxpAppPageService
 import com.smjcco.wxpusher.base.common.ApplicationUtils
@@ -42,17 +41,14 @@ class WxPusherApplication : Application() {
         WxpAppDataService.init();
         //初始化设备基础信息
         WxpBaseInfoService.init(WxpBaseInfoServiceImpl())
-        // 先加载本地降级配置，再决定推送通道；云端刷新后通知协调器热切换。
+        // 先加载本地降级配置；推送通道在同意隐私政策后再决定（见 initSdkAfterAgreement）
         ConfigManager.init(this)
-        PushManager.init(this)
         initTbs()
         //注册版本升级市场跳转能力（已适配厂商优先，其他走 TBS）
         WxpVersionCheckManager.setNavigator(AppMarketNavigator)
         // 启动时执行一次 app_fe 版本刷新（内部有 1 小时间隔，失败无影响）
         AppFeVersionManager.refreshOnAppLaunch()
-        //初始化微信SDK
-        WxpWeixinOpenManager.init(this)
-        // 仅当用户此前已同意隐私政策时，启动即初始化广告 SDK；首次未同意则等同意后再调
+        // 仅当用户此前已同意隐私政策时，启动即初始化；首次未同意则在同意页点同意后再调
         if (WxpSaveService.get(WxpSaveKey.UserHasAgreement, false)) {
             initSdkAfterAgreement()
         }
@@ -68,8 +64,11 @@ class WxPusherApplication : Application() {
     fun initSdkAfterAgreement() {
         if (agreementSdkInitialized) return
         agreementSdkInitialized = true
-        //初始化穿山甲广告 SDK（必须在用户同意隐私政策之后）
-        WxpPangleAdManager.doInit(this)
+        // 推送：厂商推送能力检测会查询各厂商推送服务/包信息，同意前调用会被应用市场判定为读取应用列表
+        PushManager.init(this)
+        // 微信SDK：registerApp 会查询微信包信息，同样需在同意后
+        WxpWeixinOpenManager.init(this)
+        // 穿山甲广告 SDK 不在这里初始化，在真正需要展示广告时由 WxpPangleAdManager.ensureStarted 懒加载
     }
 
 

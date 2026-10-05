@@ -280,6 +280,18 @@
                 <category android:name="${applicationId}" />
             </intent-filter>
         </receiver>
+
+        <!--隐私合规：移除 emoji2 自动初始化。它在启动时查询字体提供方并读取 GMS 包信息，
+            会在用户同意隐私政策前被检测为查询其他应用；国内设备无 GMS，本就不生效-->
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            android:exported="false"
+            tools:node="merge">
+            <meta-data
+                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+                tools:node="remove" />
+        </provider>
     </application>
 
     <!--荣耀推送-->

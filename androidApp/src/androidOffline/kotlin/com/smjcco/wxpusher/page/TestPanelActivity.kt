@@ -16,6 +16,7 @@ import androidx.activity.enableEdgeToEdge
 import com.bytedance.tools.util.ToolsUtil
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WxpConfig
+import com.smjcco.wxpusher.ad.WxpPangleAdManager
 import com.smjcco.wxpusher.utils.ThreadUtils
 
 class TestPanelActivity : ComponentActivity() {
@@ -170,13 +171,20 @@ class TestPanelActivity : ComponentActivity() {
 
     /**
      * 打开穿山甲测量/预览工具（对照 iOS TestPanel 的「穿山甲测量工具」按钮）。
-     * 工具由 tools-release.aar 提供，仅 offline 包打入，需 SDK 已初始化后调用。
+     * 工具由 tools-release.aar 提供，仅 offline 包打入；SDK 为懒加载，打开前先确保已初始化。
      */
     private fun openPangleTestTool() {
-        try {
-            ToolsUtil.start(this)
-        } catch (e: Throwable) {
-            Toast.makeText(this, "测试工具不可用: ${e.message}", Toast.LENGTH_SHORT).show()
+        WxpPangleAdManager.ensureStarted { ready ->
+            if (isFinishing || isDestroyed) return@ensureStarted
+            if (!ready) {
+                Toast.makeText(this, "穿山甲SDK初始化失败", Toast.LENGTH_SHORT).show()
+                return@ensureStarted
+            }
+            try {
+                ToolsUtil.start(this)
+            } catch (e: Throwable) {
+                Toast.makeText(this, "测试工具不可用: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

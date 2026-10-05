@@ -171,7 +171,7 @@ class WxpUserAgreementActivity : WxpBaseActivity() {
     private fun onAgreeClicked() {
         //用户点击后，直接保存用户同意协议
         WxpSaveService.set(WxpSaveKey.UserHasAgreement, true)
-        //同意隐私政策后，初始化需在同意后才能初始化的第三方 SDK（如穿山甲广告）
+        //同意隐私政策后，初始化需在同意后才能初始化的 SDK（推送、微信等）
         (application as? WxPusherApplication)?.initSdkAfterAgreement()
 
         // 已经有权限，直接跳转主页面
