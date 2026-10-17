@@ -24,7 +24,6 @@ import com.smjcco.wxpusher.push.PushChannelStore
 import com.smjcco.wxpusher.push.ws.ChannelGroup
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager
 import com.smjcco.wxpusher.push.ws.connect.WsManager
-import com.smjcco.wxpusher.utils.ThreadUtils
 import kotlinx.coroutines.DelicateCoroutinesApi
 import java.util.Calendar
 
@@ -37,11 +36,10 @@ enum class Actions {
 class KeepWsAliveService : Service() {
 
     private var wakeLock: PowerManager.WakeLock? = null
-    private var isServiceStarted = false
 
     private var hasStartCheckLoop = false
+    private var checkDueElapsed = 0L
 
-    private val loopCheckRunnable = Runnable { tryConnectAndAlarmLoopCheck() }
     private val loopAlarmListener = AlarmManager.OnAlarmListener { tryConnectAndAlarmLoopCheck() }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -49,6 +47,11 @@ class KeepWsAliveService : Service() {
     }
 
     companion object {
+        @Volatile
+        private var isServiceStarted = false
+
+        fun isRunning(): Boolean = isServiceStarted
+
         const val KeepWsAliveServiceNotificationId = 1
         const val KeepWsAliveNotificationChannelId = "WxPusherKeepAliveNotificationChannelId"
 
@@ -74,7 +77,7 @@ class KeepWsAliveService : Service() {
                 else -> syncServiceWithChannelState()
             }
         } else {
-            // 系统重建服务时 intent 可能为空，此时以持久化的通道状态为准。
+            WxpLogUtils.i(message = "KeepWsAliveService 系统重建,onStartCommand intent=null")
             syncServiceWithChannelState()
         }
         // 只有 WS 仍被选中时才允许系统在服务被杀后重建。
@@ -96,14 +99,11 @@ class KeepWsAliveService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        WxpLogUtils.i(message = "KeepWsAliveService onCreate")
+        WxpLogUtils.i(message = "KeepWsAliveService onCreate,pid=${android.os.Process.myPid()}")
         val notification = createNotification()
         startForeground(KeepWsAliveServiceNotificationId, notification)
-        if (PushChannelStore.isWsRequested() && !hasStartCheckLoop) {
-            hasStartCheckLoop = true
-            // 启动定时检查循环，但首次不重复执行连接操作。
-            tryConnectAndAlarmLoopCheck(false)
-        }
+        // 服务重建后 onStartCommand 可能延迟，不能只显示通知却未启动保活工作。
+        syncServiceWithChannelState()
     }
 
     override fun onDestroy() {
@@ -146,7 +146,6 @@ class KeepWsAliveService : Service() {
             }
             return
         }
-        WxpLogUtils.i(message = "KeepWsAliveService is started")
         isServiceStarted = true
         // 获取局部唤醒锁，降低系统休眠模式对 WS 保活服务的影响。
         wakeLock =
@@ -159,6 +158,11 @@ class KeepWsAliveService : Service() {
                 }
             }
         doWork()
+        if (!hasStartCheckLoop) {
+            hasStartCheckLoop = true
+            tryConnectAndAlarmLoopCheck(false)
+        }
+        WxpLogUtils.i(message = "KeepWsAliveService is started,wakeLock=${wakeLock?.isHeld},checkLoop=$hasStartCheckLoop")
     }
 
     private fun stopService() {
@@ -192,12 +196,12 @@ class KeepWsAliveService : Service() {
      */
     private fun cleanupServiceResources() {
         releaseWakeLock()
-        ThreadUtils.getMainThreadHandler().removeCallbacks(loopCheckRunnable)
         val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(loopAlarmListener)
         alarmManager.cancel(createRestartServicePendingIntent())
         stopForeground(STOP_FOREGROUND_REMOVE)
         hasStartCheckLoop = false
+        checkDueElapsed = 0L
         isServiceStarted = false
     }
 
@@ -212,7 +216,7 @@ class KeepWsAliveService : Service() {
     }
 
     private fun doWork() {
-        WsManager.tryConnect()
+        WsManager.tryConnect("keepalive-start")
     }
 
     private fun createNotification(): Notification {
@@ -276,38 +280,30 @@ class KeepWsAliveService : Service() {
         if (!PushChannelStore.isWsRequested()) {
             return
         }
-        WxpLogUtils.d(message = "tryConnectAndAlarmLoopCheck,系统非精确闹钟定时兜底")
+        val now = SystemClock.elapsedRealtime()
+        val lateMillis = if (checkDueElapsed == 0L) 0L else now - checkDueElapsed
+        val status = WsManager.getConnectStatus()
+        // 在线且按时执行的检查不上传日志；异常时最多每轮（五分钟）一条。
+        if (doWork && (lateMillis > 60_000L || status != WsManager.WsConnectStatus.Connected)) {
+            WxpLogUtils.i(message = "WS保活检查,status=$status,lateMs=${lateMillis.coerceAtLeast(0L)},running=$isServiceStarted")
+        }
         val application = ApplicationUtils.getApplication()
         if (doWork) {
-            WsManager.tryConnect()
+            WsManager.tryConnect("keepalive-check")
             KeepWsAliveServiceStarter.start(application)
         }
         val delayTime = 5
+        checkDueElapsed = SystemClock.elapsedRealtime() + delayTime * 60_000L
         val reconnectTime = Calendar.getInstance()
         reconnectTime.add(Calendar.MINUTE, delayTime)
         val alarmManager = application.getSystemService(ALARM_SERVICE) as AlarmManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (alarmManager.canScheduleExactAlarms()) {
-                alarmManager.set(
-                    AlarmManager.RTC_WAKEUP,
-                    reconnectTime.timeInMillis,
-                    "WS-tryAlarmLoopCheck",
-                    loopAlarmListener,
-                    null,
-                )
-            } else {
-                WxpLogUtils.d(message = "不能调用alarmManager，通过post delay来检查")
-                ThreadUtils.getMainThreadHandler().removeCallbacks(loopCheckRunnable)
-                ThreadUtils.runOnMainThread(loopCheckRunnable, delayTime * 60 * 1000L)
-            }
-        } else {
-            alarmManager.set(
-                AlarmManager.RTC_WAKEUP,
-                reconnectTime.timeInMillis,
-                "WS-tryAlarmLoopCheck",
-                loopAlarmListener,
-                null,
-            )
-        }
+        // 普通非精确闹钟不需要精确闹钟权限，不应因此降级为无法唤醒设备的 Handler。
+        alarmManager.set(
+            AlarmManager.RTC_WAKEUP,
+            reconnectTime.timeInMillis,
+            "WS-tryAlarmLoopCheck",
+            loopAlarmListener,
+            null,
+        )
     }
 }
