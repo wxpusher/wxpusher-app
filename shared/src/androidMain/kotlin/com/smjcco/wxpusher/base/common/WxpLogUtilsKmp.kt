@@ -26,7 +26,7 @@ private object AliyunLog {
         logId = WxpSaveService.get(logIdKey, "")
         if (logId.isEmpty()) {
             logId = "LogId_" + WxpRandomUtils.generateRandomString(26)
-            WxpSaveService.get(logIdKey, logId)
+            WxpSaveService.set(logIdKey, logId)
         }
         // endpoint前需要加 https://
         val endpoint = "https://cn-hangzhou.log.aliyuncs.com"

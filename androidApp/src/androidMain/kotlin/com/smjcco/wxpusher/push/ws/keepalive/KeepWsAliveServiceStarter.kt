@@ -67,8 +67,10 @@ class KeepWsAliveServiceStarter(private val context: Context) {
             if (!PushChannelStore.isWsRequested()) {
                 return
             }
-            // 通知仍存在说明前台服务大概率仍在运行，无需重复提交任务。
-            if (WxpNotificationManager.hasNotificationById(KeepWsAliveService.KeepWsAliveServiceNotificationId)) {
+            // 通知可能先于保活工作创建，必须同时确认工作已启动。
+            if (KeepWsAliveService.isRunning() &&
+                WxpNotificationManager.hasNotificationById(KeepWsAliveService.KeepWsAliveServiceNotificationId)
+            ) {
                 return
             }
             // 只有 WS 被协调器启用且具备通知权限时，才开启前台保活服务。
