@@ -376,24 +376,28 @@ object WsManager {
         private val TAG = "WsManager"
 
         override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-            // 热切换时旧连接可能晚到回调，必须忽略，避免覆盖新连接状态。
-            if (WsManager.webSocket !== webSocket) {
-                return
+            synchronized(WsManager) {
+                // 身份检查与更新一起加锁，避免热切换后旧回调覆盖新连接。
+                if (WsManager.webSocket !== webSocket) {
+                    return
+                }
+                WsManager.webSocket = null
+                cancelStableConnectionReset()
+                WxpLogUtils.i(TAG, "onClosed: 链接关闭，code=${code},reason=${reason}")
+                setConnectStatus(WsConnectStatus.NotConnect)
+                tryConnectDelay()
             }
-            WsManager.webSocket = null
-            cancelStableConnectionReset()
-            WxpLogUtils.i(TAG, "onClosed: 链接关闭，code=${code},reason=${reason}")
-            setConnectStatus(WsConnectStatus.NotConnect)
-            tryConnectDelay()
         }
 
         override fun onClosing(webSocket: WebSocket, code: Int, reason: String) {
-            if (WsManager.webSocket !== webSocket) {
-                return
+            synchronized(WsManager) {
+                if (WsManager.webSocket !== webSocket) {
+                    return
+                }
+                WxpLogUtils.i(TAG, "onClosing: code=${code},reason=${reason}")
+                setConnectStatus(WsConnectStatus.Closing)
+                webSocket.close(code, reason)
             }
-            WxpLogUtils.i(TAG, "onClosing: code=${code},reason=${reason}")
-            setConnectStatus(WsConnectStatus.Closing)
-            webSocket.close(code, reason)
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
