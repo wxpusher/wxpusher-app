@@ -25,7 +25,6 @@ import com.smjcco.wxpusher.push.ws.ChannelGroup
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager
 import com.smjcco.wxpusher.push.ws.connect.WsManager
 import kotlinx.coroutines.DelicateCoroutinesApi
-import java.util.Calendar
 
 
 enum class Actions {
@@ -285,7 +284,7 @@ class KeepWsAliveService : Service() {
         val status = WsManager.getConnectStatus()
         // 在线且按时执行的检查不上传日志；异常时最多每轮（五分钟）一条。
         if (doWork && (lateMillis > 60_000L || status != WsManager.WsConnectStatus.Connected)) {
-            WxpLogUtils.i(message = "WS保活检查,status=$status,lateMs=${lateMillis.coerceAtLeast(0L)},running=$isServiceStarted")
+            WxpLogUtils.i(message = "WS保活检查,status=$status,lateMs=${lateMillis.coerceAtLeast(0L)}")
         }
         val application = ApplicationUtils.getApplication()
         if (doWork) {
@@ -294,13 +293,11 @@ class KeepWsAliveService : Service() {
         }
         val delayTime = 5
         checkDueElapsed = SystemClock.elapsedRealtime() + delayTime * 60_000L
-        val reconnectTime = Calendar.getInstance()
-        reconnectTime.add(Calendar.MINUTE, delayTime)
         val alarmManager = application.getSystemService(ALARM_SERVICE) as AlarmManager
         // 普通非精确闹钟不需要精确闹钟权限，不应因此降级为无法唤醒设备的 Handler。
         alarmManager.set(
-            AlarmManager.RTC_WAKEUP,
-            reconnectTime.timeInMillis,
+            AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            checkDueElapsed,
             "WS-tryAlarmLoopCheck",
             loopAlarmListener,
             null,

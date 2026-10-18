@@ -70,6 +70,10 @@ object WsManager {
     private var alarmManager: AlarmManager? = null
 
     private const val RECONNECT_LOG_INTERVAL_MILLIS = 5 * 60_000L
+    private const val NETWORK_CHECK_INTERVAL_MILLIS = 30_000L
+    private var networkUnavailable = false
+    private var connectionSource = "caller"
+    private var lastFailureStackElapsed = 0L
     private var lastReconnectLogElapsed = 0L
     private var reconnectDueElapsed = 0L
     private var disconnectedSinceElapsed = 0L
@@ -181,7 +185,8 @@ object WsManager {
                 return
             }
             if (!DeviceUtils.isNetworkConnected()) {
-                // 网络回调可能延迟或遗漏，临时无网络也要保留下一次退避检查。
+                // 无网络不是连接失败，不推进退避；由 Handler 检查，避免反复精确唤醒。
+                networkUnavailable = true
                 tryConnectDelay("network-unavailable")
                 return
             }
@@ -189,11 +194,18 @@ object WsManager {
                 WxpLogUtils.i(TAG, "connect: WS连接已禁用")
                 return
             }
+            // 仅在实际观察到无网络 -> 有网络时重置，避免重复 onAvailable 冲掉失败退避。
+            if (networkUnavailable) {
+                networkUnavailable = false
+                reTryCount = 0
+                WxpLogUtils.i(TAG, "WS网络恢复，重置连接失败退避,source=$source")
+            }
             cancelReconnectTask()
             webSocket?.close(1000, "重新建立连接前，关闭原来的WS连接")
 
             WxpLogUtils.i(TAG, "connect: 开始WS长链接,source=$source,retry=$reTryCount")
             setConnectStatus(WsConnectStatus.Connecting)
+            connectionSource = source
             val wsUrl = getWsUrl()
             val request: Request = Request.Builder()
                 .url(wsUrl)
@@ -216,21 +228,26 @@ object WsManager {
         if (disconnectedSinceElapsed == 0L) {
             disconnectedSinceElapsed = now
         }
-        val baseRetrySeconds = RETRY_SECONDS.getOrNull(reTryCount) ?: RETRY_SECONDS.last()
-        reTryCount++
-        val retryMillis = (baseRetrySeconds * 1000L * Random.nextDouble(0.8, 1.2)).roundToLong()
+        val checkingNetwork = reason == "network-unavailable"
+        val retryMillis = if (checkingNetwork) {
+            NETWORK_CHECK_INTERVAL_MILLIS
+        } else {
+            val baseRetrySeconds = RETRY_SECONDS.getOrNull(reTryCount) ?: RETRY_SECONDS.last()
+            reTryCount++
+            (baseRetrySeconds * 1000L * Random.nextDouble(0.8, 1.2)).roundToLong()
+        }
         reconnectDueElapsed = now + retryMillis
         var mode = "handler"
         try {
-            // 保留现有 Alarm/Handler 调度方式；无权限时仍持续退避检查。
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
-                alarmManager?.canScheduleExactAlarms() == true
+            // 仅真正连接失败时使用精确闹钟；无网络检查不额外唤醒设备。
+            if (!checkingNetwork && (Build.VERSION.SDK_INT < Build.VERSION_CODES.S ||
+                    alarmManager?.canScheduleExactAlarms() == true)
             ) {
                 val manager = alarmManager
                 if (manager != null) {
                     manager.setExact(
-                        AlarmManager.RTC_WAKEUP,
-                        System.currentTimeMillis() + retryMillis,
+                        AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                        reconnectDueElapsed,
                         "WS-RECONNECT",
                         reconnectAlarmListener,
                         null
@@ -326,6 +343,7 @@ object WsManager {
         disconnectedSinceElapsed = 0L
         lastReconnectLogElapsed = 0L
         reTryCount = 0
+        networkUnavailable = false
         val socket = webSocket
         webSocket = null
         socket?.close(1000, "切换推送通道")
@@ -379,14 +397,27 @@ object WsManager {
         }
 
         override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-            if (WsManager.webSocket !== webSocket) {
-                return
+            synchronized(WsManager) {
+                if (WsManager.webSocket !== webSocket) {
+                    return
+                }
+                WsManager.webSocket = null
+                cancelStableConnectionReset()
+                val now = SystemClock.elapsedRealtime()
+                val includeStack = lastFailureStackElapsed == 0L ||
+                    now - lastFailureStackElapsed >= RECONNECT_LOG_INTERVAL_MILLIS
+                if (includeStack) {
+                    lastFailureStackElapsed = now
+                }
+                // 每次失败都留在线上；仅完整堆栈独立限频，恢复/切换通道也不重置窗口。
+                WxpLogUtils.w(
+                    TAG,
+                    "WS连接失败,type=${t.javaClass.simpleName},error=${t.message},retry=$reTryCount,source=$connectionSource",
+                    throwable = if (includeStack) t else null
+                )
+                setConnectStatus(WsConnectStatus.NotConnect)
+                tryConnectDelay()
             }
-            WsManager.webSocket = null
-            cancelStableConnectionReset()
-            WxpLogUtils.w(TAG, "WS连接失败,type=${t.javaClass.simpleName},error=${t.message}", throwable = t)
-            setConnectStatus(WsConnectStatus.NotConnect)
-            tryConnectDelay()
         }
 
         override fun onMessage(webSocket: WebSocket, text: String) {
@@ -436,17 +467,19 @@ object WsManager {
         }
 
         override fun onOpen(webSocket: WebSocket, response: Response) {
-            if (!enabled || WsManager.webSocket !== webSocket) {
-                webSocket.close(1000, "WS通道已关闭")
-                return
+            synchronized(WsManager) {
+                if (!enabled || WsManager.webSocket !== webSocket) {
+                    webSocket.close(1000, "WS通道已关闭")
+                    return
+                }
+                val offlineMillis = if (disconnectedSinceElapsed == 0L) 0L else
+                    SystemClock.elapsedRealtime() - disconnectedSinceElapsed
+                WxpLogUtils.i(TAG, "onOpen: WS链接打开,retry=$reTryCount,offlineMs=$offlineMillis")
+                disconnectedSinceElapsed = 0L
+                lastReconnectLogElapsed = 0L
+                setConnectStatus(WsConnectStatus.Connected)
+                scheduleStableConnectionReset()
             }
-            val offlineMillis = if (disconnectedSinceElapsed == 0L) 0L else
-                SystemClock.elapsedRealtime() - disconnectedSinceElapsed
-            WxpLogUtils.i(TAG, "onOpen: WS链接打开,retry=$reTryCount,offlineMs=$offlineMillis")
-            disconnectedSinceElapsed = 0L
-            lastReconnectLogElapsed = 0L
-            setConnectStatus(WsConnectStatus.Connected)
-            scheduleStableConnectionReset()
         }
     }
 }
