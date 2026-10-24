@@ -6,6 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -27,8 +28,10 @@ import com.smjcco.wxpusher.common.WxpSaveKey
 import com.smjcco.wxpusher.page.main.fragment.ITabMenuProvider
 import com.smjcco.wxpusher.page.main.fragment.MessageListFragment
 import com.smjcco.wxpusher.page.main.fragment.ProfileFragment
+import com.smjcco.wxpusher.page.main.fragment.WxpClassFragment
 import com.smjcco.wxpusher.page.main.fragment.WxpExtFuncFragment
 import com.smjcco.wxpusher.page.main.fragment.WxpProviderListFragment
+import com.smjcco.wxpusher.page.web.WxpWebViewFragment
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.push.ws.alert.WsAlertPlayer
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
@@ -54,7 +57,8 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
     private var currentMenu: Menu? = null
 
     //底部 tab 的枚举与当前有序列表（按配置动态构建）
-    private enum class MainTab { MESSAGE_LIST, MARKET, EXT_FUNC, PROFILE }
+    //CLASS 是常驻的第一个 tab，不受服务端 tab 配置影响
+    private enum class MainTab { CLASS, MESSAGE_LIST, MARKET, EXT_FUNC, PROFILE }
 
     private var tabs: List<MainTab> = emptyList()
     //已应用的 tab 配置快照，用于返回主界面时 diff，仅变化才重建
@@ -69,11 +73,24 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
         const val INTENT_KEY_URL = "url"
         //开发者传入的原文链接，服务端各推送通道都用这个名字下发
         const val INTENT_KEY_SOURCE_URL = "sourceUrl"
+
+        /**
+         * 班级管理系统入口（内部使用），放在第一个 tab 常驻。
+         *
+         * 注意：wangan.xdyzf.cn 不是 WxPusher 官方域名，因此**不加入** WxpWebHostPolicy 白名单。
+         * 非白名单域名会照常显示顶部的「第三方内容」提醒条，这是官方要求保留的提示。
+         * 代价是底部浏览器工具栏默认也会出现，这里用 setBottomBarVisibleOverride(false)
+         * 单独关掉，不靠改白名单实现。
+         */
+        const val CLASS_SITE_URL = "https://wangan.xdyzf.cn/"
     }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        //定制版：隐藏标题栏，班级页面直接用满整个屏幕（状态栏与 WebView 内容之间不留原生 UI）。
+        //必须在 setContentView 之前隐藏，否则会先画出标题栏再收起来，能看到一下闪动。
+        supportActionBar?.hide()
         setContentView(R.layout.main_activity)
         // 初始化视图
         initViews()
@@ -83,7 +100,7 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
             finish()
             return
         }
-        title = "消息列表"
+        title = tabTitle(MainTab.CLASS)
         // 设置ViewPager和TabLayout（按 tab 显隐配置动态构建）
         setupTabListeners()
         rebuildTabs(WxpTabConfigStore.read())
@@ -195,24 +212,30 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
     private fun initViews() {
         viewPager = findViewById(R.id.view_pager)
         tabLayout = findViewById(R.id.tab_layout)
+        //左下角悬浮按钮：进入账号与推送设置（原来在底部 Tab 里的「我的」）
+        findViewById<View>(R.id.btn_settings).setOnClickListener {
+            WxpProfileActivity.start(this)
+        }
     }
 
 
-    //根据配置构建有序 tab 列表：消息列表(必) → 消息市场(可配) → 扩展功能(可配) → 我的(必)
-    private fun buildTabs(config: WxpTabConfig): List<MainTab> {
-        val list = mutableListOf(MainTab.MESSAGE_LIST)
-        if (config.market) {
-            list.add(MainTab.MARKET)
-        }
-        if (config.extFunc) {
-            list.add(MainTab.EXT_FUNC)
-        }
-        list.add(MainTab.PROFILE)
-        return list
+    /**
+     * 定制版只保留「班级」一个页面，底部 Tab 栏整体隐藏。
+     *
+     * WxPusher 原本的消息列表 / 消息市场 / 扩展功能全部去掉：
+     *   - 消息市场是第三方应用的推送市场，学生用不上
+     *   - 扩展功能是 WxPusher 的推广位
+     *   - 消息列表的内容班级系统里都有（通知中心），点通知也是直接跳网页详情
+     * 「我的」（账号信息、推送设置、退出登录）改成右下角悬浮按钮进入独立页面，
+     * 不再占用底部空间。登录 WxPusher 账号仍然保留 —— 推送要靠它拿 UID。
+     */
+    private fun buildTabs(@Suppress("UNUSED_PARAMETER") config: WxpTabConfig): List<MainTab> {
+        return listOf(MainTab.CLASS)
     }
 
     //tab 的标题与图标
     private fun tabTitle(tab: MainTab): String = when (tab) {
+        MainTab.CLASS -> "班级"
         MainTab.MESSAGE_LIST -> "消息列表"
         MainTab.MARKET -> "消息市场"
         MainTab.EXT_FUNC -> "扩展功能"
@@ -220,6 +243,7 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
     }
 
     private fun tabIcon(tab: MainTab): Int = when (tab) {
+        MainTab.CLASS -> R.drawable.ic_home
         MainTab.MESSAGE_LIST -> R.drawable.ic_paperplane
         MainTab.MARKET -> R.drawable.ic_cloud
         MainTab.EXT_FUNC -> R.drawable.ic_ext_func
@@ -325,8 +349,10 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
         PushManager.showOpenNoteRemindSettingDialog(this)
         //显示首页的时候，尝试启动一次保活服务
         KeepWsAliveServiceStarter.start(this)
-        //版本升级检测（内部有 3 小时节流；冷启、后台切前台都会触发）
-        WxpVersionCheckManager.onAppForeground()
+        //定制版：关闭 WxPusher 的版本检测。
+        //否则会提示「发现新版本」，点更新装回官方版，班级入口就没了。
+        //版本统一由班委在群里发新包。
+        // WxpVersionCheckManager.onAppForeground()
     }
 
     //注册 KV 变更监听（保存即广播）：tab_config 变化即重建，未变不动。
@@ -340,19 +366,22 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
     }
 
     private fun refreshTabsIfConfigChanged() {
-        //未完成初始化（如未登录直接 finish）时跳过
-        val applied = appliedTabConfig ?: return
-        val latest = WxpTabConfigStore.read()
-        if (applied == latest) {
-            return
+        //定制版：底部 tab 结构固定为「只有班级」，服务端下发的 tab 配置不影响界面。
+        //这里直接跳过 —— 否则配置一变就会重建 ViewPager，导致班级 WebView 无谓地重新加载。
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        //定制版没有底部 Tab 兜底，返回键先交给网页：能后退就后退，退不动才退出 App。
+        //否则学生在页面里连点两次返回就直接退出，很容易误触。
+        //pagerAdapter 是 lateinit：未登录直接 finish 的分支里它还没初始化，要防一下。
+        if (::pagerAdapter.isInitialized) {
+            val fragment = pagerAdapter.getFragmentAt(viewPager.currentItem)
+            if (fragment is WxpWebViewFragment && fragment.onBackPressed()) {
+                return
+            }
         }
-        val currentTab = tabs.getOrNull(viewPager.currentItem)
-        rebuildTabs(latest)
-        //恢复到原来所在 tab；若该 tab 已被隐藏，回落到消息列表
-        val targetIndex = currentTab?.let { tabs.indexOf(it) }?.takeIf { it >= 0 } ?: 0
-        viewPager.setCurrentItem(targetIndex, false)
-        title = tabTitle(tabs[targetIndex])
-        viewPager.post { updateMenuForCurrentTab(targetIndex) }
+        super.onBackPressed()
     }
 
     override fun onPause() {
@@ -381,6 +410,7 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
 
         override fun createFragment(position: Int): Fragment {
             return when (tabs[position]) {
+                MainTab.CLASS -> WxpClassFragment.newInstance(CLASS_SITE_URL)
                 MainTab.MESSAGE_LIST -> MessageListFragment()
                 MainTab.MARKET -> WxpProviderListFragment()
                 MainTab.EXT_FUNC -> WxpExtFuncFragment()

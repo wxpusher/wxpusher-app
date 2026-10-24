@@ -140,6 +140,12 @@
             android:name=".page.web.WxpWebViewActivity"
             android:exported="true" />
 
+        <!--账号与推送设置（定制版：从班级页右下角悬浮按钮进入）-->
+        <activity
+            android:name=".page.main.WxpProfileActivity"
+            android:exported="false"
+            android:label="账号与推送设置" />
+
         <!--微信回调Activity-->
         <activity
             android:name=".wxapi.WXEntryActivity"

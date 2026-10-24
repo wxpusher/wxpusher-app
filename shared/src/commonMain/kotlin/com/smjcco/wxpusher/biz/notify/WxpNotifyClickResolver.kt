@@ -30,17 +30,18 @@ object WxpNotifyClickResolver {
      */
     fun resolve(detailUrl: String?, sourceUrl: String?): WxpNotifyClickTarget? {
         val detail = detailUrl?.trim().orEmpty()
+        val source = sourceUrl?.trim().orEmpty()
+
+        // 定制版：推送里带的原文链接就是班级系统自己的页面，
+        // 学生点通知应该一步进到班级系统的对应页面，而不是先落到 WxPusher 的消息详情页。
+        // 这里不再看「点击通知直接打开原文链接」那个开关，直接优先用原文链接。
+        if (WxpLinkClassifier.classify(source) == WxpLinkType.WEB) {
+            return WxpNotifyClickTarget(source, detail.ifEmpty { null })
+        }
+
         if (detail.isEmpty()) {
             return null
         }
-        if (!isEnabled()) {
-            return WxpNotifyClickTarget(detail, null)
-        }
-        val source = sourceUrl?.trim().orEmpty()
-        // 没有原文链接，或者原文链接不能打开（危险、格式不对），都打开详情页
-        if (WxpLinkClassifier.classify(source) == WxpLinkType.INVALID) {
-            return WxpNotifyClickTarget(detail, null)
-        }
-        return WxpNotifyClickTarget(source, detail)
+        return WxpNotifyClickTarget(detail, null)
     }
 }

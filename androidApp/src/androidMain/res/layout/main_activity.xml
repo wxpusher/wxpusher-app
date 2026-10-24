@@ -9,43 +9,54 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-
-        <!-- Fragment容器 -->
+        <!-- Fragment 容器：铺满整屏，班级页面全屏显示 -->
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/view_pager"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/divider"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
-        <!-- 分隔线 -->
+
+        <!-- 定制版隐藏底部 Tab 栏与分隔线：只保留班级页面，不显示 WxPusher 的导航 -->
         <View
             android:id="@+id/divider"
             android:layout_width="0dp"
             android:layout_height="1px"
             android:background="@color/Divider"
-            app:layout_constraintBottom_toTopOf="@+id/tab_layout"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/view_pager" />
-        <!-- 底部Tab -->
+            app:layout_constraintStart_toStartOf="parent" />
+
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
             android:layout_width="0dp"
-            android:layout_height="60dp"
-            android:background="@drawable/tab_background"
-            android:elevation="0dp"
+            android:layout_height="1dp"
+            android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:tabGravity="fill"
-            app:tabIndicator="@null"
-            app:tabIndicatorColor="?attr/colorPrimary"
-            app:tabIndicatorHeight="0dp"
-            app:tabMode="fixed"
-            app:tabSelectedTextColor="?attr/colorPrimary"
-            app:tabTextColor="@drawable/tab_text_color_selector" />
+            app:tabMode="fixed" />
+
+        <!-- 设置入口：左下角半透明悬浮按钮。
+             不能放右下角 —— 网站自己有个 fixed bottom-4 right-4 的「三条杠」菜单按钮，
+             两个会完全重叠。 -->
+        <androidx.appcompat.widget.AppCompatImageButton
+            android:id="@+id/btn_settings"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="14dp"
+            android:layout_marginBottom="14dp"
+            android:alpha="0.4"
+            android:background="@drawable/bg_float_settings"
+            android:contentDescription="设置"
+            android:padding="9dp"
+            android:src="@drawable/ic_settings"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

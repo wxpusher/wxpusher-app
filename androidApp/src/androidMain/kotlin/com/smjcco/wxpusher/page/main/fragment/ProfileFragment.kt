@@ -101,6 +101,7 @@ class ProfileFragment : WxpBaseFragment() {
         }
 
         // 设备和账号
+        // 定制版只留 UID（绑定时要复制）和账号管理，SPT、开发者后台、推送渠道网页入口都去掉了
         sectionData.add(
             ProfileSection(
                 title = "设备和账号",
@@ -113,75 +114,22 @@ class ProfileFragment : WxpBaseFragment() {
                         copyToClipboard(uid, "UID复制成功")
                     },
                     ProfileItem(
-                        title = "SPT",
-                        subtitle = if (spt.isEmpty()) "未登录" else spt,
-                        hasArrow = true
-                    ) {
-                        copyToClipboard(spt, "SPT复制成功")
-                    },
-                    ProfileItem(
                         title = "账号信息",
                         subtitle = "管理账号",
                         hasArrow = true
                     ) {
                         WxpJumpPageUtils.jumpToAccountDetail(requireActivity())
-                    },
-                    ProfileItem(
-                        title = "开发者管理后台",
-                        subtitle = "发送消息",
-                        hasArrow = true
-                    ) {
-                        WxpJumpPageUtils.jumpToWebUrl(
-                            "${WxpConfig.appFeUrl}/app/#/manage",
-                            activity
-                        )
-                    },
-                    ProfileItem(
-                        title = "推送渠道",
-                        subtitle = "管理消息接收渠道",
-                        hasArrow = true
-                    ) {
-                        WxpJumpPageUtils.jumpToWebUrl(
-                            "${WxpConfig.appFeUrl}/app/#/push-channel",
-                            activity
-                        )
                     }
                 )
             ))
 
 
         // 消息管理
+        // 定制版只留总开关；我的订阅 / 添加订阅 / 代理赚钱 / 发送测试消息都去掉了
         sectionData.add(
             ProfileSection(
                 title = "消息管理",
                 items = listOf(
-                    ProfileItem(
-                        title = "我的订阅",
-                        subtitle = "订阅的消息内容",
-                        hasArrow = true
-                    ) {
-                        WxpJumpPageUtils.jumpToWebUrl(
-                            "${WxpConfig.appFeUrl}/app/#/subscribe-list",
-                            activity
-                        )
-                    },
-                    ProfileItem(
-                        title = "添加订阅",
-                        subtitle = "扫描添加订阅",
-                        hasArrow = true
-                    ) {
-                        WxpJumpPageUtils.jumpToScan(requireActivity())
-                    },
-                    ProfileItem(
-                        title = "代理赚钱",
-                        subtitle = "推广消息产品赚佣金",
-                        hasArrow = true
-                    ) {
-                        WxpJumpPageUtils.jumpToWebUrl(
-                            "${WxpConfig.appFeUrl}/app/#/agent-overview",
-                            activity
-                        )
-                    },
                     ProfileItem(
                         title = "消息开关",
                         subtitle = "总开关，控制是否接收消息",
@@ -189,16 +137,6 @@ class ProfileFragment : WxpBaseFragment() {
                     ) {
                         WxpJumpPageUtils.jumpToWebUrl(
                             "${WxpConfig.appFeUrl}/app/#/user-enable",
-                            activity
-                        )
-                    },
-                    ProfileItem(
-                        title = "发送测试消息",
-                        subtitle = "体验发送消息全流程",
-                        hasArrow = true
-                    ) {
-                        WxpJumpPageUtils.jumpToWebUrl(
-                            "${WxpConfig.appFeUrl}/app/#/send-test-guide",
                             activity
                         )
                     }
@@ -223,32 +161,17 @@ class ProfileFragment : WxpBaseFragment() {
                         hasArrow = true
                     ) {
                         checkNotificationPermission()
-                    },
-                    ProfileItem(
-                        title = "推送检查",
-                        subtitle = "收不到消息的异常排查",
-                        hasArrow = true
-                    ) {
-                        openPushCheckUrl()
                     }
                 )
             ))
 
         // 通用
+        // 定制版只留「通知点击设置」；底部标签设置没用（我们固定两个 tab），
+        // 反馈建议 / 软件更新 / 联系我们指向 WxPusher 官方，对学生是干扰，全部去掉
         sectionData.add(
             ProfileSection(
                 title = "通用",
                 items = listOf(
-                    ProfileItem(
-                        title = "底部标签设置",
-                        subtitle = "自定义底部导航标签的显示",
-                        hasArrow = true
-                    ) {
-                        WxpJumpPageUtils.jumpToWebUrl(
-                            "${WxpConfig.appFeUrl}/app/#/tab-setting",
-                            activity
-                        )
-                    },
                     ProfileItem(
                         title = "通知点击设置",
                         subtitle = "点击通知时直接打开原文链接",
@@ -256,30 +179,6 @@ class ProfileFragment : WxpBaseFragment() {
                     ) {
                         WxpJumpPageUtils.jumpToWebUrl(
                             "${WxpConfig.appFeUrl}/app/#/notify-click-setting",
-                            activity
-                        )
-                    },
-                    ProfileItem(
-                        title = "反馈建议",
-                        subtitle = "欢迎你指导我们进步",
-                        hasArrow = true
-                    ) {
-                        openFeedbackUrl()
-                    },
-                    ProfileItem(
-                        title = "软件更新",
-                        subtitle = WxpBaseInfoService.getAppVersionName(),
-                        hasArrow = true
-                    ) {
-                        checkForUpdate()
-                    },
-                    ProfileItem(
-                        title = "联系我们",
-                        subtitle = "咨询和反馈问题",
-                        hasArrow = true
-                    ) {
-                        WxpJumpPageUtils.jumpToWebUrl(
-                            "${WxpConfig.appFeUrl}/app/#/contact",
                             activity
                         )
                     }
@@ -347,7 +246,9 @@ class ProfileFragment : WxpBaseFragment() {
     }
 
     private fun checkForUpdate() {
-        WxpVersionCheckManager.onAppForeground(force = true)
+        //定制版不做版本检测：装回官方版会丢掉班级入口。
+        //新包由班委在班级群统一发布。
+        // WxpVersionCheckManager.onAppForeground(force = true)
     }
 
     private fun openUserAgreementUrl() {
