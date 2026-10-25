@@ -16,6 +16,10 @@ data class ConfigItem(
     val oppoPush: Boolean = true,
     val honorPush: Boolean = true,
     val meizuPush: Boolean = true,
+    //是否引导小米用户开启资讯订阅通道「订阅的通知提醒」，出问题时可以远程关掉
+    val xiaomiSubscribe: Boolean = true,
+    //小米个人订阅通道 135072 的关停时间
+    val xiaomiLegacyCutoff: String = "2026-12-31T00:00:00+08:00",
 )
 
 /**

@@ -32,6 +32,8 @@ import com.smjcco.wxpusher.push.ws.alert.WsAlertStore
 import com.smjcco.wxpusher.push.ws.connect.WsManager
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveService
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
+import com.smjcco.wxpusher.push.xiaomi.VendorSubState
+import com.smjcco.wxpusher.push.xiaomi.XiaomiSubscribeManager
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
@@ -51,6 +53,8 @@ class PushChannelSettingActivity : WxpBaseActivity() {
     private lateinit var retryVendor: TextView
     private lateinit var vendorAlertSetting: View
     private lateinit var vendorAlertSummary: TextView
+    private lateinit var xiaomiSubscribeRow: View
+    private lateinit var xiaomiSubscribeState: TextView
     private lateinit var wsCard: MaterialCardView
     private lateinit var wsState: TextView
     private lateinit var wsRadio: RadioButton
@@ -105,6 +109,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         val snapshot = latestSnapshot ?: PushChannelCoordinator.getSnapshot()
         renderWsAlertSetting(snapshot)
         renderWsDependencyChecks(snapshot)
+        renderXiaomiSubscribe(snapshot)
         if (waitingForAutoStartConfirmation) {
             waitingForAutoStartConfirmation = false
             showAutoStartConfirmationDialog()
@@ -125,6 +130,8 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         retryVendor = findViewById(R.id.btn_retry_vendor)
         vendorAlertSetting = findViewById(R.id.layout_vendor_alert_setting)
         vendorAlertSummary = findViewById(R.id.tv_vendor_alert_summary)
+        xiaomiSubscribeRow = findViewById(R.id.layout_xiaomi_subscribe)
+        xiaomiSubscribeState = findViewById(R.id.tv_xiaomi_subscribe_state)
         wsCard = findViewById(R.id.card_ws_push)
         wsState = findViewById(R.id.tv_ws_state)
         wsRadio = findViewById(R.id.radio_ws)
@@ -181,6 +188,13 @@ class PushChannelSettingActivity : WxpBaseActivity() {
                 WxpJumpPageUtils.jumpToWsAlertSetting(this)
             }
         }
+        xiaomiSubscribeRow.setOnClickListener {
+            if (XiaomiSubscribeManager.currentState() == VendorSubState.GRANTED) {
+                XiaomiSubscribeManager.openChannelSettings(this)
+            } else {
+                XiaomiSubscribeManager.showGuide(this)
+            }
+        }
         foregroundNotificationCheck.row.setOnClickListener {
             if (wsDependencyActionsEnabled) {
                 handleForegroundNotificationCheck()
@@ -231,6 +245,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         renderVendorAlertSetting(snapshot)
         renderWsAlertSetting(snapshot)
         renderWsDependencyChecks(snapshot)
+        renderXiaomiSubscribe(snapshot)
 
         val selectedColor = ContextCompat.getColor(this, R.color.colorPrimary)
         val normalColor = ContextCompat.getColor(this, R.color.input_border_color)
@@ -283,6 +298,26 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         } else {
             "切换至系统推送后可设置"
         }
+    }
+
+    /** 小米设备且厂商推送已经生效时，展示资讯订阅通道的授权状态。 */
+    private fun renderXiaomiSubscribe(snapshot: PushChannelSnapshot) {
+        val visible = snapshot.vendorPlatform == DevicePlatform.Android_XIAOMI
+            && snapshot.effectiveChannel == PushChannel.VENDOR
+        xiaomiSubscribeRow.visibility = if (visible) View.VISIBLE else View.GONE
+        if (!visible) {
+            return
+        }
+        val (text, ready) = when (XiaomiSubscribeManager.currentState()) {
+            VendorSubState.GRANTED -> "已开启" to true
+            VendorSubState.DISABLED -> "已关闭，去开启" to false
+            VendorSubState.DENIED -> "未开启，去开启" to false
+            VendorSubState.UNSUPPORTED -> "系统不支持" to true
+        }
+        xiaomiSubscribeState.text = text
+        xiaomiSubscribeState.setTextColor(
+            ContextCompat.getColor(this, if (ready) R.color.check_success else R.color.check_error),
+        )
     }
 
     /**

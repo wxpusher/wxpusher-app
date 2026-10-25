@@ -37,13 +37,14 @@ object XiaomiUtils {
         }
         //针对小米，还没有创建推送通道 ，就不进行提醒
         //在收到一次消息以后，才会有这个通知通道
-        if (!WxpNotificationManager.hasNotificationChannel("mipush|com.smjcco.wxpusher|135072")) {
+        val channelId = XiaomiSubscribeManager.getActiveNotificationChannelId()
+        if (!WxpNotificationManager.hasNotificationChannel(channelId)) {
             return
         }
 
         val dialog = AlertDialog.Builder(activity)
             .setTitle("请打开通知提醒设置")
-            .setMessage("如果通知不提醒，不弹窗，按照如下2步操作：\n\n1、请点击「去设置」，【打开所有开关】\n\n2、在设置最下面选择「订阅消息」-【打开所有开关】，在设置里，你还可以自定义提示铃声。")
+            .setMessage("如果通知不提醒，不弹窗，按照如下2步操作：\n\n1、请点击「去设置」，【打开所有开关】\n\n2、在设置最下面选择「${XiaomiSubscribeManager.getActiveNotificationChannelName()}」-【打开所有开关】，在设置里，你还可以自定义提示铃声。")
             .setNegativeButton(
                 "去设置"
             ) { dialog, which ->

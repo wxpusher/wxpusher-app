@@ -80,8 +80,12 @@ object PushPlatformState {
      *
      * 持久化和内存状态在同一入口更新，避免出现两处状态由调用方手工同步的问题。
      */
-    internal fun commitEffectivePushTarget(platform: DevicePlatform, token: String) {
-        PushChannelStore.saveEffectivePushTarget(platform, token)
+    internal fun commitEffectivePushTarget(
+        platform: DevicePlatform,
+        token: String,
+        vendorSubState: String? = null,
+    ) {
+        PushChannelStore.saveEffectivePushTarget(platform, token, vendorSubState)
         runtimeEffectivePushPlatform = platform
     }
 
