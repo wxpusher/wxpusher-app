@@ -41,6 +41,8 @@ class WxPusherApplication : Application() {
         WxpAppDataService.init();
         //初始化设备基础信息
         WxpBaseInfoService.init(WxpBaseInfoServiceImpl())
+        //监听回到前台，消息列表据此拉取一次最新消息，只挂生命周期回调，不读取任何信息
+        WxpAppForegroundObserver.init()
         // 先加载本地降级配置；推送通道在同意隐私政策后再决定（见 initSdkAfterAgreement）
         ConfigManager.init(this)
         initTbs()

@@ -37,6 +37,9 @@ open class PushMsgDeviceMsg(
     BaseWsMsg(msgType, createTime) {
     //开发者传入的原文链接，可能为空，开启「点击通知直接打开原文链接」后使用
     var sourceUrl: String? = null
+
+    //消息来源名称，插入消息列表时展示，老版本服务端不下发
+    var name: String? = null
 }
 
 //升级的消息推送
