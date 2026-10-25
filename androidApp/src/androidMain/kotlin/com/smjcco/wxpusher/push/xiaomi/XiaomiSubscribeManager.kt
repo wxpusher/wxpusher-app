@@ -22,8 +22,8 @@ import com.smjcco.wxpusher.utils.WxpJumpPageUtils
 import com.xiaomi.mipush.sdk.MiPushClient
 import java.time.OffsetDateTime
 
-/** 厂商订阅通道的授权状态，跟服务端 VendorSubState 一一对应。 */
-enum class VendorSubState {
+/** 厂商订阅通道的授权状态，上报在 WxpVendorState.subscribe，跟服务端 VendorSubscribeState 一一对应。 */
+enum class VendorSubscribeState {
     /** 已授权，通道是开的。 */
     GRANTED,
 
@@ -78,20 +78,20 @@ object XiaomiSubscribeManager {
     /**
      * 读取当前设备的授权状态。只在当前厂商是小米时有意义，其他厂商调用方不应该上报。
      */
-    fun currentState(): VendorSubState {
+    fun currentState(): VendorSubscribeState {
         if (!isSupported()) {
-            return VendorSubState.UNSUPPORTED
+            return VendorSubscribeState.UNSUPPORTED
         }
         val importance = getSubscribeChannelImportance()
         if (importance != null && importance != NotificationManager.IMPORTANCE_NONE) {
             WxpSaveService.set(KEY_EVER_GRANTED, true)
-            return VendorSubState.GRANTED
+            return VendorSubscribeState.GRANTED
         }
         // 拒绝弹窗时系统可能也会建一个关着的通道，只有本机授权过才算「关掉了」
         return if (importance != null && WxpSaveService.get(KEY_EVER_GRANTED, false)) {
-            VendorSubState.DISABLED
+            VendorSubscribeState.DISABLED
         } else {
-            VendorSubState.DENIED
+            VendorSubscribeState.DENIED
         }
     }
 
@@ -127,8 +127,8 @@ object XiaomiSubscribeManager {
      */
     fun getActiveNotificationChannelId(): String {
         val state = currentState()
-        val useSubscribe = state == VendorSubState.GRANTED
-            || state == VendorSubState.DISABLED
+        val useSubscribe = state == VendorSubscribeState.GRANTED
+            || state == VendorSubscribeState.DISABLED
             || isLegacyCutoffPassed()
         return notificationChannelId(if (useSubscribe) SUBSCRIBE_CHANNEL_ID else LEGACY_CHANNEL_ID)
     }
@@ -163,13 +163,13 @@ object XiaomiSubscribeManager {
             return false
         }
         val state = currentState()
-        return state == VendorSubState.DENIED || state == VendorSubState.DISABLED
+        return state == VendorSubscribeState.DENIED || state == VendorSubscribeState.DISABLED
     }
 
     /** 消息列表顶部 banner 的提示文案。 */
     fun getBannerText(): String {
         return when {
-            currentState() == VendorSubState.DISABLED -> "小米订阅通知已关闭，收不到推送，点击开启"
+            currentState() == VendorSubscribeState.DISABLED -> "小米订阅通知已关闭，收不到推送，点击开启"
             isLegacyCutoffPassed() -> "小米订阅通知未开启，收不到推送，点击开启"
             else -> "小米推送规则调整，请开启订阅通知，否则 12 月 31 日后收不到推送"
         }
@@ -251,9 +251,9 @@ object XiaomiSubscribeManager {
             supportCache = false
         }
         // 以本地通道的实际开关为准，回调只是重新检测的时机
-        PushChannelCoordinator.onVendorSubStateChanged()
+        PushChannelCoordinator.onVendorStateChanged()
         val state = currentState()
-        if (state == VendorSubState.GRANTED) {
+        if (state == VendorSubscribeState.GRANTED) {
             WxpToastUtils.showToast("已开启。之前设置的提醒铃声需要在「推送通道设置」里重新设置")
             return
         }

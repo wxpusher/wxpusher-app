@@ -1,7 +1,9 @@
 package com.smjcco.wxpusher.push
 
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
+import com.smjcco.wxpusher.base.biz.bean.WxpVendorState
 import com.smjcco.wxpusher.base.common.WxpSaveService
+import com.smjcco.wxpusher.base.common.WxpSerializationUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 
 /** 用户主动选择的推送通道。系统强制降级不会覆盖该选择。 */
@@ -47,13 +49,13 @@ enum class VendorAvailability {
 /**
  * 持久化的推送路由目标，平台与 token 必须成对读取和写入。
  *
- * [vendorSubState] 是厂商订阅通道的授权状态（目前只有小米），跟 platform / token 一起上报；
+ * [vendorState] 是厂商推送的设备状态（目前只有小米订阅通道的授权状态），跟 platform / token 一起上报；
  * 状态变了而 platform / token 没变时，目标也会不同，从而触发重新上报。
  */
 internal data class PushChannelTarget(
     val platform: DevicePlatform,
     val token: String,
-    val vendorSubState: String? = null,
+    val vendorState: WxpVendorState? = null,
 )
 
 /** Android 推送通道状态持久化。 */
@@ -71,7 +73,7 @@ object PushChannelStore {
     private const val KEY_WS_TOKEN = "PushChannel_WsToken"
     private const val KEY_EFFECTIVE_PLATFORM = "PushChannel_EffectivePlatform"
     private const val KEY_EFFECTIVE_TOKEN = "PushChannel_EffectiveToken"
-    private const val KEY_EFFECTIVE_VENDOR_SUB_STATE = "PushChannel_EffectiveVendorSubState"
+    private const val KEY_EFFECTIVE_VENDOR_STATE = "PushChannel_EffectiveVendorState"
     private const val KEY_WS_REASON = "PushChannel_WsReason"
     private const val KEY_WS_REQUESTED = "PushChannel_WsRequested"
 
@@ -165,18 +167,18 @@ object PushChannelStore {
     internal fun saveEffectivePushTarget(
         platform: DevicePlatform,
         token: String,
-        vendorSubState: String? = null,
+        vendorState: WxpVendorState? = null,
     ) {
         WxpSaveService.set(KEY_EFFECTIVE_PLATFORM, platform.getPlatform())
         WxpSaveService.set(KEY_EFFECTIVE_TOKEN, token)
-        WxpSaveService.set(KEY_EFFECTIVE_VENDOR_SUB_STATE, vendorSubState.orEmpty())
+        WxpSaveService.set(KEY_EFFECTIVE_VENDOR_STATE, vendorState?.let { WxpSerializationUtils.toJson(it) }.orEmpty())
     }
 
     /** 清理无法确认平台与 token 对应关系的历史生效目标。 */
     internal fun clearEffectivePushTarget() {
         WxpSaveService.set(KEY_EFFECTIVE_PLATFORM, "")
         WxpSaveService.set(KEY_EFFECTIVE_TOKEN, "")
-        WxpSaveService.set(KEY_EFFECTIVE_VENDOR_SUB_STATE, "")
+        WxpSaveService.set(KEY_EFFECTIVE_VENDOR_STATE, "")
     }
 
     /**
@@ -188,8 +190,11 @@ object PushChannelStore {
         val platform = DevicePlatform.find(WxpSaveService.get(KEY_EFFECTIVE_PLATFORM, ""))
             ?: return null
         val token = WxpSaveService.get(KEY_EFFECTIVE_TOKEN, "")
-        val vendorSubState = WxpSaveService.get(KEY_EFFECTIVE_VENDOR_SUB_STATE, "").ifEmpty { null }
-        return PushChannelTarget(platform, token, vendorSubState)
+        // 用 kotlinx.serialization：release 包会混淆字段名，Gson 反射解析不可靠
+        val vendorState = WxpSaveService.get(KEY_EFFECTIVE_VENDOR_STATE, "")
+            .takeIf { it.isNotEmpty() }
+            ?.let { WxpSerializationUtils.fromJson<WxpVendorState>(it) }
+        return PushChannelTarget(platform, token, vendorState)
     }
 
     /** 保存当前使用 WS 的原因；传空表示已经不再处于 WS 特殊状态。 */

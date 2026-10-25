@@ -1,5 +1,6 @@
 package com.smjcco.wxpusher.push
 
+import com.smjcco.wxpusher.base.biz.bean.WxpVendorState
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.common.WxpSaveKey
@@ -83,9 +84,9 @@ object PushPlatformState {
     internal fun commitEffectivePushTarget(
         platform: DevicePlatform,
         token: String,
-        vendorSubState: String? = null,
+        vendorState: WxpVendorState? = null,
     ) {
-        PushChannelStore.saveEffectivePushTarget(platform, token, vendorSubState)
+        PushChannelStore.saveEffectivePushTarget(platform, token, vendorState)
         runtimeEffectivePushPlatform = platform
     }
 

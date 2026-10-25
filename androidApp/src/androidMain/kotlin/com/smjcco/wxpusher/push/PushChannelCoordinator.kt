@@ -4,6 +4,7 @@ import android.app.Application
 import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.biz.bean.WxpUpdateInfoReq
+import com.smjcco.wxpusher.base.biz.bean.WxpVendorState
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpScopeUtils
@@ -360,9 +361,9 @@ object PushChannelCoordinator {
             }
 
             if (!WxpAppDataService.isDeviceInfoReportExpired()) {
-                // 用户可能在系统设置里改了小米订阅通道的开关，状态变了就立即上报，不受一小时节流限制
-                val desiredSubState = buildDesiredTarget()?.vendorSubState
-                if (desiredSubState != PushPlatformState.getPersistedEffectivePushTarget()?.vendorSubState) {
+                // 用户可能在系统设置里改了小米订阅通道的开关，厂商状态变了就立即上报，不受一小时节流限制
+                val desiredVendorState = buildDesiredTarget()?.vendorState
+                if (desiredVendorState != PushPlatformState.getPersistedEffectivePushTarget()?.vendorState) {
                     syncDesiredChannel()
                 }
                 return@runOnMainThread
@@ -373,8 +374,8 @@ object PushChannelCoordinator {
         }
     }
 
-    /** 小米订阅通道授权弹窗结束后调用，状态有变化时上报。 */
-    fun onVendorSubStateChanged() {
+    /** 厂商状态可能变化时调用（例如小米订阅通道授权弹窗结束），有变化时上报。 */
+    fun onVendorStateChanged() {
         ThreadUtils.runOnMainThread {
             if (initialized) {
                 syncDesiredChannel()
@@ -469,7 +470,7 @@ object PushChannelCoordinator {
             deviceUuid = deviceUuid,
             pushToken = target.token,
             platform = target.platform.getPlatform(),
-            vendorSubState = target.vendorSubState,
+            vendorState = target.vendorState,
         )
         WxpScopeUtils.getMainScope().launch {
             val success = WxpApiService.updateDeviceInfo(req = updateInfoReq, silent = true) == true
@@ -488,7 +489,7 @@ object PushChannelCoordinator {
      * 也绝不能更新最近成功上报时间。登录请求会携带这里保存的平台和 token 完成设备注册。
      */
     private fun applyTargetBeforeLogin(target: PushChannelTarget) {
-        // 登录请求不带授权状态，这里不记录，登录后回到页面时会发现状态不一致再补报
+        // 登录请求不带厂商状态，这里不记录，登录后回到页面时会发现状态不一致再补报
         PushPlatformState.commitEffectivePushTarget(
             target.platform,
             target.token,
@@ -512,7 +513,7 @@ object PushChannelCoordinator {
             PushPlatformState.commitEffectivePushTarget(
                 submittedTarget.platform,
                 submittedTarget.token,
-                submittedTarget.vendorSubState,
+                submittedTarget.vendorState,
             )
             WxpAppDataService.savePushToken(submittedTarget.token)
 
@@ -719,7 +720,7 @@ object PushChannelCoordinator {
         } else {
             val vendorTarget = getCurrentVendorTarget() ?: return null
             if (vendorTarget.platform == DevicePlatform.Android_XIAOMI) {
-                vendorTarget.copy(vendorSubState = XiaomiSubscribeManager.currentState().name)
+                vendorTarget.copy(vendorState = WxpVendorState(subscribe = XiaomiSubscribeManager.currentState().name))
             } else {
                 vendorTarget
             }

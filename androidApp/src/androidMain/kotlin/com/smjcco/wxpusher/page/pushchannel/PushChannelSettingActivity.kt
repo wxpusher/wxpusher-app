@@ -32,7 +32,7 @@ import com.smjcco.wxpusher.push.ws.alert.WsAlertStore
 import com.smjcco.wxpusher.push.ws.connect.WsManager
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveService
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
-import com.smjcco.wxpusher.push.xiaomi.VendorSubState
+import com.smjcco.wxpusher.push.xiaomi.VendorSubscribeState
 import com.smjcco.wxpusher.push.xiaomi.XiaomiSubscribeManager
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionRequester
@@ -189,7 +189,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
             }
         }
         xiaomiSubscribeRow.setOnClickListener {
-            if (XiaomiSubscribeManager.currentState() == VendorSubState.GRANTED) {
+            if (XiaomiSubscribeManager.currentState() == VendorSubscribeState.GRANTED) {
                 XiaomiSubscribeManager.openChannelSettings(this)
             } else {
                 XiaomiSubscribeManager.showGuide(this)
@@ -309,10 +309,10 @@ class PushChannelSettingActivity : WxpBaseActivity() {
             return
         }
         val (text, ready) = when (XiaomiSubscribeManager.currentState()) {
-            VendorSubState.GRANTED -> "已开启" to true
-            VendorSubState.DISABLED -> "已关闭，去开启" to false
-            VendorSubState.DENIED -> "未开启，去开启" to false
-            VendorSubState.UNSUPPORTED -> "系统不支持" to true
+            VendorSubscribeState.GRANTED -> "已开启" to true
+            VendorSubscribeState.DISABLED -> "已关闭，去开启" to false
+            VendorSubscribeState.DENIED -> "未开启，去开启" to false
+            VendorSubscribeState.UNSUPPORTED -> "系统不支持" to true
         }
         xiaomiSubscribeState.text = text
         xiaomiSubscribeState.setTextColor(
