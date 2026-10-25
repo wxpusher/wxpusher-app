@@ -14,6 +14,7 @@ import com.smjcco.wxpusher.base.common.WxpScopeUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.push.PushChannelStore
 import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.push.WxpMessageArrivalNotifier
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager.sendBizMessageNotification
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.GsonUtils
@@ -129,6 +130,14 @@ object WsManager {
             }
         }
         addMsgListener(WsMessageTypeEnum.PUSH_NOTE.code, pushListener)
+        //当收到消息的时候，插入消息列表。单独注册，不放进通知逻辑：
+        //通知那边会按 mid 去重提前返回，没有通知权限时也发不出来，这些都不应该影响插入列表
+        val messageListListener = object : IWsMessageListener<PushMsgDeviceMsg> {
+            override fun onMessage(message: PushMsgDeviceMsg) {
+                WxpMessageArrivalNotifier.notifyWsMessage(message)
+            }
+        }
+        addMsgListener(WsMessageTypeEnum.PUSH_NOTE.code, messageListListener)
         val pushTokenListener = object : IWsMessageListener<InitDeviceMsg> {
             override fun onMessage(message: InitDeviceMsg) {
                 WxpLogUtils.i(TAG, "收到自建长链接Ws的pushToken=${message.pushToken}")

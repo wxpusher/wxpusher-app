@@ -10,6 +10,7 @@ import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.push.WxpMessageArrivalNotifier
 import com.smjcco.wxpusher.utils.PermissionUtils
 
 class MeizuPushMsgReceiver : MzPushMessageReceiver() {
@@ -35,6 +36,8 @@ class MeizuPushMsgReceiver : MzPushMessageReceiver() {
      */
     override fun onNotificationArrived(p0: Context?, p1: MzPushMessage?) {
         super.onNotificationArrived(p0, p1)
+        //数据不全，只当作到达信号，让消息列表拉一次
+        WxpMessageArrivalNotifier.notifySignal("meizu")
         val activity = ApplicationUtils.getCurrentActivity()
         if (activity == null) {
             return

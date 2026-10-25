@@ -6,10 +6,14 @@ import com.smjcco.wxpusher.base.common.WxpBaseMvpPresenter
 import com.smjcco.wxpusher.base.common.WxpDateTimeUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpSaveService
+import com.smjcco.wxpusher.base.common.WxpScopeUtils
 import com.smjcco.wxpusher.base.common.runAtMainSuspend
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.base.common.WxpDialogUtils
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class WxpMessageListPresenter(view: IWxpMessageListView) :
     WxpBaseMvpPresenter<IWxpMessageListView, IWxpMessageListPresenter>(view),
@@ -41,6 +45,28 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     //上次获取公告的时间
     private var lastFetchNoTime: Long = 0
 
+    //同步锚点：最近一次从服务端拉到的最大消息 id，推送插入的消息不推进它，规则见 WxpMessageListMerger.merge
+    private var syncedMaxId: Long = 0
+
+    //请求进行中又需要增量拉取，先记下来，当前请求结束后补拉一次
+    private var pendingFetch = false
+
+    //请求进行中用户触发了刷新，先记下场景，当前请求结束后再刷新，避免刷新被丢掉、下拉头一直转
+    private var pendingRefreshScene: Int? = null
+
+    //厂商到达信号的防抖任务
+    private var signalDebounceJob: Job? = null
+    private val SignalDebounceMillis = 1500L
+
+    //回前台增量拉取的节流
+    private var lastForegroundFetchTime: Long = 0
+    private val ForegroundThrottleMillis = 5000L
+
+    //最近通过推送插入的消息（插入时间, 消息），刷新结果把它们覆盖掉时补回来
+    private val recentPushedMessages = ArrayDeque<Pair<Long, WxpMessageListMessage>>()
+    private val RecentPushedKeepMillis = 60_000L
+    private val RecentPushedMaxSize = 50
+
     override fun searchIfChanged(key: String?) {
         if (this.key != key) {
             this.key = key
@@ -51,6 +77,8 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     override fun init() {
         WxpAppDataService.getCacheMessageList()?.let {
             messageListData = it.toMutableList()
+            //缓存本身就是服务端数据，可以作为同步锚点
+            syncedMaxId = it.maxOfOrNull { message -> message.messageId } ?: 0
             view?.onMessageList(it)
         }
     }
@@ -64,6 +92,10 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             // 通知视图更新
             view?.onMessageList(messageListData.toList())
             saveRefreshListData()
+            return
+        }
+        //搜索中不往搜索结果里插入，退出搜索时会全量刷新
+        if (!key.isNullOrEmpty()) {
             return
         }
         // 找到第一个 id 小于新消息 id 的位置
@@ -80,11 +112,56 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         saveRefreshListData()
     }
 
+    override fun onPushMessageArrived(message: WxpMessageListMessage) {
+        if (isNotLogin()) {
+            return
+        }
+        //搜索中不往搜索结果里插入，退出搜索时会全量刷新
+        if (!key.isNullOrEmpty()) {
+            WxpLogUtils.d(message = "推送消息到达-搜索中，不插入，messageId=${message.messageId}")
+            return
+        }
+        //WS 重放、切换通道期间两条通道都送达，都会走到这里，按 id 去重
+        val newList = WxpMessageListMerger.insert(messageListData, message) ?: return
+        WxpLogUtils.d(message = "推送消息到达-插入列表，messageId=${message.messageId}")
+        messageListData = newList.toMutableList()
+        recordRecentPushed(message)
+        view?.onMessageList(messageListData.toList())
+        saveRefreshListData()
+    }
+
+    override fun onPushSignal() {
+        signalDebounceJob?.cancel()
+        signalDebounceJob = WxpScopeUtils.getMainScope().launch {
+            delay(SignalDebounceMillis)
+            WxpLogUtils.d(message = "推送到达信号-增量拉取")
+            fetchIncremental()
+        }
+    }
+
+    override fun onAppForeground() {
+        val now = WxpDateTimeUtils.getTimestamp()
+        if (now - lastForegroundFetchTime < ForegroundThrottleMillis) {
+            WxpLogUtils.d(message = "回到前台-5秒内已拉取过，跳过")
+            return
+        }
+        lastForegroundFetchTime = now
+        WxpLogUtils.d(message = "回到前台-增量拉取")
+        fetchIncremental()
+    }
+
+    override fun onDestroy() {
+        signalDebounceJob?.cancel()
+        super.onDestroy()
+    }
+
     override fun refresh(scene: Int) {
         WxpLogUtils.d(message = "开始刷新-refresh")
         WxpLogUtils.d(message = "clickMessage=${clickMessage}")
 
         if (loading) {
+            //当前有请求在跑，等它结束后再刷新
+            pendingRefreshScene = scene
             return
         }
         //手动触发的，就给予震动反馈
@@ -101,67 +178,122 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             //如果刷新的数据不为null，说明是刷新成功了,然后才更新数据
             if (fetchResultList != null) {
                 //如果有被点击消息，就更新一下被点击消息的状态
-                if (clickMessage != null) {
-                    fetchResultList.find { it.messageId == clickMessage?.messageId }?.read =
-                        (clickMessage?.read == true)
+                //只用来改成已读：被点击消息可能是推送到达时记下的未读状态，不能用它把服务端的已读改回未读
+                if (clickMessage?.read == true) {
+                    fetchResultList.find { it.messageId == clickMessage?.messageId }?.read = true
                     WxpLogUtils.d(message = "标记消息已读=${clickMessage}")
                 }
-                messageListData = fetchResultList.toMutableList()
+                var resultList: List<WxpMessageListMessage> = fetchResultList
+                //搜索结果不能作为同步锚点，也不补回推送消息
+                if (key.isNullOrEmpty()) {
+                    syncedMaxId = fetchResultList.maxOfOrNull { it.messageId } ?: 0
+                    resultList = WxpMessageListMerger.restoreRecentPushed(
+                        resultList,
+                        getRecentPushed()
+                    )
+                }
+                messageListData = resultList.toMutableList()
                 lastMessageId = messageListData.lastOrNull()?.messageId ?: Long.MAX_VALUE
                 hasMore = messageListData.size >= pageMinCount
                 view?.showMessageMoreLoading(false, hasMore)
                 view?.onMessageList(messageListData.toList())
-                //搜索的时候，不保存缓存
-                if (key.isNullOrEmpty()) {
-                    saveRefreshListData()
-                }
+                saveRefreshListData()
             }
             loading = false
+            runPendingRequest()
         }
     }
 
     override fun fetchMessageResume() {
         WxpLogUtils.d(message = "开始刷新-fetchMessageResume")
-        if (loading) {
+        fetchIncremental()
+    }
+
+    /**
+     * 增量拉取：请求第一页，按 WxpMessageListMerger.merge 的规则合并进列表
+     * 有重叠只补齐缺失的消息，有断层就用第一页替换整个列表，都只发一次请求
+     */
+    private fun fetchIncremental() {
+        //搜索中不合并，退出搜索时会全量刷新
+        if (!key.isNullOrEmpty()) {
+            WxpLogUtils.d(message = "增量拉取-搜索中，跳过")
             return
         }
-        if (WxpAppDataService.getLoginInfo()?.deviceToken.isNullOrEmpty()) {
-            WxpLogUtils.d(message = "开始刷新-fetchMessageResume-没有登录，放弃刷新")
+        if (isNotLogin()) {
+            WxpLogUtils.d(message = "增量拉取-没有登录，跳过")
+            return
+        }
+        if (loading) {
+            pendingFetch = true
             return
         }
         runAtMainSuspend {
             loading = true
-            val req = WxpMessageListReq(Long.MAX_VALUE, key, WxpMessageListReq.SceneFetchResume)
+            val req = WxpMessageListReq(Long.MAX_VALUE, null, WxpMessageListReq.SceneFetchResume)
             val fetchResultList = WxpApiService.fetchMessageList(req)
-            WxpSaveService.set(MessageRefreshTimeKey, WxpDateTimeUtils.getTimestamp().toDouble())
-            if (fetchResultList != null) {
-                for (message in fetchResultList) {
-                    var has = false
-                    for (listMessage in messageListData) {
-                        if (listMessage.messageId == message.messageId) {
-                            has = true
-                            break
-                        }
-                    }
-                    if (has) {
-                        continue
-                    }
-                    // 找到第一个 id 小于新消息 id 的位置
-                    val insertIndex =
-                        messageListData.indexOfFirst { it.messageId < message.messageId }
-                    if (insertIndex == -1) {
-                        // 如果没有找到更小的 id，说明新消息的 id 是最小的，添加到列表末尾
-                        messageListData.add(message)
-                    } else {
-                        // 在找到的位置插入新消息
-                        messageListData.add(insertIndex, message)
-                    }
+            //请求期间进入了搜索，丢弃结果，退出搜索时会全量刷新
+            if (fetchResultList != null && key.isNullOrEmpty()) {
+                WxpSaveService.set(MessageRefreshTimeKey, WxpDateTimeUtils.getTimestamp().toDouble())
+                val mergeResult =
+                    WxpMessageListMerger.merge(messageListData, fetchResultList, syncedMaxId)
+                syncedMaxId = mergeResult.syncedMaxId
+                if (mergeResult.replaced) {
+                    WxpLogUtils.d(message = "增量拉取-有断层，替换整个列表")
+                    messageListData = WxpMessageListMerger.restoreRecentPushed(
+                        mergeResult.list,
+                        getRecentPushed()
+                    ).toMutableList()
+                    lastMessageId = messageListData.lastOrNull()?.messageId ?: Long.MAX_VALUE
+                    hasMore = messageListData.size >= pageMinCount
+                    view?.showMessageMoreLoading(false, hasMore)
+                } else {
+                    messageListData = mergeResult.list.toMutableList()
                 }
                 view?.onMessageList(messageListData.toList())
                 saveRefreshListData()
             }
             loading = false
+            runPendingRequest()
         }
+    }
+
+    /**
+     * 当前请求结束后，执行期间被推迟的请求，刷新优先，刷新本身就包含了增量拉取
+     */
+    private fun runPendingRequest() {
+        val scene = pendingRefreshScene
+        if (scene != null) {
+            pendingRefreshScene = null
+            pendingFetch = false
+            refresh(scene)
+            return
+        }
+        if (pendingFetch) {
+            pendingFetch = false
+            fetchIncremental()
+        }
+    }
+
+    private fun recordRecentPushed(message: WxpMessageListMessage) {
+        recentPushedMessages.addLast(WxpDateTimeUtils.getTimestamp() to message)
+        while (recentPushedMessages.size > RecentPushedMaxSize) {
+            recentPushedMessages.removeFirst()
+        }
+    }
+
+    /**
+     * 获取最近 60 秒内通过推送插入的消息，顺便清理过期的
+     */
+    private fun getRecentPushed(): List<WxpMessageListMessage> {
+        val expireTime = WxpDateTimeUtils.getTimestamp() - RecentPushedKeepMillis
+        while (recentPushedMessages.isNotEmpty() && recentPushedMessages.first().first < expireTime) {
+            recentPushedMessages.removeFirst()
+        }
+        return recentPushedMessages.map { it.second }
+    }
+
+    private fun isNotLogin(): Boolean {
+        return WxpAppDataService.getLoginInfo()?.deviceToken.isNullOrEmpty()
     }
 
     override fun getTipsOfLastRefreshTime(): String {
@@ -176,6 +308,10 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
      * 保存一下第一页的数据，方便下次启动的时候用缓存渲染
      */
     private fun saveRefreshListData() {
+        //搜索的时候，不保存缓存，否则下次启动会用搜索结果渲染首页
+        if (!key.isNullOrEmpty()) {
+            return
+        }
         WxpAppDataService.setCacheMessageList(messageListData)
     }
 
@@ -188,6 +324,12 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         if (messageListData.size < pageMinCount) {
             WxpLogUtils.d(message = "loadMore-数据不够1页，不加载更多")
             hasMore = false
+            view?.showMessageMoreLoading(false, hasMore)
+            return
+        }
+        //增量拉取和加载更多都会改列表，不能同时跑，结束加载状态让用户稍后再拉
+        if (loading) {
+            WxpLogUtils.d(message = "loadMore-有请求进行中，不加载")
             view?.showMessageMoreLoading(false, hasMore)
             return
         }
@@ -211,6 +353,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
             }
             view?.showMessageMoreLoading(false, hasMore)
             loading = false
+            runPendingRequest()
         }
     }
 
