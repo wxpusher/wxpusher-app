@@ -54,6 +54,10 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     //请求进行中用户触发了刷新，先记下场景，当前请求结束后再刷新，避免刷新被丢掉、下拉头一直转
     private var pendingRefreshScene: Int? = null
 
+    //当前是否有全量刷新在跑，以及它用的搜索词：同一个搜索词的刷新再来一次时直接忽略
+    private var refreshInFlight = false
+    private var refreshingKey: String? = null
+
     //厂商到达信号的防抖任务
     private var signalDebounceJob: Job? = null
     private val SignalDebounceMillis = 1500L
@@ -160,7 +164,12 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         WxpLogUtils.d(message = "clickMessage=${clickMessage}")
 
         if (loading) {
-            //当前有请求在跑，等它结束后再刷新
+            //正在跑的就是同一个搜索词的全量刷新，结果一样，不用再刷一次，它结束时会收起下拉动画
+            //（鸿蒙列表页冷启动时会连着触发两次刷新，不忽略就会多发一次请求）
+            if (refreshInFlight && refreshingKey == key) {
+                return
+            }
+            //当前有其他请求在跑，等它结束后再刷新
             pendingRefreshScene = scene
             return
         }
@@ -170,6 +179,8 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
         }
         runAtMainSuspend {
             loading = true
+            refreshInFlight = true
+            refreshingKey = key
             view?.showMessageRefreshing(true)
             val req = WxpMessageListReq(Long.MAX_VALUE, key, scene)
             val fetchResultList = WxpApiService.fetchMessageList(req)
@@ -200,6 +211,7 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
                 saveRefreshListData()
             }
             loading = false
+            refreshInFlight = false
             runPendingRequest()
         }
     }
