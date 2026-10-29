@@ -30,9 +30,9 @@ import com.smjcco.wxpusher.page.main.fragment.ProfileFragment
 import com.smjcco.wxpusher.page.main.fragment.WxpExtFuncFragment
 import com.smjcco.wxpusher.page.main.fragment.WxpProviderListFragment
 import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.push.VendorSubscribeGuide
 import com.smjcco.wxpusher.push.ws.alert.WsAlertPlayer
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
-import com.smjcco.wxpusher.push.xiaomi.XiaomiSubscribeManager
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.ThreadUtils
@@ -329,10 +329,10 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
         KeepWsAliveServiceStarter.start(this)
         //版本升级检测（内部有 3 小时节流；冷启、后台切前台都会触发）
         WxpVersionCheckManager.onAppForeground()
-        //小米订阅通道授权提醒：延迟一下，确保页面已经在前台，系统弹窗才能拉起
+        //小米、vivo 订阅通道授权提醒：延迟一下，确保页面已经在前台，系统弹窗才能拉起
         ThreadUtils.runOnMainThread({
             if (!isFinishing && !isDestroyed) {
-                XiaomiSubscribeManager.autoPromptIfNeeded(this)
+                VendorSubscribeGuide.current()?.autoPromptIfNeeded(this)
             }
         }, 1500L)
     }

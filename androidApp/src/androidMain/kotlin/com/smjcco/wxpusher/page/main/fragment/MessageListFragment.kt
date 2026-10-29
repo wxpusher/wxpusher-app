@@ -40,7 +40,6 @@ import com.smjcco.wxpusher.page.messagelist.IWxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.IWxpMessageListView
 import com.smjcco.wxpusher.page.messagelist.WxpCheckAppMsgReasonResp
 import com.smjcco.wxpusher.page.messagelist.WxpListBannerResp
-import com.smjcco.wxpusher.push.xiaomi.XiaomiSubscribeManager
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
@@ -49,6 +48,7 @@ import com.smjcco.wxpusher.push.IPushTokenChangedListener
 import com.smjcco.wxpusher.push.PushChannel
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.push.PushPlatformState
+import com.smjcco.wxpusher.push.VendorSubscribeGuide
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
@@ -251,9 +251,10 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
      */
     private fun refreshNotePermissionBanner() {
         val hasNotePermission = PermissionUtils.hasNotificationPermission(activity)
-        if (hasNotePermission && XiaomiSubscribeManager.needGuide(activity)) {
-            //小米订阅通道没开，只读本地状态；从系统设置回来 onResume 会重新检查
-            showXiaomiSubscribeBanner()
+        val subscribeGuide = VendorSubscribeGuide.current()
+        if (hasNotePermission && subscribeGuide != null && subscribeGuide.needGuide(activity)) {
+            //小米、vivo 订阅通道没开，只读本地状态；从系统设置回来 onResume 会重新检查
+            showVendorSubscribeBanner(subscribeGuide)
         } else if (hasNotePermission) {
             //在消息权限正确的前提下，检查是否可以接收到消息
             notePermissionBanner.visibility = View.GONE
@@ -280,15 +281,15 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         }
     }
 
-    /** 小米资讯订阅通道「订阅的通知提醒」没开，点击后申请授权，失败时引导去设置。 */
-    private fun showXiaomiSubscribeBanner() {
+    /** 小米、vivo 订阅通道没开，点击后申请授权，失败时引导去设置。 */
+    private fun showVendorSubscribeBanner(guide: VendorSubscribeGuide) {
         val openGuide = View.OnClickListener {
-            activity?.let { XiaomiSubscribeManager.showGuide(it) }
+            activity?.let { guide.showGuide(it) }
         }
         notePermissionBanner.setOnClickListener(openGuide)
         notePermissionBanner.visibility = View.VISIBLE
         notePermissionTv.visibility = View.VISIBLE
-        notePermissionTv.text = XiaomiSubscribeManager.getBannerText()
+        notePermissionTv.text = guide.getBannerText()
         notePermissionBtn.text = "去开启"
         notePermissionBtn.visibility = View.VISIBLE
         notePermissionBtn.setOnClickListener(openGuide)

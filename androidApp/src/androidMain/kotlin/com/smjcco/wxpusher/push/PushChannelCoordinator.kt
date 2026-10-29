@@ -12,7 +12,6 @@ import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.config.ConfigItem
 import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager
-import com.smjcco.wxpusher.push.xiaomi.XiaomiSubscribeManager
 import com.smjcco.wxpusher.push.ws.connect.WsManager
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
 import com.smjcco.wxpusher.utils.ThreadUtils
@@ -719,11 +718,9 @@ object PushChannelCoordinator {
             }
         } else {
             val vendorTarget = getCurrentVendorTarget() ?: return null
-            if (vendorTarget.platform == DevicePlatform.Android_XIAOMI) {
-                vendorTarget.copy(vendorState = WxpVendorState(subscribe = XiaomiSubscribeManager.currentState().name))
-            } else {
-                vendorTarget
-            }
+            //小米、vivo 带上订阅通道的授权状态，服务端按状态选通道
+            val guide = VendorSubscribeGuide.of(vendorTarget.platform) ?: return vendorTarget
+            vendorTarget.copy(vendorState = WxpVendorState(subscribe = guide.currentState().name))
         }
     }
 

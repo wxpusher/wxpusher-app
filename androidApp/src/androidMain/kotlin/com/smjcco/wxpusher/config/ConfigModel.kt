@@ -20,6 +20,10 @@ data class ConfigItem(
     val xiaomiSubscribe: Boolean = true,
     //小米个人订阅通道 135072 的关停时间
     val xiaomiLegacyCutoff: String = "2026-12-31T00:00:00+08:00",
+    //是否引导 vivo 用户开启订阅渠道「订阅内容更新」，出问题时可以远程关掉
+    val vivoSubscribe: Boolean = true,
+    //vivo 不走模板的订阅提醒消息被拦截的时间
+    val vivoLegacyCutoff: String = "2027-04-01T00:00:00+08:00",
 )
 
 /**
