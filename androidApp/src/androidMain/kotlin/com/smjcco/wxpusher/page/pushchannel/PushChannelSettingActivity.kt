@@ -28,12 +28,12 @@ import com.smjcco.wxpusher.push.PushChannelCoordinator
 import com.smjcco.wxpusher.push.PushChannelSnapshot
 import com.smjcco.wxpusher.push.PushPlatformResolver
 import com.smjcco.wxpusher.push.VendorAvailability
+import com.smjcco.wxpusher.push.VendorSubscribeGuide
+import com.smjcco.wxpusher.push.VendorSubscribeState
 import com.smjcco.wxpusher.push.ws.alert.WsAlertStore
 import com.smjcco.wxpusher.push.ws.connect.WsManager
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveService
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
-import com.smjcco.wxpusher.push.xiaomi.VendorSubscribeState
-import com.smjcco.wxpusher.push.xiaomi.XiaomiSubscribeManager
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionRequester
 import com.smjcco.wxpusher.utils.PermissionUtils
@@ -53,8 +53,9 @@ class PushChannelSettingActivity : WxpBaseActivity() {
     private lateinit var retryVendor: TextView
     private lateinit var vendorAlertSetting: View
     private lateinit var vendorAlertSummary: TextView
-    private lateinit var xiaomiSubscribeRow: View
-    private lateinit var xiaomiSubscribeState: TextView
+    private lateinit var vendorSubscribeRow: View
+    private lateinit var vendorSubscribeTitle: TextView
+    private lateinit var vendorSubscribeState: TextView
     private lateinit var wsCard: MaterialCardView
     private lateinit var wsState: TextView
     private lateinit var wsRadio: RadioButton
@@ -109,7 +110,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         val snapshot = latestSnapshot ?: PushChannelCoordinator.getSnapshot()
         renderWsAlertSetting(snapshot)
         renderWsDependencyChecks(snapshot)
-        renderXiaomiSubscribe(snapshot)
+        renderVendorSubscribe(snapshot)
         if (waitingForAutoStartConfirmation) {
             waitingForAutoStartConfirmation = false
             showAutoStartConfirmationDialog()
@@ -130,8 +131,9 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         retryVendor = findViewById(R.id.btn_retry_vendor)
         vendorAlertSetting = findViewById(R.id.layout_vendor_alert_setting)
         vendorAlertSummary = findViewById(R.id.tv_vendor_alert_summary)
-        xiaomiSubscribeRow = findViewById(R.id.layout_xiaomi_subscribe)
-        xiaomiSubscribeState = findViewById(R.id.tv_xiaomi_subscribe_state)
+        vendorSubscribeRow = findViewById(R.id.layout_vendor_subscribe)
+        vendorSubscribeTitle = findViewById(R.id.tv_vendor_subscribe_title)
+        vendorSubscribeState = findViewById(R.id.tv_vendor_subscribe_state)
         wsCard = findViewById(R.id.card_ws_push)
         wsState = findViewById(R.id.tv_ws_state)
         wsRadio = findViewById(R.id.radio_ws)
@@ -188,11 +190,12 @@ class PushChannelSettingActivity : WxpBaseActivity() {
                 WxpJumpPageUtils.jumpToWsAlertSetting(this)
             }
         }
-        xiaomiSubscribeRow.setOnClickListener {
-            if (XiaomiSubscribeManager.currentState() == VendorSubscribeState.GRANTED) {
-                XiaomiSubscribeManager.openChannelSettings(this)
+        vendorSubscribeRow.setOnClickListener {
+            val guide = VendorSubscribeGuide.current() ?: return@setOnClickListener
+            if (guide.currentState() == VendorSubscribeState.GRANTED) {
+                guide.openChannelSettings(this)
             } else {
-                XiaomiSubscribeManager.showGuide(this)
+                guide.showGuide(this)
             }
         }
         foregroundNotificationCheck.row.setOnClickListener {
@@ -245,7 +248,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         renderVendorAlertSetting(snapshot)
         renderWsAlertSetting(snapshot)
         renderWsDependencyChecks(snapshot)
-        renderXiaomiSubscribe(snapshot)
+        renderVendorSubscribe(snapshot)
 
         val selectedColor = ContextCompat.getColor(this, R.color.colorPrimary)
         val normalColor = ContextCompat.getColor(this, R.color.input_border_color)
@@ -300,22 +303,23 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         }
     }
 
-    /** 小米设备且厂商推送已经生效时，展示资讯订阅通道的授权状态。 */
-    private fun renderXiaomiSubscribe(snapshot: PushChannelSnapshot) {
-        val visible = snapshot.vendorPlatform == DevicePlatform.Android_XIAOMI
-            && snapshot.effectiveChannel == PushChannel.VENDOR
-        xiaomiSubscribeRow.visibility = if (visible) View.VISIBLE else View.GONE
-        if (!visible) {
+    /** 小米、vivo 设备且厂商推送已经生效时，展示订阅通道的授权状态。 */
+    private fun renderVendorSubscribe(snapshot: PushChannelSnapshot) {
+        val guide = VendorSubscribeGuide.of(snapshot.vendorPlatform)
+        val visible = guide != null && snapshot.effectiveChannel == PushChannel.VENDOR
+        vendorSubscribeRow.visibility = if (visible) View.VISIBLE else View.GONE
+        if (guide == null || !visible) {
             return
         }
-        val (text, ready) = when (XiaomiSubscribeManager.currentState()) {
+        vendorSubscribeTitle.text = guide.settingTitle
+        val (text, ready) = when (guide.currentState()) {
             VendorSubscribeState.GRANTED -> "已开启" to true
             VendorSubscribeState.DISABLED -> "已关闭，去开启" to false
             VendorSubscribeState.DENIED -> "未开启，去开启" to false
             VendorSubscribeState.UNSUPPORTED -> "系统不支持" to true
         }
-        xiaomiSubscribeState.text = text
-        xiaomiSubscribeState.setTextColor(
+        vendorSubscribeState.text = text
+        vendorSubscribeState.setTextColor(
             ContextCompat.getColor(this, if (ready) R.color.check_success else R.color.check_error),
         )
     }
