@@ -224,7 +224,7 @@ object XiaomiSubscribeManager : VendorSubscribeGuide() {
                     "你可以清理「小米服务框架」和【WxPusher】的数据后重新尝试，也可以切换到 WebSocket 推送。"
             else ->
                 "你没有允许小米的订阅通知，可能会收不到消息推送。\n\n" +
-                    "之后可以点击消息列表顶部的提示重新开启：\n\n你可以清理「小米服务框架」和【WxPusher】的数据后重新尝试，也可以切换到 WebSocket 推送。"
+                    "你可以清理「小米服务框架」和【WxPusher】的数据后重新尝试，也可以切换到 WebSocket 推送。"
         }
         val dialog = AlertDialog.Builder(activity)
             .setTitle("未开启小米订阅通知")
