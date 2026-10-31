@@ -221,10 +221,10 @@ object XiaomiSubscribeManager : VendorSubscribeGuide() {
                     "可以稍后或下个月再试，也可以切换到 WebSocket 推送。"
             CODE_GET_CHANNEL_FAILED ->
                 "这是小米系统的原因：获取订阅信息失败，这次没能弹出授权弹窗，可能是你之前拒绝过授权导致的。\n\n" +
-                    "你可以清理「小米服务框架」和【WxPusher】的数据后重新尝试，也可以切换到 WebSocket 推送。"
+                    "你可以清理【小米服务框架】的数据并且卸载再重新安装【WxPusher】后重新尝试，也可以切换到 WebSocket 推送。"
             else ->
                 "你没有允许小米的订阅通知，可能会收不到消息推送。\n\n" +
-                    "你可以清理「小米服务框架」和【WxPusher】的数据后重新尝试，也可以切换到 WebSocket 推送。"
+                    "你可以清理【小米服务框架】的数据并且卸载再重新安装【WxPusher】后重新尝试，也可以切换到 WebSocket 推送。"
         }
         val dialog = AlertDialog.Builder(activity)
             .setTitle("未开启小米订阅通知")
