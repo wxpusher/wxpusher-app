@@ -52,6 +52,7 @@ import com.smjcco.wxpusher.push.IPushTokenChangedListener
 import com.smjcco.wxpusher.push.PushChannel
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.push.PushPlatformState
+import com.smjcco.wxpusher.push.VendorSubscribeGuide
 import com.smjcco.wxpusher.push.WxpMessageArrivalNotifier
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionUtils
@@ -294,7 +295,11 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
      */
     private fun refreshNotePermissionBanner() {
         val hasNotePermission = PermissionUtils.hasNotificationPermission(activity)
-        if (hasNotePermission) {
+        val subscribeGuide = VendorSubscribeGuide.current()
+        if (hasNotePermission && subscribeGuide != null && subscribeGuide.needGuide(activity)) {
+            //小米、vivo 订阅通道没开，只读本地状态；从系统设置回来 onResume 会重新检查
+            showVendorSubscribeBanner(subscribeGuide)
+        } else if (hasNotePermission) {
             //在消息权限正确的前提下，检查是否可以接收到消息
             notePermissionBanner.visibility = View.GONE
             presenter.fetchCheckReason()
@@ -317,6 +322,25 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                 //关闭banner，在坚持后端接收状态
                 presenter.fetchCheckReason()
             }
+        }
+    }
+
+    /** 小米、vivo 订阅通道没开，点击后申请授权，失败时引导去设置。 */
+    private fun showVendorSubscribeBanner(guide: VendorSubscribeGuide) {
+        val openGuide = View.OnClickListener {
+            activity?.let { guide.showGuide(it) }
+        }
+        notePermissionBanner.setOnClickListener(openGuide)
+        notePermissionBanner.visibility = View.VISIBLE
+        notePermissionTv.visibility = View.VISIBLE
+        notePermissionTv.text = guide.getBannerText()
+        notePermissionBtn.text = "去开启"
+        notePermissionBtn.visibility = View.VISIBLE
+        notePermissionBtn.setOnClickListener(openGuide)
+        notePermissionCloseImg.setImageResource(R.drawable.ic_close)
+        notePermissionCloseImg.setOnClickListener {
+            notePermissionBanner.visibility = View.GONE
+            presenter.fetchCheckReason()
         }
     }
 

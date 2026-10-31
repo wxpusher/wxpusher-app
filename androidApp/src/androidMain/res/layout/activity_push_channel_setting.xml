@@ -172,6 +172,48 @@
                         android:src="@drawable/ic_chevron_right_24" />
                 </LinearLayout>
 
+                <!-- 小米、vivo 的订阅通道需要用户授权，没开时收不到推送。仅这两家设备显示，标题由代码设置。 -->
+                <LinearLayout
+                    android:id="@+id/layout_vendor_subscribe"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center_vertical"
+                    android:minHeight="48dp"
+                    android:orientation="horizontal"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="8dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/tv_vendor_subscribe_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="小米订阅通知授权"
+                        android:textColor="@color/text_fit_theme_first"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:id="@+id/tv_vendor_subscribe_state"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:gravity="end"
+                        android:maxLines="1"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginStart="4dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_chevron_right_24" />
+                </LinearLayout>
+
                 <TextView
                     android:id="@+id/btn_retry_vendor"
                     android:layout_width="wrap_content"
