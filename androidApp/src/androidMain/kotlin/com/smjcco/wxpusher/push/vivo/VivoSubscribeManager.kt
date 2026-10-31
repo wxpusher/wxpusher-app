@@ -150,9 +150,13 @@ object VivoSubscribeManager : VendorSubscribeGuide() {
         }
         val channelExists = findSubscribeChannel() != null
         val message = if (channelExists) {
-            "「$SUBSCRIBE_CHANNEL_NAME」已被关闭，关闭后收不到推送。\n\n请在接下来的设置页里打开「允许通知」开关。"
+            "vivo 调整了推送规则，订阅类消息需要开启【$SUBSCRIBE_CHANNEL_NAME】才能收到，WxPusher 已第一时间完成适配。\n\n" +
+                "检测到你关闭了【$SUBSCRIBE_CHANNEL_NAME】。开启方法：在接下来的设置页里，打开【允许通知】开关。\n\n" +
+                "如果不开启，你会收不到消息推送，拒绝后想要再开启非常麻烦！"
         } else {
-            "vivo推送规则调整，需要开启「$SUBSCRIBE_CHANNEL_NAME」才能正常收到推送。\n\n接下来的系统弹窗里，请点「允许」。"
+            "vivo 调整了推送规则，订阅类消息需要单独授权才能收到，WxPusher 已第一时间完成适配。\n\n" +
+                "开启方法：在接下来的系统弹窗里，先打开【$SUBSCRIBE_CHANNEL_NAME】开关，再点击【允许】。\n\n" +
+                "如果拒绝，你会收不到消息推送，拒绝后想要再开启非常麻烦！"
         }
         val builder = AlertDialog.Builder(activity)
             .setTitle("开启vivo订阅通知")
@@ -219,7 +223,8 @@ object VivoSubscribeManager : VendorSubscribeGuide() {
             }
         }
         val message = when (code) {
-            CODE_DIALOG_FREQUENCY, CODE_API_FREQUENCY -> "授权弹窗太频繁，请稍后再试，也可以切换到 WebSocket 推送。"
+            CODE_DIALOG_FREQUENCY, CODE_API_FREQUENCY ->
+                "这是 vivo 系统的限制：授权弹窗不能频繁弹出，这次被 vivo 系统拦下了。\n\n请稍后再试，也可以切换到 WebSocket 推送。"
             CODE_ANDROID_VERSION_NOT_SUPPORT, CODE_ENGINE_NOT_SUPPORT -> "当前系统不支持vivo订阅通知，可以切换到 WebSocket 推送。"
             else -> "没有开启vivo订阅通知，可能收不到推送。可以稍后再试，也可以切换到 WebSocket 推送。"
         }
@@ -245,10 +250,47 @@ object VivoSubscribeManager : VendorSubscribeGuide() {
             PushChannelCoordinator.onVendorStateChanged()
             if (currentState() == VendorSubscribeState.GRANTED) {
                 WxpToastUtils.showToast("已开启vivo订阅通知")
-            } else if (operations?.any { it.operation == ChannelOperation.OPERATION_USER_REJECT || it.operation == ChannelOperation.OPERATION_REJECT_THRESHOLD } == true) {
-                WxpToastUtils.showToast("未开启vivo订阅通知，可能收不到推送，可在「推送通道设置」里重新开启")
+                return@runOnMainThread
+            }
+            val reachThreshold = operations?.any { it.operation == ChannelOperation.OPERATION_REJECT_THRESHOLD } == true
+            if (reachThreshold || operations?.any { it.operation == ChannelOperation.OPERATION_USER_REJECT } == true) {
+                showRejectedDialog(reachThreshold)
             }
         }
+    }
+
+    /**
+     * 用户拒绝后用弹窗说明，Toast 一闪而过用户看不清。
+     * 回调来自广播，拿不到发起授权的页面，只能取当前前台页面；取不到时退回 Toast。
+     */
+    private fun showRejectedDialog(reachThreshold: Boolean) {
+        val activity = ApplicationUtils.getCurrentActivity()
+        if (activity == null || activity.isFinishing || activity.isDestroyed) {
+            WxpToastUtils.showToast("未开启vivo订阅通知，可能收不到推送，可在「推送通道设置」里重新开启")
+            return
+        }
+        val builder = AlertDialog.Builder(activity)
+            .setTitle("未开启vivo订阅通知")
+            .setNegativeButton("知道了") { d, _ -> d.dismiss() }
+        if (reachThreshold) {
+            // 拒绝次数到了上限，vivo 不会再弹授权弹窗（会建一个关着的渠道），只能去设置页打开
+            builder.setMessage(
+                "你已多次拒绝，按 vivo 系统的规则，不会再弹出授权弹窗。\n\n" +
+                    "请在接下来的设置页里，打开【$SUBSCRIBE_CHANNEL_NAME】开关。"
+            ).setPositiveButton("去设置") { d, _ ->
+                d.dismiss()
+                openChannelSettings(activity)
+            }
+        } else {
+            builder.setMessage(
+                "你没有允许 vivo 的订阅通知，可能会收不到消息推送。\n\n" +
+                    "之后可以点击消息列表顶部的提示重新开启：先打开【$SUBSCRIBE_CHANNEL_NAME】开关，再点击【允许】。也可以切换到 WebSocket 推送。"
+            ).setPositiveButton("切换推送通道") { d, _ ->
+                d.dismiss()
+                WxpJumpPageUtils.jumpToPushChannelSetting(activity)
+            }
+        }
+        DialogManager.show(activity, builder.create())
     }
 
     override fun openChannelSettings(activity: Activity) {

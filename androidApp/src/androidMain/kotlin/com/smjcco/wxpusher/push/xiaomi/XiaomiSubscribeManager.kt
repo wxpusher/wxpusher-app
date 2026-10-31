@@ -42,6 +42,8 @@ object XiaomiSubscribeManager : VendorSubscribeGuide() {
     private const val CODE_FREQUENCY_CONTROL = -500
     private const val CODE_NO_NOTIFICATION_PERMISSION = -800
     private const val CODE_NOT_SUPPORT_SYSTEM = -10001
+    //获取 channel 信息失败，真机上拒绝授权、被频控之后会返回这个，重装也不会恢复
+    private const val CODE_GET_CHANNEL_FAILED = -10003
 
     private var supportCache: Boolean? = null
     private var requesting = false
@@ -139,9 +141,13 @@ object XiaomiSubscribeManager : VendorSubscribeGuide() {
         }
         val channelExists = getSubscribeChannelImportance() != null
         val message = if (channelExists) {
-            "「订阅的通知提醒」已被关闭，关闭后收不到推送。\n\n请在接下来的设置页里打开「允许通知」开关。"
+            "小米系统调整了推送规则，订阅类消息需要开启【订阅的通知提醒】才能收到，WxPusher 已第一时间完成适配。\n\n" +
+                "检测到你关闭了【订阅的通知提醒】。\n\n开启方法：在接下来的设置页里，打开【允许通知】开关。\n\n" +
+                "如果不开启，你会收不到消息推送，拒绝后想要再开启非常麻烦！"
         } else {
-            "小米推送规则调整，需要开启「订阅的通知提醒」才能正常收到推送。\n\n接下来的系统弹窗里，请先打开「订阅的通知提醒」开关，再点「允许」。"
+            "小米系统调整了推送规则，订阅类消息需要单独授权才能收到，WxPusher 已第一时间完成适配。\n\n" +
+                "开启方法：在接下来的系统弹窗里，先打开【订阅的通知提醒】开关，再点击【允许】。\n\n" +
+                "如果拒绝，你会收不到消息推送，拒绝后想要再开启非常麻烦！"
         }
         val builder = AlertDialog.Builder(activity)
             .setTitle("开启小米订阅通知")
@@ -209,10 +215,16 @@ object XiaomiSubscribeManager : VendorSubscribeGuide() {
             return
         }
         // 没有通道，系统设置里没有可以打开的开关
-        val message = if (code == CODE_FREQUENCY_CONTROL) {
-            "本月授权次数已用完，可以下个月再试，也可以切换到 WebSocket 推送。"
-        } else {
-            "没有开启小米订阅通知，可能收不到推送。可以稍后再试，也可以切换到 WebSocket 推送。"
+        val message = when (code) {
+            CODE_FREQUENCY_CONTROL ->
+                "这是小米系统的限制：授权弹窗 30 秒内最多弹出 1 次，每月最多 2 次，这次授权被小米系统拦。\n\n" +
+                    "可以稍后或下个月再试，也可以切换到 WebSocket 推送。"
+            CODE_GET_CHANNEL_FAILED ->
+                "这是小米系统的原因：获取订阅信息失败，这次没能弹出授权弹窗，可能是你之前拒绝过授权导致的。\n\n" +
+                    "你可以清理「小米服务框架」和【WxPusher】的数据后重新尝试，也可以切换到 WebSocket 推送。"
+            else ->
+                "你没有允许小米的订阅通知，可能会收不到消息推送。\n\n" +
+                    "之后可以点击消息列表顶部的提示重新开启：\n\n你可以清理「小米服务框架」和【WxPusher】的数据后重新尝试，也可以切换到 WebSocket 推送。"
         }
         val dialog = AlertDialog.Builder(activity)
             .setTitle("未开启小米订阅通知")
