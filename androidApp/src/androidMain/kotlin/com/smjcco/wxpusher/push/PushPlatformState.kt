@@ -1,5 +1,6 @@
 package com.smjcco.wxpusher.push
 
+import com.smjcco.wxpusher.base.biz.bean.WxpVendorState
 import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.common.WxpSaveKey
@@ -80,8 +81,12 @@ object PushPlatformState {
      *
      * 持久化和内存状态在同一入口更新，避免出现两处状态由调用方手工同步的问题。
      */
-    internal fun commitEffectivePushTarget(platform: DevicePlatform, token: String) {
-        PushChannelStore.saveEffectivePushTarget(platform, token)
+    internal fun commitEffectivePushTarget(
+        platform: DevicePlatform,
+        token: String,
+        vendorState: WxpVendorState? = null,
+    ) {
+        PushChannelStore.saveEffectivePushTarget(platform, token, vendorState)
         runtimeEffectivePushPlatform = platform
     }
 

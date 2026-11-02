@@ -19,6 +19,7 @@ import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.push.PushChannel
 import com.smjcco.wxpusher.push.PushChannelCoordinator
 import com.smjcco.wxpusher.push.PushChannelSnapshot
+import com.smjcco.wxpusher.push.xiaomi.XiaomiSubscribeManager
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
 
 /**
@@ -146,7 +147,8 @@ class SystemPushSoundGuideActivity : WxpBaseActivity() {
      */
     private fun findVerifiedDirectChannel(platform: DevicePlatform): NotificationChannel? {
         val channelId = when (platform) {
-            DevicePlatform.Android_XIAOMI -> "mipush|$packageName|135072"
+            //授权过订阅通道或者过了切换日用 158071，否则还是老通道 135072
+            DevicePlatform.Android_XIAOMI -> XiaomiSubscribeManager.getActiveNotificationChannelId()
             else -> return null
         }
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -167,7 +169,7 @@ class SystemPushSoundGuideActivity : WxpBaseActivity() {
 
     private fun getDirectUnavailableHint(platform: DevicePlatform): String = when (platform) {
         DevicePlatform.Android_XIAOMI ->
-            "暂未找到“订阅消息”类别。请先接收一条系统推送消息（可以点击右上角的测试发送一个消息），再返回此页设置铃声。"
+            "暂未找到“${XiaomiSubscribeManager.getActiveNotificationChannelName()}”类别。请先接收一条系统推送消息（可以点击右上角的测试发送一个消息），再返回此页设置铃声。"
 
         DevicePlatform.Android_MEIZU ->
             "魅族系统推送无法修改通知提醒铃声，如需修改提醒铃声，可切换成WxPusher自建通道。"
