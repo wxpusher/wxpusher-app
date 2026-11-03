@@ -33,6 +33,21 @@ data class WxpUpdateInfoReq(
  */
 @Serializable
 data class WxpVendorState(
-    //订阅通道的授权状态：GRANTED / DISABLED / DENIED / UNSUPPORTED，目前只有小米
+    //订阅通道的授权状态：GRANTED / DISABLED / DENIED / UNSUPPORTED，小米、vivo
     val subscribe: String? = null,
+    //以下是授权诊断信息，只用来统计和排查，服务端不按它们路由
+    //最后一次授权操作的结果，取值见 Android 端 VendorSubscribeReason
+    val reason: String? = null,
+    //系统授权接口最后一次返回的原始错误码
+    val code: String? = null,
+    //本地订阅通道：NONE 不存在、CLOSED 存在但关着、OPEN 开着
+    val channel: String? = null,
+    //应用通知权限是否打开
+    val notify: Boolean? = null,
+    //说明弹窗累计显示次数
+    val guide: Int? = null,
+    //系统授权弹窗累计拉起次数
+    val request: Int? = null,
+    //最后一次授权操作的时间，秒
+    val at: Long? = null,
 )

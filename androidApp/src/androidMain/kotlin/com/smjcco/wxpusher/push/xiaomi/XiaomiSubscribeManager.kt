@@ -13,7 +13,9 @@ import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.push.PushChannelCoordinator
+import com.smjcco.wxpusher.push.VendorGuideSource
 import com.smjcco.wxpusher.push.VendorSubscribeGuide
+import com.smjcco.wxpusher.push.VendorSubscribeReason
 import com.smjcco.wxpusher.push.VendorSubscribeState
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.ThreadUtils
@@ -28,7 +30,6 @@ import com.xiaomi.mipush.sdk.MiPushClient
  * 方案见 monorepo docs/xiaomi-push-subscribe-template-design.md。
  */
 object XiaomiSubscribeManager : VendorSubscribeGuide() {
-    private const val TAG = "XiaomiSubscribe"
     private const val SUBSCRIBE_CHANNEL_ID = "158071"
     private const val LEGACY_CHANNEL_ID = "135072"
 
@@ -49,6 +50,7 @@ object XiaomiSubscribeManager : VendorSubscribeGuide() {
     private var requesting = false
 
     override val platform = DevicePlatform.Android_XIAOMI
+    override val vendorName = "xiaomi"
     override val settingTitle = "小米订阅通知授权"
 
     /** 升级后是否已经自动提醒过一次。 */
@@ -70,7 +72,7 @@ object XiaomiSubscribeManager : VendorSubscribeGuide() {
         if (!isSupported()) {
             return VendorSubscribeState.UNSUPPORTED
         }
-        val importance = getSubscribeChannelImportance()
+        val importance = subscribeChannelImportance()
         if (importance != null && importance != NotificationManager.IMPORTANCE_NONE) {
             WxpSaveService.set(KEY_EVER_GRANTED, true)
             return VendorSubscribeState.GRANTED
@@ -84,10 +86,15 @@ object XiaomiSubscribeManager : VendorSubscribeGuide() {
     }
 
     /** 本地通知类别的 importance，通道不存在时返回空。 */
-    private fun getSubscribeChannelImportance(): Int? {
+    override fun subscribeChannelImportance(): Int? {
         val manager = ApplicationUtils.getApplication()
             .getSystemService(NotificationManager::class.java) ?: return null
         return manager.getNotificationChannel(notificationChannelId(SUBSCRIBE_CHANNEL_ID))?.importance
+    }
+
+    override fun vendorEnvInfo(): String {
+        val os = systemProperty("ro.mi.os.version.name") ?: systemProperty("ro.miui.ui.version.name")
+        return "supported=${isSupported()} os=$os xmsf=${packageVersion("com.xiaomi.xmsf")}"
     }
 
     /** 系统是否支持订阅功能；读的是 xmsf 的 meta-data，进程内缓存。 */
@@ -135,11 +142,12 @@ object XiaomiSubscribeManager : VendorSubscribeGuide() {
      * - 本地还没有订阅通道：系统弹窗里的开关默认是关的，要先提醒用户「先打开开关再点允许」；
      * - 本地有通道但被关掉了：再调授权接口不会弹窗，只能去系统设置里打开。
      */
-    override fun showGuide(activity: Activity) {
+    override fun showGuide(activity: Activity, source: VendorGuideSource) {
         if (requesting || activity.isFinishing || activity.isDestroyed) {
+            log("guide_skip", "source=${source.name} requesting=$requesting")
             return
         }
-        val channelExists = getSubscribeChannelImportance() != null
+        val channelExists = subscribeChannelImportance() != null
         val message = if (channelExists) {
             "小米系统调整了推送规则，订阅类消息需要开启【订阅的通知提醒】才能收到，WxPusher 已第一时间完成适配。\n\n" +
                 "检测到你关闭了【订阅的通知提醒】。\n\n开启方法：在接下来的设置页里，打开【允许通知】开关。\n\n" +
@@ -154,43 +162,53 @@ object XiaomiSubscribeManager : VendorSubscribeGuide() {
             .setMessage(message)
             .setPositiveButton("去开启") { dialog, _ ->
                 dialog.dismiss()
+                recordGuideClick("confirm")
                 if (channelExists) {
                     openChannelSettings(activity)
                 } else {
                     requestAuthorization(activity)
                 }
             }
-            .setNegativeButton("暂不") { dialog, _ -> dialog.dismiss() }
+            .setNegativeButton("暂不") { dialog, _ ->
+                dialog.dismiss()
+                recordGuideClick("dismiss")
+            }
+            .setOnCancelListener { recordGuideClick("cancel") }
         if (isLegacyCutoffPassed()) {
             builder.setNeutralButton("切换推送通道") { dialog, _ ->
                 dialog.dismiss()
+                recordGuideClick("switch")
                 WxpJumpPageUtils.jumpToPushChannelSetting(activity)
             }
         }
-        DialogManager.show(activity, builder.create())
+        val dialog = builder.create()
+        // DialogManager 会排队，真正显示出来才算一次
+        dialog.setOnShowListener { recordGuideShown(source, channelExists) }
+        DialogManager.show(activity, dialog)
     }
 
     /** 调系统授权弹窗。频控（30 秒 1 次、单通道每月 2 次）由系统执行，超限回调 -500。 */
     private fun requestAuthorization(activity: Activity) {
         requesting = true
+        recordRequestStart("channel=$SUBSCRIBE_CHANNEL_ID")
         runCatching {
             MiPushClient.requestSubscribeChannel(activity, arrayListOf(SUBSCRIBE_CHANNEL_ID)) { code, bundle ->
                 ThreadUtils.runOnMainThread {
                     requesting = false
-                    WxpLogUtils.i(TAG, "授权回调，code=$code, result=${bundle?.get("open_channel_result")}")
-                    onAuthorizationResult(activity, code)
+                    onAuthorizationResult(activity, code, bundle?.get("open_channel_result")?.toString())
                 }
             }
         }.onFailure {
             requesting = false
-            WxpLogUtils.w(TAG, "调用授权接口失败", throwable = it)
+            recordRequestError(it)
         }
     }
 
-    private fun onAuthorizationResult(activity: Activity, code: Int) {
+    private fun onAuthorizationResult(activity: Activity, code: Int, openChannelResult: String?) {
         if (code == CODE_NOT_SUPPORT || code == CODE_NOT_SUPPORT_SYSTEM) {
             supportCache = false
         }
+        recordRequestResult(code.toString(), reasonOf(code), "result=$openChannelResult")
         // 以本地通道的实际开关为准，回调只是重新检测的时机
         PushChannelCoordinator.onVendorStateChanged()
         val state = currentState()
@@ -210,7 +228,7 @@ object XiaomiSubscribeManager : VendorSubscribeGuide() {
                 return
             }
         }
-        if (getSubscribeChannelImportance() != null) {
+        if (subscribeChannelImportance() != null) {
             openChannelSettings(activity)
             return
         }
@@ -238,13 +256,31 @@ object XiaomiSubscribeManager : VendorSubscribeGuide() {
         DialogManager.show(activity, dialog)
     }
 
+    /**
+     * 授权回调对应的未授权原因。小米没有单独的「用户拒绝」回调码：
+     * 没有报错（码不是负数）但通道还是没开，就当作用户在系统弹窗里拒绝了。
+     */
+    private fun reasonOf(code: Int): VendorSubscribeReason = when {
+        currentState() == VendorSubscribeState.GRANTED -> VendorSubscribeReason.NONE
+        code == CODE_FREQUENCY_CONTROL -> VendorSubscribeReason.VENDOR_LIMITED
+        code == CODE_GET_CHANNEL_FAILED -> VendorSubscribeReason.CHANNEL_FAILED
+        code == CODE_DEVICE_IDLE -> VendorSubscribeReason.NOT_FOREGROUND
+        code == CODE_NO_NOTIFICATION_PERMISSION -> VendorSubscribeReason.NOTIFY_OFF
+        code < 0 -> VendorSubscribeReason.ERROR
+        else -> VendorSubscribeReason.SYSTEM_REJECTED
+    }
+
     override fun openChannelSettings(activity: Activity) {
+        val channelId = notificationChannelId(SUBSCRIBE_CHANNEL_ID)
         val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
             .putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName)
-            .putExtra(Settings.EXTRA_CHANNEL_ID, notificationChannelId(SUBSCRIBE_CHANNEL_ID))
-        runCatching { activity.startActivity(intent) }.onFailure {
-            WxpLogUtils.w(TAG, "打开通道设置页失败", throwable = it)
+            .putExtra(Settings.EXTRA_CHANNEL_ID, channelId)
+        runCatching { activity.startActivity(intent) }.onSuccess {
+            recordSettingsOpened(channelId, true)
+        }.onFailure {
+            WxpLogUtils.w(VendorSubscribeGuide.LOG_TAG, "event=settings_open_failed vendor=$vendorName channelId=$channelId", throwable = it)
             PermissionUtils.gotoNotificationSettingPage()
+            recordSettingsOpened(null, true)
         }
     }
 }

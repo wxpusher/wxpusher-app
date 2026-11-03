@@ -15,7 +15,9 @@ import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.dialog.DialogManager
 import com.smjcco.wxpusher.push.PushChannelCoordinator
+import com.smjcco.wxpusher.push.VendorGuideSource
 import com.smjcco.wxpusher.push.VendorSubscribeGuide
+import com.smjcco.wxpusher.push.VendorSubscribeReason
 import com.smjcco.wxpusher.push.VendorSubscribeState
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.ThreadUtils
@@ -33,7 +35,6 @@ import com.vivo.push.subscribedialog.ChannelOperation
  * 用户操作回调在进程重启后就没了，所以这两个都只当作重新读取状态的时机。
  */
 object VivoSubscribeManager : VendorSubscribeGuide() {
-    private const val TAG = "VivoSubscribe"
 
     /** vivo 后台创建的订阅渠道，关联模板 t1-34veh6-1i4。 */
     private const val SUBSCRIBE_CHANNEL_ID = "vpush_channel_60"
@@ -64,6 +65,7 @@ object VivoSubscribeManager : VendorSubscribeGuide() {
     private var loggedChannelId: String? = null
 
     override val platform = DevicePlatform.Android_VIVO
+    override val vendorName = "vivo"
     override val settingTitle = "vivo订阅通知授权"
 
     /** 升级后是否已经自动提醒过一次。 */
@@ -110,9 +112,16 @@ object VivoSubscribeManager : VendorSubscribeGuide() {
             ?: channels.firstOrNull { it.id.contains(SUBSCRIBE_CHANNEL_ID) }
         if (channel != null && channel.id != loggedChannelId) {
             loggedChannelId = channel.id
-            WxpLogUtils.i(TAG, "找到订阅渠道，id=${channel.id}, importance=${channel.importance}")
+            log("channel_found", "channelId=${channel.id} importance=${channel.importance}")
         }
         return channel
+    }
+
+    override fun subscribeChannelImportance(): Int? = findSubscribeChannel()?.importance
+
+    override fun vendorEnvInfo(): String {
+        val os = systemProperty("ro.vivo.os.build.display.id") ?: systemProperty("ro.vivo.os.version")
+        return "supported=${isSupported()} os=$os pushservice=${packageVersion("com.vivo.pushservice")}"
     }
 
     /** 订阅弹窗只支持 Android 10 及以上，并且要 vpush 引擎支持；进程内缓存。 */
@@ -126,7 +135,7 @@ object VivoSubscribeManager : VendorSubscribeGuide() {
         val supported = runCatching {
             PushClient.getInstance(ApplicationUtils.getApplication()).isPushSupport(SUPPORT_SUBSCRIBE_DIALOG_FLAG)
         }.onFailure {
-            WxpLogUtils.w(TAG, "查询订阅弹窗能力失败", throwable = it)
+            WxpLogUtils.w(VendorSubscribeGuide.LOG_TAG, "event=support_check_error vendor=$vendorName", throwable = it)
         }.getOrNull() ?: return false
         supportCache = supported
         return supported
@@ -144,8 +153,9 @@ object VivoSubscribeManager : VendorSubscribeGuide() {
      * - 本地还没有订阅渠道：拉起 vivo 的授权弹窗；
      * - 本地有渠道但被关掉了：再调授权接口不会弹窗（6048），只能去系统设置里打开。
      */
-    override fun showGuide(activity: Activity) {
+    override fun showGuide(activity: Activity, source: VendorGuideSource) {
         if (requesting || activity.isFinishing || activity.isDestroyed) {
+            log("guide_skip", "source=${source.name} requesting=$requesting")
             return
         }
         val channelExists = findSubscribeChannel() != null
@@ -163,47 +173,59 @@ object VivoSubscribeManager : VendorSubscribeGuide() {
             .setMessage(message)
             .setPositiveButton("去开启") { dialog, _ ->
                 dialog.dismiss()
+                recordGuideClick("confirm")
                 if (channelExists) {
                     openChannelSettings(activity)
                 } else {
                     requestAuthorization(activity)
                 }
             }
-            .setNegativeButton("暂不") { dialog, _ -> dialog.dismiss() }
+            .setNegativeButton("暂不") { dialog, _ ->
+                dialog.dismiss()
+                recordGuideClick("dismiss")
+            }
+            .setOnCancelListener { recordGuideClick("cancel") }
         if (isLegacyCutoffPassed()) {
             builder.setNeutralButton("切换推送通道") { dialog, _ ->
                 dialog.dismiss()
+                recordGuideClick("switch")
                 WxpJumpPageUtils.jumpToPushChannelSetting(activity)
             }
         }
-        DialogManager.show(activity, builder.create())
+        val dialog = builder.create()
+        // DialogManager 会排队，真正显示出来才算一次
+        dialog.setOnShowListener { recordGuideShown(source, channelExists) }
+        DialogManager.show(activity, dialog)
     }
 
     /** 拉起 vivo 授权弹窗。频控由 vivo 执行（6043 / 8111），用户的选择从 [onSubscribeDialogResult] 回来。 */
     private fun requestAuthorization(activity: Activity) {
         requesting = true
+        recordRequestStart("channel=$SUBSCRIBE_CHANNEL_ID")
         runCatching {
             PushClient.getInstance(activity).showSubscribeDialog(activity, listOf(SUBSCRIBE_CHANNEL_ID)) { code, msg, displays ->
                 ThreadUtils.runOnMainThread {
                     requesting = false
-                    WxpLogUtils.i(TAG, "弹窗结果，code=$code, msg=$msg, displays=$displays")
-                    onDialogResult(activity, code)
+                    onDialogResult(activity, code, "msg=$msg displays=$displays")
                 }
             }
         }.onFailure {
             requesting = false
-            WxpLogUtils.w(TAG, "调用授权弹窗失败", throwable = it)
+            recordRequestError(it)
         }
     }
 
     /** 弹窗是否拉起的结果，用户的选择不在这里。 */
-    private fun onDialogResult(activity: Activity, code: Int) {
+    private fun onDialogResult(activity: Activity, code: Int, detail: String) {
         if (code == CODE_SHOWN || code == CODE_DIALOG_SHOWING) {
+            // 弹窗已经弹出，用户的选择从 onSubscribeDialogResult 回来
+            recordRequestResult(code.toString(), null, detail)
             return
         }
         if (code == CODE_ANDROID_VERSION_NOT_SUPPORT || code == CODE_ENGINE_NOT_SUPPORT) {
             supportCache = false
         }
+        recordRequestResult(code.toString(), reasonOf(code), detail)
         PushChannelCoordinator.onVendorStateChanged()
         if (currentState() == VendorSubscribeState.GRANTED || activity.isFinishing || activity.isDestroyed) {
             return
@@ -246,14 +268,23 @@ object VivoSubscribeManager : VendorSubscribeGuide() {
      */
     fun onSubscribeDialogResult(operateResult: Int, operations: List<ChannelOperation>?) {
         ThreadUtils.runOnMainThread {
-            WxpLogUtils.i(TAG, "用户操作结果，operateResult=$operateResult, operations=$operations")
+            val granted = currentState() == VendorSubscribeState.GRANTED
+            val reachThreshold = operations?.any { it.operation == ChannelOperation.OPERATION_REJECT_THRESHOLD } == true
+            val rejected = operations?.any { it.operation == ChannelOperation.OPERATION_USER_REJECT } == true
+            val reason = when {
+                granted -> VendorSubscribeReason.NONE
+                reachThreshold -> VendorSubscribeReason.REJECT_THRESHOLD
+                rejected -> VendorSubscribeReason.SYSTEM_REJECTED
+                else -> null
+            }
+            val operationText = operations?.joinToString("|") { "${it.channelId}:${it.operation}" }
+            recordUserResult(reason, "operateResult=$operateResult operations=$operationText")
             PushChannelCoordinator.onVendorStateChanged()
-            if (currentState() == VendorSubscribeState.GRANTED) {
+            if (granted) {
                 WxpToastUtils.showToast("已开启vivo订阅通知")
                 return@runOnMainThread
             }
-            val reachThreshold = operations?.any { it.operation == ChannelOperation.OPERATION_REJECT_THRESHOLD } == true
-            if (reachThreshold || operations?.any { it.operation == ChannelOperation.OPERATION_USER_REJECT } == true) {
+            if (reachThreshold || rejected) {
                 showRejectedDialog(reachThreshold)
             }
         }
@@ -293,18 +324,31 @@ object VivoSubscribeManager : VendorSubscribeGuide() {
         DialogManager.show(activity, builder.create())
     }
 
+    /** 弹窗没弹出来的返回码对应的未授权原因；6048 会接着跳设置页，结果在回来时记录。 */
+    private fun reasonOf(code: Int): VendorSubscribeReason? = when (code) {
+        CODE_DIALOG_FREQUENCY, CODE_API_FREQUENCY -> VendorSubscribeReason.VENDOR_LIMITED
+        CODE_NOT_FOREGROUND -> VendorSubscribeReason.NOT_FOREGROUND
+        CODE_NOTIFICATION_OFF, CODE_NOTIFICATION_OFF_ENGINE -> VendorSubscribeReason.NOTIFY_OFF
+        CODE_ALL_CHANNEL_CREATED -> null
+        else -> if (currentState() == VendorSubscribeState.GRANTED) VendorSubscribeReason.NONE else VendorSubscribeReason.ERROR
+    }
+
     override fun openChannelSettings(activity: Activity) {
         val channelId = findSubscribeChannel()?.id
         if (channelId == null) {
             PermissionUtils.gotoNotificationSettingPage()
+            recordSettingsOpened(null, true)
             return
         }
         val intent = Intent(Settings.ACTION_CHANNEL_NOTIFICATION_SETTINGS)
             .putExtra(Settings.EXTRA_APP_PACKAGE, activity.packageName)
             .putExtra(Settings.EXTRA_CHANNEL_ID, channelId)
-        runCatching { activity.startActivity(intent) }.onFailure {
-            WxpLogUtils.w(TAG, "打开渠道设置页失败", throwable = it)
+        runCatching { activity.startActivity(intent) }.onSuccess {
+            recordSettingsOpened(channelId, true)
+        }.onFailure {
+            WxpLogUtils.w(VendorSubscribeGuide.LOG_TAG, "event=settings_open_failed vendor=$vendorName channelId=$channelId", throwable = it)
             PermissionUtils.gotoNotificationSettingPage()
+            recordSettingsOpened(null, true)
         }
     }
 }
