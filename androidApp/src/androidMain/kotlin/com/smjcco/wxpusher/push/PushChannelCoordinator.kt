@@ -472,12 +472,11 @@ object PushChannelCoordinator {
         )
         WxpScopeUtils.getMainScope().launch {
             val success = WxpApiService.updateDeviceInfo(req = updateInfoReq, silent = true) == true
-            if (target.vendorState != null) {
-                WxpLogUtils.i(
-                    VendorSubscribeGuide.LOG_TAG,
-                    "event=report platform=${target.platform.getPlatform()} success=$success vendorState=${target.vendorState}"
-                )
-            }
+            // 不是小米、vivo 时 vendorState 为空，也打出来方便排查上报的通道和结果
+            WxpLogUtils.i(
+                VendorSubscribeGuide.LOG_TAG,
+                "event=report platform=${target.platform.getPlatform()} success=$success vendorState=${target.vendorState}"
+            )
             if (success) {
                 // 只有服务端明确返回成功才记录上报状态，网络失败后下次回到页面仍可继续尝试。
                 WxpAppDataService.recordDeviceInfoReportSuccess(updateInfoReq)
