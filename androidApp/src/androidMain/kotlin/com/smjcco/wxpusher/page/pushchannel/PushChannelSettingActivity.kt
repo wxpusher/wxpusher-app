@@ -28,6 +28,7 @@ import com.smjcco.wxpusher.push.PushChannelCoordinator
 import com.smjcco.wxpusher.push.PushChannelSnapshot
 import com.smjcco.wxpusher.push.PushPlatformResolver
 import com.smjcco.wxpusher.push.VendorAvailability
+import com.smjcco.wxpusher.push.VendorGuideSource
 import com.smjcco.wxpusher.push.VendorSubscribeGuide
 import com.smjcco.wxpusher.push.VendorSubscribeState
 import com.smjcco.wxpusher.push.ws.alert.WsAlertStore
@@ -195,7 +196,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
             if (guide.currentState() == VendorSubscribeState.GRANTED) {
                 guide.openChannelSettings(this)
             } else {
-                guide.showGuide(this)
+                guide.showGuide(this, VendorGuideSource.SETTING)
             }
         }
         foregroundNotificationCheck.row.setOnClickListener {

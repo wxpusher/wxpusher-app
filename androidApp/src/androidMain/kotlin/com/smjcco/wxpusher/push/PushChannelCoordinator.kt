@@ -4,7 +4,6 @@ import android.app.Application
 import com.smjcco.wxpusher.api.WxpApiService
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.biz.bean.WxpUpdateInfoReq
-import com.smjcco.wxpusher.base.biz.bean.WxpVendorState
 import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.base.common.WxpScopeUtils
@@ -473,6 +472,12 @@ object PushChannelCoordinator {
         )
         WxpScopeUtils.getMainScope().launch {
             val success = WxpApiService.updateDeviceInfo(req = updateInfoReq, silent = true) == true
+            if (target.vendorState != null) {
+                WxpLogUtils.i(
+                    VendorSubscribeGuide.LOG_TAG,
+                    "event=report platform=${target.platform.getPlatform()} success=$success vendorState=${target.vendorState}"
+                )
+            }
             if (success) {
                 // 只有服务端明确返回成功才记录上报状态，网络失败后下次回到页面仍可继续尝试。
                 WxpAppDataService.recordDeviceInfoReportSuccess(updateInfoReq)
@@ -718,9 +723,9 @@ object PushChannelCoordinator {
             }
         } else {
             val vendorTarget = getCurrentVendorTarget() ?: return null
-            //小米、vivo 带上订阅通道的授权状态，服务端按状态选通道
+            //小米、vivo 带上订阅通道的授权状态（服务端按状态选通道）和授权诊断（只用于统计）
             val guide = VendorSubscribeGuide.of(vendorTarget.platform) ?: return vendorTarget
-            vendorTarget.copy(vendorState = WxpVendorState(subscribe = guide.currentState().name))
+            vendorTarget.copy(vendorState = guide.buildVendorState())
         }
     }
 

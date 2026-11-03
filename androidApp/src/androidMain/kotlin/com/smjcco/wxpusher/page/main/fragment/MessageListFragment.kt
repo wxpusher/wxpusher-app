@@ -52,6 +52,7 @@ import com.smjcco.wxpusher.push.IPushTokenChangedListener
 import com.smjcco.wxpusher.push.PushChannel
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.push.PushPlatformState
+import com.smjcco.wxpusher.push.VendorGuideSource
 import com.smjcco.wxpusher.push.VendorSubscribeGuide
 import com.smjcco.wxpusher.push.WxpMessageArrivalNotifier
 import com.smjcco.wxpusher.utils.DeviceUtils
@@ -328,7 +329,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     /** 小米、vivo 订阅通道没开，点击后申请授权，失败时引导去设置。 */
     private fun showVendorSubscribeBanner(guide: VendorSubscribeGuide) {
         val openGuide = View.OnClickListener {
-            activity?.let { guide.showGuide(it) }
+            activity?.let { guide.showGuide(it, VendorGuideSource.BANNER) }
         }
         notePermissionBanner.setOnClickListener(openGuide)
         notePermissionBanner.visibility = View.VISIBLE
