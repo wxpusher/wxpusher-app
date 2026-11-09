@@ -62,7 +62,7 @@ object WxpSubscribeLinkManager {
     /**
      * 把拉起 App 的链接转换成 H5 落地页地址，不是订阅链接时返回 null：
      * - https://{本环境域名}/api/s/{sk}?extra=&jump=（App Links / Universal Links）
-     * - wxpusher://wxpusher.smjcco.com/s?sk=&extra=&intentId=（落地页「打开 App 订阅」）
+     * - wxpusher://wxpusher.smjcco.com/subscribe?sk=&extra=&intentId=（落地页「打开 App 订阅」）
      */
     fun toPageUrl(link: String?): String? {
         if (link.isNullOrEmpty()) {
@@ -76,7 +76,7 @@ object WxpSubscribeLinkManager {
         val query = mutableListOf<Pair<String, String>>()
         val protocol = url.protocol.name.lowercase()
         if (protocol == SCHEME) {
-            if (url.host != SCHEME_HOST || url.encodedPath.trimEnd('/') != "/s") {
+            if (url.host != SCHEME_HOST || url.encodedPath.trimEnd('/') != "/subscribe") {
                 return null
             }
             for (key in listOf("sk", "extra", "intentId")) {

@@ -66,7 +66,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let url = URLContexts.first?.url else {
             return
         }
-        //落地页「打开 App 订阅」的 scheme wxpusher://wxpusher.smjcco.com/s
+        //落地页「打开 App 订阅」的 scheme wxpusher://wxpusher.smjcco.com/subscribe
         if MainTabBarController.handleSubscribeLink(url.absoluteString, openNow: true) {
             return
         }

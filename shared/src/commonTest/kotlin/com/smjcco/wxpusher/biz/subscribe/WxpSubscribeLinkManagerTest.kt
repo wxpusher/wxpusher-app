@@ -32,9 +32,9 @@ class WxpSubscribeLinkManagerTest {
     fun schemeLink_keepsSkExtraIntentId() {
         assertEquals(
             page + "sk=K7M3QX&extra=a%26b&intentId=I1",
-            WxpSubscribeLinkManager.toPageUrl("wxpusher://wxpusher.smjcco.com/s?sk=K7M3QX&extra=a%26b&intentId=I1&other=x"),
+            WxpSubscribeLinkManager.toPageUrl("wxpusher://wxpusher.smjcco.com/subscribe?sk=K7M3QX&extra=a%26b&intentId=I1&other=x"),
         )
-        assertEquals(page + "intentId=I2", WxpSubscribeLinkManager.toPageUrl("wxpusher://wxpusher.smjcco.com/s?intentId=I2"))
+        assertEquals(page + "intentId=I2", WxpSubscribeLinkManager.toPageUrl("wxpusher://wxpusher.smjcco.com/subscribe?intentId=I2"))
     }
 
     @Test
@@ -48,8 +48,8 @@ class WxpSubscribeLinkManagerTest {
         assertNull(WxpSubscribeLinkManager.toPageUrl("https://wxpusher.zjiecode.com/api/s/a/b"))
         //消息详情 scheme、缺少 sk 和 intentId 的订阅 scheme、别的 scheme
         assertNull(WxpSubscribeLinkManager.toPageUrl("wxpusher://wxpusher.smjcco.com/message?id=1"))
-        assertNull(WxpSubscribeLinkManager.toPageUrl("wxpusher://wxpusher.smjcco.com/s?extra=x"))
-        assertNull(WxpSubscribeLinkManager.toPageUrl("weixin://wxpusher.smjcco.com/s?sk=K7M3QX"))
+        assertNull(WxpSubscribeLinkManager.toPageUrl("wxpusher://wxpusher.smjcco.com/subscribe?extra=x"))
+        assertNull(WxpSubscribeLinkManager.toPageUrl("weixin://wxpusher.smjcco.com/subscribe?sk=K7M3QX"))
     }
 
     @Test

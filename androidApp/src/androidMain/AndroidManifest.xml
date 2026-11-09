@@ -74,7 +74,7 @@
 
                 <data
                     android:host="wxpusher.smjcco.com"
-                    android:path="/s"
+                    android:path="/subscribe"
                     android:scheme="wxpusher" />
             </intent-filter>
             <!--统一订阅链接 App Links：https://wxpusher.zjiecode.com/api/s/{sk}，校验文件 /.well-known/assetlinks.json-->
