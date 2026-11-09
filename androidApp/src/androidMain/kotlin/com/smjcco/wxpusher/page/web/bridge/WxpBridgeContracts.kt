@@ -26,6 +26,12 @@ data class BridgeContext(
     @Volatile
     private var currentUrlSnapshot: String? = null
 
+    /**
+     * 原生桥是否只对主 frame 开放（用 addWebMessageListener 注入时为 true），通过 getEnvBaseUrl 告诉 H5
+     */
+    @Volatile
+    var frameSafe: Boolean = false
+
     val currentUrl: String?
         get() = currentUrlSnapshot
 
