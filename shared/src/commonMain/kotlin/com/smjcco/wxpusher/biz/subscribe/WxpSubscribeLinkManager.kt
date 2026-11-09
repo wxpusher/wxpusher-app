@@ -42,7 +42,7 @@ data class WxpSubscribeIntentMatchResp(
 )
 
 /**
- * 统一订阅链接在 App 端只做路由：深链 / scheme / 开放标签拉起后，统一用 WebView 打开 H5 落地页 #/s。
+ * 统一订阅链接在 App 端只做路由：深链 / scheme / 开放标签拉起后，统一用 WebView 打开 H5 落地页 #/subscribe-link。
  * 订阅逻辑都在 H5 和服务端，方案见 docs/subscribe-download-flow-design.md。
  */
 object WxpSubscribeLinkManager {
@@ -57,7 +57,7 @@ object WxpSubscribeLinkManager {
 
     /** 开放标签 extinfo 只带 intentId */
     fun pageUrlForIntent(intentId: String): String =
-        "${WxpConfig.appFeUrl}/app/#/s?intentId=${intentId.encodeURLParameter()}"
+        "${WxpConfig.appFeUrl}/app/#/subscribe-link?intentId=${intentId.encodeURLParameter()}"
 
     /**
      * 把拉起 App 的链接转换成 H5 落地页地址，不是订阅链接时返回 null：
@@ -107,7 +107,7 @@ object WxpSubscribeLinkManager {
             return null
         }
         val queryString = query.joinToString("&") { "${it.first}=${it.second.encodeURLParameter()}" }
-        return "${WxpConfig.appFeUrl}/app/#/s?$queryString"
+        return "${WxpConfig.appFeUrl}/app/#/subscribe-link?$queryString"
     }
 
     /** 未登录时先记下来，登录进入首页后再打开 */

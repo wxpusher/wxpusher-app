@@ -9,7 +9,7 @@ import kotlin.test.assertNull
  */
 class WxpSubscribeLinkManagerTest {
 
-    private val page = "https://wxpusher.zjiecode.com/app/#/s?"
+    private val page = "https://wxpusher.zjiecode.com/app/#/subscribe-link?"
 
     @Test
     fun httpsLink_withExtraAndJump() {
