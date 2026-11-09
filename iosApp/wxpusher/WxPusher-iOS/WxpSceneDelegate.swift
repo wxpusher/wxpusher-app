@@ -7,6 +7,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         guard let windowScene = (scene as? UIWindowScene) else { return }
+        //冷启动由订阅链接拉起：先记下来，首页（登录后）再打开；
+        //不是订阅链接的交给微信 SDK（开放标签冷启动拉起时 extinfo 从这里进 onReq，再走同样的暂存逻辑）
+        if let url = connectionOptions.urlContexts.first?.url,
+           !MainTabBarController.handleSubscribeLink(url.absoluteString, openNow: false) {
+            WXApi.handleOpen(url, delegate: WxpWeixinOpenManager.shared)
+        }
+        if let activity = connectionOptions.userActivities.first(where: { $0.activityType == NSUserActivityTypeBrowsingWeb }),
+           !MainTabBarController.handleSubscribeLink(activity.webpageURL?.absoluteString, openNow: false) {
+            WXApi.handleOpenUniversalLink(activity, delegate: WxpWeixinOpenManager.shared)
+        }
         
         #if DEBUG
         let tempWin = ShakeWindow(windowScene: windowScene)
@@ -45,11 +55,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     
     // Universal Links 处理
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        //统一订阅链接 https://{域名}/api/s/{sk}
+        if MainTabBarController.handleSubscribeLink(userActivity.webpageURL?.absoluteString, openNow: true) {
+            return
+        }
         WXApi.handleOpenUniversalLink(userActivity, delegate:  WxpWeixinOpenManager.shared)
     }
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         guard let url = URLContexts.first?.url else {
+            return
+        }
+        //落地页「打开 App 订阅」的 scheme wxpusher://wxpusher.smjcco.com/s
+        if MainTabBarController.handleSubscribeLink(url.absoluteString, openNow: true) {
             return
         }
         WXApi.handleOpen(url, delegate: WxpWeixinOpenManager.shared)

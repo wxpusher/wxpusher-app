@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
+import com.smjcco.wxpusher.biz.subscribe.WxpSubscribeLinkManager
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -70,6 +71,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyText: TextView
     private lateinit var emptyActionButton: MaterialButton
+    private lateinit var emptyCodeWordEntry: View
     private lateinit var adapter: MessageListAdapter
     private lateinit var searchEditText: EditText
     private lateinit var searchCancelBtn: TextView
@@ -202,6 +204,10 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         emptyActionButton.setOnClickListener {
             // 打开「去体验发送消息」引导页
             WxpJumpPageUtils.jumpToWebUrl("${WxpConfig.appFeUrl}/app/#/send-test-guide", activity)
+        }
+        emptyCodeWordEntry = view.findViewById(R.id.empty_code_word_entry)
+        emptyCodeWordEntry.setOnClickListener {
+            WxpJumpPageUtils.jumpToWebUrl(WxpSubscribeLinkManager.codeWordPageUrl(), activity)
         }
         searchEditText = view.findViewById(R.id.search_edit_text)
         searchCancelBtn = view.findViewById(R.id.search_cancel_btn)
@@ -468,6 +474,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         val emptyVisibility = if (messageList.isEmpty()) View.VISIBLE else View.GONE
         emptyText.visibility = emptyVisibility
         emptyActionButton.visibility = emptyVisibility
+        emptyCodeWordEntry.visibility = emptyVisibility
     }
 
     /**
@@ -665,6 +672,11 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                     "${WxpConfig.appFeUrl}/app/#/subscribe-list",
                     requireActivity()
                 )
+                true
+            }
+
+            R.id.menu_code_word -> {
+                WxpJumpPageUtils.jumpToWebUrl(WxpSubscribeLinkManager.codeWordPageUrl(), requireActivity())
                 true
             }
 

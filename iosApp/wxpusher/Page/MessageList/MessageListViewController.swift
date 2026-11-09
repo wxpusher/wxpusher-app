@@ -72,6 +72,15 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         return tryButton
     }()
 
+    //空态页入口：下载 App 后用订阅暗号订阅
+    private let emptyCodeWordButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("有订阅暗号？去输入", for: .normal)
+        button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        button.setTitleColor(.defAccentPrimaryColor, for: .normal)
+        return button
+    }()
+
     //空态页
     private lazy var emptyView: UIView = {
         // 添加空状态视图
@@ -90,6 +99,9 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         emptyView.addSubview(emptyImageView)
         emptyView.addSubview(emptyLabel)
         emptyView.addSubview(tryButton)
+        let codeWordButton = self.emptyCodeWordButton
+        emptyView.addSubview(codeWordButton)
+        codeWordButton.translatesAutoresizingMaskIntoConstraints = false
         
         emptyImageView.translatesAutoresizingMaskIntoConstraints = false
         emptyLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -107,7 +119,10 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
             tryButton.topAnchor.constraint(equalTo: emptyLabel.bottomAnchor, constant: 20),
             tryButton.centerXAnchor.constraint(equalTo: emptyView.centerXAnchor),
             tryButton.widthAnchor.constraint(equalToConstant: 200),
-            tryButton.heightAnchor.constraint(equalToConstant: 44)
+            tryButton.heightAnchor.constraint(equalToConstant: 44),
+
+            codeWordButton.topAnchor.constraint(equalTo: tryButton.bottomAnchor, constant: 12),
+            codeWordButton.centerXAnchor.constraint(equalTo: emptyView.centerXAnchor)
         ])
         return emptyView
     }()
@@ -118,6 +133,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         setupRefreshControl()
         setupUI()
         emptyActionButton.addTarget(self, action: #selector(onTapSendTestGuide), for: .touchUpInside)
+        emptyCodeWordButton.addTarget(self, action: #selector(onTapCodeWord), for: .touchUpInside)
         tableView.allowsMultipleSelectionDuringEditing = true
         setupBatchBottomBar()
 
@@ -157,6 +173,11 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     @objc private func onTapSendTestGuide() {
         let url = "\(WxpConfig.shared.appFeUrl)/app/#/send-test-guide"
         WxpJumpPageUtils.jumpToWebUrl(url: url)
+    }
+
+    //打开「输入订阅暗号」页
+    @objc private func onTapCodeWord() {
+        WxpJumpPageUtils.jumpToWebUrl(url: WxpSubscribeLinkManager.shared.codeWordPageUrl())
     }
 
     private func dealUserInfoMessage(userInfo:[AnyHashable : Any]?){
@@ -329,6 +350,13 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
                         WxpJumpPageUtils.jumpToScan {[weak self] code in
                             self?.navigationController?.popViewController(animated: false)
                         }
+                    }
+                ),
+                UIAction(
+                    title: "输入订阅暗号",
+                    image: UIImage(systemName: "character.cursor.ibeam"),
+                    handler:{ _ in
+                        WxpJumpPageUtils.jumpToWebUrl(url: WxpSubscribeLinkManager.shared.codeWordPageUrl())
                     }
                 ),
                 UIAction(

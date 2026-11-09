@@ -20,6 +20,7 @@ import com.smjcco.wxpusher.base.common.WxpSaveService
 import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.base.common.flush
 import com.smjcco.wxpusher.biz.notify.WxpNotifyClickResolver
+import com.smjcco.wxpusher.biz.subscribe.WxpSubscribeLinkManager
 import com.smjcco.wxpusher.biz.tab.WxpTabConfig
 import com.smjcco.wxpusher.biz.tab.WxpTabConfigStore
 import com.smjcco.wxpusher.biz.version.WxpVersionCheckManager
@@ -71,6 +72,8 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
         const val INTENT_KEY_URL = "url"
         //开发者传入的原文链接，服务端各推送通道都用这个名字下发
         const val INTENT_KEY_SOURCE_URL = "sourceUrl"
+        //微信开放标签拉起时 extinfo 里的订阅意图 id（WXEntryActivity 转过来）
+        const val INTENT_KEY_SUBSCRIBE_INTENT_ID = "subscribeIntentId"
     }
 
 
@@ -79,6 +82,8 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
         setContentView(R.layout.main_activity)
         // 初始化视图
         initViews()
+        //订阅链接拉起：先记下来，没登录时登录完成回到首页再打开
+        val hasSubscribeLink = captureSubscribeLink(intent)
 
         if (checkAppStatus()) {
             //检查没有通过，不走后面的构建页面流程了
@@ -98,7 +103,35 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
 
         //处理页面参数
         onIntent(intent)
-        addOnNewIntentListener { onIntent(it) }
+        addOnNewIntentListener {
+            captureSubscribeLink(it)
+            onIntent(it)
+        }
+        //安装后首次进入首页：按多因素还原网页上的订阅意图（每次安装只查一次）；从订阅链接进来的不需要
+        if (!hasSubscribeLink) {
+            WxpSubscribeLinkManager.checkRestoreOnce(WxpSubscribeFactors.collect(this))
+        }
+    }
+
+    /**
+     * 订阅链接（App Links / scheme / 开放标签）转换成 H5 落地页地址并暂存，返回是否是订阅链接
+     */
+    private fun captureSubscribeLink(intent: Intent?): Boolean {
+        //从最近任务重新打开时系统会重放启动 intent，订阅链接不能再打开一次
+        if (intent == null || (intent.flags and Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) != 0) {
+            return false
+        }
+        val intentId = intent.getStringExtra(INTENT_KEY_SUBSCRIBE_INTENT_ID)
+        val pageUrl = if (!intentId.isNullOrEmpty()) {
+            WxpSubscribeLinkManager.pageUrlForIntent(intentId)
+        } else {
+            WxpSubscribeLinkManager.toPageUrl(intent.data?.toString())
+        } ?: return false
+        WxpSubscribeLinkManager.savePending(pageUrl)
+        //同一个 intent 不要重复处理（例如页面重建）
+        intent.removeExtra(INTENT_KEY_SUBSCRIBE_INTENT_ID)
+        intent.data = null
+        return true
     }
 
     fun permissionRequest() {
@@ -133,6 +166,10 @@ class WxpMainActivity : WxpBaseActivity(), CurrentTabProvider {
      * 当打开页面，或者收到newIntent的时候，进行调用
      */
     private fun onIntent(intent: Intent?) {
+        WxpSubscribeLinkManager.consumePending()?.let {
+            WxpJumpPageUtils.jumpToWebUrl(it, this)
+            return
+        }
         if (intent == null) {
             return
         }
