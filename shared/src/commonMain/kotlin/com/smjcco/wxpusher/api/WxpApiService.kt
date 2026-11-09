@@ -480,7 +480,7 @@ object WxpApiService {
     suspend fun matchSubscribeIntent(factors: WxpSubscribeIntentFactors): WxpSubscribeIntentMatchResp? {
         return commonRespDeal(toastError = false, handleUnauthorized = false, block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
-                .post(WxpNetworkService.getUrl("/api/need-login/device/s/intent/match")) {
+                .post(WxpNetworkService.getUrl("/api/need-login/device/subscribe-intent/match")) {
                     setBody(factors)
                 }.body()
         })
@@ -492,7 +492,7 @@ object WxpApiService {
     suspend fun subscribeByIntent(intentId: String): WxpFollowResult? {
         return commonRespDeal(block = {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
-                .post(WxpNetworkService.getUrl("/api/need-login/device/s/subscribe")) {
+                .post(WxpNetworkService.getUrl("/api/need-login/device/subscribe-link/subscribe")) {
                     setBody(mapOf("intentId" to intentId))
                 }.body()
         })
