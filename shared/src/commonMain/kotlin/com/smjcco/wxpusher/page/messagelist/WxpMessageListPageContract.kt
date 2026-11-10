@@ -2,6 +2,7 @@ package com.smjcco.wxpusher.page.messagelist
 
 import com.smjcco.wxpusher.base.common.IWxpBaseMvpPresenter
 import com.smjcco.wxpusher.base.common.IWxpBaseMvpView
+import com.smjcco.wxpusher.biz.subscribe.WxpCodeWordMatch
 
 interface IWxpMessageListView : IWxpBaseMvpView<IWxpMessageListPresenter> {
 
@@ -41,6 +42,12 @@ interface IWxpMessageListView : IWxpBaseMvpView<IWxpMessageListPresenter> {
      * 当检查到新公告的时候调用
      */
     fun onListBanner(data: WxpListBannerResp?);
+
+    /**
+     * 搜索词正好是订阅暗号时回调匹配结果，null 表示不显示「暗号匹配」行
+     * 点击时用 WxpSubscribeLinkManager.pageUrlForCodeWord(match.word) 打开落地页
+     */
+    fun onCodeWordMatch(match: WxpCodeWordMatch?)
 
 }
 
@@ -83,6 +90,11 @@ interface IWxpMessageListPresenter :
      * 如果关键字改变， 就调用这个方法，如果关键字改变了，就会刷新搜索
      */
     fun searchIfChanged(key: String?)
+
+    /**
+     * 页面重新可见时调用：显示的「暗号匹配」还是未订阅时重新查一次，订阅完回来能变成「已订阅」
+     */
+    fun recheckCodeWordMatch()
 
     /**
      * 刷新数据

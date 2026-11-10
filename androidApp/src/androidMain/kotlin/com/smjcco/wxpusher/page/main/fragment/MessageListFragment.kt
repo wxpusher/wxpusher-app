@@ -5,6 +5,8 @@ import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.MenuItem
+import com.smjcco.wxpusher.biz.subscribe.WxpCodeWordMatch
+import com.smjcco.wxpusher.biz.subscribe.WxpSubscribeLinkManager
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -70,10 +72,13 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyText: TextView
     private lateinit var emptyActionButton: MaterialButton
+    private lateinit var emptyCodeWordEntry: View
     private lateinit var adapter: MessageListAdapter
     private lateinit var searchEditText: EditText
     private lateinit var searchCancelBtn: TextView
     private lateinit var searchBarContainer: LinearLayout
+    private lateinit var codeWordMatchRow: View
+    private var codeWordMatch: WxpCodeWordMatch? = null
 
     private var messageList = mutableListOf<WxpMessageListMessage>()
     //上一次渲染时的数据副本，用于 DiffUtil 比较。presenter 会原地修改 read 字段，所以必须存副本
@@ -176,6 +181,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         refreshBanner()
         refreshNotePermissionBanner()
         presenter.fetchListBanner()
+        presenter.recheckCodeWordMatch()
         if (pendingSignal) {
             pendingSignal = false
             presenter.onPushSignal()
@@ -203,9 +209,19 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
             // 打开「去体验发送消息」引导页
             WxpJumpPageUtils.jumpToWebUrl("${WxpConfig.appFeUrl}/app/#/send-test-guide", activity)
         }
+        emptyCodeWordEntry = view.findViewById(R.id.empty_code_word_entry)
+        emptyCodeWordEntry.setOnClickListener {
+            WxpJumpPageUtils.jumpToWebUrl(WxpSubscribeLinkManager.codeWordPageUrl(), activity)
+        }
         searchEditText = view.findViewById(R.id.search_edit_text)
         searchCancelBtn = view.findViewById(R.id.search_cancel_btn)
         searchBarContainer = view.findViewById(R.id.search_bar_container)
+        codeWordMatchRow = view.findViewById(R.id.code_word_match_row)
+        codeWordMatchRow.setOnClickListener {
+            codeWordMatch?.let {
+                WxpJumpPageUtils.jumpToWebUrl(WxpSubscribeLinkManager.pageUrlForCodeWord(it.word), activity)
+            }
+        }
         //banner
         batteryBanner = view.findViewById(R.id.battery_banner)
         bannerBtn = view.findViewById(R.id.main_banner_btn)
@@ -468,6 +484,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         val emptyVisibility = if (messageList.isEmpty()) View.VISIBLE else View.GONE
         emptyText.visibility = emptyVisibility
         emptyActionButton.visibility = emptyVisibility
+        emptyCodeWordEntry.visibility = emptyVisibility
     }
 
     /**
@@ -522,6 +539,27 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
             }
         }
 
+    }
+
+    override fun onCodeWordMatch(match: WxpCodeWordMatch?) {
+        codeWordMatch = match
+        if (match == null) {
+            codeWordMatchRow.visibility = View.GONE
+            return
+        }
+        codeWordMatchRow.findViewById<TextView>(R.id.code_word_match_name).text = match.name
+        codeWordMatchRow.findViewById<TextView>(R.id.code_word_match_type).text =
+            if (match.type == 1) "应用 · 单发" else "主题 · 群发"
+        val action = codeWordMatchRow.findViewById<TextView>(R.id.code_word_match_action)
+        if (match.subscribed) {
+            action.text = "已订阅"
+            action.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_fit_theme_second))
+        } else {
+            action.text = "去订阅"
+            action.setTextColor(ContextCompat.getColor(requireContext(), R.color.AccentColor))
+        }
+        //多选态隐藏，退出时再按 codeWordMatch 恢复
+        codeWordMatchRow.visibility = if (selectionMode) View.GONE else View.VISIBLE
     }
 
     override fun onListBanner(data: WxpListBannerResp?) {
@@ -668,6 +706,11 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                 true
             }
 
+            R.id.menu_code_word -> {
+                WxpJumpPageUtils.jumpToWebUrl(WxpSubscribeLinkManager.codeWordPageUrl(), requireActivity())
+                true
+            }
+
             R.id.menu_scan_subscribe -> {
                 // 扫码添加订阅 - 可以实现扫码功能或跳转到添加订阅页面
                 WxpJumpPageUtils.jumpToScan(requireActivity())
@@ -721,6 +764,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         // 多选态隐藏 banner 与搜索栏，让顶部工具栏完整呈现
         view?.findViewById<View>(R.id.banner)?.visibility = View.GONE
         searchBarContainer.visibility = View.GONE
+        codeWordMatchRow.visibility = View.GONE
         batchActionBar.visibility = View.VISIBLE
         updateSelectionTitle()
         updateBatchActionBarState()
@@ -738,6 +782,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         // 恢复 banner 与搜索栏，banner 的子卡片仍按自身 visibility 展示
         view?.findViewById<View>(R.id.banner)?.visibility = View.VISIBLE
         searchBarContainer.visibility = View.VISIBLE
+        codeWordMatchRow.visibility = if (codeWordMatch != null) View.VISIBLE else View.GONE
         batchActionBar.visibility = View.GONE
         adapter.notifyDataSetChanged()
     }

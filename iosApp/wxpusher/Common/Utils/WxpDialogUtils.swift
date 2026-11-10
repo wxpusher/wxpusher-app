@@ -34,7 +34,12 @@ class WxpDialogUtils: NSObject{
         }
         
         WxpJumpPageUtils.runWithWindows(){ window in
-            window.rootViewController?.present(alert, animated: true)
+            // 已有弹窗时从最上层弹出，否则 present 会静默失败、这次弹窗直接丢掉（如安装后还原弹窗只弹一次）
+            var top = window.rootViewController
+            while let presented = top?.presentedViewController {
+                top = presented
+            }
+            top?.present(alert, animated: true)
         }
     }
     

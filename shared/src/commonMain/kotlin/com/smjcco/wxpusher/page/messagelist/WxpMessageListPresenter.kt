@@ -11,6 +11,8 @@ import com.smjcco.wxpusher.base.common.runAtMainSuspend
 import com.smjcco.wxpusher.base.biz.WxpAppDataService
 import com.smjcco.wxpusher.base.common.WxpDialogParams
 import com.smjcco.wxpusher.base.common.WxpDialogUtils
+import com.smjcco.wxpusher.biz.subscribe.WxpCodeWordMatch
+import com.smjcco.wxpusher.biz.subscribe.WxpSubscribeLinkManager
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -71,10 +73,42 @@ class WxpMessageListPresenter(view: IWxpMessageListView) :
     private val RecentPushedKeepMillis = 60_000L
     private val RecentPushedMaxSize = 50
 
+    //搜索词正好是订阅暗号时匹配到的订阅目标
+    private var codeWordMatch: WxpCodeWordMatch? = null
+
     override fun searchIfChanged(key: String?) {
         if (this.key != key) {
             this.key = key
             refresh(WxpMessageListReq.SceneSearch)
+            codeWordMatch = null
+            view?.onCodeWordMatch(null)
+            lookupCodeWord()
+        }
+    }
+
+    override fun recheckCodeWordMatch() {
+        //从落地页订阅完回来，刷新一下订阅状态
+        if (codeWordMatch?.subscribed == false) {
+            lookupCodeWord()
+        }
+    }
+
+    /**
+     * 搜索词正好是订阅暗号时，在搜索结果上方多显示一行「暗号匹配」，和消息市场搜索一致
+     */
+    private fun lookupCodeWord() {
+        val word = key?.trim()
+        if (word == null || !WxpSubscribeLinkManager.isCodeWordLike(word)) {
+            return
+        }
+        runAtMainSuspend {
+            val match = WxpApiService.lookupCodeWord(word)
+            //查询期间搜索词变了，丢弃结果
+            if (key?.trim() != word) {
+                return@runAtMainSuspend
+            }
+            codeWordMatch = match?.copy(word = word)
+            view?.onCodeWordMatch(codeWordMatch)
         }
     }
 

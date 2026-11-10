@@ -35,6 +35,9 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         iconTintColor: .secondaryLabel
     )
     private let topBannerStack = UIStackView()
+    //搜索词正好是订阅暗号时显示的「暗号匹配」行
+    private let codeWordMatchRow = CodeWordMatchRowView()
+    private var codeWordMatch: WxpCodeWordMatch?
     private let checkReasonBannerView = WxpMessageBannerView(
         iconName: "bell",
         iconTintColor: .secondaryLabel
@@ -72,6 +75,15 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         return tryButton
     }()
 
+    //空态页入口：下载 App 后用订阅暗号订阅
+    private let emptyCodeWordButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("有订阅暗号？去输入", for: .normal)
+        button.titleLabel?.font = UIFont.preferredFont(forTextStyle: .subheadline)
+        button.setTitleColor(.defAccentPrimaryColor, for: .normal)
+        return button
+    }()
+
     //空态页
     private lazy var emptyView: UIView = {
         // 添加空状态视图
@@ -90,6 +102,9 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         emptyView.addSubview(emptyImageView)
         emptyView.addSubview(emptyLabel)
         emptyView.addSubview(tryButton)
+        let codeWordButton = self.emptyCodeWordButton
+        emptyView.addSubview(codeWordButton)
+        codeWordButton.translatesAutoresizingMaskIntoConstraints = false
         
         emptyImageView.translatesAutoresizingMaskIntoConstraints = false
         emptyLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -107,7 +122,10 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
             tryButton.topAnchor.constraint(equalTo: emptyLabel.bottomAnchor, constant: 20),
             tryButton.centerXAnchor.constraint(equalTo: emptyView.centerXAnchor),
             tryButton.widthAnchor.constraint(equalToConstant: 200),
-            tryButton.heightAnchor.constraint(equalToConstant: 44)
+            tryButton.heightAnchor.constraint(equalToConstant: 44),
+
+            codeWordButton.topAnchor.constraint(equalTo: tryButton.bottomAnchor, constant: 12),
+            codeWordButton.centerXAnchor.constraint(equalTo: emptyView.centerXAnchor)
         ])
         return emptyView
     }()
@@ -118,6 +136,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         setupRefreshControl()
         setupUI()
         emptyActionButton.addTarget(self, action: #selector(onTapSendTestGuide), for: .touchUpInside)
+        emptyCodeWordButton.addTarget(self, action: #selector(onTapCodeWord), for: .touchUpInside)
         tableView.allowsMultipleSelectionDuringEditing = true
         setupBatchBottomBar()
 
@@ -157,6 +176,11 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     @objc private func onTapSendTestGuide() {
         let url = "\(WxpConfig.shared.appFeUrl)/app/#/send-test-guide"
         WxpJumpPageUtils.jumpToWebUrl(url: url)
+    }
+
+    //打开「输入订阅暗号」页
+    @objc private func onTapCodeWord() {
+        WxpJumpPageUtils.jumpToWebUrl(url: WxpSubscribeLinkManager.shared.codeWordPageUrl())
     }
 
     private func dealUserInfoMessage(userInfo:[AnyHashable : Any]?){
@@ -298,10 +322,13 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         topBannerStack.addArrangedSubview(notificationPermissionBannerView)
         topBannerStack.addArrangedSubview(checkReasonBannerView)
         topBannerStack.addArrangedSubview(listBannerView)
+        topBannerStack.addArrangedSubview(codeWordMatchRow)
+        codeWordMatchRow.addTarget(self, action: #selector(codeWordMatchTapped), for: .touchUpInside)
         
         notificationPermissionBannerView.isHidden = true
         checkReasonBannerView.isHidden = true
         listBannerView.isHidden = true
+        codeWordMatchRow.isHidden = true
         topBannerStack.isHidden = true
     }
     
@@ -329,6 +356,13 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
                         WxpJumpPageUtils.jumpToScan {[weak self] code in
                             self?.navigationController?.popViewController(animated: false)
                         }
+                    }
+                ),
+                UIAction(
+                    title: "输入订阅暗号",
+                    image: UIImage(systemName: "character.cursor.ibeam"),
+                    handler:{ _ in
+                        WxpJumpPageUtils.jumpToWebUrl(url: WxpSubscribeLinkManager.shared.codeWordPageUrl())
                     }
                 ),
                 UIAction(
@@ -510,6 +544,20 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         updateTopBannerVisibility()
     }
     
+    func onCodeWordMatch(match: WxpCodeWordMatch?) {
+        codeWordMatch = match
+        if let match {
+            codeWordMatchRow.bind(match)
+        }
+        codeWordMatchRow.isHidden = match == nil
+        updateTopBannerVisibility()
+    }
+
+    @objc private func codeWordMatchTapped() {
+        guard let match = codeWordMatch else { return }
+        WxpJumpPageUtils.jumpToWebUrl(url: WxpSubscribeLinkManager.shared.pageUrlForCodeWord(word: match.word))
+    }
+    
     func onListBanner(data: WxpListBannerResp?) {
         currentListBanner = data
         guard let data else {
@@ -581,6 +629,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
     
     private func refreshBannerStateOnVisible() {
         presenter.fetchListBanner()
+        presenter.recheckCodeWordMatch()
         UNUserNotificationCenter.current().getNotificationSettings { [weak self] settings in
             DispatchQueue.main.async {
                 guard let self else { return }
@@ -601,6 +650,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
         topBannerStack.isHidden = notificationPermissionBannerView.isHidden
             && checkReasonBannerView.isHidden
             && listBannerView.isHidden
+            && codeWordMatchRow.isHidden
     }
     
     @objc private func notificationPermissionBannerTapped() {
@@ -1216,6 +1266,70 @@ private final class WxpMessageBannerView: UIControl {
             arrowView.widthAnchor.constraint(equalToConstant: 14),
             arrowView.heightAnchor.constraint(equalToConstant: 14),
             heightAnchor.constraint(greaterThanOrEqualToConstant: 44),
+        ])
+    }
+}
+
+/// 消息搜索的「暗号匹配」行：搜索词正好是订阅暗号时显示，和消息市场搜索一致
+final class CodeWordMatchRowView: UIControl {
+    private let tagLabel = UILabel()
+    private let nameLabel = UILabel()
+    private let typeLabel = UILabel()
+    private let actionLabel = UILabel()
+
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupUI()
+    }
+
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        setupUI()
+    }
+
+    override var isHighlighted: Bool {
+        didSet { backgroundColor = isHighlighted ? .secondarySystemBackground : .clear }
+    }
+
+    func bind(_ match: WxpCodeWordMatch) {
+        nameLabel.text = match.name
+        typeLabel.text = match.type == 1 ? "应用 · 单发" : "主题 · 群发"
+        actionLabel.text = match.subscribed ? "已订阅" : "去订阅"
+        actionLabel.textColor = match.subscribed ? .secondaryLabel : UIColor.defAccentPrimaryColor
+    }
+
+    private func setupUI() {
+        tagLabel.text = "暗号匹配"
+        tagLabel.font = .systemFont(ofSize: 12)
+        tagLabel.textColor = UIColor.defAccentPrimaryColor
+        nameLabel.font = .systemFont(ofSize: 16, weight: .semibold)
+        nameLabel.textColor = .label
+        nameLabel.lineBreakMode = .byTruncatingTail
+        typeLabel.font = .systemFont(ofSize: 12)
+        typeLabel.textColor = .secondaryLabel
+        actionLabel.font = .systemFont(ofSize: 14)
+        actionLabel.setContentCompressionResistancePriority(.required, for: .horizontal)
+        actionLabel.setContentHuggingPriority(.required, for: .horizontal)
+
+        let textStack = UIStackView(arrangedSubviews: [tagLabel, nameLabel, typeLabel])
+        textStack.axis = .vertical
+        textStack.alignment = .leading
+        textStack.spacing = 3
+
+        let row = UIStackView(arrangedSubviews: [textStack, actionLabel])
+        row.axis = .horizontal
+        row.alignment = .center
+        row.spacing = 12
+        // 统一由外层 UIControl 处理点击
+        row.isUserInteractionEnabled = false
+        row.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(row)
+
+        NSLayoutConstraint.activate([
+            row.topAnchor.constraint(equalTo: topAnchor, constant: 8),
+            row.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 14),
+            row.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -14),
+            row.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -8),
         ])
     }
 }

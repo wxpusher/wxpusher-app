@@ -24,11 +24,72 @@ class MainTabBarController: UITabBarController {
         setupKvListener()
         notificationPermissionRemind()
         setupListenBackToRegisterAPNs()
+        openSubscribeLinkOrRestore()
           
 //        self.delegate = self
     }
     
     
+    // MARK: - 统一订阅链接
+
+    /// 订阅链接（Universal Links / scheme）转成 H5 落地页地址；不是订阅链接返回 false
+    @discardableResult
+    static func handleSubscribeLink(_ link: String?, openNow: Bool) -> Bool {
+        guard let pageUrl = WxpSubscribeLinkManager.shared.toPageUrl(link: link) else {
+            return false
+        }
+        handleSubscribePageUrl(pageUrl, openNow: openNow)
+        return true
+    }
+
+    /// 微信开放标签拉起：extinfo 是订阅意图 id
+    static func handleSubscribeIntentId(_ intentId: String) {
+        handleSubscribePageUrl(WxpSubscribeLinkManager.shared.pageUrlForIntent(intentId: intentId), openNow: true)
+    }
+
+    /// 先暂存；已登录且首页已在显示时立即打开，否则等首页（登录后）加载时打开
+    static func handleSubscribePageUrl(_ pageUrl: String, openNow: Bool) {
+        WxpSubscribeLinkManager.shared.savePending(pageUrl: pageUrl)
+        guard openNow else {
+            return
+        }
+        let deviceToken = WxpAppDataService.shared.getLoginInfo()?.deviceToken ?? ""
+        let root = UIApplication.shared.connectedScenes
+            .compactMap { ($0 as? UIWindowScene)?.windows.first { $0.isKeyWindow }?.rootViewController }
+            .first
+        if !deviceToken.isEmpty, root is MainTabBarController,
+           let url = WxpSubscribeLinkManager.shared.consumePending() {
+            WxpJumpPageUtils.jumpToWebUrl(url: url)
+        }
+    }
+
+    /// 首页加载：有暂存的订阅链接就打开；没有就做一次安装后还原（每次安装只查一次）
+    private func openSubscribeLinkOrRestore() {
+        DispatchQueue.main.async {
+            if let url = WxpSubscribeLinkManager.shared.consumePending() {
+                WxpJumpPageUtils.jumpToWebUrl(url: url)
+                return
+            }
+            WxpSubscribeLinkManager.shared.checkRestoreOnce(factors: MainTabBarController.collectSubscribeFactors())
+        }
+    }
+
+    /// 和 H5 落地页口径一致：屏幕用 pt，竖屏短边为宽；iOS 网页拿不到机型，这里也不传
+    private static func collectSubscribeFactors() -> WxpSubscribeIntentFactors {
+        let size = UIScreen.main.bounds.size
+        return WxpSubscribeIntentFactors(
+            os: "ios",
+            osVersion: UIDevice.current.systemVersion,
+            model: nil,
+            screenW: KotlinInt(int: Int32(min(size.width, size.height).rounded())),
+            screenH: KotlinInt(int: Int32(max(size.width, size.height).rounded())),
+            dpr: KotlinDouble(double: Double(UIScreen.main.scale)),
+            netType: nil,
+            lang: Locale.preferredLanguages.first,
+            tz: TimeZone.current.identifier
+        )
+    }
+
     //底部 tab 类型
     private enum MainTab { case messageList, market, extFunc, profile }
 

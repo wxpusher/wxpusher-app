@@ -49,12 +49,14 @@ object WxpWeixinOpenManager : IWXAPIEventHandler {
 
     // IWXAPI实例
     private var api: IWXAPI? = null
+    private var appContext: Context? = null
 
     /**
      * 初始化微信SDK
      * 应该在Application的onCreate中调用
      */
     fun init(context: Context) {
+        appContext = context.applicationContext
         if (api == null) {
             // 通过WXAPIFactory工厂，获取IWXAPI的实例
             api = WXAPIFactory.createWXAPI(context, APP_ID, true)
@@ -306,6 +308,17 @@ object WxpWeixinOpenManager : IWXAPIEventHandler {
      */
     override fun onReq(req: BaseReq?) {
         WxpLogUtils.d(TAG, "收到微信请求: $req")
+        //开放标签 wx-open-launch-app 拉起：extinfo 是订阅意图 id，交给首页打开订阅落地页
+        if (req is com.tencent.mm.opensdk.modelmsg.ShowMessageFromWX.Req) {
+            val intentId = req.message?.messageExt
+            val context = appContext
+            if (!intentId.isNullOrEmpty() && context != null) {
+                val intent = android.content.Intent(context, com.smjcco.wxpusher.page.main.WxpMainActivity::class.java)
+                intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                intent.putExtra(com.smjcco.wxpusher.page.main.WxpMainActivity.INTENT_KEY_SUBSCRIBE_INTENT_ID, intentId)
+                context.startActivity(intent)
+            }
+        }
     }
 
     /**
