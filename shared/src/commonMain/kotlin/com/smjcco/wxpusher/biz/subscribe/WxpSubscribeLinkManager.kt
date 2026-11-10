@@ -151,8 +151,8 @@ object WxpSubscribeLinkManager {
                     message = message,
                     leftText = "不是我",
                     rightText = "订阅",
+                    // iOS 只有 cancelable=true 才会显示左按钮，必须保留「不是我」让用户能拒绝
                     rightBlock = { subscribeByIntent(intentId) },
-                    cancelable = false,
                 )
             )
         }
