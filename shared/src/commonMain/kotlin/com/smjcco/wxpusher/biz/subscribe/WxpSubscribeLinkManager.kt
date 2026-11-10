@@ -42,6 +42,22 @@ data class WxpSubscribeIntentMatchResp(
 )
 
 /**
+ * 消息搜索时，搜索词正好是订阅暗号匹配到的订阅目标（服务端 FollowInfo 的部分字段）
+ */
+@Serializable
+@JsonIgnoreUnknownKeys
+data class WxpCodeWordMatch(
+    //搜索的暗号，服务端不返回，查到后补上
+    val word: String = "",
+    //1 应用，2 主题
+    val type: Int = 0,
+    val id: Long = 0,
+    val name: String? = null,
+    //当前用户是否已订阅
+    val subscribed: Boolean = false,
+)
+
+/**
  * 统一订阅链接在 App 端只做路由：深链 / scheme / 开放标签拉起后，统一用 WebView 打开 H5 落地页 #/subscribe-link。
  * 订阅逻辑都在 H5 和服务端，方案见 docs/subscribe-download-flow-design.md。
  */
@@ -54,6 +70,16 @@ object WxpSubscribeLinkManager {
 
     /** 「输入订阅暗号」页 */
     fun codeWordPageUrl(): String = "${WxpConfig.appFeUrl}/app/#/code-word"
+
+    /** 和服务端 CodeWordService.VALID_WORD 一致 */
+    private val VALID_WORD = Regex("^[\u4e00-\u9fa5A-Za-z0-9]{2,16}$")
+
+    /** 是否可能是订阅暗号，不是的话不用去服务端查 */
+    fun isCodeWordLike(word: String?): Boolean = word != null && VALID_WORD.matches(word)
+
+    /** 按暗号打开落地页，和市场搜索命中暗号时跳转的一致 */
+    fun pageUrlForCodeWord(word: String): String =
+        "${WxpConfig.appFeUrl}/app/#/subscribe-link?sk=${word.encodeURLParameter()}&via=code"
 
     /** 开放标签 extinfo 只带 intentId */
     fun pageUrlForIntent(intentId: String): String =

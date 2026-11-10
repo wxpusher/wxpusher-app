@@ -10,6 +10,7 @@ import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.biz.ad.WxpShowAdResp
 import io.ktor.client.statement.bodyAsText
 import com.smjcco.wxpusher.biz.version.AppVersionCheckResp
+import com.smjcco.wxpusher.biz.subscribe.WxpCodeWordMatch
 import com.smjcco.wxpusher.biz.subscribe.WxpSubscribeIntentFactors
 import com.smjcco.wxpusher.biz.subscribe.WxpSubscribeIntentMatchResp
 import com.smjcco.wxpusher.page.scan.WxpFollowResult
@@ -38,6 +39,7 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
+import io.ktor.http.encodeURLPathPart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
@@ -471,6 +473,19 @@ object WxpApiService {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .get(WxpNetworkService.getUrl("/api/device/version-update"))
                 .body()
+        })
+    }
+
+    /**
+     * 消息搜索时按暗号查订阅目标，查不到返回 null。
+     * scene=search 单独限频、不计连续错误，不占用「输入订阅暗号」页的次数；失败静默。
+     */
+    suspend fun lookupCodeWord(word: String): WxpCodeWordMatch? {
+        return commonRespDeal<WxpCodeWordMatch?>(toastError = false, handleUnauthorized = false, block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .get(WxpNetworkService.getUrl("/api/optional-login/device/code-word/${word.encodeURLPathPart()}")) {
+                    parameter("scene", "search")
+                }.body()
         })
     }
 
