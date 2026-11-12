@@ -41,14 +41,19 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
     private val processSession = UUID.randomUUID().toString().take(8)
 
     fun isMainProcess(application: Application): Boolean =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) Application.getProcessName() == application.packageName
-        else ApplicationUtils.isMainProcess()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            Application.getProcessName() == application.packageName
+        } else {
+            ApplicationUtils.isMainProcess()
+        }
 
     private fun clocks(): String = "eventTimeMs=${System.currentTimeMillis()},elapsedMs=${SystemClock.elapsedRealtime()},uptimeMs=${SystemClock.uptimeMillis()},pid=${Process.myPid()},session=$processSession"
 
     /** Rare service lifecycle events keep the existing synchronous persistence path. */
     fun serviceEvent(message: String) {
-        if (initialized) WxpLogUtils.i("WsService", "$message,${clocks()}")
+        if (initialized) {
+            WxpLogUtils.i("WsService", "$message,${clocks()}")
+        }
     }
 
     private fun safeError(message: String?): String = (message ?: "unknown")
@@ -57,7 +62,9 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
         .take(512)
 
     fun event(tag: String, message: String, error: Throwable? = null) {
-        if (!initialized) return
+        if (!initialized) {
+            return
+        }
         val stamp = clocks()
         scope.launch {
             // Exception messages may contain URLs/tokens. Keep sanitized messages and frames.
@@ -66,8 +73,11 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
                     "${cause.javaClass.name}: ${safeError(cause.message)}\n" + cause.stackTrace.joinToString("\n")
                 }
             }
-            if (error == null) WxpLogUtils.i(tag, "$message,$stamp")
-            else WxpLogUtils.w(tag, "$message,$stamp,stack=$frames")
+            if (error == null) {
+                WxpLogUtils.i(tag, "$message,$stamp")
+            } else {
+                WxpLogUtils.w(tag, "$message,$stamp,stack=$frames")
+            }
         }
     }
     private var startedActivities = 0
@@ -76,13 +86,17 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
     private val backgroundRunnable = Runnable {
         if (startedActivities == 0) {
             foreground = false
-            if (initialized && PushChannelStore.isWsRequested()) logState("app-background")
+            if (initialized && PushChannelStore.isWsRequested()) {
+                logState("app-background")
+            }
         }
     }
 
     /** 在日志/存储初始化且用户同意协议后调用一次。 */
     fun init(application: Application) {
-        if (!isMainProcess(application) || initialized) return
+        if (!isMainProcess(application) || initialized) {
+            return
+        }
         initialized = true
         logState("process-start", force = true)
         ThreadUtils.runOnBackgroundThread(Runnable { reportPreviousExit(application) })
@@ -90,12 +104,16 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
 
     /** 相同状态不重复上传；force 仅用于进程启动、用户切换及五分钟失败诊断。 */
     fun logState(reason: String, force: Boolean = false, details: String = "") {
-        if (!initialized) return
+        if (!initialized) {
+            return
+        }
         val stamp = clocks()
         scope.launch {
             val state = runCatching { state() }.getOrElse { "stateUnavailable=${it.javaClass.simpleName}" }
             val signature = "$details,$state"
-            if (!force && signature == lastState) return@launch
+            if (!force && signature == lastState) {
+                return@launch
+            }
             lastState = signature
             WxpLogUtils.i("WsDiagnostics", "WS运行状态,reason=$reason,$stamp,$details,snapshotTimeMs=${System.currentTimeMillis()},$state")
         }
@@ -148,7 +166,9 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
                 return
             }
             val reported = WxpSaveService.get(EXIT_REPORTED_KEY, "").toLongOrNull() ?: 0L
-            if (exit.timestamp <= reported) return
+            if (exit.timestamp <= reported) {
+                return
+            }
             val reason = when (exit.reason) {
                 ApplicationExitInfo.REASON_EXIT_SELF -> "exit-self"
                 ApplicationExitInfo.REASON_SIGNALED -> "signaled"
@@ -181,7 +201,9 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
             foreground = true
             if (initialized) {
                 WsManager.tryConnect("foreground")
-                if (PushChannelStore.isWsRequested()) logState("app-foreground")
+                if (PushChannelStore.isWsRequested()) {
+                    logState("app-foreground")
+                }
             }
         }
     }
@@ -189,7 +211,9 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
     override fun onActivityStopped(activity: Activity) {
         startedActivities--
         // 避免页面跳转/旋转时短暂没有 started Activity 导致前后台日志成对刷屏。
-        if (startedActivities == 0) ThreadUtils.runOnMainThread(backgroundRunnable, 700L)
+        if (startedActivities == 0) {
+            ThreadUtils.runOnMainThread(backgroundRunnable, 700L)
+        }
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {}

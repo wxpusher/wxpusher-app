@@ -148,7 +148,9 @@ object WsManager {
 
         override fun onAvailable(network: Network) {
             synchronized(WsManager) {
-                if (current == network) return
+                if (current == network) {
+                    return
+                }
                 current = network
                 blocked = null
                 lastCapabilities = null
@@ -158,29 +160,41 @@ object WsManager {
 
         override fun onLost(network: Network) {
             synchronized(WsManager) {
-                if (current != network) return
+                if (current != network) {
+                    return
+                }
                 current = null
                 blocked = null
-                if (enabled) WsDiagnostics.logState("network-lost")
+                if (enabled) {
+                    WsDiagnostics.logState("network-lost")
+                }
             }
         }
 
         override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
             synchronized(WsManager) {
-                if (current != network) return
+                if (current != network) {
+                    return
+                }
                 val internet = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
                 val signature = "internet=$internet,validated=${capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)}"
                 if (signature != lastCapabilities) {
                     lastCapabilities = signature
-                    if (enabled) WsDiagnostics.logState("network-capabilities", details = signature)
+                    if (enabled) {
+                        WsDiagnostics.logState("network-capabilities", details = signature)
+                    }
                 }
-                if (networkUnavailable && internet && blocked != true) tryConnect("network-capabilities")
+                if (networkUnavailable && internet && blocked != true) {
+                    tryConnect("network-capabilities")
+                }
             }
         }
 
         override fun onBlockedStatusChanged(network: Network, isBlocked: Boolean) {
             synchronized(WsManager) {
-                if (current != network) return
+                if (current != network) {
+                    return
+                }
                 val previous = blocked
                 blocked = isBlocked
                 if (previous != isBlocked && enabled) {
@@ -261,7 +275,9 @@ object WsManager {
                 logEvent("connect: 关闭中，不进行链接")
                 return
             }
-            if (disableConnect) return
+            if (disableConnect) {
+                return
+            }
             if (!DeviceUtils.isNetworkConnected()) {
                 // 无网络不是连接失败，不推进退避；由 Handler 检查，避免反复精确唤醒。
                 networkUnavailable = true
@@ -355,18 +371,28 @@ object WsManager {
 
     @Synchronized
     private fun runScheduledReconnect() {
-        if (!enabled || disableConnect || reconnectDueElapsed == 0L) return
+        if (!enabled || disableConnect || reconnectDueElapsed == 0L) {
+            return
+        }
         val now = SystemClock.elapsedRealtime()
         // A canceled alarm may already be queued. Do not consume a newer schedule early.
         val remaining = if (reconnectMode.startsWith("handler")) {
             reconnectDueUptime - SystemClock.uptimeMillis()
-        } else reconnectDueElapsed - now
-        if (remaining > 0L) return
+        } else {
+            reconnectDueElapsed - now
+        }
+        if (remaining > 0L) {
+            return
+        }
         val lateMillis = -remaining
-        if (lastCheckElapsed != 0L) maxCheckGapMs = maxOf(maxCheckGapMs, now - lastCheckElapsed)
+        if (lastCheckElapsed != 0L) {
+            maxCheckGapMs = maxOf(maxCheckGapMs, now - lastCheckElapsed)
+        }
         lastCheckElapsed = now
         reconnectDueElapsed = 0L
-        if (lateMillis > 30_000L) logEvent("WS重连任务迟到,mode=$reconnectMode,lateMs=$lateMillis")
+        if (lateMillis > 30_000L) {
+            logEvent("WS重连任务迟到,mode=$reconnectMode,lateMs=$lateMillis")
+        }
         tryConnect("retry")
     }
 
@@ -511,7 +537,9 @@ object WsManager {
                     logEvent("WS连接失败,type=${t.javaClass.simpleName},retry=$reTryCount,source=$connectionSource,suppressed=$suppressedFailures", t.takeIf { includeStack })
                     lastFailureType = t.javaClass.name
                     suppressedFailures = 0
-                } else suppressedFailures++
+                } else {
+                    suppressedFailures++
+                }
                 WsDiagnostics.logState("ws-failure", force = includeStack)
                 setConnectStatus(WsConnectStatus.NotConnect)
                 tryConnectDelay()
@@ -520,7 +548,9 @@ object WsManager {
 
         override fun onMessage(webSocket: WebSocket, text: String) {
             synchronized(WsManager) {
-                if (!enabled || WsManager.webSocket !== webSocket) return
+                if (!enabled || WsManager.webSocket !== webSocket) {
+                    return
+                }
             }
             val baseWsMsg = GsonUtils.toObj(text, BaseWsMsg::class.java, logErrors = false)
             if (baseWsMsg == null) {
@@ -537,10 +567,14 @@ object WsManager {
                 logEvent("WS消息解析失败,type=${baseWsMsg.msgType}")
                 return
             }
-            if (bizMsg is PushMsgDeviceMsg) logEvent("WS消息接收,type=${bizMsg.msgType},mid=${bizMsg.mid}")
+            if (bizMsg is PushMsgDeviceMsg) {
+                logEvent("WS消息接收,type=${bizMsg.msgType},mid=${bizMsg.mid}")
+            }
             if (bizMsg.msgType == WsMessageTypeEnum.UPDATE_CLIENT.code) {
                 synchronized(WsManager) {
-                    if (enabled && WsManager.webSocket === webSocket) disconnect()
+                    if (enabled && WsManager.webSocket === webSocket) {
+                        disconnect()
+                    }
                 }
                 return
             }
@@ -566,7 +600,9 @@ object WsManager {
 
         override fun onMessage(webSocket: WebSocket, bytes: ByteString) {
             synchronized(WsManager) {
-                if (!enabled || WsManager.webSocket !== webSocket) return
+                if (!enabled || WsManager.webSocket !== webSocket) {
+                    return
+                }
             }
         }
 
@@ -576,9 +612,12 @@ object WsManager {
                     webSocket.close(1000, "WS通道已关闭")
                     return
                 }
-                val offlineMillis: Any = if (disconnectedSinceElapsed == 0L) "unknown" else
+                val offlineMillis: Any = if (disconnectedSinceElapsed == 0L) {
+                    "unknown"
+                } else {
                     SystemClock.elapsedRealtime() - disconnectedSinceElapsed
-                logEvent("onOpen: WS链接打开,source=$connectionSource,retry=$reTryCount,offlineMs=$offlineMillis,offlineUptimeMs=${if (disconnectedSinceUptime == 0L) "unknown" else SystemClock.uptimeMillis() - disconnectedSinceUptime},networkChecks=$networkChecks,attempts=$attempts,maxCheckGapMs=$maxCheckGapMs")
+                }
+                logEvent("onOpen: WS链接打开,source=$connectionSource,retry=$reTryCount,offlineMs=$offlineMillis,offlineUptimeMs=${if (disconnectedSinceUptime == 0L) { "unknown" } else { SystemClock.uptimeMillis() - disconnectedSinceUptime }},networkChecks=$networkChecks,attempts=$attempts,maxCheckGapMs=$maxCheckGapMs")
                 WsDiagnostics.logState("ws-open")
                 disconnectedSinceElapsed = 0L
                 disconnectedSinceUptime = 0L

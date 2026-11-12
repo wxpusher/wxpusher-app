@@ -21,7 +21,9 @@ object GsonUtils {
             try {
                 return GSON.fromJson<T>(str, cls)
             } catch (e: Throwable) {
-                if (logErrors) WxpLogUtils.w("GSON", "序列化错误", e)
+                if (logErrors) {
+                    WxpLogUtils.w("GSON", "序列化错误，str=$str", e)
+                }
             }
         }
         return null
@@ -36,7 +38,7 @@ object GsonUtils {
             try {
                 return GSON.fromJson(str, type) as T?
             } catch (e: Throwable) {
-                WxpLogUtils.w("GSON", "序列化错误", e)
+                WxpLogUtils.w("GSON", "序列化错误，str=$str", e)
             }
         }
         return null
@@ -49,7 +51,7 @@ object GsonUtils {
         try {
             return GSON.fromJson(json, cls)
         } catch (e: Throwable) {
-            WxpLogUtils.w("GSON", "序列化错误", e)
+            WxpLogUtils.w("GSON", "序列化错误，json=$json", e)
         }
         return null
     }

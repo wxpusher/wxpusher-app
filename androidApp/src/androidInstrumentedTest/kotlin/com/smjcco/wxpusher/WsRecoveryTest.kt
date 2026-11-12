@@ -133,7 +133,9 @@ class WsRecoveryTest {
         WsManager.stop()
         WsManager.start()
         val deadline = SystemClock.elapsedRealtime() + 20000
-        while (init.count == 2L && SystemClock.elapsedRealtime() < deadline) Thread.sleep(50)
+        while (init.count == 2L && SystemClock.elapsedRealtime() < deadline) {
+            Thread.sleep(50)
+        }
         assertEquals("local server must deliver DEVICE_INIT", 1L, init.count)
         (field("webSocket").get(WsManager) as WebSocket).cancel()
         assertTrue("existing retry must reconnect to local server", init.await(25, TimeUnit.SECONDS))
@@ -178,7 +180,7 @@ class WsRecoveryTest {
         val attempts = field("attempts").getInt(WsManager)
         repeat(10) {
             val cm = instrumentation.targetContext.getSystemService(android.content.Context.CONNECTIVITY_SERVICE) as android.net.ConnectivityManager
-            val caps = if (it % 2 == 0) cm.getNetworkCapabilities(network)!! else android.net.NetworkCapabilities()
+            val caps = if (it % 2 == 0) { cm.getNetworkCapabilities(network)!! } else { android.net.NetworkCapabilities() }
             callback.onCapabilitiesChanged(network, caps)
             callback.onBlockedStatusChanged(network, false)
         }

@@ -73,7 +73,9 @@ class KeepWsAliveService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (startupFailed) return START_NOT_STICKY
+        if (startupFailed) {
+            return START_NOT_STICKY
+        }
         if (intent != null) {
             WsDiagnostics.serviceEvent("服务入口,action=${intent.action}")
             val action = intent.action
@@ -106,7 +108,9 @@ class KeepWsAliveService : Service() {
     override fun onCreate() {
         super.onCreate()
         WsDiagnostics.serviceEvent("KeepWsAliveService onCreate,pid=${android.os.Process.myPid()}")
-        if (!promoteToForeground()) return
+        if (!promoteToForeground()) {
+            return
+        }
         // 服务重建后 onStartCommand 可能延迟，不能只显示通知却未启动保活工作。
         syncServiceWithChannelState()
     }
@@ -140,7 +144,9 @@ class KeepWsAliveService : Service() {
     @SuppressLint("WakelockTimeout")
     @OptIn(DelicateCoroutinesApi::class)
     private fun startService() {
-        if (startupFailed || destroyed) return
+        if (startupFailed || destroyed) {
+            return
+        }
         if (!PushChannelStore.isWsRequested()) {
             stopService()
             return
@@ -309,9 +315,11 @@ class KeepWsAliveService : Service() {
      * 通道已切回厂商推送时不再安排下一轮任务。
      */
     private fun tryConnectAndAlarmLoopCheck(doWork: Boolean = true) {
-        if (destroyed || startupFailed || !PushChannelStore.isWsRequested()) return
+        if (destroyed || startupFailed || !PushChannelStore.isWsRequested()) {
+            return
+        }
         val now = SystemClock.elapsedRealtime()
-        val lateMillis = if (checkDueElapsed == 0L) 0L else now - checkDueElapsed
+        val lateMillis = if (checkDueElapsed == 0L) { 0L } else { now - checkDueElapsed }
         val status = WsManager.getConnectStatus()
         // 在线且按时执行的检查不上传日志；异常时最多每轮（五分钟）一条。
         if (doWork && (lateMillis > 60_000L || status != WsManager.WsConnectStatus.Connected)) {

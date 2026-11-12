@@ -30,7 +30,9 @@ class WxPusherApplication : Application() {
 
         WxpSaveService.init()
         // 先跟踪 Activity 计数，避免首次同意协议时漏掉已经 started 的页面；此时不上传诊断。
-        if (WsDiagnostics.isMainProcess(this)) registerActivityLifecycleCallbacks(WsDiagnostics)
+        if (WsDiagnostics.isMainProcess(this)) {
+            registerActivityLifecycleCallbacks(WsDiagnostics)
+        }
         WxpLogUtils.init()
         WxpLogUtils.i(TAG, "应用启动,pid=${android.os.Process.myPid()}")
         //初始化一些配置和环境信息
@@ -67,7 +69,9 @@ class WxPusherApplication : Application() {
      * 幂等，重复调用无副作用。日后新增同类 SDK 时加到本方法，不要再放进 onCreate。
      */
     fun initSdkAfterAgreement() {
-        if (agreementSdkInitialized) return
+        if (agreementSdkInitialized) {
+            return
+        }
         agreementSdkInitialized = true
         WsDiagnostics.init(this)
         // 推送：厂商推送能力检测会查询各厂商推送服务/包信息，同意前调用会被应用市场判定为读取应用列表
