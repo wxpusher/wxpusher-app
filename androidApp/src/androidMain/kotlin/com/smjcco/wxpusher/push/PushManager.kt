@@ -74,7 +74,7 @@ object PushManager {
 
     /** 根据 token 来源分发给厂商通道或 WebSocket 通道。 */
     fun onGetPushToken(token: String, platform: DevicePlatform) {
-        WxpLogUtils.i(TAG, "收到设备注册结果，platform=${platform}")
+        WxpLogUtils.d(TAG, "收到设备注册结果，platform=${platform}")
         if (platform == DevicePlatform.Android) {
             PushChannelCoordinator.onWsToken(token)
         } else {

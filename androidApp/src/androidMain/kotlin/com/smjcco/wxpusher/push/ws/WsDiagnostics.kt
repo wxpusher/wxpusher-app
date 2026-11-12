@@ -46,12 +46,26 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
 
     private fun clocks(): String = "eventTimeMs=${System.currentTimeMillis()},elapsedMs=${SystemClock.elapsedRealtime()},uptimeMs=${SystemClock.uptimeMillis()},pid=${Process.myPid()},session=$processSession"
 
+    /** Rare service lifecycle events keep the existing synchronous persistence path. */
+    fun serviceEvent(message: String) {
+        if (initialized) WxpLogUtils.i("WsService", "$message,${clocks()}")
+    }
+
+    private fun safeError(message: String?): String = (message ?: "unknown")
+        .replace(Regex("(?:PT_|UID_|DID_)[A-Za-z0-9_-]+"), "[redacted]")
+        .replace(Regex("https?://[^\\s]+"), "[url]")
+        .take(512)
+
     fun event(tag: String, message: String, error: Throwable? = null) {
         if (!initialized) return
         val stamp = clocks()
         scope.launch {
-            // Exception messages may contain URLs/tokens. Keep type and frames only.
-            val frames = error?.let { "type=${it.javaClass.name}\n" + it.stackTrace.joinToString("\n") }
+            // Exception messages may contain URLs/tokens. Keep sanitized messages and frames.
+            val frames = error?.let {
+                generateSequence(it) { cause -> cause.cause }.take(4).joinToString("\nCaused by: ") { cause ->
+                    "${cause.javaClass.name}: ${safeError(cause.message)}\n" + cause.stackTrace.joinToString("\n")
+                }
+            }
             if (error == null) WxpLogUtils.i(tag, "$message,$stamp")
             else WxpLogUtils.w(tag, "$message,$stamp,stack=$frames")
         }
@@ -92,29 +106,32 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
         val power = app.getSystemService(Context.POWER_SERVICE) as PowerManager
         val alarms = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val notifications = app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channel = notifications.getNotificationChannel(KeepWsAliveService.KeepWsAliveNotificationChannelId)
-        val permission = Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
-            ContextCompat.checkSelfPermission(app, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED
-        val notificationsEnabled = NotificationManagerCompat.from(app).areNotificationsEnabled()
-        val notificationReady = permission && notificationsEnabled && channel?.importance != NotificationManager.IMPORTANCE_NONE
-        val autoStartConfirmed = WxpSaveService.get(AUTO_START_CONFIRMED_KEY, false)
-        val batteryExempt = DeviceUtils.isIgnoringBatteryOptimizations()
-        val backgroundRestricted = DeviceUtils.isBackgroundRestricted()
+        fun value(block: () -> Any?): String = runCatching { block()?.toString() ?: "unknown" }.getOrDefault("unknown")
         val connectivity = app.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val network = connectivity.activeNetwork
-        val caps = connectivity.getNetworkCapabilities(network)
-        val transport = listOf(
-            NetworkCapabilities.TRANSPORT_WIFI to "wifi",
-            NetworkCapabilities.TRANSPORT_CELLULAR to "cellular",
-            NetworkCapabilities.TRANSPORT_ETHERNET to "ethernet",
-            NetworkCapabilities.TRANSPORT_VPN to "vpn",
-        ).filter { caps?.hasTransport(it.first) == true }.joinToString("+") { it.second }.ifEmpty { "none-or-other" }
-        val exactAllowed = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarms.canScheduleExactAlarms()
-        return "foreground=$foreground,wsRequested=${PushChannelStore.isWsRequested()}," +
-            "notificationReady=$notificationReady,notificationPermission=$permission,notificationsEnabled=$notificationsEnabled,keepAliveChannelImportance=${channel?.importance}," +
-            "autoStartConfirmed=$autoStartConfirmed,batteryExempt=$batteryExempt,backgroundRestricted=$backgroundRestricted,backgroundReady=${batteryExempt && !backgroundRestricted}," +
-            "interactive=${power.isInteractive},idle=${power.isDeviceIdleMode},powerSave=${power.isPowerSaveMode},exactAllowed=$exactAllowed," +
-            "network=$network,transport=$transport,internet=${caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) == true},validated=${caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) == true},metered=${connectivity.isActiveNetworkMetered}"
+        val network = runCatching { connectivity.activeNetwork }.getOrNull()
+        val caps = runCatching { connectivity.getNetworkCapabilities(network) }.getOrNull()
+        return linkedMapOf(
+            "foreground" to foreground.toString(),
+            "wsRequested" to value { PushChannelStore.isWsRequested() },
+            "notificationPermission" to value { Build.VERSION.SDK_INT < 33 || ContextCompat.checkSelfPermission(app, Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED },
+            "notificationsEnabled" to value { NotificationManagerCompat.from(app).areNotificationsEnabled() },
+            "keepAliveChannelImportance" to value { notifications.getNotificationChannel(KeepWsAliveService.KeepWsAliveNotificationChannelId)?.importance },
+            "autoStartConfirmed" to value { WxpSaveService.get(AUTO_START_CONFIRMED_KEY, false) },
+            "batteryExempt" to value { DeviceUtils.isIgnoringBatteryOptimizations() },
+            "backgroundRestricted" to value { DeviceUtils.isBackgroundRestricted() },
+            "interactive" to value { power.isInteractive },
+            "idle" to value { power.isDeviceIdleMode },
+            "powerSave" to value { power.isPowerSaveMode },
+            "exactAllowed" to value { Build.VERSION.SDK_INT < 31 || alarms.canScheduleExactAlarms() },
+            "network" to value { network },
+            "transport" to value {
+                listOf(NetworkCapabilities.TRANSPORT_WIFI to "wifi", NetworkCapabilities.TRANSPORT_CELLULAR to "cellular", NetworkCapabilities.TRANSPORT_ETHERNET to "ethernet", NetworkCapabilities.TRANSPORT_VPN to "vpn")
+                    .filter { caps?.hasTransport(it.first) == true }.joinToString("+") { it.second }.ifEmpty { "none-or-other" }
+            },
+            "internet" to value { caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) },
+            "validated" to value { caps?.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) },
+            "metered" to value { connectivity.isActiveNetworkMetered },
+        ).entries.joinToString(",") { "${it.key}=${it.value}" }
     }
 
     private fun reportPreviousExit(application: Application) {

@@ -1,9 +1,9 @@
 # Android WS 恢复优化方案 v4：先解决及时收消息
 
-状态：设计稿，未实现。2026-11-12初稿；2026-11-13纳入第二轮审核复核，升级为v4。
-工作空间：~/.codex/worktrees/android-ws-recovery/monorepo；根仓库/App分支均为codex/android-ws-recovery；App HEAD=e1fbf602。
+状态：v4已实施并完成模拟器基础验证，尚未完成荣耀实机/耗电验收。2026-11-12初稿；2026-11-13更新。
+工作空间：~/.codex/worktrees/android-ws-recovery/monorepo；根仓库/App分支均为codex/android-ws-recovery；设计时App HEAD=e1fbf602；实施时已合并origin/release 291e8f2，Android版本1.8.37。
 依据：PR #27、实际荣耀故障、Claude Code审核与事实复核。本版替代v3的实施建议；第二轮审核只采纳经复核的结论。
-已有暂存的WsDiagnostics、前后台/网络/电源快照、历史退出原因作为待修正基线；保活精确闹钟按第6节调整，不直接照搬。上述暂存改动不在远端PR head中。本次仅调整本文件，不改代码、不改变暂存区。
+已有暂存的WsDiagnostics、前后台/网络/电源快照、历史退出原因作为待修正基线；保活精确闹钟按第6节调整，不直接照搬。上述暂存改动不在远端PR head中。实施与验证结果见第9节。
 
 ## 1. 唯一首要目标
 
@@ -188,3 +188,13 @@ SLS __time__/接收时间本次已出现延后，不能直接替代原事件时�
 - Alarm调度：https://developer.android.com/develop/background-work/services/alarms
 - Doze：https://developer.android.com/training/monitoring-device-state/doze-standby
 - 后台前台服务限制：https://developer.android.com/develop/background-work/services/fgs/restrictions-bg-start
+
+## 9. 2026-11-13实施与审核记录
+
+- 在原codex/android-ws-recovery分支实施，合并release 291e8f2，解决版本及设置页冲突并保留最新厂商订阅功能，Android版本1.8.37/10837。原有暂存诊断改动已纳入，五分钟保活使用普通set。
+- 完成状态一致性、网络/前台恢复、旧控制消息隔离、INTERNET判定、服务启动预期异常及取消处理、运行标记回滚、双时钟/会话/离线汇总、网络能力采样前去重和日志脱敏。
+- Claude Code在执行沙箱外只读审核，未发现高置信度P1；指出服务关键日志遗漏时钟/会话（P2），已补齐并保留这些低频生命周期事件的同步持久化路径。锁内Token注册日志改为debug；JSON解析失败禁止原始异常泄漏。详见android-ws-recovery-code-review-2026-11-13.md。
+- Android API35模拟器11项instrumentation测试全部通过，无跳过。使用真实本地MockWebServer握手和消息、实际网络开关与系统回调、真实通知提交及mid去重；其余为确定性状态/队列交错测试，不宣称并发压力或OEM验收。
+- offlineDebug/prodDebug构建通过。lint任务成功，报告0错误；工具存在Kotlin2.2元数据兼容提示，静态分析能力有限，具体警告数和最终结果见审核记录。
+- 远端测试环境/ws实际返回HTTP502，未能完成测试服端到端验证；未对服务端部署或改配置。测试Application隔离生产SDK启动与请求，不向生产发送测试消息。
+- 尚待荣耀AAP-AN00实机息屏1h、Doze/冻结、划除任务、服务启动受限及耗电对照。不因模拟器通过而认定本次荣耀事故已彻底解决。不保证OEM冻结或用户强行停止期间接收。

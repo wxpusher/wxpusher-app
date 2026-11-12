@@ -30,7 +30,8 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 
 enum class Actions {
     START,
-    STOP
+    STOP,
+    TASK_REMOVED_RESTART
 }
 
 class KeepWsAliveService : Service() {
@@ -74,6 +75,7 @@ class KeepWsAliveService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         if (startupFailed) return START_NOT_STICKY
         if (intent != null) {
+            WsDiagnostics.serviceEvent("服务入口,action=${intent.action}")
             val action = intent.action
             when (action) {
                 Actions.START.name -> syncServiceWithChannelState()
@@ -81,7 +83,7 @@ class KeepWsAliveService : Service() {
                 else -> syncServiceWithChannelState()
             }
         } else {
-            WxpLogUtils.i(message = "KeepWsAliveService 系统重建,onStartCommand intent=null")
+            WsDiagnostics.serviceEvent("KeepWsAliveService 系统重建,onStartCommand intent=null")
             syncServiceWithChannelState()
         }
         // 只有 WS 仍被选中时才允许系统在服务被杀后重建。
@@ -103,7 +105,7 @@ class KeepWsAliveService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        WxpLogUtils.i(message = "KeepWsAliveService onCreate,pid=${android.os.Process.myPid()}")
+        WsDiagnostics.serviceEvent("KeepWsAliveService onCreate,pid=${android.os.Process.myPid()}")
         if (!promoteToForeground()) return
         // 服务重建后 onStartCommand 可能延迟，不能只显示通知却未启动保活工作。
         syncServiceWithChannelState()
@@ -113,7 +115,7 @@ class KeepWsAliveService : Service() {
         destroyed = true
         cleanupServiceResources()
         super.onDestroy()
-        WxpLogUtils.i(message = "KeepWsAliveService onDestroy")
+        WsDiagnostics.serviceEvent("KeepWsAliveService onDestroy")
     }
 
     /**
@@ -124,7 +126,7 @@ class KeepWsAliveService : Service() {
         if (!PushChannelStore.isWsRequested()) {
             return
         }
-        WxpLogUtils.i(message = "KeepWsAliveService onTaskRemoved-使用定时器重新启动任务")
+        WsDiagnostics.serviceEvent("KeepWsAliveService onTaskRemoved-使用定时器重新启动任务")
         val restartServicePendingIntent = createRestartServicePendingIntent()
         val alarmService: AlarmManager =
             applicationContext.getSystemService(ALARM_SERVICE) as AlarmManager
@@ -151,23 +153,23 @@ class KeepWsAliveService : Service() {
             return
         }
         try {
-        // 获取局部唤醒锁，降低系统休眠模式对 WS 保活服务的影响。
-        wakeLock =
-            (getSystemService(POWER_SERVICE) as PowerManager).run {
-                newWakeLock(
-                    PowerManager.PARTIAL_WAKE_LOCK,
-                    "${KeepWsAliveService::class.java.name}::lock"
-                ).apply {
-                    acquire()
+            // 获取局部唤醒锁，降低系统休眠模式对 WS 保活服务的影响。
+            wakeLock =
+                (getSystemService(POWER_SERVICE) as PowerManager).run {
+                    newWakeLock(
+                        PowerManager.PARTIAL_WAKE_LOCK,
+                        "${KeepWsAliveService::class.java.name}::lock"
+                    ).apply {
+                        acquire()
+                    }
                 }
+            doWork()
+            if (!hasStartCheckLoop) {
+                hasStartCheckLoop = true
+                tryConnectAndAlarmLoopCheck(false)
             }
-        doWork()
-        if (!hasStartCheckLoop) {
-            hasStartCheckLoop = true
-            tryConnectAndAlarmLoopCheck(false)
-        }
-        isServiceStarted = true
-        WsDiagnostics.event("WsService", "服务工作启动完成,wakeLock=${wakeLock?.isHeld},checkLoop=$hasStartCheckLoop")
+            isServiceStarted = true
+            WsDiagnostics.event("WsService", "服务工作启动完成,wakeLock=${wakeLock?.isHeld},checkLoop=$hasStartCheckLoop")
         } catch (e: SecurityException) {
             failStartup(e)
         } catch (e: IllegalStateException) {
@@ -190,12 +192,12 @@ class KeepWsAliveService : Service() {
 
     private fun failStartup(error: RuntimeException) {
         startupFailed = true
-        WsDiagnostics.event("WsService", "服务启动失败,type=${error.javaClass.simpleName}")
+        WsDiagnostics.event("WsService", "服务启动失败,type=${error.javaClass.simpleName}", error)
         try { cleanupServiceResources() } finally { stopSelf() }
     }
 
     private fun stopService() {
-        WxpLogUtils.i(message = "KeepWsAliveService stopService")
+        WsDiagnostics.serviceEvent("KeepWsAliveService stopService")
         try {
             cleanupServiceResources()
             stopSelf()
@@ -209,6 +211,7 @@ class KeepWsAliveService : Service() {
     private fun createRestartServicePendingIntent(): PendingIntent {
         val restartServiceIntent = Intent(applicationContext, KeepWsAliveService::class.java).also {
             it.setPackage(packageName)
+            it.action = Actions.TASK_REMOVED_RESTART.name
         }
         return PendingIntent.getService(
             this,
@@ -312,7 +315,7 @@ class KeepWsAliveService : Service() {
         val status = WsManager.getConnectStatus()
         // 在线且按时执行的检查不上传日志；异常时最多每轮（五分钟）一条。
         if (doWork && (lateMillis > 60_000L || status != WsManager.WsConnectStatus.Connected)) {
-            WxpLogUtils.i(message = "WS保活检查,status=$status,lateMs=${lateMillis.coerceAtLeast(0L)}")
+            WsDiagnostics.serviceEvent("WS保活检查,status=$status,lateMs=${lateMillis.coerceAtLeast(0L)}")
         }
         val application = ApplicationUtils.getApplication()
         if (doWork) {
@@ -330,7 +333,7 @@ class KeepWsAliveService : Service() {
         // 初始化或模式变化才记录，不逐轮上传健康调度日志。
         if (mode != checkScheduleMode) {
             checkScheduleMode = mode
-            WxpLogUtils.i(message = "WS保活检查调度,mode=$mode,delayMs=300000")
+            WsDiagnostics.serviceEvent("WS保活检查调度,mode=$mode,delayMs=300000")
         }
     }
 }

@@ -54,6 +54,11 @@ kotlin {
             //穿山甲（CSJ/Pangle）标准版广告 SDK，对应 iOS 的 Ads-CN（7.6 系列）。
             implementation("com.pangle.cn:ads-sdk-pro:7.6.1.2")
         }
+        androidInstrumentedTest.dependencies {
+            implementation("androidx.test:runner:1.6.2")
+            implementation("androidx.test.ext:junit:1.2.1")
+            implementation("com.squareup.okhttp3:mockwebserver:4.12.0")
+        }
         commonMain.dependencies {
             implementation(libs.androidx.lifecycle.viewmodel)
             implementation(projects.shared)
@@ -67,6 +72,7 @@ android {
 
     defaultConfig {
         applicationId = "com.smjcco.wxpusher"
+        testInstrumentationRunner = "com.smjcco.wxpusher.WsTestRunner"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 10837

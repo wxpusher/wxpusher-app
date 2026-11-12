@@ -77,6 +77,8 @@ object WsManager {
     private var networkUnavailable = false
     private var connectionSource = "caller"
     private var lastFailureStackElapsed = 0L
+    private var lastFailureType: String? = null
+    private var suppressedFailures = 0
     private var lastReconnectLogElapsed = 0L
     private var reconnectDueElapsed = 0L
     private var reconnectDueUptime = 0L
@@ -136,58 +138,59 @@ object WsManager {
         val connectivityManager =
             ApplicationUtils.getApplication()
                 .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        connectivityManager.registerDefaultNetworkCallback(object :
-            ConnectivityManager.NetworkCallback() {
-            private var current: Network? = null
-            private var blocked: Boolean? = null
-            private var lastCapabilities: String? = null
+        connectivityManager.registerDefaultNetworkCallback(RecoveryNetworkCallback())
+    }
 
-            override fun onAvailable(network: Network) {
-                synchronized(WsManager) {
-                    if (current == network) return
-                    current = network
-                    blocked = null
-                    lastCapabilities = null
-                    tryConnect("network-available")
+    internal class RecoveryNetworkCallback : ConnectivityManager.NetworkCallback() {
+        private var current: Network? = null
+        private var blocked: Boolean? = null
+        private var lastCapabilities: String? = null
+
+        override fun onAvailable(network: Network) {
+            synchronized(WsManager) {
+                if (current == network) return
+                current = network
+                blocked = null
+                lastCapabilities = null
+                tryConnect("network-available")
+            }
+        }
+
+        override fun onLost(network: Network) {
+            synchronized(WsManager) {
+                if (current != network) return
+                current = null
+                blocked = null
+                if (enabled) WsDiagnostics.logState("network-lost")
+            }
+        }
+
+        override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
+            synchronized(WsManager) {
+                if (current != network) return
+                val internet = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                val signature = "internet=$internet,validated=${capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)}"
+                if (signature != lastCapabilities) {
+                    lastCapabilities = signature
+                    if (enabled) WsDiagnostics.logState("network-capabilities", details = signature)
+                }
+                if (networkUnavailable && internet && blocked != true) tryConnect("network-capabilities")
+            }
+        }
+
+        override fun onBlockedStatusChanged(network: Network, isBlocked: Boolean) {
+            synchronized(WsManager) {
+                if (current != network) return
+                val previous = blocked
+                blocked = isBlocked
+                if (previous != isBlocked && enabled) {
+                    WsDiagnostics.logState("network-blocked", details = "blocked=$isBlocked")
+                }
+                if (!isBlocked && (previous == true || (previous == null && networkUnavailable))) {
+                    tryConnect("network-unblocked")
                 }
             }
-
-            override fun onLost(network: Network) {
-                synchronized(WsManager) {
-                    if (current != network) return
-                    current = null
-                    blocked = null
-                    if (enabled) WsDiagnostics.logState("network-lost")
-                }
-            }
-
-            override fun onCapabilitiesChanged(network: Network, capabilities: NetworkCapabilities) {
-                synchronized(WsManager) {
-                    if (current != network) return
-                    val internet = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-                    val signature = "internet=$internet,validated=${capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)}"
-                    if (signature != lastCapabilities) {
-                        lastCapabilities = signature
-                        if (enabled) WsDiagnostics.logState("network-capabilities", details = signature)
-                    }
-                    if (networkUnavailable && internet && blocked != true) tryConnect("network-capabilities")
-                }
-            }
-
-            override fun onBlockedStatusChanged(network: Network, isBlocked: Boolean) {
-                synchronized(WsManager) {
-                    if (current != network) return
-                    val previous = blocked
-                    blocked = isBlocked
-                    if (previous != isBlocked && enabled) {
-                        WsDiagnostics.logState("network-blocked", details = "blocked=$isBlocked")
-                    }
-                    if (!isBlocked && (previous == true || (previous == null && networkUnavailable))) {
-                        tryConnect("network-unblocked")
-                    }
-                }
-            }
-        })
+        }
     }
 
 
@@ -264,10 +267,6 @@ object WsManager {
                 networkUnavailable = true
                 networkChecks++
                 tryConnectDelay("network-unavailable")
-                return
-            }
-            if (disableConnect) {
-                logEvent("connect: WS连接已禁用")
                 return
             }
             // 仅在实际观察到无网络 -> 有网络时重置，避免重复 onAvailable 冲掉失败退避。
@@ -507,11 +506,12 @@ object WsManager {
                 if (includeStack) {
                     lastFailureStackElapsed = now
                 }
-                // 每次失败都留在线上；仅完整堆栈独立限频，恢复/切换通道也不重置窗口。
-                logEvent(
-                    "WS连接失败,type=${t.javaClass.simpleName},retry=$reTryCount,source=$connectionSource",
-                    if (includeStack) t else null
-                )
+                // 同类失败汇总，堆栈独立限频；恢复/切换通道也不重置窗口。
+                if (includeStack || lastFailureType != t.javaClass.name) {
+                    logEvent("WS连接失败,type=${t.javaClass.simpleName},retry=$reTryCount,source=$connectionSource,suppressed=$suppressedFailures", t.takeIf { includeStack })
+                    lastFailureType = t.javaClass.name
+                    suppressedFailures = 0
+                } else suppressedFailures++
                 WsDiagnostics.logState("ws-failure", force = includeStack)
                 setConnectStatus(WsConnectStatus.NotConnect)
                 tryConnectDelay()
@@ -522,7 +522,7 @@ object WsManager {
             synchronized(WsManager) {
                 if (!enabled || WsManager.webSocket !== webSocket) return
             }
-            val baseWsMsg = GsonUtils.toObj(text, BaseWsMsg::class.java)
+            val baseWsMsg = GsonUtils.toObj(text, BaseWsMsg::class.java, logErrors = false)
             if (baseWsMsg == null) {
                 logEvent("WS消息基础类型解析失败")
                 return
@@ -532,11 +532,12 @@ object WsManager {
                 logEvent("WS未知消息类型,type=${baseWsMsg.msgType}")
                 return
             }
-            val bizMsg = GsonUtils.toObj(text, typeEnum.cls)
+            val bizMsg = GsonUtils.toObj(text, typeEnum.cls, logErrors = false)
             if (bizMsg == null) {
                 logEvent("WS消息解析失败,type=${baseWsMsg.msgType}")
                 return
             }
+            if (bizMsg is PushMsgDeviceMsg) logEvent("WS消息接收,type=${bizMsg.msgType},mid=${bizMsg.mid}")
             if (bizMsg.msgType == WsMessageTypeEnum.UPDATE_CLIENT.code) {
                 synchronized(WsManager) {
                     if (enabled && WsManager.webSocket === webSocket) disconnect()

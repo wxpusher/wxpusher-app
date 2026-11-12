@@ -56,10 +56,10 @@ class KeepWsAliveServiceStarter(private val context: Context) {
             } catch (e: kotlinx.coroutines.CancellationException) {
                 throw e
             } catch (e: IllegalStateException) {
-                com.smjcco.wxpusher.push.ws.WsDiagnostics.event("WsService", "服务启动请求失败,type=${e.javaClass.simpleName}")
+                com.smjcco.wxpusher.push.ws.WsDiagnostics.event("WsService", "服务启动请求失败,type=${e.javaClass.simpleName}", e)
                 return Result.failure()
             } catch (e: SecurityException) {
-                com.smjcco.wxpusher.push.ws.WsDiagnostics.event("WsService", "服务启动权限失败,type=${e.javaClass.simpleName}")
+                com.smjcco.wxpusher.push.ws.WsDiagnostics.event("WsService", "服务启动权限失败,type=${e.javaClass.simpleName}", e)
                 return Result.failure()
             }
             return Result.success()
