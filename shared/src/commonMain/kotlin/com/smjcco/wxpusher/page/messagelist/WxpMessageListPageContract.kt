@@ -64,6 +64,22 @@ interface IWxpMessageListPresenter :
     fun onReceiveNewMessage(message: WxpMessageListMessage);
 
     /**
+     * 收到带完整数据的推送（如 WS），直接插入列表，不发请求
+     * 和 onReceiveNewMessage 的区别：不会把消息记成被点击的消息，避免之后刷新时把服务端的已读改回未读
+     */
+    fun onPushMessageArrived(message: WxpMessageListMessage)
+
+    /**
+     * 收到不带数据的推送到达信号（厂商通道），防抖后增量拉取一次
+     */
+    fun onPushSignal()
+
+    /**
+     * App 回到前台，节流后增量拉取一次
+     */
+    fun onAppForeground()
+
+    /**
      * 如果关键字改变， 就调用这个方法，如果关键字改变了，就会刷新搜索
      */
     fun searchIfChanged(key: String?)

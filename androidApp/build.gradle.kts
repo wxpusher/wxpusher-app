@@ -30,6 +30,8 @@ kotlin {
             implementation("com.google.code.gson:gson:2.10.1")
             implementation("androidx.fragment:fragment:1.7.0")
             implementation("androidx.appcompat:appcompat:1.7.0")
+            //监听App前后台切换（ProcessLifecycleOwner），原本已通过其他SDK间接引入，这里显式声明
+            implementation(libs.androidx.lifecycle.process)
 //            implementation("androidx.webkit:webkit:1.9.0")
             implementation("com.google.android.material:material:1.12.0")
             implementation("commons-codec:commons-codec:1.6")
@@ -67,8 +69,8 @@ android {
         applicationId = "com.smjcco.wxpusher"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
-        versionCode = 10832
-        versionName = "1.8.32"
+        versionCode = 10837
+        versionName = "1.8.37"
         //指定产物名称
         setProperty("archivesBaseName", "wxpusher-app-v$versionName")
 

@@ -4,14 +4,25 @@ import android.content.Context
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.push.WxpMessageArrivalNotifier
 import com.smjcco.wxpusher.utils.GsonUtils
 import com.xiaomi.mipush.sdk.ErrorCode
 import com.xiaomi.mipush.sdk.MiPushClient
 import com.xiaomi.mipush.sdk.MiPushCommandMessage
+import com.xiaomi.mipush.sdk.MiPushMessage
 import com.xiaomi.mipush.sdk.PushMessageReceiver
 
 class XiaomiPushMessageReceiver : PushMessageReceiver() {
     private val TAG = "XiaomiPushMessageReceiver"
+
+    /**
+     * 通知消息到达，一般要应用进程存活才会回调。数据不全，只当作到达信号，让消息列表拉一次
+     */
+    override fun onNotificationMessageArrived(context: Context?, message: MiPushMessage?) {
+        super.onNotificationMessageArrived(context, message)
+        WxpMessageArrivalNotifier.notifySignal("xiaomi")
+    }
+
     override fun onReceiveRegisterResult(p0: Context?, message: MiPushCommandMessage?) {
         val command = message?.getCommand()
         if (command == null) {

@@ -24,6 +24,8 @@ internal object PushActiveReportLifecycle : Application.ActivityLifecycleCallbac
 
     /** 任意 Activity 启动时检查是否需要补充上报设备活跃信息。 */
     override fun onActivityStarted(activity: Activity) {
+        // 先记录从系统设置页回来的授权结果，结果跟着这次检查一起上报
+        VendorSubscribeGuide.current()?.onActivityStarted()
         PushChannelCoordinator.reportActiveIfNeeded()
     }
 

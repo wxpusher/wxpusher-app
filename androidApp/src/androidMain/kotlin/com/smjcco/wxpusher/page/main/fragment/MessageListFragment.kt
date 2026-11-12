@@ -16,6 +16,7 @@ import android.widget.TextView
 import android.widget.TextView.OnEditorActionListener
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.smjcco.wxpusher.base.common.WxpToastUtils
@@ -28,6 +29,8 @@ import com.scwang.smart.refresh.layout.api.RefreshLayout
 import com.scwang.smart.refresh.layout.listener.OnRefreshListener
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.WxpConfig
+import com.smjcco.wxpusher.app.IAppForegroundListener
+import com.smjcco.wxpusher.app.WxpAppForegroundObserver
 import com.smjcco.wxpusher.base.WxpBaseMvpFragment
 import com.smjcco.wxpusher.base.common.WxpDateTimeUtils
 import com.smjcco.wxpusher.base.common.WxpDialogParams
@@ -44,10 +47,14 @@ import com.smjcco.wxpusher.page.messagelist.WxpMessageListMessage
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListPresenter
 import com.smjcco.wxpusher.page.messagelist.WxpMessageListReq
 import com.smjcco.wxpusher.page.web.WxpWebViewActivity
+import com.smjcco.wxpusher.push.IMessageArrivalListener
 import com.smjcco.wxpusher.push.IPushTokenChangedListener
 import com.smjcco.wxpusher.push.PushChannel
 import com.smjcco.wxpusher.push.PushManager
 import com.smjcco.wxpusher.push.PushPlatformState
+import com.smjcco.wxpusher.push.VendorGuideSource
+import com.smjcco.wxpusher.push.VendorSubscribeGuide
+import com.smjcco.wxpusher.push.WxpMessageArrivalNotifier
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.PermissionUtils
 import com.smjcco.wxpusher.utils.WxpJumpPageUtils
@@ -57,7 +64,7 @@ import com.smjcco.wxpusher.utils.WxpJumpPageUtils
  * 对应iOS中的MessageListViewController
  */
 class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxpMessageListView,
-    ITabMenuProvider, IPushTokenChangedListener {
+    ITabMenuProvider, IPushTokenChangedListener, IMessageArrivalListener, IAppForegroundListener {
 
     private lateinit var refreshLayout: SmartRefreshLayout
     private lateinit var recyclerView: RecyclerView
@@ -69,7 +76,12 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     private lateinit var searchBarContainer: LinearLayout
 
     private var messageList = mutableListOf<WxpMessageListMessage>()
+    //上一次渲染时的数据副本，用于 DiffUtil 比较。presenter 会原地修改 read 字段，所以必须存副本
+    private var renderedSnapshot: List<WxpMessageListMessage> = emptyList()
     private var openAppFirstRefresh = true
+
+    //列表页不可见时收到了厂商到达信号，等回到列表页时再拉取，避免后台发请求
+    private var pendingSignal = false
 
 
     private lateinit var refreshHeader: ClassicsHeader
@@ -128,6 +140,9 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         refreshNotePermissionBanner()
         //监听pushToken变化，刷新banner
         PushManager.addPushTokenChangedListener(this)
+        //监听推送到达和回到前台，把新消息合并进列表
+        WxpMessageArrivalNotifier.addListener(this)
+        WxpAppForegroundObserver.addListener(this)
     }
 
     override fun onPushToken(platform: DevicePlatform, pushToken: String) {
@@ -136,11 +151,42 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         }
     }
 
+    override fun onMessageArrived(message: WxpMessageListMessage) {
+        //纯内存插入，不发请求，在后台也直接插入，回到前台就能看到
+        presenter.onPushMessageArrived(message)
+    }
+
+    override fun onMessageSignal(source: String) {
+        if (isResumed) {
+            presenter.onPushSignal()
+        } else {
+            //列表页不可见（在其他tab、二级页或后台），先记下来，回到列表页时再拉
+            pendingSignal = true
+        }
+    }
+
+    override fun onAppForeground() {
+        //回前台的拉取已经包含了期间到达的消息，不用再因为信号多拉一次
+        pendingSignal = false
+        presenter.onAppForeground()
+    }
+
     override fun onResume() {
         super.onResume()
         refreshBanner()
         refreshNotePermissionBanner()
         presenter.fetchListBanner()
+        if (pendingSignal) {
+            pendingSignal = false
+            presenter.onPushSignal()
+        }
+    }
+
+    override fun onDestroyView() {
+        //ViewPager2 可能只回收 view，不能等到 onDestroy 才取消监听
+        WxpMessageArrivalNotifier.removeListener(this)
+        WxpAppForegroundObserver.removeListener(this)
+        super.onDestroyView()
     }
 
     override fun onDestroy() {
@@ -250,7 +296,11 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
      */
     private fun refreshNotePermissionBanner() {
         val hasNotePermission = PermissionUtils.hasNotificationPermission(activity)
-        if (hasNotePermission) {
+        val subscribeGuide = VendorSubscribeGuide.current()
+        if (hasNotePermission && subscribeGuide != null && subscribeGuide.needGuide(activity)) {
+            //小米、vivo 订阅通道没开，只读本地状态；从系统设置回来 onResume 会重新检查
+            showVendorSubscribeBanner(subscribeGuide)
+        } else if (hasNotePermission) {
             //在消息权限正确的前提下，检查是否可以接收到消息
             notePermissionBanner.visibility = View.GONE
             presenter.fetchCheckReason()
@@ -273,6 +323,25 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
                 //关闭banner，在坚持后端接收状态
                 presenter.fetchCheckReason()
             }
+        }
+    }
+
+    /** 小米、vivo 订阅通道没开，点击后申请授权，失败时引导去设置。 */
+    private fun showVendorSubscribeBanner(guide: VendorSubscribeGuide) {
+        val openGuide = View.OnClickListener {
+            activity?.let { guide.showGuide(it, VendorGuideSource.BANNER) }
+        }
+        notePermissionBanner.setOnClickListener(openGuide)
+        notePermissionBanner.visibility = View.VISIBLE
+        notePermissionTv.visibility = View.VISIBLE
+        notePermissionTv.text = guide.getBannerText()
+        notePermissionBtn.text = "去开启"
+        notePermissionBtn.visibility = View.VISIBLE
+        notePermissionBtn.setOnClickListener(openGuide)
+        notePermissionCloseImg.setImageResource(R.drawable.ic_close)
+        notePermissionCloseImg.setOnClickListener {
+            notePermissionBanner.visibility = View.GONE
+            presenter.fetchCheckReason()
         }
     }
 
@@ -322,7 +391,12 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
             WxpJumpPageUtils.jumpToWebUrl(urlString, activity, showAd = true)
             // 标记消息为已读
             message.read = true
-            adapter.notifyDataSetChanged()
+            val position = messageList.indexOf(message)
+            if (position >= 0) {
+                adapter.notifyItemChanged(position)
+            } else {
+                adapter.notifyDataSetChanged()
+            }
         }
 
     }
@@ -343,11 +417,27 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
     }
 
     override fun onMessageList(data: List<WxpMessageListMessage>) {
+        //更新前记录位置：在顶部时，插入新消息后滚回顶部让它露出来；往下翻了就保持不动
+        val wasAtTop = !recyclerView.canScrollVertically(-1)
+        val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
+        val firstVisibleId = layoutManager?.findFirstVisibleItemPosition()
+            ?.let { messageList.getOrNull(it)?.messageId }
+
+        val newSnapshot = data.map { it.copy() }
+        val diffResult = DiffUtil.calculateDiff(MessageDiffCallback(renderedSnapshot, newSnapshot))
         messageList.clear()
         messageList.addAll(data)
-        adapter.notifyDataSetChanged()
+        renderedSnapshot = newSnapshot
+        //局部更新，不用 notifyDataSetChanged，否则插入新消息时已经往下翻的内容会整体跳动
+        diffResult.dispatchUpdatesTo(adapter)
+
+        //列表被整体替换（增量拉取发现断层）时，原来看到的位置已经不存在了，也回到顶部
+        val positionGone = firstVisibleId != null && data.none { it.messageId <= firstVisibleId }
+        if (!selectionMode && (wasAtTop || positionGone)) {
+            recyclerView.scrollToPosition(0)
+        }
         refreshHeader.setLastUpdateText(presenter.getTipsOfLastRefreshTime())
-        loadDataFinish()
+        updateEmptyState()
     }
 
     override fun onFeedback() {
@@ -367,10 +457,37 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
 
     private fun loadDataFinish() {
         refreshLayout.finishRefresh()
-        // 显示/隐藏空状态
+        updateEmptyState()
+    }
+
+    /**
+     * 显示/隐藏空状态
+     * 推送插入、增量拉取也会更新列表，这时下拉刷新可能还在进行，不能顺带结束刷新动画
+     */
+    private fun updateEmptyState() {
         val emptyVisibility = if (messageList.isEmpty()) View.VISIBLE else View.GONE
         emptyText.visibility = emptyVisibility
         emptyActionButton.visibility = emptyVisibility
+    }
+
+    /**
+     * 按 messageId 比较新旧列表
+     */
+    private class MessageDiffCallback(
+        private val oldList: List<WxpMessageListMessage>,
+        private val newList: List<WxpMessageListMessage>,
+    ) : DiffUtil.Callback() {
+        override fun getOldListSize(): Int = oldList.size
+
+        override fun getNewListSize(): Int = newList.size
+
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition].messageId == newList[newItemPosition].messageId
+        }
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
+            return oldList[oldItemPosition] == newList[newItemPosition]
+        }
     }
 
     override fun onCheckReason(data: WxpCheckAppMsgReasonResp?) {
