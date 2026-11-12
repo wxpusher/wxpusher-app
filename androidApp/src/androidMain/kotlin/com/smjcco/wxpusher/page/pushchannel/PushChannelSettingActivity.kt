@@ -28,6 +28,7 @@ import com.smjcco.wxpusher.push.PushChannelCoordinator
 import com.smjcco.wxpusher.push.PushChannelSnapshot
 import com.smjcco.wxpusher.push.PushPlatformResolver
 import com.smjcco.wxpusher.push.VendorAvailability
+import com.smjcco.wxpusher.push.ws.WsDiagnostics
 import com.smjcco.wxpusher.push.ws.alert.WsAlertStore
 import com.smjcco.wxpusher.push.ws.connect.WsManager
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveService
@@ -105,6 +106,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         val snapshot = latestSnapshot ?: PushChannelCoordinator.getSnapshot()
         renderWsAlertSetting(snapshot)
         renderWsDependencyChecks(snapshot)
+        if (snapshot.effectiveChannel == PushChannel.WEBSOCKET) WsDiagnostics.logState("settings-resume")
         if (waitingForAutoStartConfirmation) {
             waitingForAutoStartConfirmation = false
             showAutoStartConfirmationDialog()
@@ -462,6 +464,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
 
     private fun saveAutoStartConfirmation(confirmed: Boolean) {
         WxpSaveService.set(KEY_WS_AUTO_START_CONFIRMED, confirmed)
+        WsDiagnostics.logState("auto-start-confirmation")
         renderWsDependencyChecks(latestSnapshot ?: PushChannelCoordinator.getSnapshot())
     }
 
@@ -543,7 +546,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
     }
 
     companion object {
-        private const val KEY_WS_AUTO_START_CONFIRMED = "WsKeepAlive_AutoStartConfirmed"
+        private const val KEY_WS_AUTO_START_CONFIRMED = WsDiagnostics.AUTO_START_CONFIRMED_KEY
 
         fun start(context: Context) {
             context.startActivity(Intent(context, PushChannelSettingActivity::class.java))

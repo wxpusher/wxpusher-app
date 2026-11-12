@@ -11,6 +11,7 @@ import com.smjcco.wxpusher.bean.DevicePlatform
 import com.smjcco.wxpusher.config.ConfigItem
 import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager
+import com.smjcco.wxpusher.push.ws.WsDiagnostics
 import com.smjcco.wxpusher.push.ws.connect.WsManager
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveServiceStarter
 import com.smjcco.wxpusher.utils.ThreadUtils
@@ -342,6 +343,7 @@ object PushChannelCoordinator {
         errorMessage = null
         cancelAutomaticSyncRetry()
         ensureWsRunning()
+        WsDiagnostics.logState("select-ws", force = true)
         syncDesiredChannel()
     }
 
@@ -506,7 +508,7 @@ object PushChannelCoordinator {
 
             WxpLogUtils.i(
                 TAG,
-                "路由请求完成后目标已变化，submitted=$submittedTarget, queued=$queuedTarget, latest=$latestTarget"
+                "路由请求完成后目标已变化，submittedPlatform=${submittedTarget.platform}, queuedPlatform=${queuedTarget?.platform}, latestPlatform=${latestTarget?.platform}"
             )
             if (latestTarget != null) {
                 submitTarget(latestTarget)

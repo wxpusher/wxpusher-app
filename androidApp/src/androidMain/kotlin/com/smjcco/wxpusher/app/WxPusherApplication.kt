@@ -15,6 +15,7 @@ import com.smjcco.wxpusher.common.WxpSaveKey
 import com.smjcco.wxpusher.biz.version.WxpVersionCheckManager
 import com.smjcco.wxpusher.config.ConfigManager
 import com.smjcco.wxpusher.push.PushManager
+import com.smjcco.wxpusher.push.ws.WsDiagnostics
 import com.smjcco.wxpusher.utils.AppMarketNavigator
 import com.smjcco.wxpusher.web.AppFeVersionManager
 import com.smjcco.wxpusher.wxapi.WxpWeixinOpenManager
@@ -28,8 +29,10 @@ class WxPusherApplication : Application() {
         ApplicationUtils.init(this)
 
         WxpSaveService.init()
+        // 先跟踪 Activity 计数，避免首次同意协议时漏掉已经 started 的页面；此时不上传诊断。
+        if (WsDiagnostics.isMainProcess(this)) registerActivityLifecycleCallbacks(WsDiagnostics)
         WxpLogUtils.init()
-        WxpLogUtils.i(TAG, "应用启动")
+        WxpLogUtils.i(TAG, "应用启动,pid=${android.os.Process.myPid()}")
         //初始化一些配置和环境信息
         WxpConfig.init()
 
@@ -64,6 +67,7 @@ class WxPusherApplication : Application() {
     fun initSdkAfterAgreement() {
         if (agreementSdkInitialized) return
         agreementSdkInitialized = true
+        WsDiagnostics.init(this)
         // 推送：厂商推送能力检测会查询各厂商推送服务/包信息，同意前调用会被应用市场判定为读取应用列表
         PushManager.init(this)
         // 微信SDK：registerApp 会查询微信包信息，同样需在同意后
