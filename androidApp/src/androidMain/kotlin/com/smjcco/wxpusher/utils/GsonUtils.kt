@@ -16,19 +16,21 @@ object GsonUtils {
         }
     }
 
-    fun <T> toObj(str: String?, cls: Class<T>?): T? {
+    fun <T> toObj(str: String?, cls: Class<T>?, logErrors: Boolean = true): T? {
         synchronized(GSON) {
             try {
                 return GSON.fromJson<T>(str, cls)
             } catch (e: Throwable) {
-                WxpLogUtils.w("GSON", "序列化错误", e)
+                if (logErrors) {
+                    WxpLogUtils.w("GSON", "序列化错误，str=$str", e)
+                }
             }
         }
         return null
     }
 
-    fun <T : Any> toObj(str: String?, cls: KClass<T>?): T? {
-        return toObj(str, cls?.java)
+    fun <T : Any> toObj(str: String?, cls: KClass<T>?, logErrors: Boolean = true): T? {
+        return toObj(str, cls?.java, logErrors)
     }
 
     fun <T : Any> toObj(str: String?, type: Type?): T? {
@@ -36,7 +38,7 @@ object GsonUtils {
             try {
                 return GSON.fromJson(str, type) as T?
             } catch (e: Throwable) {
-                WxpLogUtils.w("GSON", "序列化错误", e)
+                WxpLogUtils.w("GSON", "序列化错误，str=$str", e)
             }
         }
         return null
@@ -49,7 +51,7 @@ object GsonUtils {
         try {
             return GSON.fromJson(json, cls)
         } catch (e: Throwable) {
-            WxpLogUtils.w("GSON", "序列化错误", e)
+            WxpLogUtils.w("GSON", "序列化错误，json=$json", e)
         }
         return null
     }

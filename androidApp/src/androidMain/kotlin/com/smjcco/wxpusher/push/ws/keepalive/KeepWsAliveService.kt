@@ -21,27 +21,29 @@ import com.smjcco.wxpusher.base.common.ApplicationUtils
 import com.smjcco.wxpusher.base.common.WxpLogUtils
 import com.smjcco.wxpusher.page.main.WxpMainActivity
 import com.smjcco.wxpusher.push.PushChannelStore
+import com.smjcco.wxpusher.push.ws.WsDiagnostics
 import com.smjcco.wxpusher.push.ws.ChannelGroup
 import com.smjcco.wxpusher.push.ws.WxpNotificationManager
 import com.smjcco.wxpusher.push.ws.connect.WsManager
-import com.smjcco.wxpusher.utils.ThreadUtils
 import kotlinx.coroutines.DelicateCoroutinesApi
-import java.util.Calendar
 
 
 enum class Actions {
     START,
-    STOP
+    STOP,
+    TASK_REMOVED_RESTART
 }
 
 class KeepWsAliveService : Service() {
 
     private var wakeLock: PowerManager.WakeLock? = null
-    private var isServiceStarted = false
 
+    private var startupFailed = false
+    private var destroyed = false
     private var hasStartCheckLoop = false
+    private var checkDueElapsed = 0L
+    private var checkScheduleMode: String? = null
 
-    private val loopCheckRunnable = Runnable { tryConnectAndAlarmLoopCheck() }
     private val loopAlarmListener = AlarmManager.OnAlarmListener { tryConnectAndAlarmLoopCheck() }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -49,6 +51,11 @@ class KeepWsAliveService : Service() {
     }
 
     companion object {
+        @Volatile
+        private var isServiceStarted = false
+
+        fun isRunning(): Boolean = isServiceStarted
+
         const val KeepWsAliveServiceNotificationId = 1
         const val KeepWsAliveNotificationChannelId = "WxPusherKeepAliveNotificationChannelId"
 
@@ -66,7 +73,11 @@ class KeepWsAliveService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (startupFailed) {
+            return START_NOT_STICKY
+        }
         if (intent != null) {
+            WsDiagnostics.serviceEvent("服务入口,action=${intent.action}")
             val action = intent.action
             when (action) {
                 Actions.START.name -> syncServiceWithChannelState()
@@ -74,7 +85,7 @@ class KeepWsAliveService : Service() {
                 else -> syncServiceWithChannelState()
             }
         } else {
-            // 系统重建服务时 intent 可能为空，此时以持久化的通道状态为准。
+            WsDiagnostics.serviceEvent("KeepWsAliveService 系统重建,onStartCommand intent=null")
             syncServiceWithChannelState()
         }
         // 只有 WS 仍被选中时才允许系统在服务被杀后重建。
@@ -96,20 +107,19 @@ class KeepWsAliveService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        WxpLogUtils.i(message = "KeepWsAliveService onCreate")
-        val notification = createNotification()
-        startForeground(KeepWsAliveServiceNotificationId, notification)
-        if (PushChannelStore.isWsRequested() && !hasStartCheckLoop) {
-            hasStartCheckLoop = true
-            // 启动定时检查循环，但首次不重复执行连接操作。
-            tryConnectAndAlarmLoopCheck(false)
+        WsDiagnostics.serviceEvent("KeepWsAliveService onCreate,pid=${android.os.Process.myPid()}")
+        if (!promoteToForeground()) {
+            return
         }
+        // 服务重建后 onStartCommand 可能延迟，不能只显示通知却未启动保活工作。
+        syncServiceWithChannelState()
     }
 
     override fun onDestroy() {
+        destroyed = true
         cleanupServiceResources()
         super.onDestroy()
-        WxpLogUtils.i(message = "KeepWsAliveService onDestroy")
+        WsDiagnostics.serviceEvent("KeepWsAliveService onDestroy")
     }
 
     /**
@@ -120,7 +130,7 @@ class KeepWsAliveService : Service() {
         if (!PushChannelStore.isWsRequested()) {
             return
         }
-        WxpLogUtils.i(message = "KeepWsAliveService onTaskRemoved-使用定时器重新启动任务")
+        WsDiagnostics.serviceEvent("KeepWsAliveService onTaskRemoved-使用定时器重新启动任务")
         val restartServicePendingIntent = createRestartServicePendingIntent()
         val alarmService: AlarmManager =
             applicationContext.getSystemService(ALARM_SERVICE) as AlarmManager
@@ -134,6 +144,9 @@ class KeepWsAliveService : Service() {
     @SuppressLint("WakelockTimeout")
     @OptIn(DelicateCoroutinesApi::class)
     private fun startService() {
+        if (startupFailed || destroyed) {
+            return
+        }
         if (!PushChannelStore.isWsRequested()) {
             stopService()
             return
@@ -141,28 +154,56 @@ class KeepWsAliveService : Service() {
         if (isServiceStarted) {
             //检查前台的通知是否存在，不存在就加回来，避免通知被用户删除了
             if (!WxpNotificationManager.hasNotificationById(KeepWsAliveServiceNotificationId)) {
-                val notification = createNotification()
-                startForeground(KeepWsAliveServiceNotificationId, notification)
+                promoteToForeground()
             }
             return
         }
-        WxpLogUtils.i(message = "KeepWsAliveService is started")
-        isServiceStarted = true
-        // 获取局部唤醒锁，降低系统休眠模式对 WS 保活服务的影响。
-        wakeLock =
-            (getSystemService(POWER_SERVICE) as PowerManager).run {
-                newWakeLock(
-                    PowerManager.PARTIAL_WAKE_LOCK,
-                    "${KeepWsAliveService::class.java.name}::lock"
-                ).apply {
-                    acquire()
+        try {
+            // 获取局部唤醒锁，降低系统休眠模式对 WS 保活服务的影响。
+            wakeLock =
+                (getSystemService(POWER_SERVICE) as PowerManager).run {
+                    newWakeLock(
+                        PowerManager.PARTIAL_WAKE_LOCK,
+                        "${KeepWsAliveService::class.java.name}::lock"
+                    ).apply {
+                        acquire()
+                    }
                 }
+            doWork()
+            if (!hasStartCheckLoop) {
+                hasStartCheckLoop = true
+                tryConnectAndAlarmLoopCheck(false)
             }
-        doWork()
+            isServiceStarted = true
+            WsDiagnostics.event("WsService", "服务工作启动完成,wakeLock=${wakeLock?.isHeld},checkLoop=$hasStartCheckLoop")
+        } catch (e: SecurityException) {
+            failStartup(e)
+        } catch (e: IllegalStateException) {
+            failStartup(e)
+        }
+    }
+
+    private fun promoteToForeground(): Boolean {
+        return try {
+            startForeground(KeepWsAliveServiceNotificationId, createNotification())
+            true
+        } catch (e: SecurityException) {
+            failStartup(e)
+            false
+        } catch (e: IllegalStateException) {
+            failStartup(e)
+            false
+        }
+    }
+
+    private fun failStartup(error: RuntimeException) {
+        startupFailed = true
+        WsDiagnostics.event("WsService", "服务启动失败,type=${error.javaClass.simpleName}", error)
+        try { cleanupServiceResources() } finally { stopSelf() }
     }
 
     private fun stopService() {
-        WxpLogUtils.i(message = "KeepWsAliveService stopService")
+        WsDiagnostics.serviceEvent("KeepWsAliveService stopService")
         try {
             cleanupServiceResources()
             stopSelf()
@@ -176,6 +217,7 @@ class KeepWsAliveService : Service() {
     private fun createRestartServicePendingIntent(): PendingIntent {
         val restartServiceIntent = Intent(applicationContext, KeepWsAliveService::class.java).also {
             it.setPackage(packageName)
+            it.action = Actions.TASK_REMOVED_RESTART.name
         }
         return PendingIntent.getService(
             this,
@@ -192,12 +234,12 @@ class KeepWsAliveService : Service() {
      */
     private fun cleanupServiceResources() {
         releaseWakeLock()
-        ThreadUtils.getMainThreadHandler().removeCallbacks(loopCheckRunnable)
         val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(loopAlarmListener)
         alarmManager.cancel(createRestartServicePendingIntent())
         stopForeground(STOP_FOREGROUND_REMOVE)
         hasStartCheckLoop = false
+        checkDueElapsed = 0L
         isServiceStarted = false
     }
 
@@ -212,7 +254,7 @@ class KeepWsAliveService : Service() {
     }
 
     private fun doWork() {
-        WsManager.tryConnect()
+        WsManager.tryConnect("keepalive-start")
     }
 
     private fun createNotification(): Notification {
@@ -269,45 +311,37 @@ class KeepWsAliveService : Service() {
 
 
     /**
-     * 使用系统非精确闹钟每 5 分钟检查一次连接，作为系统回收或网络波动后的兜底。
+     * 每 5 分钟通过普通唤醒闹钟检查连接，不增加精确唤醒。
      * 通道已切回厂商推送时不再安排下一轮任务。
      */
     private fun tryConnectAndAlarmLoopCheck(doWork: Boolean = true) {
-        if (!PushChannelStore.isWsRequested()) {
+        if (destroyed || startupFailed || !PushChannelStore.isWsRequested()) {
             return
         }
-        WxpLogUtils.d(message = "tryConnectAndAlarmLoopCheck,系统非精确闹钟定时兜底")
+        val now = SystemClock.elapsedRealtime()
+        val lateMillis = if (checkDueElapsed == 0L) { 0L } else { now - checkDueElapsed }
+        val status = WsManager.getConnectStatus()
+        // 在线且按时执行的检查不上传日志；异常时最多每轮（五分钟）一条。
+        if (doWork && (lateMillis > 60_000L || status != WsManager.WsConnectStatus.Connected)) {
+            WsDiagnostics.serviceEvent("WS保活检查,status=$status,lateMs=${lateMillis.coerceAtLeast(0L)}")
+        }
         val application = ApplicationUtils.getApplication()
         if (doWork) {
-            WsManager.tryConnect()
+            WsManager.tryConnect("keepalive-check")
             KeepWsAliveServiceStarter.start(application)
         }
         val delayTime = 5
-        val reconnectTime = Calendar.getInstance()
-        reconnectTime.add(Calendar.MINUTE, delayTime)
+        checkDueElapsed = SystemClock.elapsedRealtime() + delayTime * 60_000L
         val alarmManager = application.getSystemService(ALARM_SERVICE) as AlarmManager
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (alarmManager.canScheduleExactAlarms()) {
-                alarmManager.set(
-                    AlarmManager.RTC_WAKEUP,
-                    reconnectTime.timeInMillis,
-                    "WS-tryAlarmLoopCheck",
-                    loopAlarmListener,
-                    null,
-                )
-            } else {
-                WxpLogUtils.d(message = "不能调用alarmManager，通过post delay来检查")
-                ThreadUtils.getMainThreadHandler().removeCallbacks(loopCheckRunnable)
-                ThreadUtils.runOnMainThread(loopCheckRunnable, delayTime * 60 * 1000L)
-            }
-        } else {
-            alarmManager.set(
-                AlarmManager.RTC_WAKEUP,
-                reconnectTime.timeInMillis,
-                "WS-tryAlarmLoopCheck",
-                loopAlarmListener,
-                null,
-            )
+        val mode = "alarm-inexact"
+        alarmManager.set(
+            AlarmManager.ELAPSED_REALTIME_WAKEUP, checkDueElapsed,
+            "WS-tryAlarmLoopCheck", loopAlarmListener, null,
+        )
+        // 初始化或模式变化才记录，不逐轮上传健康调度日志。
+        if (mode != checkScheduleMode) {
+            checkScheduleMode = mode
+            WsDiagnostics.serviceEvent("WS保活检查调度,mode=$mode,delayMs=300000")
         }
     }
 }

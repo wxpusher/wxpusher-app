@@ -18,8 +18,7 @@ import kotlinx.coroutines.withContext
 /**
  * WS 前台保活服务的启动器。
  *
- * 通过 WorkManager 间接启动服务，避免应用从广播或后台场景直接启动前台服务时
- * 受到系统后台启动限制。停止 WS 时同时取消未执行的启动任务，防止服务被再次拉起。
+ * 通过 WorkManager 合并服务启动请求；它不绕过系统后台启动限制。停止 WS 时同时取消未执行的启动任务，防止服务被再次拉起。
  */
 class KeepWsAliveServiceStarter(private val context: Context) {
     /** 提交唯一的保活服务启动任务。 */
@@ -52,9 +51,16 @@ class KeepWsAliveServiceStarter(private val context: Context) {
                 // 任务执行前用户可能已经切回厂商通道，此时不再启动服务。
                 return Result.success()
             }
-            withContext(Dispatchers.IO) {
-                WxpLogUtils.d(message = "ServiceStartWorker call  KeepWsAliveService.start() (work ID: ${id})")
-                KeepWsAliveService.start()
+            try {
+                withContext(Dispatchers.IO) { KeepWsAliveService.start() }
+            } catch (e: kotlinx.coroutines.CancellationException) {
+                throw e
+            } catch (e: IllegalStateException) {
+                com.smjcco.wxpusher.push.ws.WsDiagnostics.event("WsService", "服务启动请求失败,type=${e.javaClass.simpleName}", e)
+                return Result.failure()
+            } catch (e: SecurityException) {
+                com.smjcco.wxpusher.push.ws.WsDiagnostics.event("WsService", "服务启动权限失败,type=${e.javaClass.simpleName}", e)
+                return Result.failure()
             }
             return Result.success()
         }
@@ -67,8 +73,10 @@ class KeepWsAliveServiceStarter(private val context: Context) {
             if (!PushChannelStore.isWsRequested()) {
                 return
             }
-            // 通知仍存在说明前台服务大概率仍在运行，无需重复提交任务。
-            if (WxpNotificationManager.hasNotificationById(KeepWsAliveService.KeepWsAliveServiceNotificationId)) {
+            // 通知可能先于保活工作创建，必须同时确认工作已启动。
+            if (KeepWsAliveService.isRunning() &&
+                WxpNotificationManager.hasNotificationById(KeepWsAliveService.KeepWsAliveServiceNotificationId)
+            ) {
                 return
             }
             // 只有 WS 被协调器启用且具备通知权限时，才开启前台保活服务。
