@@ -534,7 +534,7 @@ object WsManager {
                 }
                 // 同类失败汇总，堆栈独立限频；恢复/切换通道也不重置窗口。
                 if (includeStack || lastFailureType != t.javaClass.name) {
-                    logEvent("WS连接失败,type=${t.javaClass.simpleName},retry=$reTryCount,source=$connectionSource,suppressed=$suppressedFailures", t.takeIf { includeStack })
+                    logEvent("WS连接失败,type=${t.javaClass.simpleName},message=${WsDiagnostics.safeError(t.message)},retry=$reTryCount,source=$connectionSource,suppressed=$suppressedFailures", t.takeIf { includeStack })
                     lastFailureType = t.javaClass.name
                     suppressedFailures = 0
                 } else {

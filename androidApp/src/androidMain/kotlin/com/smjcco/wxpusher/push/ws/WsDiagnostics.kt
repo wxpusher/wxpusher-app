@@ -68,9 +68,10 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
         }
     }
 
-    private fun safeError(message: String?): String = (message ?: "unknown")
+    internal fun safeError(message: String?): String = (message ?: "unknown")
         .replace(Regex("(?:PT_|UID_|DID_)[A-Za-z0-9_-]+"), "[redacted]")
-        .replace(Regex("https?://[^\\s]+"), "[url]")
+        .replace(Regex("(?:https?|wss?)://\\S+"), "[url]")
+        .replace(Regex("[\\r\\n]+"), " ")
         .take(512)
 
     fun event(tag: String, message: String, error: Throwable? = null) {
