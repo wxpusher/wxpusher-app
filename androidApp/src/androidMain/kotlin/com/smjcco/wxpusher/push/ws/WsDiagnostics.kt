@@ -7,10 +7,14 @@ import android.app.AlarmManager
 import android.app.Application
 import android.app.ApplicationExitInfo
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
+import android.os.BatteryManager
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
@@ -48,6 +52,14 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
         }
 
     private fun clocks(): String = "eventTimeMs=${System.currentTimeMillis()},elapsedMs=${SystemClock.elapsedRealtime()},uptimeMs=${SystemClock.uptimeMillis()},pid=${Process.myPid()},session=$processSession"
+
+    private val deviceStateReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            if (PushChannelStore.isWsRequested()) {
+                logState("device-${intent.action?.substringAfterLast('.')}", force = true)
+            }
+        }
+    }
 
     /** Rare service lifecycle events keep the existing synchronous persistence path. */
     fun serviceEvent(message: String) {
@@ -98,6 +110,14 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
             return
         }
         initialized = true
+        val deviceEvents = IntentFilter().apply {
+            addAction(Intent.ACTION_POWER_CONNECTED)
+            addAction(Intent.ACTION_POWER_DISCONNECTED)
+            addAction(Intent.ACTION_SCREEN_ON)
+            addAction(Intent.ACTION_SCREEN_OFF)
+            addAction(PowerManager.ACTION_DEVICE_IDLE_MODE_CHANGED)
+        }
+        ContextCompat.registerReceiver(application, deviceStateReceiver, deviceEvents, ContextCompat.RECEIVER_NOT_EXPORTED)
         logState("process-start", force = true)
         ThreadUtils.runOnBackgroundThread(Runnable { reportPreviousExit(application) })
     }
@@ -122,6 +142,7 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
     private fun state(): String {
         val app = ApplicationUtils.getApplication()
         val power = app.getSystemService(Context.POWER_SERVICE) as PowerManager
+        val battery = app.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
         val alarms = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val notifications = app.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         fun value(block: () -> Any?): String = runCatching { block()?.toString() ?: "unknown" }.getOrDefault("unknown")
@@ -137,6 +158,8 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
             "autoStartConfirmed" to value { WxpSaveService.get(AUTO_START_CONFIRMED_KEY, false) },
             "batteryExempt" to value { DeviceUtils.isIgnoringBatteryOptimizations() },
             "backgroundRestricted" to value { DeviceUtils.isBackgroundRestricted() },
+            "charging" to value { battery.isCharging },
+            "batteryPercent" to value { battery.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY) },
             "interactive" to value { power.isInteractive },
             "idle" to value { power.isDeviceIdleMode },
             "powerSave" to value { power.isPowerSaveMode },
