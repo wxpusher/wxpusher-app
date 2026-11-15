@@ -65,6 +65,30 @@
                     android:path="/message"
                     android:scheme="wxpusher" />
             </intent-filter>
+            <!--统一订阅链接：落地页「打开 App 订阅」用的 scheme-->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="wxpusher.smjcco.com"
+                    android:path="/subscribe"
+                    android:scheme="wxpusher" />
+            </intent-filter>
+            <!--统一订阅链接 App Links：https://wxpusher.zjiecode.com/api/s/{sk}，校验文件 /.well-known/assetlinks.json-->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="wxpusher.zjiecode.com"
+                    android:pathPrefix="/api/s/"
+                    android:scheme="https" />
+            </intent-filter>
         </activity>
 
         <activity

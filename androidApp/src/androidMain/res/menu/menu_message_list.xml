@@ -7,6 +7,11 @@
         app:showAsAction="never|withText" />
 
     <item
+        android:id="@+id/menu_code_word"
+        android:title="@string/message_list_code_word"
+        app:showAsAction="never|withText" />
+
+    <item
         android:id="@+id/menu_subscription_manager"
         android:title="@string/message_list_sub_manager"
         app:showAsAction="never|withText" />

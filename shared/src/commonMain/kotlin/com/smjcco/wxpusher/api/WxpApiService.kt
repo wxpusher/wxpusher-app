@@ -10,6 +10,10 @@ import com.smjcco.wxpusher.base.common.WxpToastUtils
 import com.smjcco.wxpusher.biz.ad.WxpShowAdResp
 import io.ktor.client.statement.bodyAsText
 import com.smjcco.wxpusher.biz.version.AppVersionCheckResp
+import com.smjcco.wxpusher.biz.subscribe.WxpCodeWordMatch
+import com.smjcco.wxpusher.biz.subscribe.WxpSubscribeIntentFactors
+import com.smjcco.wxpusher.biz.subscribe.WxpSubscribeIntentMatchResp
+import com.smjcco.wxpusher.page.scan.WxpFollowResult
 import com.smjcco.wxpusher.page.accountdetail.WxpAppleBindReq
 import com.smjcco.wxpusher.page.accountdetail.WxpWeixinBindReq
 import com.smjcco.wxpusher.page.changephone.WxpPhoneBindReq
@@ -35,6 +39,7 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
+import io.ktor.http.encodeURLPathPart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
@@ -468,6 +473,43 @@ object WxpApiService {
             return@commonRespDeal WxpNetworkService.getWxpHttpClient()
                 .get(WxpNetworkService.getUrl("/api/device/version-update"))
                 .body()
+        })
+    }
+
+    /**
+     * 消息搜索时按暗号查订阅目标，查不到返回 null。
+     * scene=search 单独限频、不计连续错误，不占用「输入订阅暗号」页的次数；失败静默。
+     */
+    suspend fun lookupCodeWord(word: String): WxpCodeWordMatch? {
+        return commonRespDeal<WxpCodeWordMatch?>(toastError = false, handleUnauthorized = false, block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .get(WxpNetworkService.getUrl("/api/optional-login/device/code-word/${word.encodeURLPathPart()}")) {
+                    parameter("scene", "search")
+                }.body()
+        })
+    }
+
+    /**
+     * 安装后还原：上报多因素，返回匹配到的订阅意图。后台调用，失败静默。
+     */
+    suspend fun matchSubscribeIntent(factors: WxpSubscribeIntentFactors): WxpSubscribeIntentMatchResp? {
+        return commonRespDeal(toastError = false, handleUnauthorized = false, block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .post(WxpNetworkService.getUrl("/api/need-login/device/subscribe-intent/match")) {
+                    setBody(factors)
+                }.body()
+        })
+    }
+
+    /**
+     * 按还原出的订阅意图订阅（必须是本设备认领的）
+     */
+    suspend fun subscribeByIntent(intentId: String): WxpFollowResult? {
+        return commonRespDeal(block = {
+            return@commonRespDeal WxpNetworkService.getWxpHttpClient()
+                .post(WxpNetworkService.getUrl("/api/need-login/device/subscribe-link/subscribe")) {
+                    setBody(mapOf("intentId" to intentId))
+                }.body()
         })
     }
 }

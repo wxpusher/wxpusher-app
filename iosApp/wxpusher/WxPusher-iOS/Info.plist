@@ -20,6 +20,16 @@
 				<string>wx906c2d32c1b1a115</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>wxpusher</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>wxpusher</string>
+			</array>
+		</dict>
 	</array>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>

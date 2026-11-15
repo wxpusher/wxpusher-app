@@ -73,6 +73,16 @@ extension WxpWeixinOpenManager: WXApiDelegate {
         if let authReq = req as? SendAuthReq {
             print("收到授权请求: \(authReq)")
         }
+        //开放标签 wx-open-launch-app 拉起：extinfo 是订阅意图 id
+        var ext: String?
+        if let launchReq = req as? LaunchFromWXReq {
+            ext = launchReq.message.messageExt
+        } else if let showReq = req as? ShowMessageFromWXReq {
+            ext = showReq.message.messageExt
+        }
+        if let intentId = ext, !intentId.isEmpty {
+            MainTabBarController.handleSubscribeIntentId(intentId)
+        }
     }
     
     /// 收到微信的响应

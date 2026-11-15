@@ -370,6 +370,69 @@
             android:visibility="gone" />
     </LinearLayout>
 
+    <!-- 搜索词正好是订阅暗号时显示，点击打开订阅落地页 -->
+    <LinearLayout
+        android:id="@+id/code_word_match_row"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="16dp"
+        android:paddingTop="4dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="12dp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/search_bar_container"
+        tools:visibility="visible">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="暗号匹配"
+                android:textColor="@color/AccentColor"
+                android:textSize="12sp" />
+
+            <TextView
+                android:id="@+id/code_word_match_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:singleLine="true"
+                android:textColor="@color/text_fit_theme"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                tools:text="订阅链路测试" />
+
+            <TextView
+                android:id="@+id/code_word_match_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textColor="@color/text_fit_theme_second"
+                android:textSize="12sp"
+                tools:text="应用 · 单发" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/code_word_match_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:textColor="@color/AccentColor"
+            android:textSize="14sp"
+            tools:text="去订阅" />
+    </LinearLayout>
+
     <com.scwang.smart.refresh.layout.SmartRefreshLayout
         android:id="@+id/refresh_layout"
         android:layout_width="0dp"
@@ -378,7 +441,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/search_bar_container"
+        app:layout_constraintTop_toBottomOf="@id/code_word_match_row"
         app:layout_constraintVertical_bias="1.0">
 
         <androidx.recyclerview.widget.RecyclerView
@@ -428,5 +491,20 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/empty_text" />
+
+    <!--统一订阅链接：下载 App 后用订阅暗号订阅-->
+    <TextView
+        android:id="@+id/empty_code_word_entry"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:padding="8dp"
+        android:text="有订阅暗号？去输入"
+        android:textColor="@color/AccentColor"
+        android:textSize="14sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/empty_action_button" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
