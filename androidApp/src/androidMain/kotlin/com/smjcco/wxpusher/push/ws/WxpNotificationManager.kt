@@ -67,6 +67,7 @@ object WxpNotificationManager {
      */
     fun sendBizMessageNotification(message: PushMsgDeviceMsg) {
         if (!shouldDeliver(message.mid)) {
+            WsDiagnostics.event("WsNotification", "WS通知去重,mid=${message.mid}")
             return
         }
         val channel: String = WxPusherWsMessageChannelId
@@ -102,6 +103,7 @@ object WxpNotificationManager {
                 .build()
 
         sendNotification(notification)
+        WsDiagnostics.event("WsNotification", "WS通知已提交系统,mid=${message.mid}")
         // 渠道是静音的，震动、闪光灯、响铃由 App 按用户设置执行。
         WsAlertPlayer.alert()
     }
