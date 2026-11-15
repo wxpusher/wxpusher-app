@@ -284,6 +284,8 @@ class WxpWebViewController: UIViewController {
     }
     
     private func setupWebview(){
+        // UA 标记，和 Android、鸿蒙对齐，便于服务端识别 App 内的加载（monorepo docs/message-detail-sandbox-design.md 第 6.4 节 I2）
+        self.configuration.applicationNameForUserAgent = (self.configuration.applicationNameForUserAgent ?? "Mobile/15E148") + " WxPusher-iOS"
         self.webView = WKWebView(frame: .zero, configuration: self.configuration)
         self.webView?.translatesAutoresizingMaskIntoConstraints = false
         
@@ -1015,6 +1017,11 @@ extension WxpWebViewController: WKNavigationDelegate {
 extension WxpWebViewController: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if message.name != "wxpusher" {
+            return
+        }
+        // 消息处理器对所有 frame 可见。消息详情页正文在沙箱 iframe 里（monorepo docs/message-detail-sandbox-design.md 第 6.4 节 I1），
+        // 只接受主 frame、且主 frame 自己的源在白名单内的调用；白名单检查原来只看顶层 URL，挡不住子 frame
+        guard message.frameInfo.isMainFrame, isHostInWhitelist(message.frameInfo.securityOrigin.host) else {
             return
         }
         bridgeManager?.onMessage(message.body)

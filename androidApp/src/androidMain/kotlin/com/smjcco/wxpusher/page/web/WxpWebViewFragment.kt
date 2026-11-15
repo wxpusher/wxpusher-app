@@ -29,6 +29,8 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.createBitmap
 import androidx.core.net.toUri
+import androidx.webkit.WebViewCompat
+import androidx.webkit.WebViewFeature
 import com.smjcco.wxpusher.R
 import com.smjcco.wxpusher.ad.WxpBannerAdView
 import com.smjcco.wxpusher.ad.WxpPangleAdManager
@@ -51,6 +53,7 @@ import com.smjcco.wxpusher.web.AppFeVersionManager
 import com.smjcco.wxpusher.web.WxpWebHostPolicy
 import com.smjcco.wxpusher.wxapi.WxpWeixinOpenManager
 import com.tencent.mm.opensdk.modelmsg.SendMessageToWX
+import java.util.concurrent.Executors
 
 open class WxpWebViewFragment : WxpBaseFragment() {
     companion object Companion {
@@ -59,6 +62,8 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         private const val DEVICE_TOKEN_KEY = "deviceToken"
         private const val DEVICE_PLATFORM_KEY = "platform"
         private const val DEVICE_VERSION_NAME_KEY = "versionName"
+        private const val FRAME_SAFE_KEY = "wxpFrameSafe"
+        private const val JS_BRIDGE_NAME = "wxpusher"
         const val OPTION_MENU_COPY_LINK = "copy_link"
         const val OPTION_MENU_WEIXIN_SHARE = "weixin_share"
         const val OPTION_MENU_SHARE = "share"
@@ -108,6 +113,12 @@ open class WxpWebViewFragment : WxpBaseFragment() {
     private var bottomBarVisibleOverride: Boolean? = null
     private lateinit var bridgeContext: BridgeContext
     private lateinit var webBridgeManager: WxpWebBridgeManager
+
+    /** 原生桥是否只对主 frame 开放，见 installJsBridge */
+    private var bridgeFrameSafe = false
+
+    /** addWebMessageListener 的回调在主线程，桥消息放到这个线程顺序处理（和 addJavascriptInterface 的 JavaBridge 线程一致） */
+    private val bridgeExecutor = Executors.newSingleThreadExecutor()
 
     //图片长按菜单
     private var imageActionSheetDialogFragment: ActionSheetDialogFragment? = null
@@ -198,10 +209,8 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         // 设置User-Agent
         webSettings.userAgentString = webSettings.userAgentString + "/WxPusher-Android"
 
-        // 添加JavaScript接口，兼容iOS的调用方式
-        webView.addJavascriptInterface(WxpWebBridgeInterface(), "wxpusher")
-
         initializeWebBridge()
+        installJsBridge()
 
         webView.webViewClient = createWebViewClient()
         webView.webChromeClient = createWebChromeClient()
@@ -209,6 +218,58 @@ open class WxpWebViewFragment : WxpBaseFragment() {
         // 设置长按监听器，用于检测图片长按事件
         webView.setOnLongClickListener { view ->
             handleWebViewLongClick(view as WebView)
+        }
+    }
+
+    /**
+     * 注入 H5 调用的 window.wxpusher.postMessage(json)，H5 侧写法不变。
+     *
+     * 消息详情页正文放在沙箱 iframe 里（monorepo docs/message-detail-sandbox-design.md 第 6.3 节），桥必须只对主 frame 开放：
+     * - 支持 WEB_MESSAGE_LISTENER：用 addWebMessageListener，只有白名单源的 frame 才会注入对象，回调里再丢弃非主 frame 的消息
+     *   （白名单域名的子 frame，例如 app-fe 内嵌的详情页外壳）。沙箱 iframe 是不透明源，根本拿不到对象
+     * - 不支持的老 WebView：退回 addJavascriptInterface（所有 frame 都能调），加载白名单页面时带 wxpFrameSafe: 0，服务端对正文走受限模式
+     */
+    private fun installJsBridge() {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+            WebViewCompat.addWebMessageListener(webView, JS_BRIDGE_NAME, bridgeOriginRules()) { _, message, _, isMainFrame, _ ->
+                val data = message.data
+                if (!isMainFrame || data == null) {
+                    return@addWebMessageListener
+                }
+                // 回调在主线程；和 addJavascriptInterface 一样放到单独的线程顺序处理，桥处理逻辑的线程环境不变
+                runCatching { bridgeExecutor.execute { handleBridgeMessage(data) } } // 页面销毁后线程池已关闭，丢弃即可
+            }
+            bridgeFrameSafe = true
+        } else {
+            webView.addJavascriptInterface(WxpWebBridgeInterface(), JS_BRIDGE_NAME)
+            bridgeFrameSafe = false
+        }
+        bridgeContext.frameSafe = bridgeFrameSafe
+    }
+
+    /**
+     * addWebMessageListener 的源规则：白名单域名的 https / http 默认端口；本地调试 IP 额外放开 app-fe 开发服务器的 3000 端口
+     */
+    private fun bridgeOriginRules(): Set<String> {
+        val rules = mutableSetOf<String>()
+        for (host in WxpWebHostPolicy.DEFAULT_WHITELIST_HOSTS) {
+            rules.add("https://$host")
+            rules.add("http://$host")
+            if (host.first().isDigit()) {
+                rules.add("http://$host:3000")
+            }
+        }
+        return rules
+    }
+
+    private fun handleBridgeMessage(messageJson: String) {
+        if (!::webBridgeManager.isInitialized) {
+            return
+        }
+        runCatching {
+            webBridgeManager.onMessage(messageJson)
+        }.onFailure {
+            WxpLogUtils.w(message = "处理WebBridge消息失败", throwable = it)
         }
     }
 
@@ -455,6 +516,10 @@ open class WxpWebViewFragment : WxpBaseFragment() {
             headers[DEVICE_TOKEN_KEY] = deviceToken
             headers[DEVICE_VERSION_NAME_KEY] = versionName
             headers[DEVICE_PLATFORM_KEY] = platform
+            if (!bridgeFrameSafe) {
+                // 老 WebView 的桥对所有 frame 开放，告诉服务端消息详情页正文走受限模式
+                headers[FRAME_SAFE_KEY] = "0"
+            }
         }
 
         return headers
@@ -783,6 +848,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        bridgeExecutor.shutdown()
         webView.destroy()
     }
 
@@ -797,14 +863,7 @@ open class WxpWebViewFragment : WxpBaseFragment() {
          */
         @JavascriptInterface
         fun postMessage(messageJson: String) {
-            if (!::webBridgeManager.isInitialized) {
-                return
-            }
-            runCatching {
-                webBridgeManager.onMessage(messageJson)
-            }.onFailure {
-                WxpLogUtils.w(message = "处理WebBridge消息失败", throwable = it)
-            }
+            handleBridgeMessage(messageJson)
         }
     }
 

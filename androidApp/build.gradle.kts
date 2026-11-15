@@ -32,7 +32,8 @@ kotlin {
             implementation("androidx.appcompat:appcompat:1.7.0")
             //监听App前后台切换（ProcessLifecycleOwner），原本已通过其他SDK间接引入，这里显式声明
             implementation(libs.androidx.lifecycle.process)
-//            implementation("androidx.webkit:webkit:1.9.0")
+            //WebViewCompat.addWebMessageListener：原生桥只对主 frame 开放（消息详情页正文沙箱，见 monorepo docs/message-detail-sandbox-design.md 第 6.3 节）
+            implementation("androidx.webkit:webkit:1.9.0")
             implementation("com.google.android.material:material:1.12.0")
             implementation("commons-codec:commons-codec:1.6")
 
