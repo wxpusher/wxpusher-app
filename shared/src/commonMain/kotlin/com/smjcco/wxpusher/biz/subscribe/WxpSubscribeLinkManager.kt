@@ -55,6 +55,8 @@ data class WxpCodeWordMatch(
     val name: String? = null,
     //当前用户是否已订阅
     val subscribed: Boolean = false,
+    //已订阅时的订阅 id，点击直接进订阅详情
+    val subId: Long? = null,
 )
 
 /**
@@ -80,6 +82,15 @@ object WxpSubscribeLinkManager {
     /** 按暗号打开落地页，和市场搜索命中暗号时跳转的一致 */
     fun pageUrlForCodeWord(word: String): String =
         "${WxpConfig.appFeUrl}/app/#/subscribe-link?sk=${word.encodeURLParameter()}&via=code"
+
+    /** 消息搜索的暗号匹配行：已订阅直接进订阅详情，否则去落地页订阅，和消息市场一致 */
+    fun pageUrlForCodeWordMatch(match: WxpCodeWordMatch): String {
+        val subId = match.subId
+        if (match.subscribed && subId != null && subId > 0) {
+            return "${WxpConfig.appFeUrl}/app/#/subscribe-detail?subId=$subId"
+        }
+        return pageUrlForCodeWord(match.word)
+    }
 
     /** 开放标签 extinfo 只带 intentId */
     fun pageUrlForIntent(intentId: String): String =

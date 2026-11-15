@@ -555,7 +555,7 @@ class MessageListViewController: WxpBaseMvpUIViewController<IWxpMessageListPrese
 
     @objc private func codeWordMatchTapped() {
         guard let match = codeWordMatch else { return }
-        WxpJumpPageUtils.jumpToWebUrl(url: WxpSubscribeLinkManager.shared.pageUrlForCodeWord(word: match.word))
+        WxpJumpPageUtils.jumpToWebUrl(url: WxpSubscribeLinkManager.shared.pageUrlForCodeWordMatch(match: match))
     }
     
     func onListBanner(data: WxpListBannerResp?) {

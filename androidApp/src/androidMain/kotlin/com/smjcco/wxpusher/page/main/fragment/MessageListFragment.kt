@@ -219,7 +219,7 @@ class MessageListFragment : WxpBaseMvpFragment<IWxpMessageListPresenter>(), IWxp
         codeWordMatchRow = view.findViewById(R.id.code_word_match_row)
         codeWordMatchRow.setOnClickListener {
             codeWordMatch?.let {
-                WxpJumpPageUtils.jumpToWebUrl(WxpSubscribeLinkManager.pageUrlForCodeWord(it.word), activity)
+                WxpJumpPageUtils.jumpToWebUrl(WxpSubscribeLinkManager.pageUrlForCodeWordMatch(it), activity)
             }
         }
         //banner
