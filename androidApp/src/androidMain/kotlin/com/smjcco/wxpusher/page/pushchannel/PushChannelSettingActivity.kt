@@ -28,6 +28,7 @@ import com.smjcco.wxpusher.push.PushChannelCoordinator
 import com.smjcco.wxpusher.push.PushChannelSnapshot
 import com.smjcco.wxpusher.push.PushPlatformResolver
 import com.smjcco.wxpusher.push.VendorAvailability
+import com.smjcco.wxpusher.push.ws.WsDiagnostics
 import com.smjcco.wxpusher.push.VendorGuideSource
 import com.smjcco.wxpusher.push.VendorSubscribeGuide
 import com.smjcco.wxpusher.push.VendorSubscribeState
@@ -111,6 +112,9 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         val snapshot = latestSnapshot ?: PushChannelCoordinator.getSnapshot()
         renderWsAlertSetting(snapshot)
         renderWsDependencyChecks(snapshot)
+        if (snapshot.effectiveChannel == PushChannel.WEBSOCKET) {
+            WsDiagnostics.logState("settings-resume")
+        }
         renderVendorSubscribe(snapshot)
         if (waitingForAutoStartConfirmation) {
             waitingForAutoStartConfirmation = false
@@ -294,7 +298,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
     private fun renderVendorAlertSetting(snapshot: PushChannelSnapshot) {
         val vendorEffective = snapshot.effectiveChannel == PushChannel.VENDOR
         vendorAlertSetting.isEnabled = vendorEffective
-        vendorAlertSetting.alpha = if (vendorEffective) 1f else 0.45f
+        vendorAlertSetting.alpha = if (vendorEffective) { 1f } else { 0.45f }
         vendorAlertSummary.text = if (vendorEffective) {
             "去系统设置铃声"
         } else if (snapshot.preference == com.smjcco.wxpusher.push.PushChannelPreference.VENDOR) {
@@ -308,7 +312,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
     private fun renderVendorSubscribe(snapshot: PushChannelSnapshot) {
         val guide = VendorSubscribeGuide.of(snapshot.vendorPlatform)
         val visible = guide != null && snapshot.effectiveChannel == PushChannel.VENDOR
-        vendorSubscribeRow.visibility = if (visible) View.VISIBLE else View.GONE
+        vendorSubscribeRow.visibility = if (visible) { View.VISIBLE } else { View.GONE }
         if (guide == null || !visible) {
             return
         }
@@ -321,7 +325,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         }
         vendorSubscribeState.text = text
         vendorSubscribeState.setTextColor(
-            ContextCompat.getColor(this, if (ready) R.color.check_success else R.color.check_error),
+            ContextCompat.getColor(this, if (ready) { R.color.check_success } else { R.color.check_error }),
         )
     }
 
@@ -332,7 +336,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
     private fun renderWsAlertSetting(snapshot: PushChannelSnapshot) {
         val wsEffective = snapshot.effectiveChannel == PushChannel.WEBSOCKET
         wsAlertSetting.isEnabled = wsEffective
-        wsAlertSetting.alpha = if (wsEffective) 1f else 0.45f
+        wsAlertSetting.alpha = if (wsEffective) { 1f } else { 0.45f }
         wsAlertSummary.text = if (wsEffective) {
             WsAlertStore.summary()
         } else {
@@ -347,7 +351,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
     private fun renderWsDependencyChecks(snapshot: PushChannelSnapshot) {
         val wsEffective = snapshot.effectiveChannel == PushChannel.WEBSOCKET
         wsDependencyActionsEnabled = wsEffective
-        wsDependencySection.visibility = if (wsEffective) View.VISIBLE else View.GONE
+        wsDependencySection.visibility = if (wsEffective) { View.VISIBLE } else { View.GONE }
         if (!wsEffective) {
             return
         }
@@ -372,7 +376,11 @@ class PushChannelSettingActivity : WxpBaseActivity() {
         wsDependencySummary.setTextColor(
             ContextCompat.getColor(
                 this,
-                if (completedCount == 3) R.color.check_success else R.color.check_error,
+                if (completedCount == 3) {
+                    R.color.check_success
+                } else {
+                    R.color.check_error
+                },
             ),
         )
     }
@@ -384,11 +392,15 @@ class PushChannelSettingActivity : WxpBaseActivity() {
     ) {
         val color = ContextCompat.getColor(
             this,
-            if (ready) R.color.check_success else R.color.check_error,
+            if (ready) {
+                R.color.check_success
+            } else {
+                R.color.check_error
+            },
         )
-        views.icon.setImageResource(if (ready) R.drawable.ic_done else R.drawable.ic_warning)
+        views.icon.setImageResource(if (ready) { R.drawable.ic_done } else { R.drawable.ic_warning })
         views.icon.imageTintList = ColorStateList.valueOf(color)
-        views.status.text = if (ready) readyText else "请设置"
+        views.status.text = if (ready) { readyText } else { "请设置" }
         views.status.setTextColor(color)
         views.icon.contentDescription = views.status.text
     }
@@ -502,6 +514,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
 
     private fun saveAutoStartConfirmation(confirmed: Boolean) {
         WxpSaveService.set(KEY_WS_AUTO_START_CONFIRMED, confirmed)
+        WsDiagnostics.logState("auto-start-confirmation")
         renderWsDependencyChecks(latestSnapshot ?: PushChannelCoordinator.getSnapshot())
     }
 
@@ -583,7 +596,7 @@ class PushChannelSettingActivity : WxpBaseActivity() {
     }
 
     companion object {
-        private const val KEY_WS_AUTO_START_CONFIRMED = "WsKeepAlive_AutoStartConfirmed"
+        private const val KEY_WS_AUTO_START_CONFIRMED = WsDiagnostics.AUTO_START_CONFIRMED_KEY
 
         fun start(context: Context) {
             context.startActivity(Intent(context, PushChannelSettingActivity::class.java))
