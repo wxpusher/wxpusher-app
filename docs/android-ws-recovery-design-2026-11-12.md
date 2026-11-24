@@ -107,6 +107,26 @@ SLS __time__/接收时间本次已出现延后，不能直接替代原事件时�
 - 离线同状态五分钟一条汇总；转折事件及时记录。失败风暴按预算保留首末、类型计数及省略条数，避免每次同类堆栈强制写盘。
 - 不自动修改线上SLS索引，初期复用msg检索，结构化索引单独评估。
 
+### 4.4 上次进程退出的系统描述
+
+Android 11（API 30）起，`WsDiagnostics` 在主进程下次启动时，将 `ApplicationExitInfo.description` 随「上次进程退出」写入 SLS 的 `msg`。描述复用诊断日志的脱敏和长度限制，缺失时记为 `null`。排查时按设备和上报记录里的 `previousPid`、`exitTimeMs` 对齐断开时间。
+
+2026-11-24 在 Android 15（API 35，构建 `AE3A.240806.036`）模拟器验证了 1.8.38 Prod Debug。三项界面操作均在系统界面完成，重新打开 App 后用 Logcat 读取实际日志，并用系统退出历史核对旧进程和子原因。下表的描述已还原日志中的 JSON 字符串转义。
+
+| 操作 | 系统子原因 | 下次启动记录的 `description` |
+|---|---|---|
+| 停掉前台保活服务，退到桌面，再从最近任务划掉 WxPusher | 22 | `[REMOVE TASK] remove task` |
+| 设置 → 应用信息 → 强行停止 → 确认 | 21 | `[FORCE STOP] stop com.smjcco.wxpusher due to from pid 1039 (com.android.settings)` |
+| 快捷设置 → 活跃应用 → 停止 WxPusher | 23 | `[STOP APP] fully stop com.smjcco.wxpusher/0 by user request` |
+| App 退到后台后执行 `adb shell am kill --user 0 com.smjcco.wxpusher` | 24 | `[KILL BACKGROUND] kill background` |
+| 启动或结束测试 instrumentation 时框架停掉目标进程 | 21 | `[FORCE STOP] stop com.smjcco.wxpusher due to start instr` 或 `[FORCE STOP] stop com.smjcco.wxpusher due to finished inst` |
+
+以上进程退出都记为 `REASON_USER_REQUESTED (10)`。前台保活服务运行时，另一轮划掉任务后进程仍存活，重开时 PID 相同，没有新的退出描述。任务移除回调只证明任务被移除。
+
+`[KILL BACKGROUND]` 也可由系统的后台进程清理接口触发。`[FORCE STOP]` 可来自设置、ADB 或测试框架，具体来源结合描述后缀判断。Android 14 以前，应用更新或组件状态变更导致的退出也可能记作 10。Android 14 引入了专门的 `PACKAGE_STATE_CHANGE (15)` 和 `PACKAGE_UPDATED (16)`。系统描述可能为空，文本会随版本及厂商实现变化，保留原始诊断证据供人工判断。
+
+来源：[Android ApplicationExitInfo](https://developer.android.com/reference/android/app/ApplicationExitInfo#REASON_USER_REQUESTED)、[AOSP 子原因文本](https://android.googlesource.com/platform/frameworks/base/+/HEAD/core/java/android/app/ApplicationExitInfo.java)、[AOSP ActivityManagerService](https://android.googlesource.com/platform/frameworks/base/+/master/services/core/java/com/android/server/am/ActivityManagerService.java)。
+
 ## 5. 能回答什么，不能回答什么
 
 |证据|能够报告|不能据此断言|
