@@ -35,6 +35,7 @@ import com.smjcco.wxpusher.push.PushChannelStore
 import com.smjcco.wxpusher.push.ws.keepalive.KeepWsAliveService
 import com.smjcco.wxpusher.utils.DeviceUtils
 import com.smjcco.wxpusher.utils.ThreadUtils
+import org.json.JSONObject
 
 /** 只在关键事件记录状态，不轮询、不采集网络地址或凭证。 */
 object WsDiagnostics : Application.ActivityLifecycleCallbacks {
@@ -211,7 +212,13 @@ object WsDiagnostics : Application.ActivityLifecycleCallbacks {
                 ApplicationExitInfo.REASON_PACKAGE_UPDATED -> "package-updated"
                 else -> "other"
             }
-            WxpLogUtils.i("WsDiagnostics", "上次进程退出,currentPid=${Process.myPid()},previousPid=${exit.pid},exitTimeMs=${exit.timestamp},reason=$reason(${exit.reason}),status=${exit.status},importance=${exit.importance}")
+            val description = exit.description?.takeIf { it.isNotBlank() }
+                ?.let { JSONObject.quote(safeError(it)) } ?: "null"
+            WxpLogUtils.i(
+                "WsDiagnostics",
+                "上次进程退出,currentPid=${Process.myPid()},previousPid=${exit.pid},exitTimeMs=${exit.timestamp}," +
+                    "reason=$reason(${exit.reason}),status=${exit.status},importance=${exit.importance},description=$description"
+            )
             WxpSaveService.set(EXIT_REPORTED_KEY, exit.timestamp.toString())
         }.onFailure {
             WxpLogUtils.w("WsDiagnostics", "读取进程退出原因失败,type=${it.javaClass.simpleName}")
